@@ -1866,9 +1866,9 @@ function bQuad(F,L,o){o=o||{};const c=F[0],d=F[1],e=F[2],g=new THREE.Group(),bod
   zBx(head,d,.09*L,.16*L,.07*L,-.12*L,.22*L,0,G.cone);zBx(head,d,.09*L,.16*L,.07*L,.12*L,.22*L,0,G.cone);
   const legs=[];for(let i=0;i<4;i++){const l=zPv(body,(i%2?.17:-.17)*L,.5*L,(i<2?.42:-.4)*L);zBx(l,d,.13*L,.52*L,.13*L,0,-.26*L,0);legs.push([l,i%3===0?0:Math.PI]);}
   const tail=zPv(body,0,.74*L,-.58*L);zBx(tail,c,.1*L,.1*L,.55*L,0,0,-.25*L);
-  if(o.mane)zBx(head,o.mane,.66*L,.64*L,.5*L,0,-.02*L,-.1*L,G.sph);
+  if(o.mane)zBx(head,o.mane,.34*L,.34*L,.26*L,0,-.04*L,-.12*L,G.sph);
   if(o.flame){const f=zGl(e,1.3*L,.8);f.position.set(0,.05*L,-.55*L);tail.add(f);if(o.mane){const f2=zGl(e,1.7*L,.5);f2.position.set(0,0,-.1*L);head.add(f2);}}
-  if(o.hump)zBx(body,c,.74*L,.58*L,.7*L,0,.92*L,.2*L,G.sph);
+  if(o.hump)zBx(body,c,.34*L,.26*L,.36*L,0,.92*L,.2*L,G.sph);
   if(o.rune){const r=zGl(e,.9*L,.7);r.position.set(0,1.0*L,0);body.add(r);}
   addShadow(g,1.3*L);return {g,body,head,legs,tail,h:1.5*L+.3,quad:1};}
 function bSkel(sk,mage){const el=hexOf(sk.E.color),bone=0xe3dac0,dk=0xa89e84,g=new THREE.Group(),body=zPv(g,0,0,0);
@@ -1946,13 +1946,13 @@ const summKind=(sk,cid)=>{const t=SUMM_CLS[cid];return t?t[sk.m]:SUMM_EL[sk.E.id
 const SKIND={
   golem:{n:1,hp:1.7,spd:3.9,reach:1.9,cd:1.1,life:18,sz:1,ct:1,tau:1,fr:3,name:(el,cx)=>cx==='necro'?'Костяной колосс':GOLN[el],d:'танк: притягивает врагов, бьёт кулаками, удар по земле оглушает',b:(sk,cx)=>bGolem(sk,cx)},
   bear:{n:1,hp:1.5,spd:5,reach:1.9,cd:1.0,life:16,sz:1,ct:1,tau:1,fr:3,name:el=>ADJM[el]+' медведь',d:'танк: ревом притягивает врагов, тяжёлые удары лапой отбрасывают',b:sk=>bQuad([0x6a4a30,0x3a2818,hexOf(sk.E.color)],1.35,{hump:1,rune:1})},
-  wolves:{n:3,hp:.55,spd:8.5,reach:1.3,cd:.75,life:14,sz:1,ct:1,fr:3.4,name:el=>ADJP[el]+' волки',d:'стая из 3 быстрых волков, укусы вызывают кровотечение',b:sk=>bQuad(FURS[sk.E.id],.85,{rune:0})},
+  wolves:{n:3,hp:.55,spd:8.5,reach:1.3,cd:.75,life:14,sz:1,ct:1,fr:3.4,name:el=>ADJP[el]+' волки',d:'стая из 3 быстрых волков, укусы вызывают кровотечение',b:sk=>bQuad(FURS[sk.E.id],1,{rune:0})},
   lion:{n:1,hp:1.1,spd:6.5,reach:1.8,cd:.9,life:15,sz:1,ct:1,fr:3.4,name:el=>ADJM[el]+' лев',d:'прыгает на врага; рык оглушает всех рядом',b:sk=>{const F=FURS[sk.E.id];return bQuad(sk.E.id==='fire'?[0xc4601a,0x5a2a10,F[2]]:F,1.15,{mane:sk.E.id==='fire'?0xe0701c:F[1],flame:sk.E.id==='fire'||sk.E.id==='storm'});}},
   treant:{n:1,hp:2,spd:2.6,reach:2,cd:1.6,life:18,sz:1,ct:1,fr:3,name:el=>ADJM[el]+' древень',d:'медленный и крепкий: корни сковывают врагов на 2 с',b:sk=>bTreant(sk)},
   skelwar:{n:3,hp:.45,spd:5.6,reach:1.4,cd:.85,life:14,sz:1,ct:1,fr:3.2,name:(el)=>el==='shadow'?'Скелеты-воины':ADJP[el]+' скелеты-воины',d:'отряд из 3 скелетов-воинов с мечами и щитами',b:sk=>bSkel(sk,0)},
   skelmage:{n:1,hp:.55,spd:4.5,reach:12,cd:1.3,life:14,sz:1,fr:3.4,name:el=>el==='shadow'?'Скелет-маг':'Скелет-маг '+GENE[el],d:'держится позади и стреляет магическими болтами',b:sk=>bSkel(sk,1)},
-  bonedrake:{n:1,hp:.9,spd:5,reach:8,cd:3,life:15,sz:1,fr:4,name:()=>'Костяной дракон',d:'парит над полем и дышит конусом стихии',b:sk=>bDrake(sk)},
-  imps:{n:3,hp:.3,spd:7,reach:1.1,cd:.8,life:11,sz:1,ct:1,fr:3.6,name:el=>ADJP[el]+' бесы',d:'стая из 3 бесов; взрываются при смерти',b:sk=>bImp(sk)},
+  bonedrake:{n:1,hp:.9,spd:5,reach:8,cd:3,life:15,sz:1.3,fr:4,name:()=>'Костяной дракон',d:'парит над полем и дышит конусом стихии',b:sk=>bDrake(sk)},
+  imps:{n:3,hp:.3,spd:7,reach:1.1,cd:.8,life:11,sz:1.4,ct:1,fr:3.6,name:el=>ADJP[el]+' бесы',d:'стая из 3 бесов; взрываются при смерти',b:sk=>bImp(sk)},
   infernal:{n:1,hp:2.2,spd:2.9,reach:2.4,cd:1.5,life:16,sz:1.7,ct:1,fr:4,name:el=>el==='fire'?'Инфернал':ADJM[el]+' инфернал',d:'падает метеором и оглушает; жжёт всех рядом, бьёт тяжело',b:sk=>bInfernal(sk)},
   elemental:{n:1,hp:.8,spd:5,reach:11,cd:2.1,life:14,sz:1,fr:3.6,name:el=>'Элементаль '+GENE[el],d:'парит и бьёт цепной молнией по 4 врагам',b:sk=>bElem(sk)},
   stormbird:{n:1,hp:.5,spd:9,reach:12,cd:1.5,life:13,sz:1,fr:4,name:el=>ADJF[el]+' птица',d:'кружит над врагами и бьёт молниями с неба',b:sk=>bBird(sk)},
@@ -2578,7 +2578,7 @@ AIX.b_heart=(en,dt,dx,dz,dist,sp)=>{
 let spawnT=1,ambT=0,mode='select';
 let MPon=false,MPH=false,MPG=false;const MP={role:null,peer:null,coop:false,combo:0,comboT:0,peerId:null,ping:0,nick:''};
 const input={gx:0,gy:0,jx:0,jy:0,attack:false,keys:{},moveTo:null,mouseAttack:false};
-const camYaw=Math.PI/4,camPitch=1.06;
+const camYaw=Math.PI/4;let camPitch=1.06;
 const camT=new THREE.Vector3();
 function updatePlayer(dt){
   P.invulnT-=dt;P.slowT-=dt;
