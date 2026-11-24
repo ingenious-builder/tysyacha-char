@@ -446,6 +446,71 @@ html[data-ui=tab] #mm{top:calc(var(--m) + var(--sat) + 70px);width:calc(92px * v
   #mpCombo{right:auto;left:calc(var(--sal) + 224px);top:calc(var(--m) + var(--sat) + 100px)}
 }
 @media (max-width:520px){.coop-modes{grid-template-columns:minmax(0,1fr)}}
+/* ---- лобби комнаты ---- */
+body.inlob #select{visibility:hidden}
+#coop.lob:not([hidden]){display:block;padding:0;background:none;pointer-events:none}
+#coop.lob #coopCard{display:block;position:absolute;inset:0;max-width:none;width:auto;max-height:none;overflow:visible;text-align:left;touch-action:none}
+.lobby{position:absolute;inset:0;pointer-events:none}
+.lob-top{position:absolute;left:0;right:0;top:0;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;padding:calc(10px + var(--sat)) calc(12px + var(--sar)) 0 calc(12px + var(--sal))}
+.lob-title b{display:block;font:700 22px/1.1 var(--f-display);color:var(--gold);text-shadow:0 2px 14px rgba(0,0,0,.7)}
+.lob-title small{color:var(--muted);font-size:12px}
+.lob-net{pointer-events:auto;position:relative;height:30px;padding:0 11px;border-radius:15px;border:1px solid var(--line);background:rgba(13,17,32,.62);font:500 12px var(--f-ui);color:var(--muted);display:flex;align-items:center;gap:6px;white-space:nowrap}
+.lob-net::before{content:'';position:absolute;inset:-8px -4px}
+.lob-net::after{content:'';width:7px;height:7px;border-radius:50%;background:#e5a84d;order:-1}
+.lob-net[data-v=p2p]::after{background:#7dff8a}.lob-net[data-v=relay]::after{background:#6cc8ff}
+.lob-diag{position:absolute;pointer-events:auto;right:calc(12px + var(--sar));top:calc(46px + var(--sat));max-width:min(420px,calc(100% - 24px));max-height:40%;overflow:auto;z-index:3;background:rgba(10,13,26,.95)}
+.lobtag{position:absolute;left:0;top:0;width:max-content;max-width:min(190px,44vw);pointer-events:none;will-change:transform}
+.lt{position:relative;display:grid;gap:1px;justify-items:center;text-align:center;padding:7px 11px 6px;border-radius:13px;border:1px solid var(--c,var(--line));background:rgba(13,17,32,.74);box-shadow:0 4px 18px rgba(0,0,0,.45)}
+.lt b{font:700 15px/1.2 var(--f-ui);color:var(--text);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lt span{font-size:12px;color:var(--c,var(--muted));font-weight:600}
+.lt small{font-size:11px;color:var(--gold)}
+.lt.me{box-shadow:0 0 0 1px rgba(242,196,107,.35),0 4px 18px rgba(0,0,0,.45)}
+.lt-chk{position:absolute;top:-13px;right:-9px;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font:700 14px/1 var(--f-ui);background:#2a3250;border:2px solid var(--line);color:var(--muted)}
+.lt.rdy .lt-chk{background:#2fbf71;border-color:#a8ffcf;color:#fff}
+.lt.empty{border-style:dashed;border-color:rgba(160,180,255,.45);background:rgba(13,17,32,.55)}
+.lt.empty b{color:#cdd8ff}
+.lt-btn{pointer-events:auto;margin-top:5px;min-height:44px;padding:0 16px;border-radius:12px;border:0;font:700 14px var(--f-ui);color:#2a1a05;background:linear-gradient(180deg,#ffe3a0,var(--gold))}
+.lob-panel{position:absolute;left:0;right:0;bottom:0;pointer-events:auto;display:grid;gap:8px;align-content:end;padding:26px calc(12px + var(--sar)) calc(10px + var(--sab)) calc(12px + var(--sal));background:linear-gradient(0deg,rgba(10,13,26,.97) 80%,rgba(10,13,26,0));touch-action:pan-y}
+.lob-cls{display:flex;gap:6px;overflow-x:auto;touch-action:pan-x;scrollbar-width:none;padding:2px 0}
+.lob-cls::-webkit-scrollbar{display:none}
+.lcl{flex:0 0 62px;min-height:64px;display:grid;justify-items:center;align-content:center;gap:3px;padding:5px 2px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--muted);font:500 10.5px/1.1 var(--f-ui)}
+.lcl .lci{display:grid;place-items:center;width:32px;height:32px;border-radius:10px;border:1px solid var(--c);background:color-mix(in srgb,var(--c) 20%,transparent)}
+.lcl .lci svg{width:18px;height:18px}
+.lcl .n{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lcl.on{border-color:var(--c);color:var(--text);background:color-mix(in srgb,var(--c) 22%,transparent)}
+.lob-modes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.lm{display:grid;gap:2px;align-content:center;min-height:54px;padding:8px 10px;border-radius:12px;border:1px solid var(--line);background:var(--panel-solid);color:var(--text);text-align:left}
+.lm b{font:700 14px/1.15 var(--f-display);color:var(--gold)}
+.lm small{font-size:11px;color:var(--muted)}
+.lm.on{border-color:var(--gold);background:rgba(242,196,107,.12)}
+.lob-lvl{display:grid;grid-template-columns:44px 1fr 44px;gap:8px;align-items:center;text-align:center}
+.lob-lvl button{height:44px;border-radius:12px;border:1px solid var(--line);background:var(--panel-solid);font:700 22px var(--f-ui);color:var(--gold)}
+.lob-lvl b{display:block;font:700 14px/1.2 var(--f-ui)}
+.lob-lvl small{display:block;font-size:11px;color:var(--muted);line-height:1.25}
+.lob-info{display:grid;gap:2px;padding:8px 12px;border-radius:12px;border:1px solid rgba(242,196,107,.35);background:rgba(242,196,107,.07);text-align:center}
+.lob-info b{font:700 15px var(--f-display);color:var(--gold)}
+.lob-info small{font-size:11px;color:var(--muted);line-height:1.25}
+.lob-warn{margin:0;text-align:center;font-size:12px;color:#ffd890}
+.lob-btns{display:flex;gap:8px;align-items:center}
+.lob-btns .btn,.lob-btns .big,.lob-btns .ghost{height:48px;min-width:0;margin:0}
+.lob-rdy{flex:1 1 0;font:700 15px var(--f-ui)}
+.lob-rdy.on{background:#1f7a4a;border-color:#a8ffcf;color:#fff}
+.lob-go{flex:1.4 1 0;min-width:0;padding:0 12px;font-size:16px}
+.lob-go.warn{background:linear-gradient(180deg,#ffb48a,#ff7a4d)}
+.lob-go:disabled{opacity:.45}
+.lob-wait{flex:1.4 1 0;text-align:center;color:var(--muted);font-size:13px}
+.lob-out{flex:0 0 auto;padding:0 14px}
+@media (orientation:landscape){
+  .lob-panel{left:auto;width:min(350px,44vw);top:0;padding-top:calc(48px + var(--sat));background:linear-gradient(270deg,rgba(10,13,26,.97) 82%,rgba(10,13,26,0));overflow-y:auto;align-content:end}
+  .lob-top{right:min(350px,44vw)}
+  .lob-net{position:fixed;top:calc(8px + var(--sat));right:calc(12px + var(--sar));z-index:4}
+  .lob-diag{right:calc(min(350px,44vw) + 8px)}
+}
+@media (max-height:420px){.lm small{display:none}.lm{min-height:48px}.lob-panel{gap:6px}.lcl{min-height:58px}}
+html[data-ui=tab] .lob-title b{font-size:30px}html[data-ui=tab] .lt b{font-size:19px}html[data-ui=tab] .lt span{font-size:15px}html[data-ui=tab] .lt small{font-size:13px}
+html[data-ui=tab] .lcl{flex-basis:84px;min-height:84px;font-size:13px}html[data-ui=tab] .lcl .lci{width:42px;height:42px}
+html[data-ui=tab] .lm b,html[data-ui=tab] .lob-lvl b{font-size:18px}html[data-ui=tab] .lm small,html[data-ui=tab] .lob-lvl small,html[data-ui=tab] .lob-info small{font-size:14px}
+html[data-ui=tab] .lob-btns .btn,html[data-ui=tab] .lob-btns .big,html[data-ui=tab] .lob-btns .ghost{height:58px;font-size:18px}
 
 @media (orientation:landscape){#verTag{right:auto;left:50%;transform:translateX(-50%);top:auto;bottom:calc(var(--sab) + 4px)}}
 @media (orientation:portrait) and (max-height:600px){.si-scroll{display:none}.sel-title p{display:none}}
@@ -2834,6 +2899,7 @@ let selVO=null,selVT=0,selOX=0,selOY=0,selOW=0,selOH=0;
 function selView(){const c=document.querySelector('#select>div:not([class])');if(!c||$('#select').hidden){selVO=null;return;}const r=c.getBoundingClientRect(),a=app.getBoundingClientRect();selVO={dx:(r.left+r.width/2)-(a.left+a.width/2),dy:(r.top+r.height/2)-(a.top+a.height/2),h:r.height};}
 function updateCamera(dt){
   const portrait=app.clientHeight>app.clientWidth;
+  if(mode==='select'&&LOB.on){lobCam();sky.position.copy(camera.position);moon.position.set(-25,60,18);moon.target.position.set(0,0,0);return;}
   if(mode==='select'){selVT-=dt;if(selVT<=0||!selVO){selVT=.25;selView();}
     const pitch=portrait?.32:.26;let d=portrait?7.4:6.2;const ty=portrait?.3:1;
     if(selVO&&portrait){const fovT=Math.tan(camera.fov*Math.PI/360);d=clamp(2.9*(H/Math.max(120,selVO.h))/(2*fovT),7.4,17);}
@@ -3406,6 +3472,7 @@ function renderQuality(){$('#qChips').innerHTML=QMODES.map(([k,l])=>chip(l,SAVE.
 $('#qChips').addEventListener('click',e=>{const b=e.target.closest('[data-q]');if(!b)return;SAVE.q=b.dataset.q;applyQuality(true);renderQuality();save();});
 function applyQuality(reset){const q=TEST?'low':SAVE.q;
   if(q==='high'||(q==='auto'&&reset)){Q.pp=true;Q.shadow=true;pr=PR_MAX;}else if(q==='mid'){Q.pp=true;Q.shadow=false;pr=Math.min(PR_MAX,1.25);}else if(q==='low'){Q.pp=false;Q.shadow=false;pr=Math.min(PR_MAX,1);}
+  if(TEST){Q.pp=false;Q.shadow=false;pr=1;}
   moon.castShadow=Q.shadow;renderer.setPixelRatio(pr);resize();}
 
 function renderTalents(){const free=tpFree();$('#tpFree').textContent=free;
@@ -3511,11 +3578,12 @@ function loop(now){
     updateTele(dt);updateEZ(dt);updateZones(dt);updateLoot(dt);updateFx(dt);updateAim();updateTargetRing();
     if(luQueue>0&&!luOpen&&!P.dead){luDelay-=dt;if(luDelay<=0)openLevelUp();}
     saveClock+=dt;if(saveClock>15){saveClock=0;save();}
-  } else if(mode==='select'){time+=dt;updateFx(dt);updateLater(dt);P.face=camYaw;animateHero(dt,false);
-    selFx-=dt;if(selFx<=0){selFx=1.6;const e=Math.random()<.65?EL[CLS.p]:EL[CLS.s];heroColor(ELEMENTS[e].color);P.castT=.35;ringBurst(e,0,0,2.6,22);fxGlow(0,0,2.2,ELEMENTS[e].color,.6,.8);elBurst(e,Math.sin(P.face)*.4,1.8,Math.cos(P.face)*.4,14);}
-    P.castT-=dt;if(Math.random()<.5){const c=CLS.color;const a=rand(0,TAU);emit(SPARK,Math.cos(a)*1.2,rand(0,.3),Math.sin(a)*1.2,0,rand(.6,1.6),0,c,1,-.5,.5);}}
+  } else if(mode==='select'){time+=dt;updateFx(dt);updateLater(dt);P.face=LOB.on?LOB.myFace:camYaw;animateHero(dt,false);
+    selFx-=dt;if(selFx<=0){selFx=1.6;const lx=LOB.on?LOB.myX:0,e=Math.random()<.65?EL[CLS.p]:EL[CLS.s];heroColor(ELEMENTS[e].color);P.castT=.35;ringBurst(e,lx,0,2.6,22);fxGlow(lx,0,2.2,ELEMENTS[e].color,.6,.8);elBurst(e,lx+Math.sin(P.face)*.4,1.8,Math.cos(P.face)*.4,14);}
+    P.castT-=dt;if(Math.random()<.5){const c=CLS.color;const a=rand(0,TAU);emit(SPARK,(LOB.on?LOB.myX:0)+Math.cos(a)*1.2,rand(0,.3),Math.sin(a)*1.2,0,rand(.6,1.6),0,c,1,-.5,.5);}}
   else if(P.dead){time+=dt;updateFx(dt);updateLater(dt);}
   else time+=dt*.3;
+  lobTick(dt);
   if(MPon)mpUpdate(dt);
   for(const f of WORLD_ANIM)f();
   updateGfx(paused&&mode!=='select'?0:dt);
@@ -3629,7 +3697,7 @@ function mpNetDetail(){
   return L.join('\n');}
 function mpRefreshNet(){
   const a=document.getElementById('mpNetSt'),b=document.getElementById('mpDiag');
-  if(a)a.textContent=mpNetLine();if(b&&!b.hidden)b.textContent=mpNetDetail();}
+  if(a)a.textContent=mpNetLine();if(b&&!b.hidden)b.textContent=mpNetDetail();lobRefreshNet();}
 function mpSend(o){if(MP.peerId)mpSendTo(o,MP.peerId);}
 async function mpOpen(role,code){
   mpCloseRoom();const gen=++mpOpenGen;
@@ -3686,7 +3754,7 @@ function mpPeerJoin(id){
 function mpPeerLeave(id){if(id!==MP.peerId)return;mpPeerGone('left');}
 function mpPeerGone(why){
   MP.verBad=null;if(MP.err==='ver')MP.err='';
-  const nick=MP.peer?MP.peer.nick:'Напарник';MP.peerId=null;
+  const nick=MP.peer?MP.peer.nick:'Напарник';MP.peerId=null;LOB.ready=false;LOB.confirmT=0;
   if(MP.peer){mpPeerModelDrop();MP.peer=null;}
   MP.status=MP.role==='host'?'waiting':'joining';MP.t0=performance.now();
   if(MP.active){
@@ -3704,7 +3772,7 @@ function mpVerMismatch(m){
 function mpGuestLost(){
   // хост пропал: ждём его возвращения по той же ссылке
   $('#coop').hidden=false;MP.err='lost';mpRenderLobby();syncPause();}
-function mpHello(){mpSend({t:'hi',n:mpNick(),c:CLS.id,l:RUN.on?S.lvl:1,ml:mastLvl(),g:S.gorge|0,r:MP.role,v:1,b:APP_BUILD});}
+function mpHello(){mpSend({t:'hi',n:mpNick(),c:CLS.id,l:RUN.on?S.lvl:1,ml:mastLvl(),g:S.gorge|0,r:MP.role,v:1,b:APP_BUILD});lobSend();}
 function mpTick(){
   const now=performance.now();
   if(!(mpTick.n=(mpTick.n||0)+1)%20&&!$('#coop').hidden)mpRefreshNet();
@@ -3764,16 +3832,17 @@ function mpOnMsg(m,id){
     case 'cho':mpChestOpened();break;
     case 'pl':break;
     case 'camp':if(TCC)TCC.onMsg(m);break;
+    case 'lob':mpOnLob(m);break;
   }
 }
-function mpOnFull(){MP.status='full';MP.err='Комната занята: там уже двое.';mpCloseRoom();mpRenderLobby();}
+function mpOnFull(){LOB.wasLinked=false;MP.status='full';MP.err='Комната занята: там уже двое.';mpCloseRoom();mpRenderLobby();}
 function mpOnHi(m){
   if(m.b!==APP_BUILD){mpVerMismatch(m);return;}
   if(MP.verBad){MP.verBad=null;MP.err='';mpRenderLobby();}
   const cls=CLASS_BY[m.c]?m.c:'pyro';
   const first=!MP.peer;
   if(first)MP.peer={ib:new Interp(),on:false,pos:new THREE.Vector3(),vel:new THREE.Vector3(),tx:0,tz:0,tf:0,dead:false,hp:100,maxHp:100,walk:0,castT:0,hero:null,lbl:null,placed:false,mv:0,sh:0,rp:0};
-  const pr=MP.peer;pr.nick=nickClean(m.n)||'Напарник';pr.cls=cls;pr.lvl=m.l|0||1;pr.ml=m.ml|0;pr.gorge=m.g|0;
+  const pr=MP.peer;if(first){pr.ready=false;pr.md='camp';pr.g=1;}pr.nick=nickClean(m.n)||'Напарник';pr.cls=cls;pr.lvl=m.l|0||1;pr.ml=m.ml|0;pr.gorge=m.g|0;
   MP.status=MP.active?'playing':'lobby';
   if(first&&MP.active&&MPH){/* гость вернулся, пока идёт игра: ждёт его «rdy» или сам войдёт */}
   if(first)mpHello();
@@ -3814,7 +3883,7 @@ function mpOnStart(m){
   mpApplyStart(m.p,m.g|0);}
 function mpApplyStart(play,g){
   mpSessionClear();mpNoSandbox();
-  MP.active=true;MP.play=play;MP.g=g;MP.status='playing';MP.wiped=false;
+  MP.active=true;MP.play=play;MP.g=g;MP.status='playing';MP.wiped=false;LOB.ready=false;if(MP.peer)MP.peer.ready=false;
   if(CLS)MP.myEl=EL[CLS.p];
   mpPeerModelMake();mpSelfLabel();
   $('#mpHud').hidden=false;
@@ -4286,6 +4355,9 @@ function mpRenderLobby(){
   if(mode==='select'&&MP._selRole!==MP.role){MP._selRole=MP.role;renderSelInfo();}
   const ov=$('#coop');if(ov.hidden)return;const c=$('#coopCard');
   const pr=MP.peer;let h='';
+  if(pr)LOB.wasLinked=true;
+  LOB.want=lobWant();ov.classList.toggle('lob',LOB.want);
+  if(LOB.want){lobRender(c);return;}
   if(!MP.role){
     h=`<h1>Играть вместе</h1><p>Кооператив на двоих: общие бои, нить между героями, реакции стихий, подъём напарника и сундук с наградой. Создай комнату и отправь другу ссылку.</p>
     <button class="big" data-a="create" type="button">Создать комнату</button>
@@ -4338,9 +4410,157 @@ $('#coopCard').addEventListener('click',e=>{
   else if(a==='hero'){$('#coop').hidden=true;if(MPon&&!MP.active){MPon=false;}if(MP.active&&mode==='game'){toSelect();}}});
 $('#coopCard').addEventListener('keydown',e=>{e.stopPropagation();if(e.key==='Enter'&&e.target.id==='codeIn'){const v=e.target.value.trim();if(v)mpJoin(v);}});
 $('#coopCard').addEventListener('keyup',e=>e.stopPropagation());
+// ---------- ЛОББИ КОМНАТЫ: два героя на постаментах, выбор героя, «Готов», режим, «В бой» ----------
+// 3D рисуется в общей сцене (режим 'select'), подписи и панель — HTML поверх. Сеть: лёгкое {t:'lob'} только при изменении.
+const LOB={on:false,want:false,ready:false,mode:'camp',lvl:0,ph:null,sil:null,ped:null,sig:'',mysig:'',myX:-1.75,peX:1.75,myFace:.3,confirmT:0,copiedT:0,wasLinked:false};
+const LOB_X=1.75,LOB_Y=.3,coopEl=$('#coop');
+const LOB_SILMAT=new THREE.MeshBasicMaterial({color:0x5b72b8,transparent:true,opacity:.3,depthWrite:false});
+function lobWant(){return !!MP.role&&mode==='select'&&!MP.verBad&&MP.err!=='lost'&&MP.status!=='error'&&MP.status!=='full'&&(!!MP.peer||LOB.wasLinked||MP.role==='host');}
+function campOpen(k){if(k<=1)return true;if(S&&S.sandbox)return true;const d=SAVE.camp&&SAVE.camp.d;return !!(d&&d[k-1]);}
+function campNext(){const d=SAVE.camp&&SAVE.camp.d;for(let k=1;k<=8;k++)if(!(d&&d[k]))return k;return 1;}
+function lobLv(k){return TCC&&TCC.LV?TCC.LV[clamp(k|0,1,8)-1]:null;}
+function lobBuild(){
+  if(LOB.ped)return;
+  const g=new THREE.Group();g.visible=false;scene.add(g);
+  const stone=lam(0x2b3350),stone2=lam(0x161b33);
+  for(const sx of [-1,1]){const p=new THREE.Group();p.position.x=sx*LOB_X;
+    const b=new THREE.Mesh(new THREE.CylinderGeometry(1.3,1.45,.3,40),stone);b.position.y=.15;p.add(b);
+    const t=new THREE.Mesh(new THREE.CylinderGeometry(1.12,1.12,.035,40),stone2);t.position.y=.31;p.add(t);
+    const ringM=new THREE.MeshBasicMaterial({color:0xffffff});const r=new THREE.Mesh(new THREE.TorusGeometry(1.2,.03,6,56),ringM);r.rotation.x=Math.PI/2;r.position.y=.32;p.add(r);
+    const glowM=new THREE.MeshBasicMaterial({map:glowTex,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,color:0xffffff,opacity:.5});
+    const gl=new THREE.Mesh(FXG.glow,glowM);gl.scale.set(4.4,1,4.4);gl.position.y=.06;p.add(gl);
+    p.userData={ringM,glowM};g.add(p);}
+  const big=new THREE.Mesh(new THREE.TorusGeometry(3.7,.02,6,90),new THREE.MeshBasicMaterial({color:0x6c8cff,transparent:true,opacity:.35}));big.rotation.x=Math.PI/2;big.position.y=.04;g.add(big);
+  LOB.ped=g;}
+function lobPedAt(x,col){const p=LOB.ped&&LOB.ped.children[x<0?0:1];if(!p)return;const c=col||new THREE.Color(0x5b72b8);p.userData.ringM.color.copy(c);p.userData.glowM.color.copy(c);p.userData.glowM.opacity=col?.55:.18;}
+function lobBurst(x,col,n){fxPillar(x,0,1.2,7,col,1);colBurst(col,x,1,0,40,5,1,-1);fxGlow(x,0,3.4,col,.9,.9);if(n>1){fxPillar(x,0,.8,10,WHITE,.6);colBurst(col,x,1.4,0,70,7,1.3,-1);}}
+function lobColorHero(h,c){if(h.rims)for(const u of h.rims)u.value.copy(c).lerp(WHITE,.4);h.orb.material.color.copy(c).lerp(WHITE,.3);h.halo.material.color.copy(c);h.pool.material.color.copy(c);}
+function lobMakePeer(cls){const c=CLASS_BY[cls],h=buildHero(c.look);lobColorHero(h,c.color);h.g.position.set(LOB.peX,LOB_Y,0);h.g.rotation.y=-Math.sign(LOB.peX)*.3;h.g.scale.setScalar(.01);
+  return {h,cls,c,castT:0,castAt:time+1.2,born:time};}
+function lobMakeSil(){const h=buildHero(CLASSES[0].look);
+  h.g.traverse(o=>{if(o.isMesh&&o.material!==shMat&&o.material!==h.pool.material&&o.material!==h.shieldM.material&&o!==h.orb)o.material=LOB_SILMAT;});
+  h.orb.visible=false;h.halo.visible=false;h.pool.visible=false;h.shieldM.visible=false;
+  h.g.position.set(LOB.peX,LOB_Y,0);h.g.rotation.y=-Math.sign(LOB.peX)*.3;return {h,sil:true};}
+function lobDrop(o){if(!o)return;const h=o.h;scene.remove(h.g);h.D.forEach(d=>d.dispose());h.halo.material.dispose();h.pool.material.dispose();h.shieldM.material.dispose();}
+function lobEnter(){
+  lobBuild();LOB.on=true;LOB.ped.visible=true;document.body.classList.add('inlob');
+  const host=MP.role==='host';LOB.myX=host?-LOB_X:LOB_X;LOB.peX=-LOB.myX;LOB.myFace=-Math.sign(LOB.myX)*.3;
+  LOB.sig='';LOB.mysig='';hero.g.position.y=LOB_Y;}
+function lobLeave(){
+  LOB.on=false;LOB.sig='';LOB.mysig='';if(LOB.ped)LOB.ped.visible=false;document.body.classList.remove('inlob');
+  lobDrop(LOB.ph);LOB.ph=null;lobDrop(LOB.sil);LOB.sil=null;
+  camera.clearViewOffset();resize();if(hero)hero.g.position.y=0;}
+function lobSync(){
+  const pr=MP.peer,want=pr?pr.cls:'-';
+  if(want!==LOB.sig){
+    const old=LOB.sig;LOB.sig=want;
+    if(LOB.ph){lobDrop(LOB.ph);LOB.ph=null;}
+    if(pr){if(LOB.sil){lobDrop(LOB.sil);LOB.sil=null;}LOB.ph=lobMakePeer(want);lobBurst(LOB.peX,CLASS_BY[want].color,old==='-'||old===''?2:1);lobPedAt(LOB.peX,CLASS_BY[want].color);}
+    else if(!LOB.sil){LOB.sil=lobMakeSil();lobPedAt(LOB.peX,null);}}
+  if(LOB.mysig!==CLS.id){const first=!LOB.mysig;LOB.mysig=CLS.id;lobPedAt(LOB.myX,CLS.color);if(!first)lobBurst(LOB.myX,CLS.color,1);}}
+function lobAnim(o,dt){
+  const h=o.h,t=time,e=Math.min(1,(time-o.born)/.55),s=e<1?1+2.2*Math.pow(e-1,3)+1.2*Math.pow(e-1,2):1;
+  h.g.scale.setScalar(Math.max(.01,s));h.g.position.y=LOB_Y;
+  const a=-Math.sign(LOB.peX)*.3-h.g.rotation.y;h.g.rotation.y+=a*Math.min(1,dt*10);
+  h.body.position.y=Math.sin(t*2+1)*.02;h.body.scale.y=1+Math.sin(t*2+1)*.012;
+  o.castT=Math.max(0,o.castT-dt);
+  if(time>o.castAt){o.castAt=time+1.6+Math.random()*.4;o.castT=.35;const el=Math.random()<.65?EL[o.c.p]:EL[o.c.s];lobColorHero(h,ELEMENTS[el].color);
+    ringBurst(el,LOB.peX,0,2.6,22);fxGlow(LOB.peX,0,2.2,ELEMENTS[el].color,.6,.8);elBurst(el,LOB.peX,1.8,0,14);}
+  const k=Math.min(1,dt*22),tR=o.castT>0?-1.5*(o.castT/.35)-.2:Math.sin(t*1.4)*.06,tL=Math.sin(t*1.4+1)*.05;
+  h.al+=(tL-h.al)*k;h.ar+=(tR-h.ar)*k;h.armL.rotation.x=h.al;h.armR.rotation.x=h.ar;
+  if(h.cape){h.cape.rotation.x=.1;const cp=h.cape.geometry.attributes.position,cb=h.capeBase;
+    for(let i=0;i<cp.count;i++){const bx=cb[i*3],by=cb[i*3+1],tt=Math.min(1,-by/1.1);cp.array[i*3]=bx*(1+.3*tt)+Math.sin(t*2.2+tt*3)*.035*tt;cp.array[i*3+2]=cb[i*3+2]+.08*tt+Math.sin(t*4.2-by*5+bx*3)*.07*tt;}cp.needsUpdate=true;}
+  h.orb.scale.setScalar(h.fists?.001:.1+(o.castT>0?.07:0)+Math.sin(t*5)*.01);h.halo.scale.setScalar(1+(o.castT>0?.8:0)+Math.sin(t*4)*.08);
+  h.pool.material.opacity=.22+(o.castT>0?.25:0);
+  if(Math.random()<.25){const c=o.c.color,an=rand(0,TAU);emit(SPARK,LOB.peX+Math.cos(an)*1.2,rand(0,.3),Math.sin(an)*1.2,0,rand(.6,1.6),0,c,1,-.5,.5);}}
+function lobAnimSil(dt){const o=LOB.sil,h=o.h;LOB_SILMAT.opacity=.24+.1*Math.sin(time*2.2);h.g.position.y=LOB_Y+Math.sin(time*1.6)*.05;h.body.position.y=Math.sin(time*2)*.02;}
+// камера: пара героев вписывается в свободную от панели область экрана
+const lobV=new THREE.Vector3();
+function lobCam(){
+  const land=W>H*1.05,pn=document.getElementById('lobPanel'),tp=document.getElementById('lobTop');
+  let x0=0,x1=W,y0=0,y1=H;
+  if(pn){const r=pn.getBoundingClientRect();if(land){x1=Math.min(x1,r.left);y0=46;y1=H-8;}else{y1=Math.min(y1,r.top+14);y0=tp?tp.getBoundingClientRect().bottom:50;}}
+  const rw=Math.max(120,x1-x0),rh=Math.max(120,y1-y0),fov=land?34:40,tn=Math.tan(fov*Math.PI/360);
+  const ppuW=rw*.92/6.0,ppuH=(rh-96)/3.0,ppu=Math.max(18,Math.min(ppuW,ppuH));
+  const d=clamp(Math.min(H/(2*tn*ppu),9.5),6,24),sway=Math.sin(time*.4)*.1,ly=1.3,fv=Math.min(78,2*Math.atan(H/(2*d*ppu))*180/Math.PI);
+  camera.fov=fv;camera.position.set(Math.sin(sway)*d,ly+1.0,Math.cos(sway)*d);camera.lookAt(0,ly,0);
+  const cx=(x0+x1)/2,py0=y1-.07*rh,cy=py0-ppu*ly;
+  camera.setViewOffset(W,H,-(cx-W/2),-(cy-H/2),W,H);
+  LOB.ppu=ppu;lobPlaceTags();}
+function lobPlaceTags(){
+  for(const [id,x] of [['lobTagL',-LOB_X],['lobTagR',LOB_X]]){const el=document.getElementById(id);if(!el)continue;
+    lobV.set(x,2.9,0).project(camera);const px=(lobV.x*.5+.5)*W,py=(-lobV.y*.5+.5)*H;
+    el.style.transform=`translate(${px.toFixed(1)}px,${py.toFixed(1)}px) translate(-50%,-100%)`;}}
+function lobTick(dt){
+  const want=LOB.want&&mode==='select'&&!coopEl.hidden;
+  if(want&&!LOB.on)lobEnter();else if(!want&&LOB.on)lobLeave();
+  if(!LOB.on)return;
+  lobSync();hero.g.position.x=LOB.myX;hero.g.position.y=LOB_Y;
+  if(LOB.ph)lobAnim(LOB.ph,dt);else if(LOB.sil)lobAnimSil(dt);}
+function lobSend(){if(!MP.peerId)return;mpSend({t:'lob',cls:CLS.id,ready:LOB.ready?1:0,nick:mpNick(),lvl:S.lvl,ml:mastLvl(),md:LOB.mode,g:LOB.lvl|0});}
+function mpOnLob(m){
+  const pr=MP.peer;if(!pr)return;
+  if(CLASS_BY[m.cls])pr.cls=m.cls;pr.nick=nickClean(m.nick)||pr.nick;pr.lvl=m.lvl|0||pr.lvl;pr.ml=m.ml|0;pr.ready=!!m.ready;
+  if(MP.role==='guest'){pr.md=m.md==='world'?'world':'camp';pr.g=clamp(m.g|0,1,8);}
+  if(!coopEl.hidden)mpRenderLobby();}
+function lobNetText(){const v=mpVia(),p=MP.ping?' · '+Math.round(MP.ping)+' мс':'';return (v==='p2p'?'P2P':v==='relay'?'Сервер':'…')+p;}
+function lobRefreshNet(){const a=document.getElementById('lobNet');if(a){a.textContent=lobNetText();a.dataset.v=mpVia();}}
+function lobTagHtml(i){
+  if(!i){
+    if(MP.role==='host')return `<div class="lt empty"><b>Ждём друга…</b><small>Место свободно</small><button class="lt-btn" data-l="invite" type="button">${performance.now()<LOB.copiedT?'Ссылка скопирована':'Пригласить'}</button></div>`;
+    return `<div class="lt empty"><b>Хозяин вышел</b><small>Ждём его возвращения…</small></div>`;}
+  const c=CLASS_BY[i.cls];
+  return `<div class="lt${i.ready?' rdy':''}${i.me?' me':''}" style="--c:${c.hex}"><div class="lt-chk">${i.ready?'✓':'…'}</div><b>${esc(i.nick)}</b><span>${esc(c.name)} · ${esc(c.role)}</span><small>${i.host?'Хозяин':'Гость'} · ур. ${i.lvl|0}${i.ml?' · мастерство '+(i.ml|0):''}${i.me?' · ты':''}</small></div>`;}
+function lobRender(c){
+  const pr=MP.peer,host=MP.role==='host';
+  const old=c.querySelector('.lob-cls'),sx=old?old.scrollLeft:0;
+  if(host&&!LOB.lvl){LOB.lvl=campNext();}
+  const me={nick:mpNick()||'—',cls:CLS.id,lvl:S.lvl,ml:mastLvl(),ready:LOB.ready,host,me:1};
+  const fr=pr?{nick:pr.nick,cls:pr.cls,lvl:pr.lvl,ml:pr.ml|0,ready:!!pr.ready,host:!host}:null;
+  const L=host?me:fr,R=host?fr:me;
+  const camp=(host?LOB.mode:(pr&&pr.md))!=='world',kk=host?LOB.lvl:(pr?pr.g||1:1),lv=lobLv(kk);
+  const cls=CLASSES.map(k=>`<button type="button" class="lcl${k.id===CLS.id?' on':''}" data-l="cls" data-c="${k.id}" style="--c:${k.hex}" aria-label="${esc(k.name)}"><span class="lci">${svg(k.icon)}</span><span class="n">${esc(k.name)}</span></button>`).join('');
+  let mid='';
+  if(host){
+    mid=`<div class="lob-modes"><button class="lm${camp?' on':''}" data-l="mode" data-m="camp" type="button"><b>Прохождение вдвоём</b><small>8 уровней с целями</small></button><button class="lm${camp?'':' on'}" data-l="mode" data-m="world" type="button"><b>Свободный мир</b><small>Открытая песочница</small></button></div>`;
+    if(camp&&lv)mid+=`<div class="lob-lvl"><button type="button" data-l="lvl" data-d="-1" aria-label="Предыдущий уровень">‹</button><div><b>Уровень ${lv.k} · ${esc(lv.name)}</b><small>${esc(lv.goal)}</small></div><button type="button" data-l="lvl" data-d="1" aria-label="Следующий уровень">›</button></div>`;}
+  else mid=pr?`<div class="lob-info"><small>Хозяин выбрал</small><b>${camp?'Прохождение вдвоём':'Свободный мир'}</b>${camp&&lv?`<small>Уровень ${lv.k} · ${esc(lv.name)} — ${esc(lv.goal)}</small>`:'<small>Открытая песочница, бродите вдвоём</small>'}</div>`:'';
+  const warn=host&&pr&&!pr.ready&&performance.now()<LOB.confirmT;
+  let btns=`<button type="button" class="btn lob-rdy${LOB.ready?' on':''}" data-l="rdy">${LOB.ready?'✓ Готов':'Готов'}</button>`;
+  if(host)btns+=`<button type="button" class="big lob-go${warn?' warn':''}" data-l="go" ${pr?'':'disabled'}>${!pr?'Ждём друга…':warn?'Всё равно в бой':'В бой'}</button>`;
+  else btns+=`<span class="lob-wait">${pr&&pr.ready?'Друг готов':pr?'Хозяин начнёт бой':'Ждём хозяина…'}</span>`;
+  btns+=`<button type="button" class="ghost lob-out" data-a="leave">Выйти</button>`;
+  c.innerHTML=`<div class="lobby"><div id="lobTop" class="lob-top"><div class="lob-title"><b>Комната ${esc(MP.code)}</b><small>${host?'Ты — хозяин':'Ты — гость'}</small></div><button type="button" class="lob-net" id="lobNet" data-a="diag" data-v="${mpVia()}">${esc(lobNetText())}</button></div>
+  <pre id="mpDiag" class="coop-diag lob-diag" ${mpDiag.open?'':'hidden'}>${esc(mpDiag.open?mpNetDetail():'')}</pre>
+  <div class="lobtag" id="lobTagL">${lobTagHtml(L)}</div><div class="lobtag" id="lobTagR">${lobTagHtml(R)}</div>
+  <div class="lob-panel" id="lobPanel"><div class="lob-cls">${cls}</div>${mid}${warn?'<p class="lob-warn">Друг ещё не готов. Нажми ещё раз, чтобы начать без него.</p>':''}<div class="lob-btns">${btns}</div></div></div>`;
+  const nc=c.querySelector('.lob-cls');if(nc){nc.scrollLeft=sx;if(!sx){const on=nc.querySelector('.on');if(on)nc.scrollLeft=Math.max(0,on.offsetLeft-nc.clientWidth/2+30);}}}
+function lobPickClass(id){
+  if(!CLASS_BY[id]||id===CLS.id)return;
+  selId=id;setClass(id);renderClasses();renderSelInfo();selFx=.3;save();LOB.ready=false;LOB.confirmT=0;lobSend();mpRenderLobby();}
+function lobGo(){
+  if(MP.role!=='host'||!MP.peer)return;
+  if(!MP.peer.ready&&performance.now()>=LOB.confirmT){LOB.confirmT=performance.now()+4500;mpRenderLobby();setTimeout(()=>{if(performance.now()>=LOB.confirmT){LOB.confirmT=0;if(!coopEl.hidden)mpRenderLobby();}},4700);return;}
+  LOB.confirmT=0;const camp=LOB.mode==='camp'&&TCC&&lobLv(LOB.lvl);
+  mpHostStart(camp?'camp':'world',camp?LOB.lvl:0);}
+function lobCopy(v){
+  const done=()=>{LOB.copiedT=performance.now()+3500;if(!coopEl.hidden)mpRenderLobby();setTimeout(()=>{if(!coopEl.hidden)mpRenderLobby();},3600);};
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(v).then(done).catch(()=>lobCopyOld(v,done));else lobCopyOld(v,done);}
+function lobCopyOld(v,done){const t=document.createElement('textarea');t.value=v;t.style.cssText='position:fixed;left:-999px;top:0';document.body.appendChild(t);t.select();try{document.execCommand('copy');}catch(e){}t.remove();done();}
+function lobInvite(){const v=mpUrl(MP.code);
+  if(navigator.share)navigator.share({title:'Тысяча чар',text:'Заходи ко мне в «Тысячу чар» — сыграем вдвоём!',url:v}).catch(()=>lobCopy(v));else lobCopy(v);}
+coopEl.addEventListener('click',e=>{
+  const b=e.target.closest('[data-l]');if(!b)return;const a=b.dataset.l;
+  if(a==='cls')lobPickClass(b.dataset.c);
+  else if(a==='rdy'){LOB.ready=!LOB.ready;LOB.confirmT=0;lobSend();mpRenderLobby();}
+  else if(a==='mode'&&MP.role==='host'){LOB.mode=b.dataset.m==='world'?'world':'camp';LOB.confirmT=0;lobSend();mpRenderLobby();}
+  else if(a==='lvl'&&MP.role==='host'){const d=+b.dataset.d;let k=LOB.lvl;for(let i=0;i<8;i++){k+=d;if(k<1||k>8){k=LOB.lvl;break;}if(campOpen(k))break;}if(k!==LOB.lvl){LOB.lvl=k;LOB.confirmT=0;lobSend();mpRenderLobby();}}
+  else if(a==='go')lobGo();
+  else if(a==='invite')lobInvite();});
+
 function mpLeaveRoom(){
   if(MP.active||MPon){MP.noEcho=false;if(mode==='game'){mpEndSession();toSelect();}else mpEndSession();}
-  mpSend({t:'bye'});mpCloseRoom();MP.role=null;MP.code='';MP.status='idle';MP.err='';MP.peer=null;
+  mpSend({t:'bye'});mpCloseRoom();LOB.wasLinked=false;LOB.ready=false;MP.role=null;MP.code='';MP.status='idle';MP.err='';MP.peer=null;
   $('#coop').hidden=true;if(mode==='select')renderSelInfo();}
 
 // ---------- запуск: ник и ссылка-приглашение ----------
