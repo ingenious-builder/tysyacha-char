@@ -469,7 +469,7 @@ html[data-ui=tab] #atk svg{width:calc(40px * var(--u));height:calc(40px * var(--
 html[data-ui=tab] .sk svg{width:calc(26px * var(--u));height:calc(26px * var(--u))}
 html[data-ui=tab] .sk .t{font-size:calc(15px * var(--u))}
 html[data-ui=tab] .sk .eb{width:20px;height:20px}html[data-ui=tab] .sk .eb svg{width:13px;height:13px}
-html[data-ui=tab] .sk .mb{font-size:11px}
+html[data-ui=tab] .sk .mb{font-size:12px}
 html[data-ui=tab] #joy{width:calc(100px * var(--u));height:calc(100px * var(--u));margin:calc(-50px * var(--u)) 0 0 calc(-50px * var(--u));
   left:calc(var(--m) * 2 + 50px * var(--u) + var(--sal));top:calc(100% - var(--m) * 2 - 50px * var(--u) - var(--sab))}
 html[data-ui=tab] #knob{width:calc(56px * var(--u));height:calc(56px * var(--u));margin:calc(-28px * var(--u)) 0 0 calc(-28px * var(--u))}
@@ -485,9 +485,11 @@ html[data-ui=tab] #mpHint{font-size:18px;padding:11px 22px;bottom:calc(var(--sab
   html[data-ui=tab] #topc{top:calc(var(--sat) + var(--m) + 104px);width:min(520px,calc(100% - 40px))}
   html[data-ui=tab] #toast{top:calc(var(--sat) + 270px)}
   html[data-ui=tab] #mpCard{top:calc(var(--sat) + 210px)}
-  html[data-ui=tab] #mpCombo{top:calc(var(--sat) + var(--m) + 110px)}
+  html[data-ui=tab] #mpCombo{top:auto;bottom:calc(var(--sab) + var(--m) + 222px * var(--u))}
   html[data-ui=tab] #mpHint{bottom:calc(var(--sab) + 460px)}
 }
+/* iPad: подсказка и связка не растягиваются панелью (top и bottom вместе); связка под карточкой напарника */
+@media (orientation:landscape){html[data-ui=tab] #toast{bottom:auto}html[data-ui=tab] #mpCombo{left:calc(var(--sal) + var(--m) + 24px);top:calc(var(--m) + var(--sat) + 150px * var(--u))}}
 /* мини-карта: только планшет, только свободный мир */
 #mm{display:none}
 html[data-ui=tab] #mm{display:block;position:absolute;pointer-events:none;width:calc(92px * var(--u));height:calc(92px * var(--u));right:calc(var(--m) + var(--sar));top:calc(var(--m) + var(--sat) + 70px);border-radius:50%;box-shadow:0 2px 12px #0008}
@@ -620,7 +622,7 @@ html[data-ui=tab] .sh-act .btn{min-width:150px}
 #upg .ut b{display:block;font:600 14px/1.25 var(--f-ui)}#upg .ut small{display:block;font-size:12px;color:var(--muted);margin-top:2px}
 #upg .ub{grid-column:1/-1;display:flex;gap:8px}#upg .ub .btn{flex:1;height:44px}
 @media (orientation:portrait){#upg{top:calc(var(--sat) + 268px)}}
-@media (orientation:landscape) and (max-height:520px){#upg{transform:translateX(-62%);width:min(360px,calc(100% - 330px))}}
+@media (orientation:landscape) and (max-height:520px){#upg{transform:translateX(-72%);width:min(340px,calc(100% - 370px))}}
 /* iPad, правки по рецензии 2 */
 html[data-ui=tab] .sel-left{background:linear-gradient(90deg,rgba(10,13,26,.96) 95%,rgba(10,13,26,0))}
 html[data-ui=tab] .sel-btns .btn{white-space:nowrap;padding:0 8px}
@@ -3664,6 +3666,7 @@ function mpOnStop(){ // хост вышел в меню
   MP.noEcho=true;mpEndSession();if(mode==='game')toSelect();MP.noEcho=false;
   MP.status='lobby';MP.err='';MP.notice='Хозяин комнаты вышел из игры. Он выберет уровень заново — игра начнётся сама.';$('#coop').hidden=false;mpRenderLobby();}
 function mpOnBye(){ // напарник вышел в меню, мы продолжаем одни
+  if(!MP.peer&&MP.role==='host'&&!MP.active){MP.verBad=null;if(MP.err==='ver')MP.err='';MP.status='waiting';}
   if(MP.peer){MP.peer.on=false;mpPeerModelDrop();}
   if(MP.active&&MPH){hint((MP.peer?MP.peer.nick:'Напарник')+' вышел в меню. Он может вернуться из «Играть вместе».',6);if(P.dead&&MP.down){MP.down=false;dieFull();}}
   mpRenderLobby();}
@@ -4095,6 +4098,7 @@ function mpRenderLobby(){
       <button class="coop-mode" data-a="mode-world" type="button"><b>Свободный мир</b><small>Открытый мир без цели: бродите вдвоём, охотьтесь, зовите боссов. Спокойная песочница.</small></button></div>${TCC?TCC.lobbyStrip():''}
       ${playing?'<button class="ghost" data-a="close" type="button">Вернуться в игру</button>':''}`;}
     else h+=`${MP.notice?'<p class="coop-note">'+esc(MP.notice)+'</p>':''}<p class="coop-wait"><span class="spin"></span>Хозяин комнаты выбирает режим. Игра начнётся сама.</p>${TCC?TCC.lobbyStrip():''}${playing?'<button class="ghost" data-a="close" type="button">Вернуться в игру</button>':''}`;
+    h+=mpNetBlock();
     h+=`<div class="coop-row"><button class="ghost" data-a="hero" type="button">Сменить героя</button><button class="ghost" data-a="leave" type="button">Выйти из комнаты</button></div>`;}
   c.innerHTML=h;}
 $('#coopCard').addEventListener('click',e=>{
