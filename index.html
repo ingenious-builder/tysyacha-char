@@ -128,10 +128,10 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 @media (max-width:600px){#kills,#autoTxt{display:none}.tbtn{padding:0 11px;gap:6px}#stats{width:calc(100% - 205px - env(safe-area-inset-left,0px) - env(safe-area-inset-right,0px));min-width:150px}}
 
 /* hero select */
-#select{position:absolute;inset:0;display:grid;grid-template-columns:minmax(250px,320px) 1fr minmax(260px,340px);pointer-events:none}
+#select{position:absolute;inset:0;padding-top:var(--sat);padding-bottom:var(--sab);display:grid;grid-template-columns:minmax(250px,320px) 1fr minmax(260px,340px);pointer-events:none}
 #select>*{min-height:0;min-width:0}
 .sel-left{pointer-events:auto;display:flex;flex-direction:column;gap:10px;padding:12px 14px 12px max(14px,env(safe-area-inset-left,0px));background:linear-gradient(90deg,rgba(10,13,26,.95) 72%,rgba(10,13,26,0))}
-.sel-right{pointer-events:auto;display:flex;flex-direction:column;gap:10px;padding:12px max(14px,env(safe-area-inset-right,0px)) 12px 14px;background:linear-gradient(270deg,rgba(10,13,26,.95) 72%,rgba(10,13,26,0));overflow-y:auto;touch-action:pan-y}
+.sel-right{pointer-events:auto;display:flex;flex-direction:column;gap:10px;padding:12px max(14px,env(safe-area-inset-right,0px)) 0 14px;background:linear-gradient(270deg,rgba(10,13,26,.95) 72%,rgba(10,13,26,0));overflow-y:auto;touch-action:pan-y}
 .sel-title h1{margin:0;font:700 30px/1 var(--f-display);color:var(--gold);text-shadow:0 4px 30px rgba(242,196,107,.25)}
 .sel-title p{margin:4px 0 0;font-size:13px;color:var(--muted)}
 .classes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;overflow-y:auto;touch-action:pan-y;padding-bottom:6px;align-content:start}
@@ -159,16 +159,27 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 .si-sig span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .si-prog{margin:0;font-size:12px;color:var(--gold)}
 .sel-right .big{width:100%}
+.sel-right .sel-btns{position:sticky;bottom:0;z-index:2;margin:0 -14px;padding:10px 14px 28px;background:linear-gradient(0deg,rgba(10,13,26,.98) 82%,rgba(10,13,26,0))}
+#verTag{position:absolute;right:max(10px,var(--sar));top:calc(var(--sat) + 2px);font:500 10px/1 var(--f-ui);color:var(--muted);opacity:.8;padding:6px 14px;pointer-events:auto;touch-action:manipulation;z-index:5}
+#updBar{position:absolute;left:50%;transform:translateX(-50%);top:calc(var(--sat) + 8px);z-index:60;display:flex;gap:10px;align-items:center;background:rgba(10,13,26,.96);border:1px solid var(--gold);border-radius:12px;padding:8px 12px;font-size:13px;box-shadow:0 6px 24px rgba(0,0,0,.5)}
+#updBar button{background:var(--gold);color:#1a1405;border:0;border-radius:8px;padding:6px 12px;font-weight:700}
+#diag{position:absolute;inset:0;z-index:70;display:grid;place-items:center;padding:max(16px,var(--sat)) 16px max(16px,var(--sab));background:rgba(5,8,18,.85)}
+#diag pre{margin:0;max-height:70vh;overflow:auto;white-space:pre-wrap;word-break:break-all;font:12px/1.4 monospace;background:#0d1120;border:1px solid var(--line);border-radius:10px;padding:10px;user-select:text;-webkit-user-select:text}
+#diag .bx{width:100%;max-width:420px;display:grid;gap:10px}
+#diag button{padding:10px;border-radius:10px;border:1px solid var(--line);background:#1a2140}
 .si-hint{margin:0;font-size:12px;color:var(--muted);line-height:1.4}
 .si-rolebar{margin:0;font-size:12px;color:var(--muted)}
 .si-nums{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:var(--muted)}
 .si-nums b{color:var(--text);font-weight:600;font-variant-numeric:tabular-nums}
 .si-role{font-weight:700}
 @media (orientation:portrait){
-  #select{grid-template-columns:minmax(0,1fr);grid-template-rows:auto 1fr auto}
-  .sel-left{background:linear-gradient(180deg,rgba(10,13,26,.95) 76%,rgba(10,13,26,0));padding:12px max(14px,env(safe-area-inset-right,0px)) 22px max(14px,env(safe-area-inset-left,0px))}
+  #select{display:flex;flex-direction:column}
+  #select>.sel-left{flex:none}
+  #select>div:not(.sel-left):not(.sel-right){flex:1 1 0;min-height:110px}
+  #select>.sel-right{flex:0 1 auto;min-height:0}
+  .sel-left{background:linear-gradient(180deg,rgba(10,13,26,.95) 76%,rgba(10,13,26,0));padding:max(12px,env(safe-area-inset-top,0px)) max(14px,env(safe-area-inset-right,0px)) 22px max(14px,env(safe-area-inset-left,0px))}
   .classes{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:66px;overflow-x:auto;overflow-y:hidden;touch-action:pan-x}
-  .sel-right{background:linear-gradient(0deg,rgba(10,13,26,.96) 82%,rgba(10,13,26,0));padding:22px max(14px,env(safe-area-inset-right,0px)) 14px max(14px,env(safe-area-inset-left,0px));max-height:54vh}
+  .sel-right{background:linear-gradient(0deg,rgba(10,13,26,.96) 82%,rgba(10,13,26,0));padding:22px max(14px,env(safe-area-inset-right,0px)) 0 max(14px,env(safe-area-inset-left,0px));overflow-y:auto}
   .si-sig,.si-stats{display:none}
 }
 @media (orientation:landscape) and (max-height:520px){.sel-title h1{font-size:24px}.si-desc{font-size:13px}.si-top h2{font-size:20px}.si-sig{display:none}}
@@ -411,6 +422,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
     </div>
     <div></div>
     <div class="sel-right" id="selInfo"></div>
+    <div id="verTag">v8.1</div>
   </div>
 
   <div id="lvlup" class="ov" hidden>
@@ -484,6 +496,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
             <div class="bd-actions"><button class="btn gold" id="randBuild" type="button">Случайный билд из изученных</button><button class="btn warn" id="clearBuild" type="button">Снять всё</button></div>
             <label class="toggle"><input type="checkbox" id="sandbox">Тестовый режим: все чары класса изучены, 50 слотов открыты, +30 очков талантов</label>
             <section style="margin-top:14px"><h3>Графика</h3><div class="chips" id="qChips"></div><p class="hint" id="qHint"></p></section>
+            <section style="margin-top:14px"><h3>Отступ снизу</h3><div class="chips"><button type="button" class="chip" id="botM">−</button><span id="botV" style="min-width:60px;text-align:center;align-self:center">0</span><button type="button" class="chip" id="botP">+</button></div><p class="hint">Если снизу тёмная полоса и кнопки обрезаны — добавь отступ (шаг 8).</p></section>
           </div>
         </div>
       </div>
@@ -2710,6 +2723,7 @@ $('#clearBuild').addEventListener('click',e=>{const b=e.currentTarget;if(!clearA
 const QMODES=[['auto','Авто'],['high','Высокая'],['mid','Средняя'],['low','Низкая']];
 function renderQuality(){$('#qChips').innerHTML=QMODES.map(([k,l])=>chip(l,SAVE.q===k,`data-q="${k}"`)).join('');
   $('#qHint').textContent=({auto:'Начинает с высокой и сама снижает, если телефон не тянет.',high:'Свечение, тени, полное разрешение.',mid:'Свечение без теней.',low:'Без свечения и теней, ниже разрешение.'})[SAVE.q]+' Сейчас: '+(Q.pp?'свечение':'без свечения')+', '+(Q.shadow?'тени':'без теней')+', масштаб '+pr.toFixed(2)+'.';}
+{const sh=()=>{$('#botV').textContent=botAdj()+' px';};sh();const st=d=>{try{localStorage.setItem('tcBot',String(Math.max(0,Math.min(120,botAdj()+d))));}catch(e){}sh();resize();};$('#botM').onclick=()=>st(-8);$('#botP').onclick=()=>st(8);}
 $('#qChips').addEventListener('click',e=>{const b=e.target.closest('[data-q]');if(!b)return;SAVE.q=b.dataset.q;applyQuality(true);renderQuality();save();});
 function applyQuality(reset){const q=SAVE.q;
   if(q==='high'||(q==='auto'&&reset)){Q.pp=true;Q.shadow=true;pr=PR_MAX;}else if(q==='mid'){Q.pp=true;Q.shadow=false;pr=Math.min(PR_MAX,1.25);}else if(q==='low'){Q.pp=false;Q.shadow=false;pr=Math.min(PR_MAX,1);}
@@ -2778,7 +2792,11 @@ $('#heroBtn').addEventListener('click',toSelect);
 // =====================================================================
 let paused=true,last=performance.now(),perfAcc=0,perfN=0,perfGood=0,W=1,H=1,saveClock=0;
 function syncPause(){paused=mode!=='game'||(!MPon&&(bookOpen||luOpen))||!$('#dead').hidden||!$('#win').hidden;}
-function fitApp(){const sa=navigator.standalone||matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches;const els=[document.documentElement,document.body,app];if(!sa){els.forEach(x=>{x.style.height='';x.style.bottom='';});return;}const h=Math.round(Math.min(innerHeight,window.visualViewport?visualViewport.height+visualViewport.offsetTop:innerHeight));els.forEach(x=>{x.style.bottom='auto';x.style.height=h+'px';});}
+function botAdj(){try{return Math.max(0,Math.min(120,+localStorage.getItem('tcBot')||0));}catch(e){return 0;}}
+function envPx(side){const d=document.createElement('div');d.style.cssText='position:absolute;visibility:hidden;pointer-events:none;padding-'+side+':env(safe-area-inset-'+side+',0px)';document.body.appendChild(d);const v=parseFloat(getComputedStyle(d)['padding'+side[0].toUpperCase()+side.slice(1)])||0;d.remove();return v;}
+function fitApp(){const sa=navigator.standalone||matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches;const els=[document.documentElement,document.body,app];const adj=botAdj();if(!sa&&!adj){els.forEach(x=>{x.style.height='';x.style.bottom='';});return;}let h=Math.round(Math.min(innerHeight,window.visualViewport?visualViewport.height+visualViewport.offsetTop:innerHeight));
+if(navigator.standalone&&/iPhone/.test(navigator.userAgent)&&innerHeight>=innerWidth&&innerHeight>=screen.height-2){h=screen.height-Math.max(47,envPx('top'));}
+h=Math.max(300,h-adj);els.forEach(x=>{x.style.bottom='auto';x.style.height=h+'px';});}
 function resize(){fitApp();W=app.clientWidth;H=app.clientHeight;renderer.setSize(W,H,false);camera.aspect=W/H;camera.fov=W<H?56:42;camera.updateProjectionMatrix();makeRT();
   }
 window.addEventListener('resize',resize);window.addEventListener('orientationchange',()=>setTimeout(resize,250));if(/[?&]dbg=1/.test(location.search)){const d=document.createElement('div');d.style.cssText='position:fixed;left:4px;top:40%;z-index:99;background:#000c;color:#0f0;font:12px monospace;padding:4px;pointer-events:none';document.body.appendChild(d);setInterval(()=>{d.textContent='inner '+innerWidth+'x'+innerHeight+' screen '+screen.width+'x'+screen.height+' app '+app.clientWidth+'x'+app.clientHeight+' sa '+(navigator.standalone?1:0)+' top '+app.getBoundingClientRect().top;},500);}
@@ -3511,6 +3529,43 @@ window.__tc={halfNear:()=>ENEMIES.forEach((e,i)=>{if(e.dead)return;e.hp=Math.rou
 try{window.claude&&window.claude.hot&&window.claude.hot.snapshot&&window.claude.hot.snapshot(()=>{save();return {SAVE:JSON.parse(JSON.stringify(SAVE))};});}catch(e){}
 const H_=window.claude&&window.claude.hot;
 if(H_&&H_.ready)H_.ready(start);else start((H_&&H_.data)||{});
+})();
+</script>
+<script>
+// версия, проверка обновлений и диагностика экрана
+(function(){
+const CUR='v8.1';let reg=null;
+const $=id=>document.getElementById(id);
+function showUpd(v){if($('updBar'))return;const b=document.createElement('div');b.id='updBar';b.innerHTML='<span>Есть обновление '+v+'</span><button type="button">Обновить</button>';b.querySelector('button').onclick=async()=>{b.firstChild.textContent='Обновляю…';try{if(reg)await reg.update();}catch(e){}try{const ks=await caches.keys();await Promise.all(ks.filter(k=>k.startsWith('tysyacha-char-')).map(k=>caches.delete(k)));}catch(e){}try{if(reg&&reg.waiting)reg.waiting.postMessage('skip');}catch(e){}location.reload();};($('app')||document.body).appendChild(b);}
+async function chk(){try{const r=await fetch('sw.js?'+Date.now(),{cache:'no-store'});const t=await r.text();const m=t.match(/VERSION\s*=\s*['"]([^'"]+)['"]/);if(m&&m[1]!==CUR)showUpd(m[1]);}catch(e){}}
+window.addEventListener('load',()=>{if('serviceWorker' in navigator)navigator.serviceWorker.getRegistration().then(r=>{reg=r||null;}).catch(()=>{});setTimeout(chk,1500);});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)chk();});
+function env(side){const d=document.createElement('div');d.style.cssText='position:absolute;visibility:hidden;pointer-events:none;padding-'+side+':env(safe-area-inset-'+side+',0px)';document.body.appendChild(d);const v=getComputedStyle(d)['padding'+side[0].toUpperCase()+side.slice(1)];d.remove();return v;}
+function diag(){
+  const vv=window.visualViewport,a=$('app');let bot='';try{bot=localStorage.getItem('tcBot');}catch(e){}
+  const L=['версия '+CUR,
+    'inner '+innerWidth+'x'+innerHeight,
+    'visualViewport '+(vv?(Math.round(vv.width*10)/10)+'x'+(Math.round(vv.height*10)/10)+' top '+vv.offsetTop+' left '+vv.offsetLeft+' scale '+vv.scale:'нет'),
+    'screen '+screen.width+'x'+screen.height+' avail '+screen.availWidth+'x'+screen.availHeight,
+    'dpr '+devicePixelRatio,
+    'standalone '+(navigator.standalone===true)+' / display-mode '+matchMedia('(display-mode: standalone)').matches,
+    'safe top '+env('top')+' bottom '+env('bottom')+' left '+env('left')+' right '+env('right'),
+    '#app '+(a?a.clientWidth+'x'+a.clientHeight+' top '+Math.round(a.getBoundingClientRect().top):'-'),
+    'doc '+document.documentElement.clientWidth+'x'+document.documentElement.clientHeight,
+    'отступ снизу '+bot,
+    'UA '+navigator.userAgent].join(String.fromCharCode(10));
+  const o=document.createElement('div');o.id='diag';
+  o.innerHTML='<div class="bx"><pre></pre><button type="button" data-c>Скопировать</button><button type="button" data-x>Закрыть</button></div>';
+  o.querySelector('pre').textContent=L;
+  o.querySelector('[data-x]').onclick=()=>o.remove();
+  o.querySelector('[data-c]').onclick=async e=>{
+    try{await navigator.clipboard.writeText(L);e.target.textContent='Скопировано';}
+    catch(x){const r=document.createRange();r.selectNodeContents(o.querySelector('pre'));const s=getSelection();s.removeAllRanges();s.addRange(r);try{document.execCommand('copy');e.target.textContent='Скопировано';}catch(y){e.target.textContent='Выдели текст и скопируй';}}
+  };
+  ($('app')||document.body).appendChild(o);
+}
+let n=0,tm=0;const vt=$('verTag');
+if(vt){vt.textContent=CUR;vt.addEventListener('click',()=>{n++;clearTimeout(tm);tm=setTimeout(()=>{n=0;},700);if(n>=3){n=0;diag();}});}
 })();
 </script>
 <script>

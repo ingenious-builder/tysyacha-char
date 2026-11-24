@@ -1,6 +1,6 @@
 // Сервис-воркер «Тысячи чар»: офлайн-кэш и обновление без залипания на старой версии.
 // При каждом выпуске меняй VERSION — старый кэш удалится, новая версия подхватится сама.
-const VERSION='v8';
+const VERSION='v8.1';
 const CACHE='tysyacha-char-'+VERSION;
 const CORE=['./','index.html','manifest.webmanifest','vendor/three.min.js','net-relay.js','vendor/trystero-nostr-0.21.5.js','icons/icon-192.png','icons/icon-512.png','icons/maskable-512.png','icons/apple-touch-icon.png'];
 self.addEventListener('install',e=>{
@@ -29,7 +29,7 @@ self.addEventListener('fetch',e=>{
   if(u.protocol!=='https:'&&u.protocol!=='http:')return;
   if(u.origin===location.origin){
     // страница и скрипты — сначала сеть (свежая версия), без сети — кэш
-    if(req.mode==='navigate'||u.pathname.endsWith('/')||u.pathname.endsWith('.html')||u.pathname.endsWith('sw.js')||u.pathname.endsWith('.webmanifest')){e.respondWith(netFirst(req,4000));return;}
+    if(req.mode==='navigate'||u.pathname.endsWith('/')||u.pathname.endsWith('.html')||u.pathname.endsWith('sw.js')||u.pathname.endsWith('.webmanifest')){e.respondWith(netFirst(req,8000));return;}
     e.respondWith(caches.match(req).then(m=>m||fetch(req).then(r=>{if(r&&r.ok){const cl=r.clone();caches.open(CACHE).then(c=>c.put(req,cl));}return r;})));
     return;
   }

@@ -1,3 +1,6 @@
 _check/
 node_modules/
 *.log
+_shots/
+_m.js
+_o.html
