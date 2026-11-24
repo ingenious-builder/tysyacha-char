@@ -60,6 +60,8 @@ function killLeft(filter){for(const en of X.ENEMIES){if(!en.dead&&!en.boss&&(!fi
 function alive(list){return !!(list&&list.some(e=>!e.dead));}
 function mkEnc(Z,i,z,kind,elite){Z.enc.push({z,i,done:false,elite:!!elite,kind:kind.split('+')[0],next:kind.split('+')[1]||null,units:[],second:false});Z.arenas.push({z:z+4,len:9,w:Z.th.aw});}
 function encCleared(e){return e.done&&(!e.next||e.second)&&e.units.length>0&&e.units.every(u=>u.dead);}
+function barsTick(){const Z=Zf();for(let i=0;i<Z.enc.length;i++){if(!CS.gt[i]&&encCleared(Z.enc[i]))openBar(i,i<Z.enc.length-1?['Засада разбита','Проход открыт']:null);}}
+function rearZ(){let z=1e9;for(const h of heroes())z=Math.min(z,hLocal(h).z);return z;}
 function addBar(Z,z){Z.cb.push({z});return Z.cb.length-1;}
 function applyBars(){const Z=Zf();if(!Z||!Z.cb||!CS)return;let z1=Z.L+1;for(let i=0;i<Z.cb.length;i++){if(!CS.gt[i]&&Z.cb[i].z-.7<z1)z1=Z.cb[i].z-.7;}Z.z1=z1;}
 function openBar(i,text){if(CS.gt[i])return;CS.gt[i]=1;sendNow();if(text)bn(text[0],text[1]);}
@@ -195,10 +197,10 @@ function platesTick(dt){
 
 // 5. Страж: мини-босс с тремя фазами
 LVL[5]={
- shape(Z){mkEnc(Z,0,30,'norm');mkEnc(Z,1,62,'ranged');Z.arenas.push({z:Z.bossZ+4,len:22,w:16});},
+ shape(Z){mkEnc(Z,0,30,'norm');mkEnc(Z,1,62,'ranged');for(const e of Z.enc)addBar(Z,e.z+18);Z.arenas.push({z:Z.bossZ+4,len:22,w:16});},
  begin(){CS.ph=0;CS.cn=3;},
  tick(dt){const Z=Zf();holdShield();
-  if(!H.bsp){if(leadZ()>Z.bossZ-16){bossSpawn('bonelord',.4,'Страж ущелья «'+Z.th.n+'»');CS.ph=1;sendNow();}return;}
+  if(!H.bsp){barsTick();if(leadZ()>Z.bossZ-16&&(rearZ()>Z.bossZ-40||leadZ()>Z.bossZ-6)){bossSpawn('bonelord',.4,'Страж ущелья «'+Z.th.n+'»');CS.ph=1;sendNow();}return;}
   const B=X.BOSS;
   if(!B){if(!CS.done){CS.ph=4;killLeft();setDone(['Страж повержен','Откройте сундук вдвоём и входите в портал']);}return;}
   const f=B.hp/B.maxHp;
@@ -209,7 +211,7 @@ LVL[5]={
  hud(){if(CS.done)return {g:'Страж повержен',s:'Откройте сундук и входите в портал',f:1};
   const B=X.BOSS;const f=B?clamp(B.hp/B.maxHp,0,1):CS.ph?0:1;
   if(CS.ph===0)return {g:'Дойдите до стража',s:'Впереди арена',f:0};
-  return {g:'Страж: фаза '+Math.min(3,Math.max(1,CS.ph))+' из 3',s:CS.sh?'Щит! Убейте прислужников':'Бейте стража и держитесь на плитах',f,b:!!CS.sh};}
+  return {g:'Страж: фаза '+Math.min(3,Math.max(1,CS.ph))+' из 3',s:CS.sh?'Щит! Убейте прислужников':'Бейте стража',f,b:!!CS.sh};}
 };
 
 // 6. Побег
@@ -254,10 +256,10 @@ function huntSpawn(i){H.sp++;const l=leadZ();let z=0;
 
 // 8. Финал
 LVL[8]={
- shape(Z){mkEnc(Z,0,28,'swarm');mkEnc(Z,1,56,'ranged');mkEnc(Z,2,84,'heavy',true);Z.arenas.push({z:Z.bossZ+4,len:24,w:18});},
+ shape(Z){mkEnc(Z,0,28,'swarm');mkEnc(Z,1,56,'ranged');mkEnc(Z,2,84,'heavy',true);for(const e of Z.enc)addBar(Z,e.z+18);Z.arenas.push({z:Z.bossZ+4,len:24,w:18});},
  begin(){CS.ph=0;CS.cn=3;H.cT=8;H.aT=18;H.lastCombo=0;},
  tick(dt){const Z=Zf();holdShield();
-  if(!H.bsp){if(leadZ()>Z.bossZ-16){bossSpawn('heart',.8,'Последний бой «'+Z.th.n+'»');CS.ph=1;sendNow();}return;}
+  if(!H.bsp){barsTick();if(leadZ()>Z.bossZ-16&&(rearZ()>Z.bossZ-40||leadZ()>Z.bossZ-6)){bossSpawn('heart',.8,'Последний бой «'+Z.th.n+'»');CS.ph=1;sendNow();}return;}
   const B=X.BOSS;
   if(!B){if(!CS.done){CS.ph=4;CS.cr=null;killLeft();setDone(['Хранитель повержен','Откройте сундук вдвоём и входите в портал']);}return;}
   const f=B.hp/B.maxHp,hs=heroes();
@@ -265,13 +267,13 @@ LVL[8]={
   if(CS.sh===2){const c=MPm.combo|0;if(c>H.lastCombo)CS.shc+=c-H.lastCombo;H.lastCombo=c;H.shT-=dt;
    if(CS.shc>=CS.shn){shieldOff(['Щит разбит','Реакция вдвоём сработала. Бейте!']);}
    else if(H.shT<=0){shieldOff(['Щит треснул','Бейте хранителя!']);}}
-  if(CS.ph===2&&!CS.sh&&f<=.35){CS.ph=3;B.spd*=1.2;B.dmg=Math.round(B.dmg*1.12);H.cT=5;bn('Сердце в ярости','Свет и плиты чередуются всё быстрее',true);}
+  if(CS.ph===2&&!CS.sh&&f<=.35){CS.ph=3;B.spd*=1.2;B.dmg=Math.round(B.dmg*1.12);H.cT=5;bn('Сердце в ярости','Круги света вспыхивают всё быстрее',true);}
   if(CS.ph>=2){circleTick(dt,B,hs);
    if(CS.ph===3){H.aT-=dt;if(H.aT<=0){H.aT=22;H.adds=addsAround(B,['wraith','mage','elemental'],3);}}}},
  hud(){if(CS.done)return {g:'Хранитель повержен',s:'Откройте сундук и входите в портал',f:1};
   const B=X.BOSS;const f=B?clamp(B.hp/B.maxHp,0,1):1;
   if(CS.ph===0)return {g:'Дойдите до арены хранителя',s:'Враги по пути держат ворота',f:0};
-  const s=CS.sh===2?'Щит стихий: общие реакции '+Math.min(CS.shn,CS.shc|0)+' / '+CS.shn:(CS.cr?'Сойдитесь в круге света!':'Плиты и круг света');
+  const s=CS.sh===2?'Щит стихий: общие реакции '+Math.min(CS.shn,CS.shc|0)+' / '+CS.shn:(CS.cr?'Сойдитесь в круге света!':(CS.ph>=2?'Ждите круг света':'Бейте хранителя'));
   return {g:'Хранитель сердца: фаза '+Math.min(3,Math.max(1,CS.ph))+' из 3',s,f,b:!!CS.cr};}
 };
 function circleTick(dt,B,hs){
@@ -485,6 +487,7 @@ const css=document.createElement('style');css.textContent=`
 @media (orientation:portrait){#mpHud.camp #mpCard{top:calc(var(--sat) + 168px)}#mpHud.camp #mpCombo{top:calc(var(--sat) + 172px)}}
 #campPull{position:absolute;left:50%;bottom:calc(var(--sab) + 18px);transform:translateX(-50%);pointer-events:auto;height:40px;padding:0 16px;border-radius:20px;border:1px solid rgba(242,196,107,.6);background:var(--panel);color:var(--gold);font:700 14px var(--f-ui);touch-action:manipulation}
 #campPull[hidden]{display:none}
+@media (orientation:portrait) and (max-width:600px){#campPull{left:calc(var(--m) + var(--sal));bottom:calc(var(--m) + var(--sab) + 116px);transform:none}}
 #campSel{z-index:30;background:rgba(9,12,24,.97)}
 #campSel .ov-card{max-width:760px}
 .camp-strip{display:flex;gap:5px;justify-content:center;flex-wrap:wrap;align-items:center;font-size:12px;color:var(--muted)}

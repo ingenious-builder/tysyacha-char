@@ -305,7 +305,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 .plus{flex:none;width:40px;height:40px;border-radius:10px;border:1px solid rgba(242,196,107,.6);background:transparent;color:var(--gold);font:700 22px/1 var(--f-ui)}
 .plus:disabled{opacity:.25;cursor:default}
 
-#sheet{position:absolute;inset:0;background:rgba(5,8,18,.6);display:flex;align-items:flex-end;justify-content:center;
+#sheet{position:absolute;inset:0;z-index:10;background:rgba(5,8,18,.6);display:flex;align-items:flex-end;justify-content:center;
   padding:max(12px,env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-right,0px)) max(12px,env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-left,0px))}
 .sh{width:100%;max-width:460px;max-height:100%;overflow-y:auto;background:var(--panel-solid);border:1px solid var(--line);border-radius:18px;padding:16px;display:grid;gap:12px;touch-action:pan-y}
 .sh-top{display:flex;gap:12px;align-items:center}
@@ -3134,6 +3134,7 @@ function mpOnMsg(m,id){
     case 'ka':break;
     case 'full':mpOnFull();break;
     case 'hi':mpOnHi(m);break;
+    case 'rs':if(MPH&&MP.active&&mode==='game'&&performance.now()-(MP.rsHostAt||0)>800){MP.rsHostAt=performance.now();mpHostResync2();}break;
     case 'rdy':if(MPH&&MP.active&&mode==='game'){if(MP.peer){MP.peer.on=true;mpPeerModelMake();}mpHostResync();}break;
     case 'start':mpOnStart(m);break;
     case 'stop':mpOnStop();break;
@@ -3212,6 +3213,12 @@ function mpApplyStart(play,g){
   $('#mpHud').hidden=false;
   if(play==='camp'&&TCC)TCC.start(g);else if(play==='gorge')startGorge(g);else startGame();
   syncPause();}
+// лёгкая досылка без перезапуска игры у гостя: гость увидел расхождение (потерялся 'sp' или 'k' после обрыва связи)
+function mpHostResync2(){
+  for(const en of ENEMIES){if(!en.dead)mpSend(mpSpawnMsg(en));}
+  if(GZ)mpSend({t:'gs',o:GZ.open?1:0,bs:GZ.bossSpawned?1:0});
+  if(TCC&&MP.play==='camp')TCC.resync();
+  if(MP.chest)mpSend({t:'ch',x:MP.chest.x,z:MP.chest.z});}
 function mpHostResync(){
   mpSend({t:'start',p:MP.play,g:MP.g,j:1});
   for(const en of ENEMIES){if(!en.dead)mpSend(mpSpawnMsg(en));}
@@ -3300,9 +3307,22 @@ function mpOnSnap(m){
     if(!en.tg)en.pos.set(x,0,z);
     if(!en.ib)en.ib=new Interp();en.ib.push(ts,x,z);
     en.tg={x,z,f:E[i+3]/100,fl:E[i+5],jy:E[i+6]/50};en.hp=hp;}
+  mpReconcile(E);
   MP.combo=m.cb|0;MP.comboT=m.ct||0;
   if(m.pl){MP.pl={a:{x:m.pl.a[0],z:m.pl.a[1]},b:{x:m.pl.b[0],z:m.pl.b[1]},p:m.pl.p,tl:m.pl.tl,oa:m.pl.oa,ob:m.pl.ob,need:3};}else MP.pl=null;
   if(MP.chest&&m.ch!=null)MP.chest.t=m.ch;}
+// сверка с хостом: снимок — полный список живых врагов. Потерянный 'sp' → просим досылку, потерянный 'k' → убираем «призрака»
+function mpReconcile(E){
+  const now=performance.now(),seen=new Set();let unk=false;
+  for(let i=0;i+6<E.length;i+=7){const u=E[i];seen.add(u);
+    if(!MP.byUid.has(u)){if(!MP.unkAt)MP.unkAt=new Map();if(!MP.unkAt.has(u))MP.unkAt.set(u,now);if(now-MP.unkAt.get(u)>900)unk=true;}
+    else if(MP.unkAt)MP.unkAt.delete(u);}
+  if(MP.unkAt)for(const u of [...MP.unkAt.keys()])if(!seen.has(u))MP.unkAt.delete(u);
+  if(unk&&now-(MP.rsAt||0)>1500){MP.rsAt=now;mpSend({t:'rs'});}
+  for(const [u,en] of [...MP.byUid]){
+    if(seen.has(u)){en.missAt=0;continue;}
+    if(!en.missAt){en.missAt=now;continue;}
+    if(now-en.missAt>1500){MP.byUid.delete(u);if(en===BOSS)BOSS=null;if(!en.dead){const k=ENEMIES.indexOf(en);if(k>=0)removeEnemy(k);}}}}
 function mpStepRemote(en,dt){
   en.flash-=dt;const t=en.tg;if(!t)return;
   const ox=en.pos.x,oz=en.pos.z;if(en.ib&&en.ib.at(ENEMY_DELAY,IP_OUT)){en.pos.x=IP_OUT.x;en.pos.z=IP_OUT.z;}else{en.pos.x=t.x;en.pos.z=t.z;}
