@@ -159,6 +159,10 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 .si-prog{margin:0;font-size:12px;color:var(--gold)}
 .sel-right .big{width:100%}
 .si-hint{margin:0;font-size:12px;color:var(--muted);line-height:1.4}
+.si-rolebar{margin:0;font-size:12px;color:var(--muted)}
+.si-nums{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:var(--muted)}
+.si-nums b{color:var(--text);font-weight:600;font-variant-numeric:tabular-nums}
+.si-role{font-weight:700}
 @media (orientation:portrait){
   #select{grid-template-columns:minmax(0,1fr);grid-template-rows:auto 1fr auto}
   .sel-left{background:linear-gradient(180deg,rgba(10,13,26,.95) 76%,rgba(10,13,26,0));padding:12px max(14px,env(safe-area-inset-right,0px)) 22px max(14px,env(safe-area-inset-left,0px))}
@@ -674,53 +678,54 @@ const REACT={},REACT_LIST=[];
 
 // 20 classes: primary element (5 active + 3 passive forms), secondary (1 active + 3 passive)
 const CLASSES=[
- {id:'pyro',name:'Пиромант',role:'Маг',p:'fire',s:'wind',pa:['bolt','nova','meteor','rain','beam'],pp:['aura','surge','brand'],sa:['blink'],sp:['orbit','trail','revenge'],hp:.9,mp:1.25,spd:1,diff:1,
+ {id:'pyro',name:'Пиромант',role:'Маг',p:'fire',s:'wind',pa:['bolt','nova','meteor','rain','beam'],pp:['aura','surge','brand'],sa:['blink'],sp:['orbit','trail','revenge'],hp:0.75,mp:1.35,spd:1,ban:['strike','whirl'],diff:1,
   desc:'Сжигает толпы огненными шарами и метеорами. Ветер даёт скачок и раздувает пламя в огненный смерч.',look:{body:'robe',c1:0x9a2e1c,c2:0xffb347,head:'wizard',hc:0x5a1a12,weapon:'staff',beard:0xe9e6f2,cape:0x5a1a12}},
- {id:'cryo',name:'Криомант',role:'Маг',p:'ice',s:'arcane',pa:['bolt','nova','beam','meteor','trap'],pp:['aura','orbit','brand'],sa:['blink'],sp:['surge','doom','revenge'],hp:.95,mp:1.2,spd:1,diff:1,
+ {id:'cryo',name:'Криомант',role:'Маг',p:'ice',s:'arcane',pa:['bolt','nova','beam','meteor','trap'],pp:['aura','orbit','brand'],sa:['blink'],sp:['surge','doom','revenge'],hp:0.78,mp:1.3,spd:1,ban:['strike','whirl'],diff:1,
   desc:'Замедляет и замораживает всё вокруг. Аркана возвращает ману и даёт телепорт.',look:{body:'robe',c1:0x3f6fb0,c2:0xdff4ff,head:'hood',hc:0x2a4a7a,eyes:0x9fe8ff,weapon:'staff',cape:0x1f3a66}},
- {id:'storm',name:'Громовержец',role:'Маг',p:'storm',s:'light',pa:['chain','bolt','meteor','rain','nova'],pp:['brand','surge','orbit'],sa:['beam'],sp:['aura','revenge','trail'],hp:.95,mp:1.15,spd:1.02,diff:1,
+ {id:'storm',name:'Громовержец',role:'Маг',p:'storm',s:'light',pa:['chain','bolt','meteor','rain','nova'],pp:['brand','surge','orbit'],sa:['beam'],sp:['aura','revenge','trail'],hp:0.75,mp:1.3,spd:1.02,ban:['strike','whirl'],diff:1,
   desc:'Цепные молнии и грозы с неба. Свет лечит и бьёт божественным лучом.',look:{body:'robe',c1:0x2c2f5a,c2:0xffe45c,head:'horned',hc:0x4a4f6a,weapon:'tome',beard:0x9aa0b0,eyes:0xffe45c}},
- {id:'plague',name:'Чумной лекарь',role:'Маг',p:'poison',s:'shadow',pa:['bolt','rain','trap','nova','beam'],pp:['aura','doom','trail'],sa:['summon'],sp:['brand','orbit','revenge'],hp:1,mp:1.1,spd:1,diff:2,
+ {id:'plague',name:'Чумной лекарь',role:'Маг',p:'poison',s:'shadow',pa:['bolt','rain','trap','nova','beam'],pp:['aura','doom','trail'],sa:['summon'],sp:['brand','orbit','revenge'],hp:0.8,mp:1.25,spd:1,ban:['strike','whirl'],diff:2,
   desc:'Травит всё живое: яд копится до 8 раз. Тьма лечит и призывает слугу.',look:{body:'coat',c1:0x2a2a2e,c2:0x9be84a,head:'beak',hc:0x1a1a1e,eyes:0x9be84a,weapon:'lantern'}},
- {id:'necro',name:'Некромант',role:'Призыватель',p:'shadow',s:'blood',pa:['summon','bolt','chain','nova','meteor'],pp:['doom','aura','orbit'],sa:['blink'],sp:['brand','revenge','surge'],hp:1,mp:1.15,spd:.98,diff:2,
+ {id:'necro',name:'Некромант',role:'Призыватель',p:'shadow',s:'blood',pa:['summon','bolt','chain','nova','meteor'],pp:['doom','aura','orbit'],sa:['blink'],sp:['brand','revenge','surge'],hp:0.85,mp:1.3,spd:0.98,ban:['strike','whirl'],diff:2,
   desc:'Армия теней и взрывы трупов. Кровь усиливает чары ценой здоровья.',look:{body:'robe',c1:0x241a33,c2:0xb07bff,head:'hood',hc:0x1a1226,eyes:0xb07bff,weapon:'scythe',cape:0x120c1c}},
- {id:'paladin',name:'Паладин',role:'Воин',p:'light',s:'earth',pa:['strike','nova','barrier','meteor','whirl'],pp:['aura','revenge','brand'],sa:['trap'],sp:['doom','orbit','trail'],hp:1.45,mp:.9,spd:.96,armor:.85,melee:true,diff:1,
+ {id:'paladin',name:'Паладин',role:'Танк',p:'light',s:'earth',pa:['strike','nova','barrier','meteor','whirl'],pp:['aura','revenge','brand'],sa:['trap'],sp:['doom','orbit','trail'],hp:1.45,mp:0.85,spd:0.96,armor:0.8,melee:true,diff:1,
   desc:'Танк с молотом и щитом. Свет лечит его в бою, каждый удар по нему возвращается врагу.',look:{body:'armor',c1:0xd8d2c0,c2:0xf2c46b,head:'helm',hc:0xd8d2c0,eyes:0xfff1b8,weapon:'hammer',shield:0xf2c46b,cape:0xe8e4d8}},
- {id:'geo',name:'Геомант',role:'Маг',p:'earth',s:'fire',pa:['meteor','nova','trap','beam','summon'],pp:['orbit','revenge','aura'],sa:['bolt'],sp:['doom','surge','brand'],hp:1.15,mp:1,spd:.97,diff:1,
+ {id:'geo',name:'Геомант',role:'Маг',p:'earth',s:'fire',pa:['meteor','nova','trap','beam','summon'],pp:['orbit','revenge','aura'],sa:['bolt'],sp:['doom','surge','brand'],hp:0.8,mp:1.25,spd:0.97,ban:['strike','whirl'],diff:1,
   desc:'Обвалы, каменные шипы и големы. Огонь плавит камень в магму.',look:{body:'robe',c1:0x6b4e33,c2:0xd39a5a,head:'bald',hc:0x6b4e33,weapon:'staff',beard:0x8a6a4a,cape:0x3f2e20}},
- {id:'windr',name:'Странник ветров',role:'Стрелок',p:'wind',s:'storm',pa:['bolt','blink','chain','rain','beam'],pp:['orbit','trail','brand'],sa:['nova'],sp:['surge','aura','doom'],hp:.95,mp:1,spd:1.14,diff:2,
+ {id:'windr',name:'Странник ветров',role:'Стрелок',p:'wind',s:'storm',pa:['bolt','blink','chain','rain','beam'],pp:['orbit','trail','brand'],sa:['nova'],sp:['surge','aura','doom'],hp:0.9,mp:1,spd:1.14,ban:['strike','whirl'],diff:2,
   desc:'Быстрый лучник: скачет, стягивает врагов вихрем и добивает грозой.',look:{body:'leather',c1:0x3e6b5a,c2:0x8ff5d2,head:'hood',hc:0x2f5246,eyes:0x8ff5d2,weapon:'bow',cape:0x2f5246}},
- {id:'hemo',name:'Гемомант',role:'Маг',p:'blood',s:'fire',pa:['bolt','nova','beam','barrier','chain'],pp:['doom','aura','surge'],sa:['meteor'],sp:['brand','trail','revenge'],hp:1.1,mp:1,spd:1,diff:3,
+ {id:'hemo',name:'Гемомант',role:'Маг',p:'blood',s:'fire',pa:['bolt','nova','beam','barrier','chain'],pp:['doom','aura','surge'],sa:['meteor'],sp:['brand','trail','revenge'],hp:0.8,mp:1.25,spd:1,ban:['strike','whirl'],diff:3,
   desc:'Платит здоровьем за огромный урон и возвращает его убийствами.',look:{body:'robe',c1:0x4a0f1a,c2:0xff3b5c,head:'hood',hc:0x2e0a10,eyes:0xff3b5c,weapon:'tome',cape:0x2e0a10}},
- {id:'arcan',name:'Арканист',role:'Маг',p:'arcane',s:'light',pa:['bolt','beam','chain','trap','blink'],pp:['orbit','surge','brand'],sa:['nova'],sp:['aura','doom','revenge'],hp:.9,mp:1.35,spd:1,diff:2,
+ {id:'arcan',name:'Арканист',role:'Маг',p:'arcane',s:'light',pa:['bolt','beam','chain','trap','blink'],pp:['orbit','surge','brand'],sa:['nova'],sp:['aura','doom','revenge'],hp:0.72,mp:1.5,spd:1,ban:['strike','whirl'],diff:2,
   desc:'Рикошеты, рунные мины и сферы. Почти никогда не остаётся без маны.',look:{body:'robe',c1:0x23306b,c2:0xf2c46b,head:'wizard',hc:0x1b2350,weapon:'tome',beard:0xd8d8e8,cape:0x1b2350}},
- {id:'bers',name:'Берсерк',role:'Воин',p:'blood',s:'earth',pa:['strike','whirl','blink','nova','barrier'],pp:['revenge','doom','trail'],sa:['meteor'],sp:['aura','brand','orbit'],hp:1.55,mp:.85,spd:1.05,armor:.9,melee:true,diff:1,
+ {id:'bers',name:'Берсерк',role:'Боец',p:'blood',s:'earth',pa:['strike','whirl','blink','nova','barrier'],pp:['revenge','doom','trail'],sa:['meteor'],sp:['aura','brand','orbit'],hp:1.15,mp:0.85,spd:1.05,armor:0.95,melee:true,diff:1,
   desc:'Врывается в толпу с двумя топорами. Чем чаще его бьют, тем сильнее он отвечает.',look:{body:'bare',c1:0x4a3020,c2:0x9a2a2a,skin:0xe0a882,head:'horned',hc:0x6a6a72,weapon:'axes',beard:0xa0522d}},
- {id:'dk',name:'Рыцарь смерти',role:'Воин',p:'shadow',s:'ice',pa:['strike','whirl','chain','summon','barrier'],pp:['revenge','aura','doom'],sa:['nova'],sp:['brand','orbit','trail'],hp:1.45,mp:.9,spd:.97,armor:.85,melee:true,diff:2,
+ {id:'dk',name:'Рыцарь смерти',role:'Танк',p:'shadow',s:'ice',pa:['strike','whirl','chain','summon','barrier'],pp:['revenge','aura','doom'],sa:['nova'],sp:['brand','orbit','trail'],hp:1.4,mp:0.85,spd:0.97,armor:0.85,melee:true,diff:2,
   desc:'Тёмный клинок и ледяная броня. Тянет жизнь из каждого удара.',look:{body:'armor',c1:0x2a2d3a,c2:0x8fdcff,head:'helm',hc:0x23252f,eyes:0x8fdcff,weapon:'sword',cape:0x1a1c26}},
- {id:'druid',name:'Друид',role:'Призыватель',p:'earth',s:'poison',pa:['summon','rain','trap','nova','meteor'],pp:['aura','orbit','trail'],sa:['bolt'],sp:['doom','brand','surge'],hp:1.2,mp:1.05,spd:1,diff:1,
+ {id:'druid',name:'Друид',role:'Призыватель',p:'earth',s:'poison',pa:['summon','rain','trap','nova','meteor'],pp:['aura','orbit','trail'],sa:['bolt'],sp:['doom','brand','surge'],hp:0.88,mp:1.2,spd:1,ban:['strike','whirl'],diff:1,
   desc:'Каменные големы, ядовитые споры и капканы. Самый живучий из магов.',look:{body:'robe',c1:0x3f5a2c,c2:0x9be84a,head:'antlers',hc:0x5a4030,weapon:'staff',beard:0x6b5a40,cape:0x2f4420}},
- {id:'hunter',name:'Ледяной охотник',role:'Стрелок',p:'ice',s:'wind',pa:['bolt','trap','rain','blink','chain'],pp:['brand','orbit','trail'],sa:['beam'],sp:['surge','doom','revenge'],hp:1,mp:1,spd:1.08,diff:2,
+ {id:'hunter',name:'Ледяной охотник',role:'Стрелок',p:'ice',s:'wind',pa:['bolt','trap','rain','blink','chain'],pp:['brand','orbit','trail'],sa:['beam'],sp:['surge','doom','revenge'],hp:0.9,mp:1,spd:1.08,ban:['strike','whirl'],diff:2,
   desc:'Пронзающие ледяные болты, капканы и метель.',look:{body:'leather',c1:0x5a6a78,c2:0xdff4ff,head:'hood',hc:0xb8c4cc,eyes:0x9fe8ff,weapon:'crossbow',cape:0x8a96a0}},
- {id:'assassin',name:'Ассасин',role:'Убийца',p:'shadow',s:'poison',pa:['strike','blink','whirl','trap','bolt'],pp:['brand','doom','trail'],sa:['chain'],sp:['orbit','aura','revenge'],hp:1,mp:.95,spd:1.18,melee:true,diff:3,
+ {id:'assassin',name:'Ассасин',role:'Ловкач',p:'shadow',s:'poison',pa:['strike','blink','whirl','trap','bolt'],pp:['brand','doom','trail'],sa:['chain'],sp:['orbit','aura','revenge'],hp:0.9,mp:0.95,spd:1.2,melee:true,diff:3,
   desc:'Скачет за спину и режет отравленными кинжалами. Хрупкий, но самый быстрый.',look:{body:'leather',c1:0x1e1b26,c2:0xb07bff,head:'hood',hc:0x14121a,eyes:0x9be84a,weapon:'daggers',cape:0x14121a}},
- {id:'shaman',name:'Шаман бури',role:'Призыватель',p:'storm',s:'earth',pa:['summon','chain','nova','rain','strike'],pp:['aura','orbit','brand'],sa:['trap'],sp:['revenge','surge','doom'],hp:1.1,mp:1.05,spd:1,diff:1,
+ {id:'shaman',name:'Шаман бури',role:'Призыватель',p:'storm',s:'earth',pa:['summon','chain','nova','rain','beam'],pp:['aura','orbit','brand'],sa:['trap'],sp:['revenge','surge','doom'],hp:0.88,mp:1.2,spd:1,ban:['strike','whirl'],diff:1,
   desc:'Духи бури, землетрясения и молнии с неба.',look:{body:'leather',c1:0x7a5a3a,c2:0xffe45c,head:'mask',hc:0xc89a5a,eyes:0xffe45c,weapon:'staff',cape:0x5a3f28}},
- {id:'monk',name:'Монах ветра',role:'Воин',p:'wind',s:'light',pa:['strike','whirl','blink','nova','beam'],pp:['revenge','surge','aura'],sa:['barrier'],sp:['orbit','brand','trail'],hp:1.2,mp:1,spd:1.15,armor:.92,melee:true,diff:2,
+ {id:'monk',name:'Монах ветра',role:'Боец',p:'wind',s:'light',pa:['strike','whirl','blink','nova','beam'],pp:['revenge','surge','aura'],sa:['barrier'],sp:['orbit','brand','trail'],hp:1.15,mp:1,spd:1.15,armor:0.92,melee:true,diff:2,
   desc:'Серии ударов, рывки и вихри. Свет лечит прямо посреди боя.',look:{body:'bare',c1:0xd9822b,c2:0xfff1b8,skin:0xe8b88f,head:'bald',hc:0xd9822b,weapon:'fists'}},
- {id:'lock',name:'Чернокнижник',role:'Призыватель',p:'fire',s:'shadow',pa:['summon','meteor','rain','chain','bolt'],pp:['doom','brand','aura'],sa:['beam'],sp:['orbit','surge','revenge'],hp:1,mp:1.15,spd:1,diff:2,
+ {id:'lock',name:'Чернокнижник',role:'Призыватель',p:'fire',s:'shadow',pa:['summon','meteor','rain','chain','bolt'],pp:['doom','brand','aura'],sa:['beam'],sp:['orbit','surge','revenge'],hp:0.85,mp:1.3,spd:1,ban:['strike','whirl'],diff:2,
   desc:'Призывает огненных бесов и обрушивает адское пламя.',look:{body:'robe',c1:0x2a1020,c2:0xff7a33,head:'horned',hc:0x1a0a14,eyes:0xff7a33,weapon:'tome',cape:0x1a0a14}},
- {id:'inq',name:'Инквизитор',role:'Стрелок',p:'light',s:'fire',pa:['bolt','beam','trap','strike','rain'],pp:['brand','revenge','surge'],sa:['nova'],sp:['aura','orbit','doom'],hp:1.1,mp:1,spd:1.02,diff:2,
+ {id:'inq',name:'Инквизитор',role:'Боец',p:'light',s:'fire',pa:['strike','whirl','bolt','trap','barrier'],pp:['brand','revenge','surge'],sa:['nova'],sp:['aura','orbit','doom'],hp:1.15,mp:0.95,spd:1.02,armor:0.9,melee:true,diff:2,
   desc:'Охотник на нечисть: святые печати, болты из арбалета и очищающий огонь.',look:{body:'coat',c1:0x2a2a2e,c2:0xf2c46b,head:'widehat',hc:0x1c1c20,weapon:'crossbow',cape:0x3a1a1a}},
- {id:'alch',name:'Алхимик',role:'Маг',p:'poison',s:'arcane',pa:['meteor','trap','bolt','chain','summon'],pp:['trail','brand','surge'],sa:['barrier'],sp:['aura','orbit','doom'],hp:1,mp:1.1,spd:1.03,diff:3,
+ {id:'alch',name:'Алхимик',role:'Маг',p:'poison',s:'arcane',pa:['meteor','trap','bolt','chain','summon'],pp:['trail','brand','surge'],sa:['barrier'],sp:['aura','orbit','doom'],hp:0.78,mp:1.3,spd:1.03,ban:['strike','whirl'],diff:3,
   desc:'Швыряет колбы, расставляет мины и варит ядовитые облака.',look:{body:'leather',c1:0x6b4a2e,c2:0x9be84a,head:'goggles',hc:0x3a2a1a,eyes:0x9be84a,weapon:'flask'}},
 ];
 // третья стихия класса: по характеру, даёт ещё 19 баз чар (всего 57 баз × 8 вариантов)
 const THIRD={pyro:'earth',cryo:'wind',storm:'wind',plague:'blood',necro:'poison',paladin:'fire',geo:'storm',windr:'ice',hemo:'shadow',arcan:'ice',bers:'fire',dk:'blood',druid:'wind',hunter:'earth',assassin:'blood',shaman:'wind',monk:'fire',lock:'blood',inq:'earth',alch:'fire'};
-const CLASS_BY={};CLASSES.forEach(c=>{CLASS_BY[c.id]=c;c.icon='w_'+c.look.weapon;
+const ROLES={'Маг':'Дальний бой, много маны, хрупкий','Призыватель':'Помощники в бою, средняя прочность','Стрелок':'Дальний бой и скорость','Ловкач':'Скорость и ближний бой, мало здоровья','Боец':'Ближний бой, крепкий','Танк':'Ближний бой, много здоровья и броня'};
+const CLASS_BY={};CLASSES.forEach(c=>{CLASS_BY[c.id]=c;c.icon='w_'+c.look.weapon;c.ban=new Set(c.ban||[]);
   c.t=THIRD[c.id];c.core=new Set([...c.pa.map(f=>[c.p,f]),...c.pp.map(f=>[c.p,f]),...c.sa.map(f=>[c.s,f]),...c.sp.map(f=>[c.s,f])].map(([e,f])=>EL[e]*NF+FORM[f]));
-  c.pairs=[];for(const e of [c.p,c.s,c.t])for(const F of FORMS)c.pairs.push([e,F.id]);
-  c.pool=new Set();for(const [e,f] of c.pairs)for(const m of MODS)c.pool.add(sid(e,f,m.id));
+  c.pairs=[];c.pairsAll=[];for(const e of [c.p,c.s,c.t])for(const F of FORMS){c.pairsAll.push([e,F.id]);if(!c.ban.has(F.id))c.pairs.push([e,F.id]);}
+  c.pool=new Set();c.poolAll=new Set();for(const [e,f] of c.pairsAll)for(const m of MODS){const id=sid(e,f,m.id);c.poolAll.add(id);if(!c.ban.has(f))c.pool.add(id);}
   c.color=ELEMENTS[EL[c.p]].color;c.hex=ELEMENTS[EL[c.p]].hex;});
 
 const BRANCHES=[{name:'Стихии',sub:'урон и реакции'},{name:'Стойкость',sub:'выживание и ближний бой'},{name:'Таинство',sub:'мана, призывы, пассивки'}];
@@ -778,7 +783,7 @@ function newChar(c){const s={lvl:1,xp:0,kills:0,ess:0,learned:[],ranks:{},talent
   s.learned=[...s.active,...s.passive].filter(v=>v!=null);return s;}
 function validChar(d,c){if(!d||!Array.isArray(d.active)||!Array.isArray(d.passive)||!Array.isArray(d.learned))return newChar(c);
   const s=newChar(c);s.lvl=clamp(d.lvl|0,1,99);s.xp=Math.max(0,+d.xp||0);s.kills=d.kills|0;s.ess=Math.max(0,d.ess|0);s.sandbox=!!d.sandbox;s.auto=d.auto===true;s.bosses=d.bosses|0;s.gorge=clamp(d.gorge|0,0,12);
-  s.learned=d.learned.filter(v=>c.pool.has(v));s.ranks=(d.ranks&&typeof d.ranks==='object')?d.ranks:{};s.talents=(d.talents&&typeof d.talents==='object')?d.talents:{};
+  s.learned=d.learned.filter(v=>c.poolAll.has(v));s.ranks=(d.ranks&&typeof d.ranks==='object')?d.ranks:{};s.talents=(d.talents&&typeof d.talents==='object')?d.talents:{};
   for(let i=0;i<8;i++){const v=d.active[i];s.active[i]=(v!=null&&c.pool.has(v)&&SKILLS[v].active)?v:null;}
   for(let i=0;i<42;i++){const v=d.passive[i];s.passive[i]=(v!=null&&c.pool.has(v)&&!SKILLS[v].active)?v:null;}
   const seenB=new Set();for(const a of [s.active,s.passive])for(let i=0;i<a.length;i++){if(a[i]==null)continue;const b=SKILLS[a[i]].bk;if(seenB.has(b))a[i]=null;else seenB.add(b);}
@@ -2347,7 +2352,7 @@ function updateHudSlots(){const n=activeSlots();
     s.b.setAttribute('aria-label',skName(sk));s.id=id;s.p=-1;s.t='';s.low=null;s.cdEl=s.b.querySelector('.cd');s.tEl=s.b.querySelector('.t');});
   const tot=EQUIPPED.size,cap_=activeSlots()+passiveSlots();
   $('#bookCount').textContent=tot+'/'+cap_;$('#tabBuildN').textContent=tot+'/'+cap_;
-  $('#tabLibN').textContent=(S.sandbox?CLS.pool.size:LEARNED.size)+'/'+CLS.pool.size;
+  $('#tabLibN').textContent=(S.sandbox?CLS.pool.size:[...LEARNED].filter(id=>CLS.pool.has(id)).length)+'/'+CLS.pool.size;
   const tf=tpFree();$('#tpBadge').hidden=!tf;$('#tpBadge').textContent=tf;$('#tabTalDot').hidden=!tf;}
 const hpI=$('#hpI'),shI=$('#shI'),mpI=$('#mpI'),xpI=$('#xpI'),hpT=$('#hpT'),mpT=$('#mpT'),lvNum=$('#lvNum'),hurtEl=$('#hurt'),killsEl=$('#kills'),essT=$('#essT'),bossbar=$('#bossbar'),threatEl=$('#threat'),bossI=$('#bossI'),threatI=$('#threatI'),gprogEl=$('#gprog'),gI=$('#gI');
 const hudCache={};
@@ -2428,12 +2433,13 @@ function renderClasses(){$('#classes').innerHTML=CLASSES.map(c=>{const sv=SAVE.c
 function renderSelInfo(){const c=CLASS_BY[selId],sv=SAVE.chars[c.id],E1=ELEMENTS[EL[c.p]],E2=ELEMENTS[EL[c.s]];const R=REACT[rkey(EL[c.p],EL[c.s])];
   const stat=(n,v,mx)=>`<div class="si-stat" style="--c:${c.hex}">${n}<div class="bar"><i style="transform:scaleX(${clamp(v/mx,.08,1).toFixed(2)})"></i></div></div>`;
   const sig=[[c.p,c.pa[0]],[c.p,c.pa[2]],[c.s,c.sa[0]],[c.p,c.pp[0]]].map(([e,f])=>{const sk=SKILLS[sid(e,f,'mighty')];return `<div><span class="ico${sk.active?'':' p'}" style="--c:${sk.E.hex}">${svg(sk.F.id)}</span><span>${sk.base} — ${sk.F.role.toLowerCase()}</span></div>`;}).join('');
-  $('#selInfo').innerHTML=`<div class="si-top"><span class="ico" style="--c:${c.hex}">${svg(c.icon)}</span><div><h2>${c.name}</h2><p>${c.role} · сложность ${diffDots(c.diff)}${c.melee?' · ближний бой':''}</p></div></div>
+  $('#selInfo').innerHTML=`<div class="si-top"><span class="ico" style="--c:${c.hex}">${svg(c.icon)}</span><div><h2>${c.name}</h2><p><b class="si-role" style="color:${c.hex}">${c.role}</b> · ${c.melee?'ближний бой':'дальний бой'} · сложность ${diffDots(c.diff)}</p></div></div>
   <div class="si-els"><span class="rchip" style="--c:${E1.hex}"><span class="dot"></span>${E1.name} — основная</span><span class="rchip" style="--c:${E2.hex}"><span class="dot"></span>${E2.name}</span>${R?`<span class="rchip"><b>${R.name}</b></span>`:''}</div>
   <p class="si-desc">${c.desc}</p>
-  <div class="si-stats">${stat('Здоровье',c.hp,1.55)}${stat('Мана',c.mp,1.35)}${stat('Скорость',c.spd,1.18)}</div>
+  <p class="si-rolebar">${ROLES[c.role]||''}</p><div class="si-nums"><span>Здоровье <b>${Math.round(120*c.hp)}</b></span><span>Мана <b>${Math.round(100*c.mp)}</b></span><span>Броня <b>${Math.round((1-(c.armor||1))*100)}%</b></span><span>Скорость <b>${Math.round(c.spd*100)}%</b></span></div>
+  <div class="si-stats">${stat('Здоровье',c.hp,1.5)}${stat('Мана',c.mp,1.5)}${stat('Броня',(1-(c.armor||1))*100+8,28)}${stat('Скорость',c.spd,1.2)}</div>
   <div class="si-sig">${sig}</div>
-  <p class="si-prog">${sv?`Уровень ${sv.lvl|0} · побед ${sv.kills|0} · изучено ${(sv.learned||[]).length} из ${c.pool.size}`:`Новый герой · ${c.pairs.length} видов чар, ${c.pool.size} вариантов`}</p>
+  <p class="si-prog">${sv?`Уровень ${sv.lvl|0} · побед ${sv.kills|0} · изучено ${(sv.learned||[]).filter(v=>c.pool.has(v)).length} из ${c.pool.size}`:`Новый герой · ${c.pairs.length} видов чар, ${c.pool.size} вариантов`}</p>
   <div class="sel-btns">${MP.joinCode&&!MPon?`<button class="big" id="selJoin" type="button">Присоединиться к комнате ${MP.joinCode}</button>`:''}<button class="${MP.joinCode&&!MPon?'btn':'big'}" id="selPlay" type="button">Свободный мир</button><button class="btn" id="selGorge" type="button">Ущелья · пройдено ${(sv&&sv.gorge)|0} из 12</button><button class="btn coop" id="selCoop" type="button">${MP.role?'Вернуться в комнату':'Играть вместе'}</button><button class="ghost" id="selNick" type="button">Ник: ${esc(mpNick()||'—')} · сменить</button></div>
   <p class="si-hint">Слева — ходьба. Справа — атака и чары: тап колдует сам, потяни от кнопки — прицел. Красное на земле — уходи.</p>`;
   $('#selPlay').addEventListener('click',startGame);$('#selGorge').addEventListener('click',openGorges);$('#selCoop').addEventListener('click',mpOpenLobby);$('#selNick').addEventListener('click',()=>nickAsk(true));const jb=$('#selJoin');if(jb)jb.addEventListener('click',()=>mpJoin(MP.joinCode));}
