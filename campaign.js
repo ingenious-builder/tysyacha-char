@@ -333,6 +333,7 @@ function finish(){
   winLocal(m);sendProg();}
 function winLocal(m){
   const Z=Zf();if(!Z||!CS)return;Z.won=true;CS.win=1;
+  if(X.runWon)X.runWon();
   const k=CS.k,c=LV[k-1],first=!!m.fs;
   const xp=Math.round(X.xpNeed(Math.max(1,X.S.lvl))*(first?.55:.25)*(1+.08*k)),ess=Math.round(40*k+(first?55*k:0)),sc=(first?2:1)+(first&&k===8?1:0);
   X.gainXp(xp);X.S.ess+=ess;for(let i=0;i<sc;i++)X.learnRandom();X.save();
