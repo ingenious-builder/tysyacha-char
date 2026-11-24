@@ -482,9 +482,10 @@ const css=document.createElement('style');css.textContent=`
 #campBox.warn{border-color:rgba(255,120,100,.7)}
 #campBox.warn .bar i{background:#ff7a5a}
 #mpHud.camp #mpCombo{top:calc(var(--m) + var(--sat) + 100px)}
-@media (orientation:portrait){#mpHud.camp #mpCombo{top:calc(var(--sat) + 196px)}}
+@media (orientation:portrait){#mpHud.camp #mpCard{top:calc(var(--sat) + 168px)}#mpHud.camp #mpCombo{top:calc(var(--sat) + 172px)}}
 #campPull{position:absolute;left:50%;bottom:calc(var(--sab) + 18px);transform:translateX(-50%);pointer-events:auto;height:40px;padding:0 16px;border-radius:20px;border:1px solid rgba(242,196,107,.6);background:var(--panel);color:var(--gold);font:700 14px var(--f-ui);touch-action:manipulation}
 #campPull[hidden]{display:none}
+#campSel{z-index:30;background:rgba(9,12,24,.97)}
 #campSel .ov-card{max-width:760px}
 .camp-strip{display:flex;gap:5px;justify-content:center;flex-wrap:wrap;align-items:center;font-size:12px;color:var(--muted)}
 .camp-strip i{font-style:normal;min-width:30px;padding:3px 5px;border-radius:8px;border:1px solid var(--line);background:var(--panel-solid);color:var(--muted);font-size:12px}
