@@ -351,22 +351,68 @@ html[data-ui=tab] #mm{top:calc(var(--m) + var(--sat) + 70px);width:calc(92px * v
 .toggle{display:flex;gap:12px;align-items:center;min-height:44px;font-size:14px;color:var(--muted);line-height:1.35}
 .toggle input{width:24px;height:24px;accent-color:var(--gold);flex:none}
 
-.tl-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:8px}
-.tl-pts{font:700 20px var(--f-display)}
-.tl-pts b{color:var(--gold)}
-.branches{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:16px}
-.branch{display:grid;gap:6px;align-content:start}
-.branch h3{margin:0;font:700 18px var(--f-display);display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
-.branch h3 small{font:500 12px var(--f-ui);color:var(--muted)}
-.node{display:flex;gap:10px;align-items:center;padding:9px 10px;border-radius:12px;background:rgba(255,255,255,.035);border:1px solid var(--line)}
-.node.locked{opacity:.45}
-.node.maxed{border-color:rgba(242,196,107,.45)}
-.node .nt{flex:1;min-width:0;display:grid;gap:2px}
-.node .nt b{font-weight:500;font-size:14px}
-.node .nt span{font-size:12px;color:var(--muted);line-height:1.3}
-.node .pts{font:500 12px var(--f-ui);color:var(--gold);font-variant-numeric:tabular-nums}
-.plus{flex:none;width:44px;height:44px;border-radius:10px;border:1px solid rgba(242,196,107,.6);background:transparent;color:var(--gold);font:700 22px/1 var(--f-ui)}
-.plus:disabled{opacity:.25;cursor:default}
+/* Таланты: всё на одном экране — сетка плиток «3 ветки × 5», нажатие на плитку = +1 очко, описание — одной строкой внизу */
+.tl{flex:1;min-height:0;width:100%;max-width:784px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr) auto auto;grid-template-rows:auto minmax(0,auto) auto;align-content:center;
+  grid-template-areas:"pts auto reset" "tg tg tg" "hint hint hint";gap:8px;padding:8px 12px 10px;overflow:hidden}
+.tl-pts{grid-area:pts;align-self:center;font:700 22px/1 var(--f-display);white-space:nowrap}
+.tl-pts b{color:var(--gold);font-variant-numeric:tabular-nums}
+.tl-pts.z b{color:var(--muted)}
+#tpAuto{grid-area:auto;min-width:78px}#tpReset{grid-area:reset;min-width:78px}
+.tg{grid-area:tg;min-height:0;display:grid;gap:6px 8px;
+  grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:auto repeat(5,minmax(0,112px));grid-auto-flow:column}
+.tb{display:flex;align-items:baseline;justify-content:center;gap:6px;min-width:0;overflow:hidden;white-space:nowrap;font:700 16px/1.15 var(--f-display);color:var(--c)}
+.tb i{font:500 13px var(--f-ui);font-style:normal;color:var(--muted);font-variant-numeric:tabular-nums}
+.tb i.on{color:var(--gold)}
+.tn{position:relative;min-width:0;min-height:44px;display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto auto auto;align-content:center;gap:3px 6px;
+  padding:6px 8px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--text);text-align:left;overflow:hidden}
+.tn .ti{display:grid;color:var(--c)}.tn svg{width:22px;height:22px}
+.tn .td{justify-self:end;align-self:center;display:flex;gap:3px;color:var(--muted)}
+.tn .td i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.16)}
+.tn .td i.f{background:var(--c)}
+.tn .td svg{width:15px;height:15px}
+.tn b{grid-column:1/-1;font:500 13px/1.15 var(--f-ui);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tn .tv{grid-column:1/-1;font:500 12px/1.15 var(--f-ui);color:var(--c);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}
+.tn .tv.z,.tn.lk .tv{color:var(--muted)}
+.tn.can{border-color:color-mix(in srgb,var(--c) 55%,transparent);background:color-mix(in srgb,var(--c) 11%,rgba(255,255,255,.03))}
+.tn.mx{border-color:var(--gold);box-shadow:inset 0 0 0 1px rgba(242,196,107,.35)}
+.tn.mx .td{font:700 11px/1 var(--f-ui);letter-spacing:.04em;color:var(--gold)}
+.tn.lk{opacity:.42}
+.tn.sel{box-shadow:0 0 0 2px rgba(238,240,255,.28)}.tn.mx.sel{box-shadow:inset 0 0 0 1px rgba(242,196,107,.35),0 0 0 2px rgba(238,240,255,.28)}
+.tn.bump{animation:tbump .18s ease-out}
+@keyframes tbump{50%{transform:scale(.94)}}
+.tn .pop{position:absolute;right:8px;bottom:6px;font:700 16px/1 var(--f-ui);color:var(--gold);text-shadow:0 1px 3px #000;pointer-events:none;animation:tpop .75s ease-out forwards}
+@keyframes tpop{0%{opacity:0;transform:translateY(8px) scale(.7)}25%{opacity:1;transform:translateY(0) scale(1.15)}100%{opacity:0;transform:translateY(-18px) scale(1)}}
+.tl-hint{grid-area:hint;margin:0;height:calc(2.7em);font-size:13px;line-height:1.35;color:var(--muted);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.tl-hint b{color:var(--text);font-weight:500}.tl-hint em{font-style:normal;color:var(--gold)}
+@media (orientation:landscape){
+  /* горизонтально: ветки строками, таланты слева направо */
+  .tl{max-width:1064px}
+  .tg{grid-template-columns:auto repeat(5,minmax(0,1fr));grid-template-rows:repeat(3,minmax(0,118px));grid-auto-flow:row}
+  .tb{flex-direction:column;align-items:flex-start;justify-content:center;gap:2px;padding-right:2px}
+}
+@media (orientation:landscape) and (max-height:430px){
+  .tl{gap:6px;padding:6px 12px 6px}
+  .tb{font-size:14px}
+  .tn{gap:2px 6px;padding:4px 6px}.tn svg{width:18px;height:18px}
+  .tn b{font-size:12.5px}.tn .tv{font-size:11.5px}
+  .tl-hint{font-size:12px}
+}
+/* узкие телефоны (Android 360, iPhone 5/SE1 320): мельче шрифт и поля, чтобы подписи плиток влезали целиком */
+@media (orientation:portrait) and (max-width:369px){
+  .tl{gap:6px;padding:6px 8px 8px}
+  .tg{gap:5px 6px}
+  .tb{font-size:14px}
+  .tn{gap:2px 4px;padding:5px 6px}.tn svg{width:19px;height:19px}
+  .tn b{font-size:12px}.tn .tv{font-size:11px}
+  .tl-hint{font-size:12px}
+}
+@media (orientation:portrait) and (max-width:339px){
+  .tl{padding:6px 6px 8px}.tg{gap:4px 4px}
+  .tn{padding:4px 5px}.tn svg{width:17px;height:17px}.tn .td{gap:2px}.tn .td i{width:6px;height:6px}
+  .tn b{font-size:11px}.tn .tv{font-size:10.5px;letter-spacing:-.01em}
+  .tl-hint{font-size:11.5px}
+}
+@media (hover:hover) and (pointer:fine){.tn:not(.lk):hover{filter:brightness(1.15)}}
 
 #sheet{position:absolute;inset:0;z-index:10;background:rgba(5,8,18,.6);display:flex;align-items:flex-end;justify-content:center;
   padding:max(12px,var(--sat)) max(12px,var(--sar)) max(12px,var(--sab)) max(12px,var(--sal))}
@@ -581,13 +627,13 @@ html[data-ui=tab] .cls .ico{width:46px;height:46px}html[data-ui=tab] .cls .ico s
 html[data-ui=tab] #verTag{font-size:13px;padding:8px 14px}
 #tip{position:absolute;z-index:80;pointer-events:none;max-width:min(320px,70vw);padding:8px 12px;border-radius:10px;background:rgba(10,13,26,.96);border:1px solid var(--gold);color:var(--text);font:500 14px/1.3 var(--f-ui);box-shadow:0 6px 24px #0008;opacity:0;transition:opacity .12s}
 #tip.on{opacity:1}#tip b{display:block;font-weight:700;color:var(--gold)}#tip kbd{font:600 12px var(--f-ui);padding:1px 6px;border:1px solid var(--line);border-radius:5px;margin-left:6px}
-@media (hover:hover) and (pointer:fine){button{cursor:pointer}.sk:hover,.tbtn:hover,.btn:hover,.big:hover,.ghost:hover,.cls:hover,.row:hover,.card:hover,.grow:hover,.tab:hover,.chip:hover,.node:hover .plus{filter:brightness(1.18)}}
+@media (hover:hover) and (pointer:fine){button{cursor:pointer}.sk:hover,.tbtn:hover,.btn:hover,.big:hover,.ghost:hover,.cls:hover,.row:hover,.card:hover,.grow:hover,.tab:hover,.chip:hover{filter:brightness(1.18)}}
 html.kb :focus-visible,html.pad :focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 html[data-ui=tab] #tip{font-size:16px;padding:10px 14px}
 /* iPad в узком окне (Split View 1/2, 1/3, Stage Manager): телефонная раскладка + мелкие поправки только для iPad */
 html.ipad:not([data-ui=tab]) .sel-title{padding-right:60px}html.ipad #select>#verTag{align-self:start;min-height:0;flex:none}html.ipad:not([data-ui=tab]) #verTag{padding:3px 8px}
 @media (max-width:640px){html.ipad:not([data-ui=tab]) #tabLibN,html.ipad:not([data-ui=tab]) #tabBuildN,html.ipad:not([data-ui=tab]) .bk-title{display:none}html.ipad:not([data-ui=tab]) .tabs{margin-left:0}}
-html[data-ui=tab] .si-top{padding-right:72px}html[data-ui=tab] .nv,html[data-ui=tab] .card .mb,html[data-ui=tab] .row .mb,html[data-ui=tab] .sh .mb,html[data-ui=tab] .nm .mb{font-size:13px}html[data-ui=tab] .bd small,html[data-ui=tab] .branch small,html[data-ui=tab] .branches small{font-size:14px}
+html[data-ui=tab] .si-top{padding-right:72px}html[data-ui=tab] .nv,html[data-ui=tab] .card .mb,html[data-ui=tab] .row .mb,html[data-ui=tab] .sh .mb,html[data-ui=tab] .nm .mb{font-size:13px}html[data-ui=tab] .bd small{font-size:14px}
 html[data-ui=tab] .si-top .ico{width:68px;height:68px}html[data-ui=tab] .si-top .ico svg{width:36px;height:36px}
 html[data-ui=tab] .si-top h2{font-size:32px}html[data-ui=tab] .si-top p{font-size:15px}
 html[data-ui=tab] .si-desc{font-size:17px}html[data-ui=tab] .si-rolebar,html[data-ui=tab] .si-nums,html[data-ui=tab] .si-hint,html[data-ui=tab] .si-prog{font-size:15px}
@@ -654,17 +700,21 @@ html[data-ui=tab] .ico{width:50px;height:50px}html[data-ui=tab] .ico svg{width:2
 html[data-ui=tab] .nm{font-size:18px}html[data-ui=tab] .nm i{font-size:15px}html[data-ui=tab] .meta{font-size:14px}html[data-ui=tab] .badge{font-size:13px}
 html[data-ui=tab] .bd{padding:20px}
 html[data-ui=tab] .bd-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,400px),1fr));gap:20px 34px}
-html[data-ui=tab] .bd h3,html[data-ui=tab] .branch h3{font-size:23px}
+html[data-ui=tab] .bd h3{font-size:23px}
 html[data-ui=tab] .hint{font-size:16px}
 html[data-ui=tab] .slots{grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:10px}
 html[data-ui=tab] .rchip,html[data-ui=tab] .react{font-size:16px}
 html[data-ui=tab] .react{padding:10px 14px}
 html[data-ui=tab] .toggle{font-size:16px}html[data-ui=tab] .toggle input{width:26px;height:26px}
 html[data-ui=tab] .bd-actions{gap:12px}
-html[data-ui=tab] .tl-pts{font-size:26px}
-html[data-ui=tab] .branches{grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:22px}
-html[data-ui=tab] .node{padding:12px 14px;gap:14px}html[data-ui=tab] .node .nt b{font-size:17px}html[data-ui=tab] .node .nt span{font-size:14px}html[data-ui=tab] .node .pts{font-size:14px}
-html[data-ui=tab] .plus{width:56px;height:56px;font-size:28px;border-radius:14px}
+html[data-ui=tab] .tl{gap:12px;padding:14px 20px 16px;max-width:940px}html[data-ui=tab] .tl-pts{font-size:30px}html[data-ui=tab] #tpAuto,html[data-ui=tab] #tpReset{min-width:110px}
+html[data-ui=tab] .tg{gap:10px 12px;grid-template-rows:auto repeat(5,minmax(0,140px))}
+html[data-ui=tab] .tb{font-size:21px}html[data-ui=tab] .tb i{font-size:16px}
+html[data-ui=tab] .tn{gap:5px 8px;padding:10px 12px;border-radius:15px}html[data-ui=tab] .tn svg{width:30px;height:30px}html[data-ui=tab] .tn .td svg{width:19px;height:19px}
+html[data-ui=tab] .tn .td{gap:4px}html[data-ui=tab] .tn .td i{width:10px;height:10px}html[data-ui=tab] .tn.mx .td{font-size:14px}
+html[data-ui=tab] .tn b{font-size:17px}html[data-ui=tab] .tn .tv{font-size:15px}html[data-ui=tab] .tn .pop{font-size:21px}
+html[data-ui=tab] .tl-hint{font-size:16px}
+@media (orientation:landscape){html[data-ui=tab] .tl{max-width:1220px}html[data-ui=tab] .tg{grid-template-rows:repeat(3,minmax(0,150px))}}
 html[data-ui=tab] .vchip{padding:11px 14px;font-size:15px;min-height:44px;border-radius:11px}
 html[data-ui=tab] .vars{gap:8px}
 html[data-ui=tab] #sheet{align-items:center}
@@ -826,10 +876,12 @@ html[data-ui=tab] .sk::after{font-size:15px;padding:3px 6px;border-radius:7px;ri
       </div>
     </section>
     <section id="tal" class="pane" hidden>
-      <div class="bd">
-        <div class="tl-head"><div class="tl-pts">Свободно очков: <b id="tpFree">0</b></div><button class="btn warn" id="tpReset" type="button">Сбросить таланты</button></div>
-        <p class="hint">Очко даётся за каждый уровень. Нижние таланты ветки открываются, когда в неё вложено 2, 4, 6 и 8 очков. Сброс бесплатный.</p>
-        <div class="branches" id="branches"></div>
+      <div class="tl">
+        <div class="tl-pts" id="tpPts">Очки: <b id="tpFree">0</b></div>
+        <button class="btn gold" id="tpAuto" type="button" aria-label="Раскидать все свободные очки по классу">Авто</button>
+        <button class="btn warn" id="tpReset" type="button">Сброс</button>
+        <div class="tg" id="branches" role="group" aria-label="Таланты"></div>
+        <p class="tl-hint" id="tpHint" aria-live="polite"></p>
       </div>
     </section>
     <div id="sheet" hidden><div class="sh" id="sh"></div></div>
@@ -1072,24 +1124,41 @@ const CLASS_BY={};CLASSES.forEach(c=>{CLASS_BY[c.id]=c;c.icon='w_'+c.look.weapon
   c.pool=new Set();c.poolAll=new Set();for(const [e,f] of c.pairsAll)for(const m of MODS){const id=sid(e,f,m.id);c.poolAll.add(id);if(!c.ban.has(f))c.pool.add(id);}
   c.color=ELEMENTS[EL[c.p]].color;c.hex=ELEMENTS[EL[c.p]].hex;});
 
-const BRANCHES=[{name:'Стихии',sub:'урон и реакции'},{name:'Стойкость',sub:'выживание и ближний бой'},{name:'Таинство',sub:'мана, призывы, пассивки'}];
+const BRANCHES=[{name:'Стихии',sub:'урон и реакции',c:'#ff8a3d'},{name:'Стойкость',sub:'выживание и ближний бой',c:'#6fd08c'},{name:'Таинство',sub:'мана, призывы, пассивки',c:'#b58cff'}];
 const TALENTS=[
- {b:0,id:'power',  name:'Сила стихий',      max:5, d:v=>`+${v*6}% урона всех чар`},
- {b:0,id:'cdr',    name:'Перегрев',         max:5, d:v=>`перезарядка короче на ${v*4}%`},
- {b:0,id:'crit',   name:'Критическая масса',max:5, d:v=>`+${v*4}% шанс крита ×2`},
- {b:0,id:'reso',   name:'Гармония',         max:3, d:v=>`резонанс ${3+v}% за чары стихии`},
- {b:0,id:'react',  name:'Катализ',          max:3, d:v=>`реакции сильнее на ${v*25}%`},
- {b:1,id:'vit',    name:'Живучесть',        max:5, d:v=>`+${v*10}% здоровья`},
- {b:1,id:'armor',  name:'Каменная кожа',    max:5, d:v=>`входящий урон −${v*5}%`},
- {b:1,id:'regen',  name:'Восстановление',   max:3, d:v=>`+${v*2} здоровья в секунду`},
- {b:1,id:'leech',  name:'Жажда',            max:3, d:v=>`${v*2}% урона возвращается здоровьем`},
- {b:1,id:'wrath',  name:'Ярость',           max:3, d:v=>`ближний бой, скачки, вихри и ответы +${v*20}% урона`},
- {b:2,id:'mana',   name:'Поток маны',       max:5, d:v=>`+${v*10}% маны и её восстановления`},
- {b:2,id:'summ',   name:'Повелитель духов', max:3, d:v=>`призывы +${v*20}% урона, лимит +${v}`},
- {b:2,id:'luck',   name:'Метки судьбы',     max:5, d:v=>`клейма срабатывают на ${v*3}% чаще`},
- {b:2,id:'cascade',name:'Каскад',           max:3, d:v=>`ауры, кары, следы и ловушки +${v*15}% урона и радиуса`},
- {b:2,id:'orbit',  name:'Свита',            max:3, d:v=>`+${v} сфера каждому спутнику, их урон +${v*15}%`},
+ {b:0,id:'power',  name:'Сила стихий',      max:5, d:v=>`+${v*6}% урона всех чар`, ic:'power', s:v=>`+${v*6}% урон`},
+ {b:0,id:'cdr',    name:'Перегрев',         max:5, d:v=>`перезарядка короче на ${v*4}%`, ic:'cdr', s:v=>`−${v*4}% перезар.`},
+ {b:0,id:'crit',   name:'Критическая масса',max:5, d:v=>`+${v*4}% шанс крита ×2`, ic:'crit', sn:'Крит. масса', s:v=>`+${v*4}% крит`},
+ {b:0,id:'reso',   name:'Гармония',         max:3, d:v=>`резонанс ${3+v}% за чары стихии`, ic:'reso', s:v=>`резонанс ${3+v}%`},
+ {b:0,id:'react',  name:'Катализ',          max:3, d:v=>`реакции сильнее на ${v*25}%`, ic:'react', s:v=>`+${v*25}% реакции`},
+ {b:1,id:'vit',    name:'Живучесть',        max:5, d:v=>`+${v*10}% здоровья`, ic:'vit', s:v=>`+${v*10}% здоровья`},
+ {b:1,id:'armor',  name:'Каменная кожа',    max:5, d:v=>`входящий урон −${v*5}%`, ic:'armor', sn:'Камнекожа', s:v=>`защита +${v*5}%`},
+ {b:1,id:'regen',  name:'Восстановление',   max:3, d:v=>`+${v*2} здоровья в секунду`, ic:'regen', sn:'Регенерация', s:v=>`+${v*2} здоровья/с`},
+ {b:1,id:'leech',  name:'Жажда',            max:3, d:v=>`${v*2}% урона возвращается здоровьем`, ic:'leech', s:v=>`вампиризм ${v*2}%`},
+ {b:1,id:'wrath',  name:'Ярость',           max:3, d:v=>`ближний бой, скачки, вихри и ответы +${v*20}% урона`, ic:'wrath', s:v=>`+${v*20}% вблизи`},
+ {b:2,id:'mana',   name:'Поток маны',       max:5, d:v=>`+${v*10}% маны и её восстановления`, ic:'mana', s:v=>`+${v*10}% маны`},
+ {b:2,id:'summ',   name:'Повелитель духов', max:3, d:v=>`призывы +${v*20}% урона, лимит +${v}`, ic:'summ', sn:'Духи', s:v=>`призывы +${v*20}%`},
+ {b:2,id:'luck',   name:'Метки судьбы',     max:5, d:v=>`клейма срабатывают на ${v*3}% чаще`, ic:'luck', s:v=>`клейма +${v*3}%`},
+ {b:2,id:'cascade',name:'Каскад',           max:3, d:v=>`ауры, кары, следы и ловушки +${v*15}% урона и радиуса`, ic:'cascade', s:v=>`ауры +${v*15}%`},
+ {b:2,id:'orbit',  name:'Свита',            max:3, d:v=>`+${v} сфера каждому спутнику, их урон +${v*15}%`, ic:'orbit', s:v=>`сферы +${v}`},
 ];
+
+const TICON={
+ power:'<path d="M12 21.5a6.5 6.5 0 0 0 6.5-6.5c0-4-3-6-4-9.5-1.5 2-2 3.5-2 5-1.3-1-2-2.5-2-4.5-2.5 2-5 4.5-5 9a6.5 6.5 0 0 0 6.5 6.5z"/>',
+ cdr:'<circle cx="12" cy="13.5" r="7.5"/><path d="M12 9.5v4l2.6 2.4M9 2.5h6M18.5 6l1.5-1.5"/>',
+ crit:'<circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="1.6"/><path d="M12 1.8v5M12 17.2v5M1.8 12h5M17.2 12h5"/>',
+ reso:'<circle cx="12" cy="7" r="3.5"/><circle cx="6.5" cy="16.5" r="3.5"/><circle cx="17.5" cy="16.5" r="3.5"/>',
+ react:'<circle cx="12" cy="12" r="1.6"/><ellipse cx="12" cy="12" rx="9.5" ry="3.8"/><ellipse cx="12" cy="12" rx="9.5" ry="3.8" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="9.5" ry="3.8" transform="rotate(-60 12 12)"/>',
+ vit:'<path d="M12 20.5S3.5 15.3 3.5 9.2A4.7 4.7 0 0 1 12 6.6a4.7 4.7 0 0 1 8.5 2.6c0 6.1-8.5 11.3-8.5 11.3z"/>',
+ armor:ICON.barrier,
+ regen:'<circle cx="12" cy="12" r="9"/><path d="M12 7.5v9M7.5 12h9"/>',
+ leech:'<path d="M12 2.8c3.4 4.6 6.3 8.2 6.3 11.6a6.3 6.3 0 0 1-12.6 0c0-3.4 2.9-7 6.3-11.6z"/>',
+ wrath:'<path d="M4 4l12 12M13 19l6-6M16 16l4 4M20 4L8 16M5 13l6 6M8 16l-4 4"/>',
+ mana:'<path d="M12 2.5l6.5 9.5L12 21.5 5.5 12z"/><path d="M5.5 12h13"/>',
+ summ:ICON.summon,luck:ICON.brand,cascade:ICON.aura,orbit:ICON.orbit,
+ lock:'<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
+};
+const tsvg=k=>'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+TICON[k]+'</svg>';
 
 const MOBS={
  slime:  {name:'Слизень',          hp:40,  dmg:7,  spd:2.6,r:.62,xp:6,  h:1.3,col:0x58c46e,mass:1, ai:'melee'},
@@ -1180,6 +1249,9 @@ const tpTotal=()=>S.lvl-1+mastTp()+(S.sandbox?30:0);
 const tpSpent=()=>Object.values(S.talents).reduce((a,b)=>a+(b|0),0);
 const tpFree=()=>Math.max(0,tpTotal()-tpSpent());
 const branchPts=b=>TALENTS.filter(t=>t.b===b).reduce((a,t)=>a+T(t.id),0);
+// есть куда вложить очко: при нынешних TALENTS закрытый талант всегда открывается очками в ветке, поэтому «не все на максимуме» = «есть открытый»
+const talRoom=()=>TALENTS.some(t=>T(t.id)<t.max);
+const talFreeUse=()=>talRoom()?tpFree():0;   // свободные очки, которые реально можно вложить (для бейджа и точки)
 const rk=id=>S.ranks[id]||1;
 const rankCost=r=>Math.round(25*Math.pow(r,1.7));
 const ST={};
@@ -3500,7 +3572,7 @@ function updateHudSlots(){const n=activeSlots();
   const tot=EQUIPPED.size,cap_=activeSlots()+passiveSlots();
   $('#bookCount').textContent=tot+'/'+cap_;$('#tabBuildN').textContent=tot+'/'+cap_;
   $('#tabLibN').textContent=(S.sandbox?CLS.pool.size:[...LEARNED].filter(id=>CLS.pool.has(id)).length)+'/'+CLS.pool.size;
-  const tf=tpFree();$('#tpBadge').hidden=!tf;$('#tpBadge').textContent=tf;$('#tabTalDot').hidden=!tf;}
+  const tf=talFreeUse();$('#tpBadge').hidden=!tf;$('#tpBadge').textContent=tf;$('#tabTalDot').hidden=!tf;}
 const hpI=$('#hpI'),shI=$('#shI'),mpI=$('#mpI'),xpI=$('#xpI'),hpT=$('#hpT'),mpT=$('#mpT'),lvNum=$('#lvNum'),hurtEl=$('#hurt'),killsEl=$('#kills'),essT=$('#essT'),bossbar=$('#bossbar'),threatEl=$('#threat'),bossI=$('#bossI'),threatI=$('#threatI'),gprogEl=$('#gprog'),gI=$('#gI');
 const hudCache={};
 function setTxt(el,key,val){if(hudCache[key]!==val){hudCache[key]=val;el.textContent=val;}}
@@ -3633,7 +3705,7 @@ window.addEventListener('keyup',e=>{input.keys[e.code]=false;if(e.code==='Space'
 window.addEventListener('blur',()=>{input.keys={};input.attack=false;});
 $('#autoBtn').addEventListener('click',()=>{S.auto=!S.auto;syncAuto();toast(S.auto?'Авто: герой сам бьёт и колдует':'Авто выключено: колдуй кнопками');saveSoon();});
 function syncAuto(){$('#autoBtn').classList.toggle('on',S.auto);$('#autoTxt').textContent=S.auto?'Авто вкл':'Авто';}
-$('#bookBtn').addEventListener('click',()=>openBook(tpFree()&&bookTab==='lib'?'tal':bookTab));
+$('#bookBtn').addEventListener('click',()=>openBook(talFreeUse()&&bookTab==='lib'?'tal':bookTab));
 $('#reviveBtn').addEventListener('click',revive);$('#deadMenu').addEventListener('click',toSelect);
 
 // =====================================================================
@@ -3684,7 +3756,7 @@ function cardPow(sk){const r=rarOf(sk),u=upgradeFor(sk,true),arr=sk.active?S.act
   const free=baseSlot(sk)==null&&arr.findIndex((v,i)=>i<n&&v==null)>=0&&formSlot(sk)==null;
   return `<small class="pw" data-r="${r}">${RARITY[r].n} ${sk.active?'актив.':'пассив.'} · сила ${Math.round(pwr(sk))}${free?' · встанет в свободный слот':u?' · ↑ сильнее «'+skName(SKILLS[u.tgt])+'» на '+pct(u.gain)+'%':''}</small>`;}
 function openLevelUp(){const ch=rollChoices();if(!ch.length){luQueue=0;return;}luOpen=true;hideUpg();syncPause();
-  $('#luTitle').textContent='Уровень '+S.lvl;$('#luSub').textContent='Выбери новые чары. Если есть свободный слот, они сразу встанут в билд.'+(tpFree()?' Очков талантов: '+tpFree()+'.':'');
+  $('#luTitle').textContent='Уровень '+S.lvl;$('#luSub').textContent='Выбери новые чары. Если есть свободный слот, они сразу встанут в билд.'+(talFreeUse()?' Очков талантов: '+tpFree()+'.':'');
   $('#luCards').innerHTML=ch.map(sk=>`<button type="button" class="card" data-id="${sk.id}"><span class="ico${sk.active?'':' p'}" data-r="${rarOf(sk)}" style="--c:${sk.E.hex}">${svg(sk.F.id)}${modBadge(sk)}</span><span class="ct"><span class="tag">${sk.F.role} · ${sk.E.name}${knownBase(sk)?'<i class="nv">вариант известной</i>':'<i class="nv">новая чара</i>'}${bookOn()&&BOOK.has(sk.id)?'<i class="nv">из Книги чар</i>':''}</span><b>${sk.base}</b><span class="var">${sk.M.name}: ${sk.M.desc}</span><small>${cap(skLead(sk))}</small><small>${cardStat(sk)}</small>${cardPow(sk)}</span></button>`).join('');
   $('#luSkip').textContent='Пропустить: +'+(20+S.lvl*5)+' эссенции';$('#lvlup').hidden=false;}
 function closeLevelUp(){luOpen=false;$('#lvlup').hidden=true;luQueue=Math.max(0,luQueue-1);luDelay=.35;syncPause();}
@@ -3798,14 +3870,84 @@ function applyQuality(reset){const q=TEST?'low':SAVE.q;
   if(TEST){Q.pp=false;Q.shadow=false;pr=1;}
   moon.castShadow=Q.shadow;renderer.setPixelRatio(pr);resize();}
 
-function renderTalents(){const free=tpFree();$('#tpFree').textContent=free;
-  $('#branches').innerHTML=BRANCHES.map((b,bi)=>{const bp=branchPts(bi);
-    return `<div class="branch"><h3>${b.name} <small>${b.sub} · вложено ${bp}</small></h3>`+TALENTS.filter(t=>t.b===bi).map((t,k)=>{const v=T(t.id),need=k*2,locked=bp<need&&v===0,maxed=v>=t.max;
-      return `<div class="node${locked?' locked':''}${maxed?' maxed':''}"><div class="nt"><b>${t.name}</b><span>${cap(v?t.d(v):t.d(1)+' за очко')}${locked?' · нужно '+need+' очков в ветке':''}</span><span class="pts">${v} / ${t.max}</span></div><button type="button" class="plus" data-t="${t.id}" ${(locked||maxed||!free)?'disabled':''} aria-label="Вложить очко: ${t.name}">+</button></div>`;}).join('')+'</div>';}).join('');}
-$('#branches').addEventListener('click',e=>{const b=e.target.closest('.plus');if(!b||b.disabled)return;S.talents[b.dataset.t]=T(b.dataset.t)+1;onTalentsChanged();});
+// Окно талантов: плитки «3 ветки × 5» на одном экране. Нажатие = +1 очко; зажатие (или наведение мышью) — описание в строке внизу.
+const TAL_BY={},TAL_K={};BRANCHES.forEach((b,bi)=>TALENTS.filter(t=>t.b===bi).forEach((t,k)=>{TAL_BY[t.id]=t;TAL_K[t.id]=k;}));
+const talNeed=t=>TAL_K[t.id]*2;
+const talLocked=t=>branchPts(t.b)<talNeed(t)&&T(t.id)===0;
+const talOpen=t=>!talLocked(t)&&T(t.id)<t.max;
+const TAL_HOVER=matchMedia('(hover:hover) and (pointer:fine)');   // наведение мышью — только там, где есть настоящая мышь
+let tpSel=null,tpHold=0,tpHeld=false,tpHov=null,tpMsg='',tpMsgT=0;
+const talPl=n=>n%10===1&&n%100!==11?'очко':n%10>=2&&n%10<=4&&(n%100<10||n%100>=20)?'очка':'очков';
+// итог «Авто»/«Сброса» — в строку-подсказку: тост в HUD закрыт книгой
+function talSay(m){tpMsg=m;tpSel=null;talMark();clearTimeout(tpMsgT);tpMsgT=setTimeout(()=>{tpMsg='';talHint(tpHov);},6000);talHint();}
+function renderTalents(){const free=tpFree(),box=$('#branches'),ae=document.activeElement,fid=ae&&box.contains(ae)?ae.dataset.t:null;
+  $('#tpFree').textContent=free;$('#tpPts').classList.toggle('z',!free||!talRoom());
+  $('#tpAuto').disabled=!free||!TALENTS.some(talOpen);$('#tpReset').disabled=!tpSpent();
+  box.innerHTML=BRANCHES.map((b,bi)=>{const bp=branchPts(bi);
+    return `<div class="tb" style="--c:${b.c}">${b.name}<i class="${bp?'on':''}">${bp}</i></div>`+TALENTS.filter(t=>t.b===bi).map(t=>{const v=T(t.id),lk=talLocked(t),mx=v>=t.max,can=!lk&&!mx&&free>0;
+      const top=lk?tsvg('lock'):mx?'МАКС':Array.from({length:t.max},(_,i)=>i<v?'<i class="f"></i>':'<i></i>').join('');
+      return `<button type="button" class="tn${can?' can':''}${mx?' mx':''}${lk?' lk':''}${tpSel===t.id?' sel':''}" style="--c:${b.c}" data-t="${t.id}" aria-label="${t.name}: ${v} из ${t.max}${lk?', закрыт':''}">`+
+        `<span class="ti">${tsvg(t.ic)}</span><span class="td">${top}</span><b>${t.sn||t.name}</b><span class="tv${v||lk?'':' z'}">${lk?'ещё '+(talNeed(t)-bp):t.s(v)}</span></button>`;}).join('');}).join('');
+  if(fid){const nb=box.querySelector(`[data-t="${fid}"]`);if(nb)nb.focus({preventScroll:true});}
+  talHint();}
+function talHint(id){const h=$('#tpHint'),t=TAL_BY[id||tpSel];
+  if(!t){const how=TAL_HOVER.matches?'Наведи':'Зажми';
+    h.textContent=tpMsg||(!talRoom()?'Все таланты на максимуме.':tpFree()?`Нажми плитку — +1 очко. ${how} — что даёт.`:`Очки даются за уровень. ${how==='Наведи'?'Наведи на плитку':'Зажми плитку'} — что даёт.`);return;}
+  const v=T(t.id),m=talNeed(t)-branchPts(t.b);
+  let s=`<b>${t.name} ${v}/${t.max}</b>: `+(v?t.d(v):'за очко '+t.d(1));
+  if(talLocked(t))s+=` · <em>замок: вложи в ветку ещё ${m}</em>`;
+  else if(v>=t.max)s+=' · <em>максимум</em>';
+  else{if(v)s+=' · след. очко: '+t.s(v+1);if(!tpFree())s+=' · нет свободных очков';}
+  h.innerHTML=s;}
+function talMark(){$('#branches').querySelectorAll('.tn').forEach(x=>x.classList.toggle('sel',x.dataset.t===tpSel));}
+function talPop(id,txt){const b=$('#branches').querySelector(`[data-t="${id}"]`);if(!b)return;b.classList.remove('bump');void b.offsetWidth;b.classList.add('bump');
+  if(!txt)return;const p=document.createElement('span');p.className='pop';p.textContent=txt;b.appendChild(p);setTimeout(()=>p.remove(),800);}
+// рекомендованная раскладка по роли героя: шаги «талант:до уровня»; если талант ещё закрыт, недостающие очки ветки идут в её лучший открытый талант
+const TAL_PLAN={
+ 'Маг':'power:2 cdr:2 power:5 cdr:5 mana:3 crit:3 vit:2 mana:5 crit:5 reso:3 react:3 vit:5 armor:3',
+ 'Призыватель':'mana:2 summ:3 vit:3 mana:5 power:3 vit:5 cdr:3 luck:2 cascade:3 orbit:3 armor:3 power:5 cdr:5',
+ 'Стрелок':'power:2 cdr:2 crit:5 power:5 cdr:5 mana:3 vit:3 reso:3 react:3 mana:5 vit:5 armor:3',
+ 'Ловкач':'power:2 cdr:2 crit:5 power:5 vit:2 armor:2 vit:4 armor:4 wrath:3 cdr:5 leech:3 vit:5',
+ 'Боец':'vit:2 armor:2 vit:4 armor:4 wrath:3 leech:3 power:3 vit:5 armor:5 regen:3 power:5 cdr:3',
+ 'Танк':'vit:3 armor:3 vit:5 armor:5 wrath:3 regen:3 leech:3 power:3 cdr:3 power:5',
+};
+function talAuto(role){const plan=(TAL_PLAN[role]||TAL_PLAN['Маг']).split(' ').map(x=>x.split(':')),rank={};
+  plan.forEach(([id],i)=>{if(!(id in rank))rank[id]=i;});
+  const best=(a,b)=>((a.id in rank?rank[a.id]:99)-(b.id in rank?rank[b.id]:99))||TAL_K[a.id]-TAL_K[b.id];
+  const put=t=>{S.talents[t.id]=T(t.id)+1;};let g=0;
+  for(const [id,lv] of plan){const t=TAL_BY[id];
+    while(tpFree()>0&&T(id)<Math.min(+lv,t.max)&&g++<300){
+      if(talOpen(t)){put(t);continue;}
+      const f=TALENTS.filter(x=>x.b===t.b&&x!==t&&talOpen(x)).sort(best)[0];if(!f)break;put(f);}}
+  while(tpFree()>0&&g++<600){const f=TALENTS.filter(talOpen).sort(best)[0];if(!f)break;put(f);}}
+{const box=$('#branches');
+  box.addEventListener('pointerdown',e=>{const b=e.target.closest('.tn');if(!b)return;tpMsg='';clearTimeout(tpMsgT);tpSel=b.dataset.t;talMark();talHint();
+    tpHeld=false;clearTimeout(tpHold);tpHold=setTimeout(()=>{tpHeld=true;},420);});
+  box.addEventListener('pointerup',()=>clearTimeout(tpHold));box.addEventListener('pointercancel',()=>clearTimeout(tpHold));
+  box.addEventListener('contextmenu',e=>e.preventDefault());
+  box.addEventListener('pointerover',e=>{if(e.pointerType!=='mouse'||!TAL_HOVER.matches)return;const b=e.target.closest('.tn');if(b){tpHov=b.dataset.t;talHint(tpHov);}});
+  box.addEventListener('pointerleave',e=>{if(e.pointerType==='mouse'&&TAL_HOVER.matches){tpHov=null;talHint();}});
+  box.addEventListener('focusin',e=>{const b=e.target.closest('.tn');if(b&&b.matches(':focus-visible'))talHint(b.dataset.t);});
+  // стрелки — переход между плитками (Tab в игре открывает и закрывает книгу)
+  box.addEventListener('keydown',e=>{const d={ArrowUp:[0,-1],ArrowDown:[0,1],ArrowLeft:[-1,0],ArrowRight:[1,0]}[e.key],b=e.target.closest('.tn');if(!d||!b)return;e.preventDefault();
+    const r=b.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;let best=null,bs=1e9;
+    box.querySelectorAll('.tn').forEach(x=>{if(x===b)return;const q=x.getBoundingClientRect(),dx=q.left+q.width/2-cx,dy=q.top+q.height/2-cy,al=dx*d[0]+dy*d[1];
+      if(al<=1)return;const sc=al+2*(Math.abs(dx*d[1])+Math.abs(dy*d[0]));if(sc<bs){bs=sc;best=x;}});
+    if(best)best.focus();});
+  box.addEventListener('click',e=>{const b=e.target.closest('.tn');if(!b)return;const id=b.dataset.t,t=TAL_BY[id];tpSel=id;tpMsg='';clearTimeout(tpMsgT);
+    if(tpHeld&&e.detail){tpHeld=false;talMark();talHint();return;}   // зажали — только прочитать, очко не тратим
+    tpHeld=false;
+    if(!tpFree()||!talOpen(t)){talMark();talHint();talPop(id,'');return;}
+    S.talents[id]=T(id)+1;onTalentsChanged();talPop(id,'+1');});}
+$('#tpAuto').addEventListener('click',()=>{const free=tpFree();if(!free){talSay('Свободных очков нет.');return;}
+  const role=CLS&&CLS.role,before={...S.talents};talAuto(role);const n=free-tpFree();if(!n){talSay('Все таланты на максимуме.');return;}
+  onTalentsChanged();for(const t of TALENTS){const d=T(t.id)-(before[t.id]||0);if(d>0)talPop(t.id,'+'+d);}
+  talSay('Авто'+(TAL_PLAN[role]?' для роли «'+role+'»':'')+': вложено '+n+' '+talPl(n)+'.');});
 let resetArm=0;
-$('#tpReset').addEventListener('click',e=>{const b=e.currentTarget;if(!resetArm){b.textContent='Точно сбросить?';resetArm=setTimeout(()=>{resetArm=0;b.textContent='Сбросить таланты';},3000);return;}
-  clearTimeout(resetArm);resetArm=0;b.textContent='Сбросить таланты';S.talents={};onTalentsChanged();toast('Очки вернулись: '+tpFree());});
+const TAL_ARM='Нажми «Точно?» ещё раз — все очки вернутся.';
+$('#tpReset').addEventListener('click',e=>{const b=e.currentTarget;if(!resetArm){b.textContent='Точно?';talSay(TAL_ARM);
+    resetArm=setTimeout(()=>{resetArm=0;b.textContent='Сброс';if(tpMsg===TAL_ARM){tpMsg='';talHint(tpHov);}},3000);return;}
+  clearTimeout(resetArm);resetArm=0;b.textContent='Сброс';S.talents={};onTalentsChanged();talSay('Очки вернулись: '+tpFree()+'.');});
 function onTalentsChanged(){computeStats();recalcStats();onBuildChanged();renderTalents();saveSoon();}
 
 function sheetHtml(sk){const eq=EQUIPPED.has(sk.id),ln=isLearned(sk.id),r=rk(sk.id);
