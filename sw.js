@@ -1,6 +1,6 @@
 // Сервис-воркер «Тысячи чар»: офлайн-кэш и обновление без залипания на старой версии.
 // При каждом выпуске меняй VERSION — старый кэш удалится, новая версия подхватится сама.
-const VERSION='v13';
+const VERSION='v13.1';
 const CACHE='tysyacha-char-'+VERSION;
 const CORE=['./','index.html','net-relay.js','campaign.js','net-p2p.js','manifest.webmanifest','vendor/three.min.js','vendor/trystero-nostr-0.21.5.js','icons/icon-192.png','icons/icon-512.png','icons/maskable-512.png','icons/apple-touch-icon.png'];
 self.addEventListener('install',e=>{
@@ -12,7 +12,8 @@ self.addEventListener('activate',e=>{
 const netFirst=async(req,ms)=>{
   const c=await caches.open(CACHE);
   try{
-    const r=await Promise.race([fetch(req),new Promise((_,j)=>setTimeout(()=>j(new Error('t')),ms))]);
+    // cache:'no-cache' — всегда сверяться с сервером, а не брать страницу из кэша браузера (иначе «Обновить» возвращало старую версию)
+    const r=await Promise.race([fetch(req.url,{cache:'no-cache',credentials:'same-origin'}),new Promise((_,j)=>setTimeout(()=>j(new Error('t')),ms))]);
     if(r&&r.ok)c.put(req,r.clone());
     return r;
   }catch(e){const m=await c.match(req,{ignoreSearch:true});if(m)return m;throw e;}
