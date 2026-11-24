@@ -718,6 +718,7 @@ html[data-ui=tab] .sh-act .btn{min-width:150px}
 <script src="vendor/three.min.js"></script>
 <script src="net-relay.js"></script>
 <script src="campaign.js"></script>
+<script src="net-p2p.js"></script>
 <script>
 'use strict';
 (function(){
@@ -3064,6 +3065,8 @@ Object.assign(MP,{verBad:null,pingQ:[],pingRaw:0,active:false,play:'world',g:0,s
 let mpLib=null,mpRoom=null,mpSendFn=null,mpTimer=0,mpSeq=0,mpHintUntil=0;
 // два канала одной комнаты: P2P (Trystero) и «через сервер» (Supabase). Id пира у обоих одинаковый (selfId задаём сами).
 let mpTry=null,mpTrySend=null,mpRel=null,mpRelSend=null,mpP2P=new Set(),mpSrv=new Set(),mpOpenGen=0;
+// третий путь: свой WebRTC (net-p2p.js), сигнализация через канал сервера. Приоритет: свой DataChannel → Trystero → сервер.
+let mpDc=null,mpQ=0,mpSeen=new Set(),mpSeenArr=[];
 const mpDiag={nostr:null,nostrAt:0,open:false};
 
 // ---------- буфер интерполяции: чужие сущности рисуются чуть в прошлом, по времени отправителя ----------
@@ -3105,10 +3108,13 @@ async function mpEnsureLib(){if(!mpLib)mpLib=await import('./vendor/trystero-nos
 function mpSendTo(o,id){try{const r=mpSendFn&&mpSendFn(o,id);if(r&&r.catch)r.catch(()=>{});}catch(e){}}
 // P2P, если он поднят; иначе через сервер
 function mpRoute(o,id){
+  if(mpDc&&mpDc.isOpen(id)){
+    if(!(o&&(o.t==='p'||o.t==='s'||o.t==='ka'))&&o._q===undefined){o=Object.assign({},o,{_q:++mpQ});}
+    if(mpDc.send(o,id))return;}
   if(mpTrySend&&mpP2P.has(id))return mpTrySend(o,id);
   if(mpRelSend&&mpSrv.has(id))return mpRelSend(o,id);
   if(mpTrySend)return mpTrySend(o,id);}
-function mpVia(){const id=MP.peerId;return !id?'':mpP2P.has(id)?'p2p':mpSrv.has(id)?'relay':'';}
+function mpVia(){const id=MP.peerId;return !id?'':(mpDc&&mpDc.isOpen(id))||mpP2P.has(id)?'p2p':mpSrv.has(id)?'relay':'';}
 function mpProbeNostr(){
   mpDiag.nostr={ok:0,total:MP_RELAYS.length,done:0};const d=mpDiag.nostr;
   for(const u of MP_RELAYS){let w=null,fin=false;const end=ok=>{if(fin)return;fin=true;if(ok)d.ok++;d.done++;try{w&&w.close();}catch(e){}};
@@ -3119,8 +3125,8 @@ function mpIceInfo(){
     return a.length?a.join('; '):'пира нет';}catch(e){return '?';}}
 function mpNetLine(){
   const v=mpVia();
-  if(v==='p2p')return 'Связь: P2P (напрямую)';
-  if(v==='relay')return 'Связь: через сервер'+(mpTry?' · P2P ищется…':'');
+  if(v==='p2p')return 'Связь: напрямую (P2P)';
+  if(v==='relay')return 'Связь: через сервер · P2P ищется…';
   const rs=mpRel&&mpRel.status();
   if(rs&&rs.joined)return 'Сервер связи подключён, ждём второго игрока…';
   if(rs&&rs.lastErr)return 'Нет связи с сервером: '+rs.lastErr;
@@ -3131,7 +3137,10 @@ function mpNetDetail(){
   L.push('Сервер связи (Supabase): '+(rs?(rs.joined?'подключён':'не подключён ('+rs.ws+(rs.lastErr?', '+rs.lastErr:'')+', попыток '+rs.tries+')')+(rs.rtt?', отклик '+Math.round(rs.rtt)+' мс':'')+', игроков в канале: '+rs.peers+', принято '+rs.rx+', отправлено '+rs.tx:'не запущен'));
   if(MP.ping)L.push('Пинг туда-обратно: '+Math.round(MP.ping)+' мс (медиана из 5), в одну сторону примерно '+Math.round(MP.ping/2)+' мс'+(mpVia()==='relay'?'; через сервер сообщение идёт игрок → сервер → игрок, пинг считает дорогу туда и обратно: 4 участка':''));
   L.push('Реле nostr (поиск P2P): '+(n?(n.done<n.total?'проверяем… ':'')+n.ok+' из '+n.total+' отвечают':'не проверялись'));
-  L.push('P2P / ICE: '+mpIceInfo());
+  const di=mpDc?mpDc.info():null;
+  if(di){L.push('Прямое соединение (свой WebRTC): '+({idle:'ждёт напарника',connecting:'соединяемся…',open:'открыто',failed:'не вышло'}[di.state]||di.state)+(di.state==='open'?'; пара ICE: '+(di.pair||'…')+(di.openMs?'; поднялось за '+(di.openMs/1000).toFixed(1)+' с':''):'')+(di.fails?'; неудач: '+di.fails:''));
+    if(di.state!=='open'&&(di.reason||di.summary))L.push('Почему не напрямую: '+(di.reason||di.summary));}
+  L.push('P2P Trystero / ICE: '+mpIceInfo());
   L.push('Код комнаты: '+MP.code+', роль: '+(MP.role==='host'?'хозяин':'гость'));
   return L.join('\n');}
 function mpRefreshNet(){
@@ -3151,6 +3160,13 @@ async function mpOpen(role,code){
     const [rsend,rget]=mpRel.makeAction('m');mpRelSend=rsend;
     rget((d,id)=>mpOnMsg(d,id));mpRel.onPeerJoin(id=>mpChanJoin('srv',id));mpRel.onPeerLeave(id=>mpChanLeave('srv',id));}}catch(e){mpRel=null;mpRelSend=null;}
   mpProbeNostr();
+  // 1б) свой WebRTC поверх канала сервера
+  try{if(mpRel&&window.p2pDirect&&!window.__NOMYP2P){
+    mpDc=p2pDirect({rel:mpRel,host:role==='host',
+      onMessage:(d,id)=>mpOnMsg(d,id),
+      onOpen:id=>{if(MP.peerId===id)MP.lastRx=performance.now();mpRenderLobby();},
+      onClose:(id,lost)=>{if(lost&&lost.length&&mpRelSend&&mpSrv.has(id))for(const o of lost){try{mpRelSend(o,id);}catch(e){}}mpRenderLobby();}});
+    if(mpSrv.size)for(const id of mpSrv)mpDc.peerJoined(id);}}catch(e){mpDc=null;}
   // 2) P2P (Trystero)
   if(lib){
     try{
@@ -3165,18 +3181,20 @@ async function mpOpen(role,code){
 }
 function mpCloseRoom(){
   mpOpenGen++;
-  try{if(mpRel)mpRel.leave();}catch(e){}try{if(mpTry)mpTry.leave();}catch(e){}
+  try{if(mpDc)mpDc.leave();}catch(e){}mpDc=null;try{if(mpRel)mpRel.leave();}catch(e){}try{if(mpTry)mpTry.leave();}catch(e){}
   mpRel=null;mpRelSend=null;mpTry=null;mpTrySend=null;mpP2P.clear();mpSrv.clear();
   MP.verBad=null;MP.pingQ=[];MP.ping=0;
   mpRoom=null;mpSendFn=null;MP.peerId=null;MP.peer&&mpPeerModelDrop();MP.peer=null;clearInterval(mpTimer);}
 // вход/выход пира на одном из каналов; для игры пир один, канал выбирается на лету
 function mpChanJoin(ch,id){
   (ch==='p2p'?mpP2P:mpSrv).add(id);
+  if(ch==='srv'&&mpDc)mpDc.peerJoined(id);
   if(MP.peerId===id){MP.lastRx=performance.now();mpRenderLobby();return;}
   mpPeerJoin(id);}
 function mpChanLeave(ch,id){
   (ch==='p2p'?mpP2P:mpSrv).delete(id);
-  if(mpP2P.has(id)||mpSrv.has(id)){mpRenderLobby();return;}
+  if(mpP2P.has(id)||mpSrv.has(id)||(mpDc&&mpDc.isOpen(id))){mpRenderLobby();return;}
+  try{if(mpDc)mpDc.peerLeft(id);}catch(e){}
   mpPeerLeave(id);}
 function mpPeerJoin(id){
   if(MP.peerId&&MP.peerId!==id){if(performance.now()-MP.lastRx>4500){mpPeerGone('replace');}else{mpSendTo({t:'full'},id);return;}}
@@ -3213,7 +3231,7 @@ function mpTick(){
       if(MP.hitQ.length){mpSend({t:'H',a:MP.hitQ.splice(0,60)});}
       if(MPH)mpSendSnap();
     }else if(now-MP.kaAt>2000||!MP.kaAt){MP.kaAt=now;mpSend({t:'ka'});}
-    if(now-MP.pingAt>2500){MP.pingAt=now;try{const pr=mpP2P.has(MP.peerId)&&mpTry?mpTry:mpRel;if(pr)pr.ping(MP.peerId).then(ms=>{MP.pingRaw=ms;const q=MP.pingQ;q.push(ms);if(q.length>5)q.shift();MP.ping=q.slice().sort((a,b)=>a-b)[q.length>>1];}).catch(()=>{});}catch(e){}}
+    if(mpDc&&mpDc.isOpen(MP.peerId)){const r=mpDc.rtt();if(r)MP.ping=r;}else if(now-MP.pingAt>2500){MP.pingAt=now;try{const pr=mpP2P.has(MP.peerId)&&mpTry?mpTry:mpRel;if(pr)pr.ping(MP.peerId).then(ms=>{MP.pingRaw=ms;const q=MP.pingQ;q.push(ms);if(q.length>5)q.shift();MP.ping=q.slice().sort((a,b)=>a-b)[q.length>>1];}).catch(()=>{});}catch(e){}}
   }else if(MP.role&&MP.code&&mpRoom&&now-MP.t0>(MP.role==='guest'?25000:60000)){MP.t0=now;mpOpen(MP.role,MP.code);}
 }
 function mpSendPos(){
@@ -3223,6 +3241,8 @@ function mpSendPos(){
 function mpOnMsg(m,id){
   if(!m||id!==MP.peerId){if(m&&m.t==='full')return mpOnFull();return;}
   MP.lastRx=performance.now();
+  if(m._q!==undefined){ // событие могло прийти и по прямому каналу, и дослано через сервер — второй раз не применяем
+    const k=id+':'+m._q;if(mpSeen.has(k))return;mpSeen.add(k);mpSeenArr.push(k);if(mpSeenArr.length>300)mpSeen.delete(mpSeenArr.shift());}
   if(MP.verBad&&m.t!=='hi'&&m.t!=='ver'&&m.t!=='bye'&&m.t!=='ka')return;
   switch(m.t){
     case 'ka':break;
@@ -3700,7 +3720,7 @@ function mpHud(){
     card.classList.toggle('down',!!pr.dead);
     const lag=now-MP.lastRx,ok=lag<2500;
     mpTxt($('#mpInfo'),'i',pr.dead?'упал':Math.round(pr.hp)+' / '+pr.maxHp);
-    const lk=$('#mpLink');mpTxt(lk,'l',ok?'● '+(mpVia()==='relay'?'сервер · ':'')+(MP.ping?Math.round(MP.ping)+' мс':'на связи'):'● нет связи');lk.className=ok?'ok':'bad';}
+    const lk=$('#mpLink');mpTxt(lk,'l',ok?'● '+(mpVia()==='relay'?'сервер · ':mpVia()==='p2p'?'напрямую · ':'')+(MP.ping?Math.round(MP.ping)+' мс':'на связи'):'● нет связи');lk.className=ok?'ok':'bad';}
   const cb=$('#mpCombo');if(MP.combo>=2){cb.hidden=false;mpTxt(cb,'c','Связка ×'+MP.combo);}else cb.hidden=true;
   if(MP.down){const t=P.dead?'Ты упал — напарник может поднять тебя ('+Math.round(((pr&&pr.rp)||0)*100)+'%)':'';if(P.dead){const el=$('#mpHint');el.hidden=false;mpTxt(el,'h',t);}}
   else if(mpHintUntil&&now>mpHintUntil){mpHintUntil=0;$('#mpHint').hidden=true;MP.hint='';}
@@ -3792,11 +3812,11 @@ function mpInit(){
   if(code){code=code.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,8);if(code.length>=4)MP.joinCode=code;}
   if(!MP.nick)nickAsk(false,()=>{if(MP.joinCode&&mode==='select')renderSelInfo();});
   else if(MP.joinCode&&mode==='select')renderSelInfo();
-  window.__mp={MP,mpOpen,mpHostStart,mpJoin,mpCreate};
+  window.__mp={MP,mpOpen,mpHostStart,mpJoin,mpCreate,dc:()=>mpDc,via:mpVia};
   const mpBack=()=>{if(document.hidden||!MP.role||!MP.code)return;
     if(!MP.peerId)MP.t0=-1e9;
     // iOS усыпляет сокеты: пересоздаём канал сервера и объявляемся заново
-    try{if(mpRel)mpRel.kick();}catch(e){}
+    try{if(mpRel)mpRel.kick();}catch(e){}try{if(mpDc)mpDc.kick();}catch(e){}
     setTimeout(()=>{try{if(MP.peerId)mpHello();}catch(e){}},700);};
   document.addEventListener('visibilitychange',mpBack);window.addEventListener('pageshow',mpBack);window.addEventListener('online',mpBack);}
 
