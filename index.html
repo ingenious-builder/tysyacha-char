@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"><meta name="theme-color" content="#0d1120"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Тысяча чар"><meta name="application-name" content="Тысяча чар"><meta name="description" content="Тысяча чар — action-RPG в браузере: 20 героев, 10 стихий, 12 ущелий и кооператив на двоих."><link rel="manifest" href="manifest.webmanifest"><link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png"><link rel="apple-touch-icon" href="icons/apple-touch-icon.png"><style>:root{color-scheme:light;box-sizing:border-box}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"><meta name="theme-color" content="#0d1120"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="apple-mobile-web-app-title" content="Тысяча чар"><meta name="application-name" content="Тысяча чар"><meta name="description" content="Тысяча чар — action-RPG в браузере: 20 героев, 10 стихий, 12 ущелий и кооператив на двоих."><link rel="manifest" href="manifest.webmanifest"><link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png"><link rel="apple-touch-icon" href="icons/apple-touch-icon.png"><style>:root{color-scheme:light;box-sizing:border-box}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>Тысяча чар</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -128,7 +128,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 @media (max-width:600px){#kills,#autoTxt{display:none}.tbtn{padding:0 11px;gap:6px}#stats{width:calc(100% - 205px - env(safe-area-inset-left,0px) - env(safe-area-inset-right,0px));min-width:150px}}
 
 /* hero select */
-#select{position:absolute;inset:0;padding-top:var(--sat);padding-bottom:var(--sab);display:grid;grid-template-columns:minmax(250px,320px) 1fr minmax(260px,340px);pointer-events:none}
+#select{position:absolute;inset:0;padding-top:0;padding-bottom:var(--sab);display:grid;grid-template-columns:minmax(250px,320px) 1fr minmax(260px,340px);pointer-events:none}
 #select>*{min-height:0;min-width:0}
 .sel-left{pointer-events:auto;display:flex;flex-direction:column;gap:10px;padding:12px 14px 12px max(14px,env(safe-area-inset-left,0px));background:linear-gradient(90deg,rgba(10,13,26,.95) 72%,rgba(10,13,26,0))}
 .sel-right{pointer-events:auto;display:flex;flex-direction:column;gap:10px;padding:12px max(14px,env(safe-area-inset-right,0px)) 0 14px;background:linear-gradient(270deg,rgba(10,13,26,.95) 72%,rgba(10,13,26,0));overflow-y:auto;touch-action:pan-y}
@@ -422,7 +422,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
     </div>
     <div></div>
     <div class="sel-right" id="selInfo"></div>
-    <div id="verTag">v8.2</div>
+    <div id="verTag">v8.3</div>
   </div>
 
   <div id="lvlup" class="ov" hidden>
@@ -2796,7 +2796,7 @@ function botAdj(){try{return Math.max(0,Math.min(120,+localStorage.getItem('tcBo
 function envPx(side){const d=document.createElement('div');d.style.cssText='position:absolute;visibility:hidden;pointer-events:none;padding-'+side+':env(safe-area-inset-'+side+',0px)';document.body.appendChild(d);const v=parseFloat(getComputedStyle(d)['padding'+side[0].toUpperCase()+side.slice(1)])||0;d.remove();return v;}
 function fitApp(){const sa=navigator.standalone||matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches;const els=[document.documentElement,document.body,app];const adj=botAdj();if(!sa&&!adj){els.forEach(x=>{x.style.height='';x.style.bottom='';});return;}let h=Math.round(Math.min(innerHeight,window.visualViewport?visualViewport.height+visualViewport.offsetTop:innerHeight));
 if(navigator.standalone&&/iPhone/.test(navigator.userAgent)&&innerHeight>=innerWidth&&innerHeight>=screen.height-2){h=screen.height-Math.max(47,envPx('top'))+envPx('bottom');}
-h=Math.max(300,h-adj);els.forEach(x=>{x.style.bottom='auto';x.style.height=h+'px';});}
+h=Math.max(300,h-adj);els.forEach(x=>{x.style.bottom='auto';x.style.height=h+'px';});const cut=navigator.standalone&&/iPhone/.test(navigator.userAgent)&&innerHeight>=innerWidth&&Math.abs(innerHeight+envPx('top')-screen.height)<4;document.documentElement.style.setProperty('--sab',cut?'0px':'env(safe-area-inset-bottom,0px)');document.documentElement.classList.toggle('ios-cut',!!cut);}
 function resize(){fitApp();W=app.clientWidth;H=app.clientHeight;renderer.setSize(W,H,false);camera.aspect=W/H;camera.fov=W<H?56:42;camera.updateProjectionMatrix();makeRT();
   }
 window.addEventListener('resize',resize);window.addEventListener('orientationchange',()=>setTimeout(resize,250));if(/[?&]dbg=1/.test(location.search)){const d=document.createElement('div');d.style.cssText='position:fixed;left:4px;top:40%;z-index:99;background:#000c;color:#0f0;font:12px monospace;padding:4px;pointer-events:none';document.body.appendChild(d);setInterval(()=>{d.textContent='inner '+innerWidth+'x'+innerHeight+' screen '+screen.width+'x'+screen.height+' app '+app.clientWidth+'x'+app.clientHeight+' sa '+(navigator.standalone?1:0)+' top '+app.getBoundingClientRect().top;},500);}
@@ -3534,7 +3534,7 @@ if(H_&&H_.ready)H_.ready(start);else start((H_&&H_.data)||{});
 <script>
 // версия, проверка обновлений и диагностика экрана
 (function(){
-const CUR='v8.2';let reg=null;
+const CUR='v8.3';let reg=null;
 const $=id=>document.getElementById(id);
 function showUpd(v){if($('updBar'))return;const b=document.createElement('div');b.id='updBar';b.innerHTML='<span>Есть обновление '+v+'</span><button type="button">Обновить</button>';b.querySelector('button').onclick=async()=>{b.firstChild.textContent='Обновляю…';try{if(reg)await reg.update();}catch(e){}try{const ks=await caches.keys();await Promise.all(ks.filter(k=>k.startsWith('tysyacha-char-')).map(k=>caches.delete(k)));}catch(e){}try{if(reg&&reg.waiting)reg.waiting.postMessage('skip');}catch(e){}location.reload();};($('app')||document.body).appendChild(b);}
 async function chk(){try{const r=await fetch('sw.js?'+Date.now(),{cache:'no-store'});const t=await r.text();const m=t.match(/VERSION\s*=\s*['"]([^'"]+)['"]/);if(m&&m[1]!==CUR)showUpd(m[1]);}catch(e){}}
