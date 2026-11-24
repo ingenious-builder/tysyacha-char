@@ -397,6 +397,21 @@ html[data-ui=tab] #mm{top:calc(var(--m) + var(--sat) + 70px);width:calc(92px * v
   .tn b{font-size:12.5px}.tn .tv{font-size:11.5px}
   .tl-hint{font-size:12px}
 }
+/* узкие телефоны (Android 360, iPhone 5/SE1 320): мельче шрифт и поля, чтобы подписи плиток влезали целиком */
+@media (orientation:portrait) and (max-width:369px){
+  .tl{gap:6px;padding:6px 8px 8px}
+  .tg{gap:5px 6px}
+  .tb{font-size:14px}
+  .tn{gap:2px 4px;padding:5px 6px}.tn svg{width:19px;height:19px}
+  .tn b{font-size:12px}.tn .tv{font-size:11px}
+  .tl-hint{font-size:12px}
+}
+@media (orientation:portrait) and (max-width:339px){
+  .tl{padding:6px 6px 8px}.tg{gap:4px 4px}
+  .tn{padding:4px 5px}.tn svg{width:17px;height:17px}.tn .td{gap:2px}.tn .td i{width:6px;height:6px}
+  .tn b{font-size:11px}.tn .tv{font-size:10.5px;letter-spacing:-.01em}
+  .tl-hint{font-size:11.5px}
+}
 @media (hover:hover) and (pointer:fine){.tn:not(.lk):hover{filter:brightness(1.15)}}
 
 #sheet{position:absolute;inset:0;z-index:10;background:rgba(5,8,18,.6);display:flex;align-items:flex-end;justify-content:center;
@@ -1234,6 +1249,9 @@ const tpTotal=()=>S.lvl-1+mastTp()+(S.sandbox?30:0);
 const tpSpent=()=>Object.values(S.talents).reduce((a,b)=>a+(b|0),0);
 const tpFree=()=>Math.max(0,tpTotal()-tpSpent());
 const branchPts=b=>TALENTS.filter(t=>t.b===b).reduce((a,t)=>a+T(t.id),0);
+// есть куда вложить очко: при нынешних TALENTS закрытый талант всегда открывается очками в ветке, поэтому «не все на максимуме» = «есть открытый»
+const talRoom=()=>TALENTS.some(t=>T(t.id)<t.max);
+const talFreeUse=()=>talRoom()?tpFree():0;   // свободные очки, которые реально можно вложить (для бейджа и точки)
 const rk=id=>S.ranks[id]||1;
 const rankCost=r=>Math.round(25*Math.pow(r,1.7));
 const ST={};
@@ -3554,7 +3572,7 @@ function updateHudSlots(){const n=activeSlots();
   const tot=EQUIPPED.size,cap_=activeSlots()+passiveSlots();
   $('#bookCount').textContent=tot+'/'+cap_;$('#tabBuildN').textContent=tot+'/'+cap_;
   $('#tabLibN').textContent=(S.sandbox?CLS.pool.size:[...LEARNED].filter(id=>CLS.pool.has(id)).length)+'/'+CLS.pool.size;
-  const tf=tpFree();$('#tpBadge').hidden=!tf;$('#tpBadge').textContent=tf;$('#tabTalDot').hidden=!tf;}
+  const tf=talFreeUse();$('#tpBadge').hidden=!tf;$('#tpBadge').textContent=tf;$('#tabTalDot').hidden=!tf;}
 const hpI=$('#hpI'),shI=$('#shI'),mpI=$('#mpI'),xpI=$('#xpI'),hpT=$('#hpT'),mpT=$('#mpT'),lvNum=$('#lvNum'),hurtEl=$('#hurt'),killsEl=$('#kills'),essT=$('#essT'),bossbar=$('#bossbar'),threatEl=$('#threat'),bossI=$('#bossI'),threatI=$('#threatI'),gprogEl=$('#gprog'),gI=$('#gI');
 const hudCache={};
 function setTxt(el,key,val){if(hudCache[key]!==val){hudCache[key]=val;el.textContent=val;}}
@@ -3687,7 +3705,7 @@ window.addEventListener('keyup',e=>{input.keys[e.code]=false;if(e.code==='Space'
 window.addEventListener('blur',()=>{input.keys={};input.attack=false;});
 $('#autoBtn').addEventListener('click',()=>{S.auto=!S.auto;syncAuto();toast(S.auto?'Авто: герой сам бьёт и колдует':'Авто выключено: колдуй кнопками');saveSoon();});
 function syncAuto(){$('#autoBtn').classList.toggle('on',S.auto);$('#autoTxt').textContent=S.auto?'Авто вкл':'Авто';}
-$('#bookBtn').addEventListener('click',()=>openBook(tpFree()&&bookTab==='lib'?'tal':bookTab));
+$('#bookBtn').addEventListener('click',()=>openBook(talFreeUse()&&bookTab==='lib'?'tal':bookTab));
 $('#reviveBtn').addEventListener('click',revive);$('#deadMenu').addEventListener('click',toSelect);
 
 // =====================================================================
@@ -3738,7 +3756,7 @@ function cardPow(sk){const r=rarOf(sk),u=upgradeFor(sk,true),arr=sk.active?S.act
   const free=baseSlot(sk)==null&&arr.findIndex((v,i)=>i<n&&v==null)>=0&&formSlot(sk)==null;
   return `<small class="pw" data-r="${r}">${RARITY[r].n} ${sk.active?'актив.':'пассив.'} · сила ${Math.round(pwr(sk))}${free?' · встанет в свободный слот':u?' · ↑ сильнее «'+skName(SKILLS[u.tgt])+'» на '+pct(u.gain)+'%':''}</small>`;}
 function openLevelUp(){const ch=rollChoices();if(!ch.length){luQueue=0;return;}luOpen=true;hideUpg();syncPause();
-  $('#luTitle').textContent='Уровень '+S.lvl;$('#luSub').textContent='Выбери новые чары. Если есть свободный слот, они сразу встанут в билд.'+(tpFree()?' Очков талантов: '+tpFree()+'.':'');
+  $('#luTitle').textContent='Уровень '+S.lvl;$('#luSub').textContent='Выбери новые чары. Если есть свободный слот, они сразу встанут в билд.'+(talFreeUse()?' Очков талантов: '+tpFree()+'.':'');
   $('#luCards').innerHTML=ch.map(sk=>`<button type="button" class="card" data-id="${sk.id}"><span class="ico${sk.active?'':' p'}" data-r="${rarOf(sk)}" style="--c:${sk.E.hex}">${svg(sk.F.id)}${modBadge(sk)}</span><span class="ct"><span class="tag">${sk.F.role} · ${sk.E.name}${knownBase(sk)?'<i class="nv">вариант известной</i>':'<i class="nv">новая чара</i>'}${bookOn()&&BOOK.has(sk.id)?'<i class="nv">из Книги чар</i>':''}</span><b>${sk.base}</b><span class="var">${sk.M.name}: ${sk.M.desc}</span><small>${cap(skLead(sk))}</small><small>${cardStat(sk)}</small>${cardPow(sk)}</span></button>`).join('');
   $('#luSkip').textContent='Пропустить: +'+(20+S.lvl*5)+' эссенции';$('#lvlup').hidden=false;}
 function closeLevelUp(){luOpen=false;$('#lvlup').hidden=true;luQueue=Math.max(0,luQueue-1);luDelay=.35;syncPause();}
@@ -3857,22 +3875,27 @@ const TAL_BY={},TAL_K={};BRANCHES.forEach((b,bi)=>TALENTS.filter(t=>t.b===bi).fo
 const talNeed=t=>TAL_K[t.id]*2;
 const talLocked=t=>branchPts(t.b)<talNeed(t)&&T(t.id)===0;
 const talOpen=t=>!talLocked(t)&&T(t.id)<t.max;
-let tpSel=null,tpHold=0,tpHeld=false;
+const TAL_HOVER=matchMedia('(hover:hover) and (pointer:fine)');   // наведение мышью — только там, где есть настоящая мышь
+let tpSel=null,tpHold=0,tpHeld=false,tpHov=null,tpMsg='',tpMsgT=0;
+const talPl=n=>n%10===1&&n%100!==11?'очко':n%10>=2&&n%10<=4&&(n%100<10||n%100>=20)?'очка':'очков';
+// итог «Авто»/«Сброса» — в строку-подсказку: тост в HUD закрыт книгой
+function talSay(m){tpMsg=m;tpSel=null;talMark();clearTimeout(tpMsgT);tpMsgT=setTimeout(()=>{tpMsg='';talHint(tpHov);},6000);talHint();}
 function renderTalents(){const free=tpFree(),box=$('#branches'),ae=document.activeElement,fid=ae&&box.contains(ae)?ae.dataset.t:null;
-  $('#tpFree').textContent=free;$('#tpPts').classList.toggle('z',!free);
+  $('#tpFree').textContent=free;$('#tpPts').classList.toggle('z',!free||!talRoom());
   $('#tpAuto').disabled=!free||!TALENTS.some(talOpen);$('#tpReset').disabled=!tpSpent();
   box.innerHTML=BRANCHES.map((b,bi)=>{const bp=branchPts(bi);
     return `<div class="tb" style="--c:${b.c}">${b.name}<i class="${bp?'on':''}">${bp}</i></div>`+TALENTS.filter(t=>t.b===bi).map(t=>{const v=T(t.id),lk=talLocked(t),mx=v>=t.max,can=!lk&&!mx&&free>0;
       const top=lk?tsvg('lock'):mx?'МАКС':Array.from({length:t.max},(_,i)=>i<v?'<i class="f"></i>':'<i></i>').join('');
       return `<button type="button" class="tn${can?' can':''}${mx?' mx':''}${lk?' lk':''}${tpSel===t.id?' sel':''}" style="--c:${b.c}" data-t="${t.id}" aria-label="${t.name}: ${v} из ${t.max}${lk?', закрыт':''}">`+
-        `<span class="ti">${tsvg(t.ic)}</span><span class="td">${top}</span><b>${t.sn||t.name}</b><span class="tv${v||lk?'':' z'}">${lk?'ещё '+(talNeed(t)-bp):t.s(v||1)}</span></button>`;}).join('');}).join('');
+        `<span class="ti">${tsvg(t.ic)}</span><span class="td">${top}</span><b>${t.sn||t.name}</b><span class="tv${v||lk?'':' z'}">${lk?'ещё '+(talNeed(t)-bp):t.s(v)}</span></button>`;}).join('');}).join('');
   if(fid){const nb=box.querySelector(`[data-t="${fid}"]`);if(nb)nb.focus({preventScroll:true});}
   talHint();}
 function talHint(id){const h=$('#tpHint'),t=TAL_BY[id||tpSel];
-  if(!t){h.textContent=tpFree()?'Нажми плитку — +1 очко. Зажми — что даёт. Замок снимается очками в ветке.':'Очки даются за уровень. Зажми плитку — что даёт.';return;}
-  const v=T(t.id),bp=branchPts(t.b),need=talNeed(t);
+  if(!t){const how=TAL_HOVER.matches?'Наведи':'Зажми';
+    h.textContent=tpMsg||(!talRoom()?'Все таланты на максимуме.':tpFree()?`Нажми плитку — +1 очко. ${how} — что даёт.`:`Очки даются за уровень. ${how==='Наведи'?'Наведи на плитку':'Зажми плитку'} — что даёт.`);return;}
+  const v=T(t.id),m=talNeed(t)-branchPts(t.b);
   let s=`<b>${t.name} ${v}/${t.max}</b>: `+(v?t.d(v):'за очко '+t.d(1));
-  if(talLocked(t))s+=` · <em>откроется, когда в ветке «${BRANCHES[t.b].name}» будет ${need} ${need<5?'очка':'очков'} (ещё ${need-bp})</em>`;
+  if(talLocked(t))s+=` · <em>замок: вложи в ветку ещё ${m}</em>`;
   else if(v>=t.max)s+=' · <em>максимум</em>';
   else{if(v)s+=' · след. очко: '+t.s(v+1);if(!tpFree())s+=' · нет свободных очков';}
   h.innerHTML=s;}
@@ -3898,13 +3921,12 @@ function talAuto(role){const plan=(TAL_PLAN[role]||TAL_PLAN['Маг']).split(' '
       const f=TALENTS.filter(x=>x.b===t.b&&x!==t&&talOpen(x)).sort(best)[0];if(!f)break;put(f);}}
   while(tpFree()>0&&g++<600){const f=TALENTS.filter(talOpen).sort(best)[0];if(!f)break;put(f);}}
 {const box=$('#branches');
-  box.addEventListener('pointerdown',e=>{const b=e.target.closest('.tn');if(!b)return;tpSel=b.dataset.t;talMark();talHint();
+  box.addEventListener('pointerdown',e=>{const b=e.target.closest('.tn');if(!b)return;tpMsg='';clearTimeout(tpMsgT);tpSel=b.dataset.t;talMark();talHint();
     tpHeld=false;clearTimeout(tpHold);tpHold=setTimeout(()=>{tpHeld=true;},420);});
   box.addEventListener('pointerup',()=>clearTimeout(tpHold));box.addEventListener('pointercancel',()=>clearTimeout(tpHold));
   box.addEventListener('contextmenu',e=>e.preventDefault());
-  const HOVER=matchMedia('(hover:hover) and (pointer:fine)');   // наведение мышью — только там, где есть настоящая мышь
-  box.addEventListener('pointerover',e=>{if(e.pointerType!=='mouse'||!HOVER.matches)return;const b=e.target.closest('.tn');if(b)talHint(b.dataset.t);});
-  box.addEventListener('pointerleave',e=>{if(e.pointerType==='mouse'&&HOVER.matches)talHint();});
+  box.addEventListener('pointerover',e=>{if(e.pointerType!=='mouse'||!TAL_HOVER.matches)return;const b=e.target.closest('.tn');if(b){tpHov=b.dataset.t;talHint(tpHov);}});
+  box.addEventListener('pointerleave',e=>{if(e.pointerType==='mouse'&&TAL_HOVER.matches){tpHov=null;talHint();}});
   box.addEventListener('focusin',e=>{const b=e.target.closest('.tn');if(b&&b.matches(':focus-visible'))talHint(b.dataset.t);});
   // стрелки — переход между плитками (Tab в игре открывает и закрывает книгу)
   box.addEventListener('keydown',e=>{const d={ArrowUp:[0,-1],ArrowDown:[0,1],ArrowLeft:[-1,0],ArrowRight:[1,0]}[e.key],b=e.target.closest('.tn');if(!d||!b)return;e.preventDefault();
@@ -3912,18 +3934,20 @@ function talAuto(role){const plan=(TAL_PLAN[role]||TAL_PLAN['Маг']).split(' '
     box.querySelectorAll('.tn').forEach(x=>{if(x===b)return;const q=x.getBoundingClientRect(),dx=q.left+q.width/2-cx,dy=q.top+q.height/2-cy,al=dx*d[0]+dy*d[1];
       if(al<=1)return;const sc=al+2*(Math.abs(dx*d[1])+Math.abs(dy*d[0]));if(sc<bs){bs=sc;best=x;}});
     if(best)best.focus();});
-  box.addEventListener('click',e=>{const b=e.target.closest('.tn');if(!b)return;const id=b.dataset.t,t=TAL_BY[id];tpSel=id;
+  box.addEventListener('click',e=>{const b=e.target.closest('.tn');if(!b)return;const id=b.dataset.t,t=TAL_BY[id];tpSel=id;tpMsg='';clearTimeout(tpMsgT);
     if(tpHeld&&e.detail){tpHeld=false;talMark();talHint();return;}   // зажали — только прочитать, очко не тратим
     tpHeld=false;
     if(!tpFree()||!talOpen(t)){talMark();talHint();talPop(id,'');return;}
     S.talents[id]=T(id)+1;onTalentsChanged();talPop(id,'+1');});}
-$('#tpAuto').addEventListener('click',()=>{const free=tpFree();if(!free){toast('Свободных очков нет');return;}
-  const before={...S.talents};talAuto(CLS&&CLS.role);const n=free-tpFree();if(!n){toast('Все таланты уже на максимуме');return;}
+$('#tpAuto').addEventListener('click',()=>{const free=tpFree();if(!free){talSay('Свободных очков нет.');return;}
+  const role=CLS&&CLS.role,before={...S.talents};talAuto(role);const n=free-tpFree();if(!n){talSay('Все таланты на максимуме.');return;}
   onTalentsChanged();for(const t of TALENTS){const d=T(t.id)-(before[t.id]||0);if(d>0)talPop(t.id,'+'+d);}
-  toast('Авто: вложено '+n+' '+(n%10===1&&n%100!==11?'очко':n%10>=2&&n%10<=4&&(n%100<10||n%100>=20)?'очка':'очков'));});
+  talSay('Авто'+(TAL_PLAN[role]?' для роли «'+role+'»':'')+': вложено '+n+' '+talPl(n)+'.');});
 let resetArm=0;
-$('#tpReset').addEventListener('click',e=>{const b=e.currentTarget;if(!resetArm){b.textContent='Точно?';resetArm=setTimeout(()=>{resetArm=0;b.textContent='Сброс';},3000);return;}
-  clearTimeout(resetArm);resetArm=0;b.textContent='Сброс';S.talents={};onTalentsChanged();toast('Очки вернулись: '+tpFree());});
+const TAL_ARM='Нажми «Точно?» ещё раз — все очки вернутся.';
+$('#tpReset').addEventListener('click',e=>{const b=e.currentTarget;if(!resetArm){b.textContent='Точно?';talSay(TAL_ARM);
+    resetArm=setTimeout(()=>{resetArm=0;b.textContent='Сброс';if(tpMsg===TAL_ARM){tpMsg='';talHint(tpHov);}},3000);return;}
+  clearTimeout(resetArm);resetArm=0;b.textContent='Сброс';S.talents={};onTalentsChanged();talSay('Очки вернулись: '+tpFree()+'.');});
 function onTalentsChanged(){computeStats();recalcStats();onBuildChanged();renderTalents();saveSoon();}
 
 function sheetHtml(sk){const eq=EQUIPPED.has(sk.id),ln=isLearned(sk.id),r=rk(sk.id);
