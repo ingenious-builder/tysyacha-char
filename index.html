@@ -88,8 +88,8 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 .sk.empty{border:2px dashed rgba(255,255,255,.35);background:rgba(14,18,34,.55);color:rgba(255,255,255,.6);font-size:26px;line-height:1}
 .sk.down{transform:translate(var(--x),var(--y)) scale(.92)}
 
-#joy{position:absolute;width:112px;height:112px;margin:-56px 0 0 -56px;border-radius:50%;
-  left:calc(var(--m) + 56px + var(--sal));top:calc(100% - var(--m) - 56px - var(--sab));
+#joy{position:absolute;width:100px;height:100px;margin:-50px 0 0 -50px;border-radius:50%;
+  left:calc(var(--m) + 50px + var(--sal));top:calc(100% - var(--m) - 50px - var(--sab));
   border:2px solid rgba(255,255,255,.22);background:rgba(255,255,255,.05);opacity:.55;transition:opacity .2s}
 #joy.on{opacity:1;transition:none}
 #knob{position:absolute;left:50%;top:50%;width:56px;height:56px;margin:-28px 0 0 -28px;border-radius:50%;background:rgba(255,255,255,.32);border:2px solid rgba(255,255,255,.5)}
@@ -2266,7 +2266,7 @@ function updateAim(){if(!aimSt||!aimSt.on||P.dead){hideAim();return;}const A=aim
   else{const len=F==='strike'?3+3.4*R:sk.F.range;aimLine.visible=true;aimLine.position.set(P.pos.x,.1,P.pos.z);aimLine.rotation.y=Math.atan2(A.dir.x,A.dir.z);aimLine.scale.set(F==='strike'?2.4*R:F==='beam'?1.1*R:.9,1,len);}}
 const tgtRing=new THREE.Mesh(FXG.ring,new THREE.MeshBasicMaterial({color:0xf2c46b,transparent:true,opacity:.85,depthWrite:false}));tgtRing.visible=false;scene.add(tgtRing);
 function updateTargetRing(){const t=target&&!target.dead&&mode==='game'?target:null;tgtRing.visible=!!t;if(t){tgtRing.position.set(t.pos.x,.09,t.pos.z);const s=t.r*1.7;tgtRing.scale.set(s,1,s);tgtRing.rotation.y=time*2;}}
-const ARC=[[110,180],[110,150],[110,120],[110,90],[170,160],[170,136.7],[170,113.3],[170,90]];
+const ARC=[[110,175],[110,145],[110,115],[110,85],[168,175],[168,145],[168,115],[168,85]];
 for(let i=0;i<8;i++){const b=document.createElement('button');b.type='button';b.className='sk';const [r,a]=ARC[i];
   b.style.setProperty('--x',(Math.cos(a*Math.PI/180)*r).toFixed(1)+'px');b.style.setProperty('--y',(-Math.sin(a*Math.PI/180)*r).toFixed(1)+'px');
   pad.appendChild(b);SKB.push({b,id:-2,p:-1,t:'',low:null});
