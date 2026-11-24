@@ -12,8 +12,10 @@
  *   room.kick() — принудительное переподключение (вернулись в приложение на iOS);  room.leave();
  *   room.status() -> { ws, joined, peers, tx, rx, lastErr, rtt, ... } для диагностики.
  *
- * Частота: сообщения копятся и уходят пачкой не чаще 1 раза в flushMs (по умолчанию 80 мс, то есть ≤ ~12 конвертов/с
- * на игрока). «Последнее побеждает» для игровых сообщений p (позиция), s (снимок), ka — они не копятся в очереди.
+ * Отправка (v2, меньше задержка): всё, что игра накопила за текущий ход JS (позиция + снимок + удар…), уходит одним конвертом
+ * в конце этого хода (микрозадача), без ожидания пачки. Позиции и снимки (p, s, ka) «последнее побеждает»: старый p/s в очереди
+ * заменяется новым. Пинг/понг и присутствие идут мимо очереди сразу. Лимит на себя: ведро ~24 конверта/с (ёмкость 8);
+ * при нехватке сообщения копятся (p/s заменяются) и уходят следующим конвертом, как только есть место.
  * Лимиты Supabase Realtime (бесплатный план): ~100 событий/с на проект и до 200 одновременных соединений.
  * Присутствие: свои hello раз в 2 с и bye при выходе; пир пропадает после 6 с молчания (любое сообщение его освежает).
  */
@@ -25,7 +27,7 @@
     o = o || {};
     var selfId = o.selfId || Math.random().toString(36).slice(2, 12);
     var url = o.url || DEF_URL, key = o.key || '';
-    var flushMs = o.flushMs || 80, helloMs = o.helloMs || 2000, silenceMs = o.silenceMs || 6000;
+    var rateMax = o.rate || 24, burst = o.burst || 8, helloMs = o.helloMs || 2000, silenceMs = o.silenceMs || 6000;
     var coalesce = o.coalesce || ['p', 's', 'ka'];
     var topic = 'realtime:' + String(o.appId || 'app').replace(/[^A-Za-z0-9_-]/g, '-').slice(-40) + '-' + String(o.roomId || 'room').replace(/[^A-Za-z0-9_-]/g, '').slice(0, 24);
 
@@ -123,7 +125,7 @@
       var isNew = seen(id, now);
       if (k === 'h') { if (isNew && !env.re) sendHello(true); return; }
       if (k === 'pi') { emitEnv({ k: 'po', n: env.n, to: id }); return; }
-      if (k === 'po') { var pr = pings[env.n]; if (pr) { delete pings[env.n]; var ms = now - pr.t; st.rtt = ms; pr.res(ms); } return; }
+      if (k === 'po') { var pr = pings[env.n]; if (pr) { delete pings[env.n]; var ms = performance.now() - pr.t; st.rtt = ms; pr.res(ms); } return; }
       if (k === 'd' && env.m) {
         for (var j = 0; j < env.m.length; j++) {
           var a = env.m[j], cbs = actions[a[0]]; if (!cbs) continue;
@@ -132,9 +134,19 @@
       } else if (isNew && k !== 'h') { /* неизвестный пир прислал данные — считаем присутствием */ }
     }
 
-    function flush() {
+    var tokens = o.burst || 8, tokAt = 0;
+    function takeToken() {
+      var n = performance.now();
+      if (!tokAt) tokAt = n;
+      tokens = Math.min(burst, tokens + (n - tokAt) * rateMax / 1000); tokAt = n;
+      if (tokens >= 1) { tokens -= 1; return 0; }
+      return Math.ceil((1 - tokens) * 1000 / rateMax);   // через сколько мс будет токен
+    }
+    function flush(force) {
       flushTimer = 0;
       if (!joined || !queue.length) { if (!joined && queue.length > 300) queue.splice(0, queue.length - 300); return; }
+      var wait = force === true ? 0 : takeToken();
+      if (wait) { flushTimer = setTimeout(flush, wait); return; }
       var by = {}, order = [], i, it;
       for (i = 0; i < queue.length; i++) { it = queue[i]; var t = it.to || ''; if (!by[t]) { by[t] = []; order.push(t); } by[t].push([it.a, it.d]); }
       queue = [];
@@ -152,7 +164,7 @@
         for (var i = 0; i < queue.length; i++) { var q = queue[i]; if (q.a === a && q.to === to && q.d && q.d.t === d.t) { q.d = d; return Promise.resolve(); } }
       }
       queue.push({ a: a, d: d, to: to || '' });
-      if (!flushTimer) flushTimer = setTimeout(flush, flushMs);
+      if (!flushTimer) { flushTimer = -1; Promise.resolve().then(function () { if (flushTimer === -1) flush(); }); }
       return Promise.resolve();
     }
 
@@ -179,7 +191,7 @@
       ping: function (peerId) {
         return new Promise(function (res, rej) {
           if (!joined || !peers[peerId]) { rej(new Error('нет связи')); return; }
-          var n = String(ref++); pings[n] = { t: Date.now(), res: res };
+          var n = String(ref++); pings[n] = { t: performance.now(), res: res };
           setTimeout(function () { if (pings[n]) { delete pings[n]; rej(new Error('таймаут')); } }, 5000);
           emitEnv({ k: 'pi', n: n, to: peerId });
         });
@@ -197,7 +209,7 @@
       },
       leave: function () {
         if (closed) return;
-        flush();
+        flush(true);
         if (joined) emitEnv({ k: 'b' });
         closed = true;
         clearInterval(helloTimer); clearInterval(prTimer); clearInterval(hbTimer); clearTimeout(reconTimer); clearTimeout(flushTimer);
