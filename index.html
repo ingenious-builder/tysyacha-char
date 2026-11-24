@@ -1401,6 +1401,10 @@ function spawnEnemy(tid,x,z,lv,o){o=o||{};const t=MOBS[tid],mdl=buildMob(tid);ri
   bg.renderOrder=30;fill.renderOrder=31;bar.add(bg,fill);bar.visible=false;bar.scale.setScalar(o.elite?2:1.45);en.bar=bar;en.fill=fill;
   scene.add(en.g,bar);ENEMIES.push(en);if(MPH)mpOnSpawn(en,o);return en;}
 function removeEnemy(i){const en=ENEMIES[i];if(MPH&&!en.dead)mpSend({t:'rm',u:en.uid});scene.remove(en.g,en.bar);if(en.label){scene.remove(en.label);en.label.material.map.dispose();en.label.material.dispose();}if(en.ring)en.ring.material.dispose();if(en.aura)en.aura.material.dispose();en.mats.forEach(m=>m.dispose());ENEMIES.splice(i,1);}
+// прогрев: по одному экземпляру каждого врага компилируем шейдеры заранее (иначе первое появление типа даёт провал кадра 50–400 мс)
+let WARMED=false;const WARM=[];
+function warmMobs(){WARMED=true;try{for(const id of Object.keys(MOBS)){const t=MOBS[id],m=buildMob(id);rimify(m.g,t.boss?0xff7a6a:0x8fb0ff,t.boss?.6:.42);m.g.position.set(0,-200,0);scene.add(m.g);WARM.push(m.g);}
+  renderer.compile(scene,camera);for(const g of WARM)g.visible=false;}catch(e){}}
 const aliveCount=()=>{let n=0;for(const e of ENEMIES)if(!e.dead)n++;return n;};
 function spawnPack(){const C=mpSpawnCenter(),a=rand(0,TAU),d=rand(18,26);let x=C.x+Math.cos(a)*d,z=C.z+Math.sin(a)*d;const l=Math.hypot(x,z);if(l>WORLD-3){x*=(WORLD-3)/l;z*=(WORLD-3)/l;}
   if(Math.hypot(x-C.x,z-C.z)<12||Math.hypot(x,z)<10)return;
@@ -2781,6 +2785,7 @@ function loop(now){
   requestAnimationFrame(loop);
   const dt=Math.min(.05,(now-last)/1000);last=now;
   if(bookOpen&&!MPon)return;
+  if(!WARMED&&mode==='game')warmMobs();
   pBudget=500;timeU.value=time;if(MPon&&mode==='game'&&(bookOpen||luOpen))P.invulnT=Math.max(P.invulnT,.25);
   if(!paused){
     time+=dt;procBudget=40;perf(dt);
@@ -2821,6 +2826,24 @@ const MP_TURN=[{urls:['turn:openrelay.metered.ca:80','turn:openrelay.metered.ca:
 const NICK_KEY='tysyacha-nick',ROOM_KEY='tysyacha-room';
 Object.assign(MP,{active:false,play:'world',g:0,status:'idle',err:'',code:'',joinCode:null,lastRx:0,pingAt:0,byUid:new Map(),hitQ:[],pickGorge:false,down:false,revT:0,tBroken:false,pl:null,plCd:0,chest:null,wiped:false,hint:'',hintT:0});
 let mpLib=null,mpRoom=null,mpSendFn=null,mpTimer=0,mpSeq=0,mpHintUntil=0;
+
+// ---------- буфер интерполяции: чужие сущности рисуются чуть в прошлом, по времени отправителя ----------
+// отметка времени отправителя (ts, мс) -> свои часы через нижнюю огибающую задержки; между двумя образцами — линейно,
+// после последнего — экстраполяция по скорости не дальше 0.25 с (потерянный или поздний пакет не даёт рывка)
+function Interp(){this.b=[];this.off=null;}
+Interp.prototype.push=function(ts,x,z){const now=performance.now(),c=now-ts;
+  if(this.off===null||c<this.off)this.off=c;else this.off+=(c-this.off)*.02;
+  const b=this.b;if(b.length&&ts<=b[b.length-1][0])return;b.push([ts,x,z]);if(b.length>8)b.shift();};
+Interp.prototype.at=function(delay,out){const b=this.b,n=b.length;if(!n)return false;
+  const T=performance.now()-this.off-delay;
+  if(n===1||T<=b[0][0]){out.x=b[0][1];out.z=b[0][2];return true;}
+  const L=b[n-1];
+  if(T>=L[0]){const P=b[n-2],dt=L[0]-P[0],e=Math.min(T-L[0],250);
+    if(dt>0&&Math.hypot(L[1]-P[1],L[2]-P[2])<6){const k=e/dt;out.x=L[1]+(L[1]-P[1])*k;out.z=L[2]+(L[2]-P[2])*k;}else{out.x=L[1];out.z=L[2];}return true;}
+  for(let i=n-1;i>0;i--){const A=b[i-1],B=b[i];if(T>=A[0]){const k=(T-A[0])/Math.max(1,B[0]-A[0]);
+    if(Math.hypot(B[1]-A[1],B[2]-A[2])>8){out.x=B[1];out.z=B[2];}else{out.x=A[1]+(B[1]-A[1])*k;out.z=A[2]+(B[2]-A[2])*k;}return true;}}
+  out.x=b[0][1];out.z=b[0][2];return true;};
+const IP_OUT={x:0,z:0},PEER_DELAY=95,ENEMY_DELAY=110;
 
 // ---------- ник ----------
 function mpNick(){try{return localStorage.getItem(NICK_KEY)||'';}catch(e){return '';}}
@@ -2879,13 +2902,13 @@ function mpTick(){
     if(MP.active&&mode==='game'&&MP.peer&&MP.peer.on){
       mpSendPos();
       if(MP.hitQ.length){mpSend({t:'H',a:MP.hitQ.splice(0,60)});}
-      if(MPH&&((++mpSeq)&1)===0)mpSendSnap();
+      if(MPH)mpSendSnap();
     }else if(now-MP.kaAt>2000||!MP.kaAt){MP.kaAt=now;mpSend({t:'ka'});}
     if(now-MP.pingAt>2500){MP.pingAt=now;try{mpRoom.ping(MP.peerId).then(ms=>{MP.ping=ms;}).catch(()=>{});}catch(e){}}
   }else if(MP.role&&MP.code&&mpRoom&&now-MP.t0>(MP.role==='guest'?25000:60000)){MP.t0=now;mpOpen(MP.role,MP.code);}
 }
 function mpSendPos(){
-  mpSend({t:'p',x:r2(P.pos.x),z:r2(P.pos.z),f:r2(P.face),h:Math.round(P.hp),m:Math.round(P.maxHp),mv:P.moving?1:0,d:P.dead?1:0,c:P.castT>0?1:0,sw:P.swingT>0?1:0,sh:P.shield>0?1:0,rp:r2(MP.revT/3),l:S.lvl});}
+  mpSend({t:'p',ts:Math.round(performance.now()),x:r2(P.pos.x),z:r2(P.pos.z),f:r2(P.face),h:Math.round(P.hp),m:Math.round(P.maxHp),mv:P.moving?1:0,d:P.dead?1:0,c:P.castT>0?1:0,sw:P.swingT>0?1:0,sh:P.shield>0?1:0,rp:r2(MP.revT/3),l:S.lvl});}
 
 // ---------- приём сообщений ----------
 function mpOnMsg(m,id){
@@ -2926,7 +2949,7 @@ function mpOnFull(){MP.status='full';MP.err='Комната занята: там
 function mpOnHi(m){
   const cls=CLASS_BY[m.c]?m.c:'pyro';
   const first=!MP.peer;
-  if(first)MP.peer={on:false,pos:new THREE.Vector3(),vel:new THREE.Vector3(),tx:0,tz:0,tf:0,dead:false,hp:100,maxHp:100,walk:0,castT:0,hero:null,lbl:null,placed:false,mv:0,sh:0,rp:0};
+  if(first)MP.peer={ib:new Interp(),on:false,pos:new THREE.Vector3(),vel:new THREE.Vector3(),tx:0,tz:0,tf:0,dead:false,hp:100,maxHp:100,walk:0,castT:0,hero:null,lbl:null,placed:false,mv:0,sh:0,rp:0};
   const pr=MP.peer;pr.nick=nickClean(m.n)||'Напарник';pr.cls=cls;pr.lvl=m.l|0||1;pr.gorge=m.g|0;
   MP.status=MP.active?'playing':'lobby';
   if(first&&MP.active&&MPH){/* гость вернулся, пока идёт игра: ждёт его «rdy» или сам войдёт */}
@@ -3033,8 +3056,8 @@ function mpSendSnap(){
   const e=[];
   for(const en of ENEMIES){if(en.dead)continue;
     const fl=(en.moving?1:0)|(en.stun>0?2:0)|(en.frozenT>0?4:0)|(en.burnT>0?8:0)|(en.poisT>0?16:0)|(en.slowT>0?32:0)|(en.lunge>0?64:0)|(en.slam>0?128:0)|(en.draw>0?256:0)|(en.busy>0?512:0)|(en.fuse?1024:0);
-    e.push([en.uid,r2(en.pos.x),r2(en.pos.z),r2(en.face),Math.round(en.hp),fl,r2(en.jy||0)]);}
-  const o={t:'s',e,cb:MP.combo,ct:+MP.comboT.toFixed(1)};
+    e.push(en.uid,Math.round(en.pos.x*20),Math.round(en.pos.z*20),Math.round(en.face*100),Math.round(en.hp),fl,Math.round((en.jy||0)*50));}
+  const o={t:'s',ts:Math.round(performance.now()),e,cb:MP.combo,ct:+MP.comboT.toFixed(1)};
   if(MP.pl)o.pl={a:[r2(MP.pl.a.x),r2(MP.pl.a.z)],b:[r2(MP.pl.b.x),r2(MP.pl.b.z)],p:r2(MP.pl.p),tl:r2(MP.pl.tl),oa:MP.pl.oa,ob:MP.pl.ob};
   if(MP.chest&&!MP.chest.open)o.ch=r2(MP.chest.t);
   mpSend(o);}
@@ -3051,18 +3074,21 @@ function mpGuestKill(m){
 function mpGuestRemove(m){const en=MP.byUid.get(m.u);if(!en)return;MP.byUid.delete(m.u);if(en===BOSS)BOSS=null;const i=ENEMIES.indexOf(en);if(i>=0)removeEnemy(i);}
 function mpOnSnap(m){
   if(!MPG)return;
-  for(const t of m.e){const en=MP.byUid.get(t[0]);if(!en||en.dead)continue;
-    const dh=en.hp-t[4];if(dh>=1&&time-(en.selfHit||-9)>.45)float({x:en.pos.x,y:en.hy-1.7,z:en.pos.z},String(Math.round(dh)),'#cfd8ff',12);
-    if(!en.tg)en.pos.set(t[1],0,t[2]);
-    en.tg={x:t[1],z:t[2],f:t[3],fl:t[5],jy:t[6]};en.hp=t[4];}
+  const E=m.e,ts=m.ts!=null?m.ts:performance.now();
+  for(let i=0;i+6<E.length;i+=7){const en=MP.byUid.get(E[i]);if(!en||en.dead)continue;
+    const x=E[i+1]/20,z=E[i+2]/20,hp=E[i+4];
+    const dh=en.hp-hp;if(dh>=1&&time-(en.selfHit||-9)>.45)float({x:en.pos.x,y:en.hy-1.7,z:en.pos.z},String(Math.round(dh)),'#cfd8ff',12);
+    if(!en.tg)en.pos.set(x,0,z);
+    if(!en.ib)en.ib=new Interp();en.ib.push(ts,x,z);
+    en.tg={x,z,f:E[i+3]/100,fl:E[i+5],jy:E[i+6]/50};en.hp=hp;}
   MP.combo=m.cb|0;MP.comboT=m.ct||0;
   if(m.pl){MP.pl={a:{x:m.pl.a[0],z:m.pl.a[1]},b:{x:m.pl.b[0],z:m.pl.b[1]},p:m.pl.p,tl:m.pl.tl,oa:m.pl.oa,ob:m.pl.ob,need:3};}else MP.pl=null;
   if(MP.chest&&m.ch!=null)MP.chest.t=m.ch;}
 function mpStepRemote(en,dt){
   en.flash-=dt;const t=en.tg;if(!t)return;
-  const dx=t.x-en.pos.x,dz=t.z-en.pos.z,d=Math.hypot(dx,dz),k=1-Math.exp(-dt*13);
-  if(d>10){en.pos.x=t.x;en.pos.z=t.z;}else{en.pos.x+=dx*k;en.pos.z+=dz*k;}
-  const f=t.fl;en.face=t.f;en.jy=t.jy;en.moving=!!(f&1)||d>.06;
+  const ox=en.pos.x,oz=en.pos.z;if(en.ib&&en.ib.at(ENEMY_DELAY,IP_OUT)){en.pos.x=IP_OUT.x;en.pos.z=IP_OUT.z;}else{en.pos.x=t.x;en.pos.z=t.z;}
+  const d=Math.hypot(t.x-en.pos.x,t.z-en.pos.z);
+  const f=t.fl;en.face=t.f;en.jy=t.jy;en.moving=!!(f&1)||Math.hypot(en.pos.x-ox,en.pos.z-oz)>.004;
   en.stun=(f&2)?.6:0;en.frozenT=(f&4)?1:0;en.burnT=(f&8)?1:0;en.poisT=(f&16)?1:0;en.slowT=(f&32)?1:0;
   en.lunge=(f&64)?.2:0;en.slam=(f&128)?.2:0;en.draw=(f&256)?.2:0;en.busy=(f&512)?.2:0;en.fuse=!!(f&1024);}
 function mpGuestTele(m){if(!MPG||mode!=='game')return;
@@ -3122,14 +3148,14 @@ function mpSelfLabel(){
 function mpOnPos(m){
   const pr=MP.peer;if(!pr||!MP.active)return;
   if(!pr.on){/* напарник в игре — значит вошёл */pr.on=true;if(MP.active)mpPeerModelMake();}
-  pr.tx=m.x;pr.tz=m.z;pr.tf=m.f;pr.hp=m.h;pr.maxHp=m.m;pr.mv=m.mv;pr.sw=m.sw;pr.sh=m.sh;pr.rp=m.rp;pr.lvl=m.l||pr.lvl;
+  pr.ib.push(m.ts!=null?m.ts:performance.now(),m.x,m.z);pr.tx=m.x;pr.tz=m.z;pr.tf=m.f;pr.hp=m.h;pr.maxHp=m.m;pr.mv=m.mv;pr.sw=m.sw;pr.sh=m.sh;pr.rp=m.rp;pr.lvl=m.l||pr.lvl;
   if(m.c&&pr.castT<.1)pr.castT=.3;
   const wasDead=pr.dead;pr.dead=!!m.d;if(pr.dead&&!wasDead&&MP.active)hint(pr.nick+' упал — встань рядом на 3 секунды, чтобы поднять',5);
   if(!pr.placed){pr.pos.set(m.x,0,m.z);pr.placed=true;}}
 function mpUpdatePeer(dt){
   const pr=MP.peer;if(!pr||!pr.on||!pr.hero)return;const h=pr.hero;
   const ox=pr.pos.x,oz=pr.pos.z,k=1-Math.exp(-dt*16);
-  if(Math.hypot(pr.tx-ox,pr.tz-oz)>12){pr.pos.x=pr.tx;pr.pos.z=pr.tz;}else{pr.pos.x+=(pr.tx-ox)*k;pr.pos.z+=(pr.tz-oz)*k;}
+  if(pr.ib&&pr.ib.at(PEER_DELAY,IP_OUT)){pr.pos.x=IP_OUT.x;pr.pos.z=IP_OUT.z;}else if(Math.hypot(pr.tx-ox,pr.tz-oz)>12){pr.pos.x=pr.tx;pr.pos.z=pr.tz;}else{pr.pos.x+=(pr.tx-ox)*k;pr.pos.z+=(pr.tz-oz)*k;}
   pr.vel.set((pr.pos.x-ox)/Math.max(dt,1e-3),0,(pr.pos.z-oz)/Math.max(dt,1e-3));
   h.g.position.set(pr.pos.x,pr.dead?.2:0,pr.pos.z);
   let a=pr.tf-h.g.rotation.y;a=Math.atan2(Math.sin(a),Math.cos(a));h.g.rotation.y+=a*Math.min(1,dt*14);h.g.rotation.z=pr.dead?1.4:0;
