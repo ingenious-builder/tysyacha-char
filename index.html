@@ -217,6 +217,14 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 .ico{flex:none;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;border:2px solid var(--c);background:radial-gradient(circle at 40% 35%,color-mix(in srgb,var(--c) 50%,transparent),#0e1222 75%)}
 .ico svg{width:22px;height:22px}
 .ico.p{border-radius:11px}
+.ico,.slot{position:relative}
+.mb{position:absolute;right:-3px;bottom:-3px;min-width:15px;padding:1px 3px;border-radius:7px;background:rgba(8,10,22,.88);border:1px solid rgba(255,233,168,.55);color:#ffe9a8;font:700 10px/1.25 var(--f-ui);font-style:normal;text-align:center;z-index:4;pointer-events:none}
+.sk .mb{right:5px;bottom:3px;border:0;background:rgba(8,10,22,.75);font-size:9px;min-width:0;padding:0 2px}
+.vars{display:flex;flex-wrap:wrap;gap:5px}
+.vchip{padding:4px 8px;border-radius:9px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--text);font:500 12px var(--f-ui)}
+.vchip.on{border-color:var(--gold);background:rgba(242,196,107,.14);color:var(--gold)}
+.vchip.lk{opacity:.45}
+.nv{font-size:10px;color:var(--gold);border:1px solid rgba(242,196,107,.5);border-radius:6px;padding:1px 5px;margin-left:6px;font-style:normal}
 .rt{flex:1;min-width:0;display:grid;gap:2px}
 .nm{font:500 15px/1.2 var(--f-ui);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .nm i{font-style:normal;color:var(--ess);font-size:13px}
@@ -560,11 +568,13 @@ const NF=FORMS.length,NM=MODS.length,PER_EL=NF*NM;
 const SKILLS=[];
 for(let e=0;e<10;e++)for(let f=0;f<NF;f++)for(let m=0;m<NM;m++){
   const E=ELEMENTS[e],F=FORMS[f],M=MODS[m];
-  SKILLS.push({id:e*PER_EL+f*NM+m,e,f,m,E,F,M,active:F.kind==='active',base:F.names[e],
+  SKILLS.push({id:e*PER_EL+f*NM+m,e,f,m,E,F,M,bk:e*NF+f,active:F.kind==='active',base:F.names[e],
     key:(F.names[e]+' '+M.name+' '+E.name+' '+F.role).toLowerCase()});
 }
 const sid=(e,f,m)=>EL[e]*PER_EL+FORM[f]*NM+MOD[m];
 const skName=sk=>sk.base+' · '+sk.M.name;
+const MODG=['+','»','×3','◎','♥','✸','✦','≈'];
+const modBadge=sk=>`<i class="mb" title="${sk.M.name}">${MODG[sk.m]}</i>`;
 const skLead=sk=>sk.F.how+', '+sk.E.short+'.';
 
 const rkey=(a,b)=>a<b?a*16+b:b*16+a;
@@ -641,8 +651,11 @@ const CLASSES=[
  {id:'alch',name:'Алхимик',role:'Маг',p:'poison',s:'arcane',pa:['meteor','trap','bolt','chain','summon'],pp:['trail','brand','surge'],sa:['barrier'],sp:['aura','orbit','doom'],hp:1,mp:1.1,spd:1.03,diff:3,
   desc:'Швыряет колбы, расставляет мины и варит ядовитые облака.',look:{body:'leather',c1:0x6b4a2e,c2:0x9be84a,head:'goggles',hc:0x3a2a1a,eyes:0x9be84a,weapon:'flask'}},
 ];
+// третья стихия класса: по характеру, даёт ещё 19 баз чар (всего 57 баз × 8 вариантов)
+const THIRD={pyro:'earth',cryo:'wind',storm:'wind',plague:'blood',necro:'poison',paladin:'fire',geo:'storm',windr:'ice',hemo:'shadow',arcan:'ice',bers:'fire',dk:'blood',druid:'wind',hunter:'earth',assassin:'blood',shaman:'wind',monk:'fire',lock:'blood',inq:'earth',alch:'fire'};
 const CLASS_BY={};CLASSES.forEach(c=>{CLASS_BY[c.id]=c;c.icon='w_'+c.look.weapon;
-  c.pairs=[...c.pa.map(f=>[c.p,f]),...c.pp.map(f=>[c.p,f]),...c.sa.map(f=>[c.s,f]),...c.sp.map(f=>[c.s,f])];
+  c.t=THIRD[c.id];c.core=new Set([...c.pa.map(f=>[c.p,f]),...c.pp.map(f=>[c.p,f]),...c.sa.map(f=>[c.s,f]),...c.sp.map(f=>[c.s,f])].map(([e,f])=>EL[e]*NF+FORM[f]));
+  c.pairs=[];for(const e of [c.p,c.s,c.t])for(const F of FORMS)c.pairs.push([e,F.id]);
   c.pool=new Set();for(const [e,f] of c.pairs)for(const m of MODS)c.pool.add(sid(e,f,m.id));
   c.color=ELEMENTS[EL[c.p]].color;c.hex=ELEMENTS[EL[c.p]].hex;});
 
@@ -701,6 +714,7 @@ function validChar(d,c){if(!d||!Array.isArray(d.active)||!Array.isArray(d.passiv
   s.learned=d.learned.filter(v=>c.pool.has(v));s.ranks=(d.ranks&&typeof d.ranks==='object')?d.ranks:{};s.talents=(d.talents&&typeof d.talents==='object')?d.talents:{};
   for(let i=0;i<8;i++){const v=d.active[i];s.active[i]=(v!=null&&c.pool.has(v)&&SKILLS[v].active)?v:null;}
   for(let i=0;i<42;i++){const v=d.passive[i];s.passive[i]=(v!=null&&c.pool.has(v)&&!SKILLS[v].active)?v:null;}
+  const seenB=new Set();for(const a of [s.active,s.passive])for(let i=0;i<a.length;i++){if(a[i]==null)continue;const b=SKILLS[a[i]].bk;if(seenB.has(b))a[i]=null;else seenB.add(b);}
   return s;}
 let saveTimer=0;
 function save(){if(CLS&&S){SAVE.chars[CLS.id]=S;SAVE.cur=CLS.id;}try{localStorage.setItem(SAVE_KEY,JSON.stringify(SAVE));}catch(e){}}
@@ -1260,13 +1274,17 @@ function dropLoot(en){const tot=Math.max(1,Math.round(en.xp*.55));const n=en.bos
   for(let i=0;i<n;i++)dropItem('ess',en.pos.x,en.pos.z,Math.max(1,Math.round(tot/n)));
   const sc=en.boss?3:Math.random()<(en.elite?.45:.04)?1:0;for(let i=0;i<sc;i++)dropItem('scroll',en.pos.x,en.pos.z);
   if(en.boss||en.elite||Math.random()<.1)dropItem('hp',en.pos.x,en.pos.z);}
+const baseSlot=sk=>{for(const a of [S.active,S.passive])for(const v of a)if(v!=null&&v!==sk.id&&SKILLS[v].bk===sk.bk)return v;return null;};
 function learn(id,autoEquip){if(!LEARNED.has(id)){LEARNED.add(id);S.learned.push(id);}
-  if(autoEquip&&!EQUIPPED.has(id)){const sk=SKILLS[id],arr=sk.active?S.active:S.passive,n=sk.active?activeSlots():passiveSlots();const idx=arr.findIndex((v,i)=>i<n&&v==null);if(idx>=0)arr[idx]=id;}
+  if(autoEquip&&!EQUIPPED.has(id)&&baseSlot(SKILLS[id])==null){const sk=SKILLS[id],arr=sk.active?S.active:S.passive,n=sk.active?activeSlots():passiveSlots();const idx=arr.findIndex((v,i)=>i<n&&v==null);if(idx>=0)arr[idx]=id;}
   onBuildChanged();saveSoon();}
 function unlearnedPool(){const a=[];CLS.pool.forEach(id=>{if(!LEARNED.has(id))a.push(SKILLS[id]);});return a;}
-function learnRandom(){const pool=unlearnedPool();
+// свитки и выбор уровня: сначала новые базы чар (а не ещё один вариант уже известной), чары ядра класса втрое чаще
+function rollPool(){const all=unlearnedPool(),lb=new Set();LEARNED.forEach(id=>lb.add(SKILLS[id].bk));const nb=all.filter(s=>!lb.has(s.bk));return nb.length&&Math.random()<.9?nb:all;}
+function wpick(c){let t=0;const w=c.map(s=>CLS.core.has(s.bk)?3:1);for(const x of w)t+=x;let r=Math.random()*t;for(let i=0;i<c.length;i++){r-=w[i];if(r<=0)return c[i];}return c[0];}
+function learnRandom(){const pool=rollPool();
   if(!pool.length||S.sandbox){S.ess+=60;toast('Свиток рассыпался в 60 эссенции');return;}
-  const sk=pool[Math.random()*pool.length|0];learn(sk.id,true);fxPillar(P.pos.x,P.pos.z,.8,5,GOLD,.7);colBurst(GOLD,P.pos.x,1.2,P.pos.z,20,4,.7,-2);
+  const sk=wpick(pool);learn(sk.id,true);fxPillar(P.pos.x,P.pos.z,.8,5,GOLD,.7);colBurst(GOLD,P.pos.x,1.2,P.pos.z,20,4,.7,-2);
   toast('Свиток: «'+skName(sk)+'»'+(EQUIPPED.has(sk.id)?' — сразу в билде':' — в книге'));}
 
 // =====================================================================
@@ -1890,7 +1908,7 @@ for(let i=0;i<8;i++){const b=document.createElement('button');b.type='button';b.
 function updateHudSlots(){const n=activeSlots();
   SKB.forEach((s,i)=>{const id=i<n?S.active[i]:null;s.b.hidden=i>=n;if(i>=n)return;
     if(id==null){s.b.className='sk empty';s.b.textContent='+';s.b.style.removeProperty('--c');s.id=-1;s.b.setAttribute('aria-label','Пустой слот '+(i+1));return;}
-    const sk=SKILLS[id];s.b.className='sk';s.b.style.setProperty('--c',sk.E.hex);s.b.innerHTML=svg(sk.F.id)+'<span class="cd"></span><span class="t"></span>';
+    const sk=SKILLS[id];s.b.className='sk';s.b.style.setProperty('--c',sk.E.hex);s.b.innerHTML=svg(sk.F.id)+modBadge(sk)+'<span class="cd"></span><span class="t"></span>';
     s.b.setAttribute('aria-label',skName(sk));s.id=id;s.p=-1;s.t='';s.low=null;s.cdEl=s.b.querySelector('.cd');s.tEl=s.b.querySelector('.t');});
   const tot=EQUIPPED.size,cap_=activeSlots()+passiveSlots();
   $('#bookCount').textContent=tot+'/'+cap_;$('#tabBuildN').textContent=tot+'/'+cap_;
@@ -1980,7 +1998,7 @@ function renderSelInfo(){const c=CLASS_BY[selId],sv=SAVE.chars[c.id],E1=ELEMENTS
   <p class="si-desc">${c.desc}</p>
   <div class="si-stats">${stat('Здоровье',c.hp,1.55)}${stat('Мана',c.mp,1.35)}${stat('Скорость',c.spd,1.18)}</div>
   <div class="si-sig">${sig}</div>
-  <p class="si-prog">${sv?`Уровень ${sv.lvl|0} · побед ${sv.kills|0} · изучено ${(sv.learned||[]).length} из ${c.pool.size}`:`Новый герой · ${c.pool.size} чар класса`}</p>
+  <p class="si-prog">${sv?`Уровень ${sv.lvl|0} · побед ${sv.kills|0} · изучено ${(sv.learned||[]).length} из ${c.pool.size}`:`Новый герой · ${c.pairs.length} видов чар, ${c.pool.size} вариантов`}</p>
   <div class="sel-btns"><button class="big" id="selPlay" type="button">Свободный мир</button><button class="btn" id="selGorge" type="button">Ущелья · пройдено ${(sv&&sv.gorge)|0} из 12</button></div>
   <p class="si-hint">Слева — ходьба. Справа — атака и чары: тап колдует сам, потяни от кнопки — прицел. Красное на земле — уходи.</p>`;
   $('#selPlay').addEventListener('click',startGame);$('#selGorge').addEventListener('click',openGorges);}
@@ -1997,13 +2015,14 @@ function toSelect(){save();closeBook();mode='select';clearWorld();exitGorge();$(
 // LEVEL-UP CHOICE
 // =====================================================================
 let luOpen=false;
-function rollChoices(){const pool=unlearnedPool();if(!pool.length)return[];const res=[];
-  const take=f=>{const c=pool.filter(s=>f(s)&&!res.includes(s));if(c.length)res.push(c[Math.random()*c.length|0]);};
-  take(s=>s.active);take(s=>!s.active);take(s=>s.E.id===CLS.s);while(res.length<3&&res.length<pool.length)take(()=>true);return res;}
+function rollChoices(){const pool=rollPool();if(!pool.length)return[];const res=[];
+  const take=f=>{const c=pool.filter(s=>f(s)&&!res.some(r=>r.bk===s.bk));if(c.length)res.push(wpick(c));};
+  take(s=>s.active);take(s=>!s.active);take(s=>s.E.id===CLS.s);let g=0;while(res.length<3&&g++<9)take(()=>true);return res;}
+const knownBase=sk=>{for(const id of LEARNED)if(SKILLS[id].bk===sk.bk)return true;return false;};
 function cardStat(sk){return sk.active?`${fmt(skDmg(sk))} урона · ${skMana(sk)} маны · ${fmt(skCd(sk))} с`:`${fmt(skDmg(sk))} урона · пассивная`;}
 function openLevelUp(){const ch=rollChoices();if(!ch.length){luQueue=0;return;}luOpen=true;syncPause();
   $('#luTitle').textContent='Уровень '+S.lvl;$('#luSub').textContent='Выбери новые чары. Если есть свободный слот, они сразу встанут в билд.'+(tpFree()?' Очков талантов: '+tpFree()+'.':'');
-  $('#luCards').innerHTML=ch.map(sk=>`<button type="button" class="card" data-id="${sk.id}"><span class="ico${sk.active?'':' p'}" style="--c:${sk.E.hex}">${svg(sk.F.id)}</span><span class="ct"><span class="tag">${sk.F.role} · ${sk.E.name}</span><b>${sk.base}</b><span class="var">${sk.M.name}: ${sk.M.desc}</span><small>${cap(skLead(sk))}</small><small>${cardStat(sk)}</small></span></button>`).join('');
+  $('#luCards').innerHTML=ch.map(sk=>`<button type="button" class="card" data-id="${sk.id}"><span class="ico${sk.active?'':' p'}" style="--c:${sk.E.hex}">${svg(sk.F.id)}${modBadge(sk)}</span><span class="ct"><span class="tag">${sk.F.role} · ${sk.E.name}${knownBase(sk)?'<i class="nv">вариант известной</i>':'<i class="nv">новая чара</i>'}</span><b>${sk.base}</b><span class="var">${sk.M.name}: ${sk.M.desc}</span><small>${cap(skLead(sk))}</small><small>${cardStat(sk)}</small></span></button>`).join('');
   $('#luSkip').textContent='Пропустить: +'+(20+S.lvl*5)+' эссенции';$('#lvlup').hidden=false;}
 function closeLevelUp(){luOpen=false;$('#lvlup').hidden=true;luQueue=Math.max(0,luQueue-1);luDelay=.35;syncPause();}
 $('#luCards').addEventListener('click',e=>{const b=e.target.closest('.card');if(!b)return;const sk=SKILLS[+b.dataset.id];learn(sk.id,true);toast('Изучено: '+skName(sk)+(EQUIPPED.has(sk.id)?' — в билде':' — в книге'));closeLevelUp();});
@@ -2020,8 +2039,8 @@ function chip(label,on,attrs,c){return `<button type="button" class="chip${on?' 
 function renderFilters(){
   const T_=[['learned','Изученные'],['all','Все чары класса'],['active','Активные'],['passive','Пассивные'],['eq','В билде']];
   $('#fType').innerHTML=T_.map(([k,l])=>chip(l,F_.type===k,`data-type="${k}"`)).join('');
-  const els=[EL[CLS.p],EL[CLS.s]];
-  $('#fEl').innerHTML=chip('Обе стихии',F_.el<0,'data-el="-1"')+els.map(i=>chip(`<span class="dot"></span>${ELEMENTS[i].name}`,F_.el===i,`data-el="${i}"`,ELEMENTS[i].hex)).join('');
+  const els=[EL[CLS.p],EL[CLS.s],EL[CLS.t]];
+  $('#fEl').innerHTML=chip('Все стихии',F_.el<0,'data-el="-1"')+els.map(i=>chip(`<span class="dot"></span>${ELEMENTS[i].name}`,F_.el===i,`data-el="${i}"`,ELEMENTS[i].hex)).join('');
   const forms=[...new Set(CLASS_BY[CLS.id].pairs.map(p=>p[1]))];
   $('#fForm').innerHTML=chip('Все виды',F_.form<0,'data-form="-1"')+forms.map(f=>{const i=FORM[f];return chip(svg(f,'currentColor')+FORMS[i].role+(['nova','meteor','rain'].includes(f)?' · '+({nova:'нова',meteor:'удар сверху',rain:'дождь'})[f]:['bolt','chain','beam'].includes(f)?' · '+({bolt:'снаряд',chain:'цепь',beam:'луч'})[f]:['strike','whirl'].includes(f)?' · '+({strike:'удар',whirl:'вихрь'})[f]:''),F_.form===i,`data-form="${i}"`);}).join('');}
 $('#fType').addEventListener('click',e=>{const b=e.target.closest('[data-type]');if(!b)return;F_.type=b.dataset.type;renderFilters();renderList();});
@@ -2029,10 +2048,11 @@ $('#fEl').addEventListener('click',e=>{const b=e.target.closest('[data-el]');if(
 $('#fForm').addEventListener('click',e=>{const b=e.target.closest('[data-form]');if(!b)return;F_.form=+b.dataset.form;renderFilters();renderList();});
 $('#q').addEventListener('input',e=>{F_.q=e.target.value.trim().toLowerCase();renderList();});
 const pips=r=>`<span class="pips">${[1,2,3,4,5].map(i=>`<i class="${i<=r?'on':''}"></i>`).join('')}</span>`;
-function rowHtml(sk){const eq=EQUIPPED.has(sk.id),ln=isLearned(sk.id);
-  return `<button type="button" class="row${eq?' eq':''}${ln?'':' locked'}" data-id="${sk.id}"><span class="ico${sk.active?'':' p'}" style="--c:${sk.E.hex}">${svg(sk.F.id)}</span>
-  <span class="rt"><span class="nm">${sk.base} <i>· ${sk.M.name}</i></span><span class="meta">${sk.F.role} · ${ln?(rk(sk.id)>1?'ранг '+rk(sk.id)+' · ':'')+cardStat(sk):'не изучено'}</span></span>${eq?'<span class="badge">в билде</span>':''}</button>`;}
-function classSkills(){const a=[];CLS.pool.forEach(id=>a.push(SKILLS[id]));a.sort((x,y)=>(x.E.id===CLS.p?0:1)-(y.E.id===CLS.p?0:1)||x.f-y.f||x.m-y.m);return a;}
+const learnedVars=bk=>{let n=0;for(let m=0;m<NM;m++)if(isLearned(bk*NM+m))n++;return n;};
+function rowHtml(sk){const eq=EQUIPPED.has(sk.id),ln=isLearned(sk.id),lv=learnedVars(sk.bk);
+  return `<button type="button" class="row${eq?' eq':''}${ln?'':' locked'}" data-id="${sk.id}"><span class="ico${sk.active?'':' p'}" style="--c:${sk.E.hex}">${svg(sk.F.id)}${modBadge(sk)}</span>
+  <span class="rt"><span class="nm">${sk.base} <i>· ${sk.M.name}</i></span><span class="meta">${sk.F.role} · вариантов ${lv}/${NM} · ${ln?(rk(sk.id)>1?'ранг '+rk(sk.id)+' · ':'')+cardStat(sk):'не изучено'}</span></span>${eq?'<span class="badge">в билде</span>':''}</button>`;}
+function classSkills(){const a=[];CLS.pool.forEach(id=>a.push(SKILLS[id]));const er=e=>e===CLS.p?0:e===CLS.s?1:2;a.sort((x,y)=>er(x.E.id)-er(y.E.id)||x.f-y.f||x.m-y.m);return a;}
 function renderList(){
   const q=F_.q,lockType=pending&&pending.type?pending.type:null;
   LIST=classSkills().filter(sk=>{
@@ -2040,6 +2060,7 @@ function renderList(){
     if(F_.type==='learned'&&!isLearned(sk.id))return false;if(F_.type==='active'&&!sk.active)return false;if(F_.type==='passive'&&sk.active)return false;if(F_.type==='eq'&&!EQUIPPED.has(sk.id))return false;
     if(F_.el>=0&&sk.e!==F_.el)return false;if(F_.form>=0&&sk.f!==F_.form)return false;
     if(q)return q.split(/\s+/).every(w=>sk.key.includes(w));return true;});
+  {const gr=new Map(),sc=x=>(EQUIPPED.has(x.id)?10:0)+(isLearned(x.id)?5:0)+Math.min(rk(x.id),5)*.1;for(const sk of LIST){const o=gr.get(sk.bk);if(!o||sc(sk)>sc(o))gr.set(sk.bk,sk);}LIST=[...gr.values()];}
   if(pending&&pending.type)LIST.sort((a,b)=>isLearned(b.id)-isLearned(a.id));
   $('#found').textContent=LIST.length?('Найдено: '+LIST.length):'';
   listEl.scrollTop=0;shown=0;listEl.innerHTML=LIST.length?'':'<p class="hint" style="padding:12px 0">'+(F_.type==='learned'?'Среди изученных таких нет. Новые чары выпадают в свитках и даются за уровень.':'Ничего не нашлось. Сбрось фильтры или поищи по-другому.')+'</p>';
@@ -2053,7 +2074,7 @@ listEl.addEventListener('click',e=>{const r=e.target.closest('.row');if(r)openSh
 function slotHtml(id,i,kind,unlocked,lvlNeed){
   if(!unlocked)return `<button type="button" class="slot lock${id!=null?' has':''}" data-k="${kind}" data-i="${i}" aria-label="Закрыт до уровня ${lvlNeed}">ур ${lvlNeed}</button>`;
   if(id==null)return `<button type="button" class="slot empty" data-k="${kind}" data-i="${i}" aria-label="Пустой слот">+</button>`;
-  const sk=SKILLS[id];return `<button type="button" class="slot" style="--c:${sk.E.hex}" data-k="${kind}" data-i="${i}" aria-label="${skName(sk)}">${svg(sk.F.id)}</button>`;}
+  const sk=SKILLS[id];return `<button type="button" class="slot" style="--c:${sk.E.hex}" data-k="${kind}" data-i="${i}" aria-label="${skName(sk)}">${svg(sk.F.id)}${modBadge(sk)}</button>`;}
 function renderBuild(){
   const na=activeSlots(),np=passiveSlots();
   $('#slotsA').innerHTML=S.active.map((id,i)=>slotHtml(id,i,'a',i<na,activeLvl(i))).join('');
@@ -2076,7 +2097,7 @@ function onSlotClick(e){const b=e.target.closest('.slot');if(!b)return;const kin
 $('#slotsA').addEventListener('click',onSlotClick);$('#slotsP').addEventListener('click',onSlotClick);
 $('#sandbox').addEventListener('change',e=>{S.sandbox=e.target.checked;computeStats();recalcStats();onBuildChanged();renderBuild();toast(S.sandbox?'Тестовый режим: всё открыто':'Обычный режим: прогресс по уровням');});
 $('#randBuild').addEventListener('click',()=>{const na=activeSlots(),np=passiveSlots();const L=classSkills().filter(s=>isLearned(s.id));const A_=L.filter(s=>s.active).map(s=>s.id),P_=L.filter(s=>!s.active).map(s=>s.id);
-  const pick=(arr,n)=>{const c=arr.slice();for(let i=c.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[c[i],c[j]]=[c[j],c[i]];}return c.slice(0,n);};
+  const pick=(arr,n)=>{const c=arr.slice(),sb=new Set(),r=[];for(let i=c.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[c[i],c[j]]=[c[j],c[i]];}for(const id of c){if(r.length>=n)break;const b=SKILLS[id].bk;if(sb.has(b))continue;sb.add(b);r.push(id);}return r;};
   const a=pick(A_,na),p=pick(P_,np);for(let i=0;i<8;i++)S.active[i]=i<a.length?a[i]:null;for(let i=0;i<42;i++)S.passive[i]=i<p.length?p[i]:null;onBuildChanged();toast('Собран билд: '+(a.length+p.length)+' чар');});
 let clearArm=0;
 $('#clearBuild').addEventListener('click',e=>{const b=e.currentTarget;if(!clearArm){b.textContent='Точно снять все?';clearArm=setTimeout(()=>{clearArm=0;b.textContent='Снять всё';},3000);return;}
@@ -2109,23 +2130,24 @@ function sheetHtml(sk){const eq=EQUIPPED.has(sk.id),ln=isLearned(sk.id),r=rk(sk.
   else{acts=`<div class="sh-act">${eq?`<button type="button" class="btn warn" data-act="off">Снять</button>`:`<button type="button" class="btn gold" data-act="on">${pending&&pending.index!=null?'Поставить в слот '+(pending.index+1):'Взять в билд'}</button>`}`+
     (r<5?`<button type="button" class="btn ess" data-act="rank" ${S.ess<cost?'disabled':''}>Ранг ${r+1} · ${cost} эсс.</button>`:'')+`<button type="button" class="btn" data-act="close">Закрыть</button></div>`+
     (r<5&&S.ess<cost?`<p class="note">Нужно ${cost} эссенции, есть ${S.ess}. Эссенция падает со всех врагов.</p>`:'');}
-  return `<div class="sh-top"><span class="ico${sk.active?'':' p'}" style="--c:${sk.E.hex}">${svg(sk.F.id)}</span><div><h2>${sk.base}</h2><p><span class="tagc v">${sk.M.name}</span><span class="tagc">${sk.F.role}</span><span class="tagc" style="border-color:${sk.E.hex}">${sk.E.name}</span></p></div></div>
-  <p class="lead">${cap(skLead(sk))}</p><p class="note"><b style="color:var(--ess);font-weight:500">${sk.M.name}:</b> ${sk.M.desc}.</p>
+  const vars=`<div class="vars" role="group" aria-label="Варианты чары">${MODS.map((M,mi)=>{const v=SKILLS[sk.bk*NM+mi];return `<button type="button" class="vchip${v.id===sk.id?' on':''}${isLearned(v.id)?'':' lk'}" data-v="${v.id}">${MODG[mi]} ${M.name}${EQUIPPED.has(v.id)?' ●':''}</button>`;}).join('')}</div>`;
+  return `<div class="sh-top"><span class="ico${sk.active?'':' p'}" style="--c:${sk.E.hex}">${svg(sk.F.id)}${modBadge(sk)}</span><div><h2>${sk.base}</h2><p><span class="tagc v">${sk.M.name}</span><span class="tagc">${sk.F.role}</span><span class="tagc" style="border-color:${sk.E.hex}">${sk.E.name}</span></p></div></div>
+  ${vars}<p class="lead">${cap(skLead(sk))}</p><p class="note"><b style="color:var(--ess);font-weight:500">${sk.M.name}:</b> ${sk.M.desc}.</p>
   ${rankRow}<div class="stats">${st.map(([k,v])=>`<div>${k}<b>${v}</b></div>`).join('')}</div>${acts}`;}
 let sheetId=null;
 function openSheet(id){sheetId=id;$('#sh').innerHTML=sheetHtml(SKILLS[id]);$('#sheet').hidden=false;}
 function closeSheet(){$('#sheet').hidden=true;sheetId=null;}
-$('#sheet').addEventListener('click',e=>{if(e.target.id==='sheet'){closeSheet();return;}const b=e.target.closest('[data-act]');if(!b||b.disabled)return;const a=b.dataset.act,sk=SKILLS[sheetId];
+$('#sheet').addEventListener('click',e=>{if(e.target.id==='sheet'){closeSheet();return;}const vb=e.target.closest('[data-v]');if(vb){openSheet(+vb.dataset.v);return;}const b=e.target.closest('[data-act]');if(!b||b.disabled)return;const a=b.dataset.act,sk=SKILLS[sheetId];
   if(a==='close')closeSheet();
   else if(a==='rank'){const r=rk(sk.id),c=rankCost(r);if(S.ess<c||r>=5)return;S.ess-=c;S.ranks[sk.id]=r+1;onBuildChanged();saveSoon();openSheet(sk.id);toast(skName(sk)+': ранг '+(r+1));}
   else if(a==='off'){unequip(sk.id);closeSheet();toast('Снято: '+skName(sk));}
   else if(a==='on'){const r=equip(sk.id);closeSheet();
     if(r==='ok'){toast('В билде: '+skName(sk));if(pending&&pending.index!=null){setPending(null);closeBook();}}
     else if(r==='full'){setPending({replace:sk.id});showTab('build');toast('Слоты заняты. Нажми слот, который заменить');}}});
-function putInSlot(id,type,idx){const arr=type==='active'?S.active:S.passive;for(const a of [S.active,S.passive]){const j=a.indexOf(id);if(j>=0)a[j]=null;}arr[idx]=id;onBuildChanged();}
+function putInSlot(id,type,idx){const arr=type==='active'?S.active:S.passive,bk=SKILLS[id].bk;for(const a of [S.active,S.passive])for(let j=0;j<a.length;j++)if(a[j]!=null&&SKILLS[a[j]].bk===bk)a[j]=null;arr[idx]=id;onBuildChanged();}
 function equip(id){const sk=SKILLS[id];if(EQUIPPED.has(id))return 'ok';const type=sk.active?'active':'passive';
   if(pending&&pending.index!=null&&pending.type===type){putInSlot(id,type,pending.index);return 'ok';}
-  const arr=sk.active?S.active:S.passive,n=sk.active?activeSlots():passiveSlots();const idx=arr.findIndex((v,i)=>i<n&&v==null);if(idx<0)return 'full';putInSlot(id,type,idx);return 'ok';}
+  const arr=sk.active?S.active:S.passive,n=sk.active?activeSlots():passiveSlots();const ov=baseSlot(sk);if(ov!=null){putInSlot(id,type,arr.indexOf(ov));return 'ok';}const idx=arr.findIndex((v,i)=>i<n&&v==null);if(idx<0)return 'full';putInSlot(id,type,idx);return 'ok';}
 function unequip(id){for(const a of [S.active,S.passive]){const j=a.indexOf(id);if(j>=0)a[j]=null;}onBuildChanged();}
 function setPending(p){pending=p;const bar=$('#pendingBar');
   if(!p)bar.hidden=true;else{bar.hidden=false;$('#pendingTxt').textContent=p.replace!=null?('Выбери слот для «'+skName(SKILLS[p.replace])+'»'):('Выбери '+(p.type==='active'?'активные':'пассивные')+' чары для слота '+(p.index+1));}
