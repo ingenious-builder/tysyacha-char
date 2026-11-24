@@ -2898,7 +2898,7 @@ function mpOnMsg(m,id){
     case 'ka':break;
     case 'full':mpOnFull();break;
     case 'hi':mpOnHi(m);break;
-    case 'rdy':if(MPH&&MP.active&&mode==='game'){if(MP.peer)MP.peer.on=true;mpHostResync();}break;
+    case 'rdy':if(MPH&&MP.active&&mode==='game'){if(MP.peer){MP.peer.on=true;mpPeerModelMake();}mpHostResync();}break;
     case 'start':mpOnStart(m);break;
     case 'stop':mpOnStop();break;
     case 'bye':mpOnBye();break;
