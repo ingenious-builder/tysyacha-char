@@ -1,4 +1,6 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"><meta name="theme-color" content="#0d1120"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="apple-mobile-web-app-title" content="Тысяча чар"><meta name="application-name" content="Тысяча чар"><meta name="description" content="Тысяча чар — action-RPG в браузере: 20 героев, 10 стихий, 12 ущелий и кооператив на двоих."><link rel="manifest" href="manifest.webmanifest"><link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png"><link rel="apple-touch-icon" href="icons/apple-touch-icon.png"><style>:root{color-scheme:light;box-sizing:border-box}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"><meta name="theme-color" content="#0d1120"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="apple-mobile-web-app-title" content="Тысяча чар"><meta name="application-name" content="Тысяча чар"><meta name="description" content="Тысяча чар — action-RPG в браузере: 20 героев, 10 стихий, 12 ущелий и кооператив на двоих."><link rel="manifest" href="manifest.webmanifest"><link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png"><link rel="apple-touch-icon" href="icons/apple-touch-icon.png"><style>:root{color-scheme:light;box-sizing:border-box}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}.sk::after{display:none;position:absolute;right:4px;top:2px;z-index:5;font:700 11px/1 var(--f-ui);color:#fff;background:rgba(8,10,22,.8);border-radius:5px;padding:2px 4px;pointer-events:none}
+html.kb .sk::after{display:block;content:attr(data-k)}html.pad .sk::after{display:block;content:attr(data-g)}
+</style></head><body>
 <title>Тысяча чар</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -25,7 +27,7 @@
   color-scheme:dark;
   --sat-env:env(safe-area-inset-top,0px);--sab-env:env(safe-area-inset-bottom,0px);--sal-env:env(safe-area-inset-left,0px);--sar-env:env(safe-area-inset-right,0px);
   --sat-min:0px;--sab-min:0px;--sat:max(var(--sat-env),var(--sat-min));--sab:max(var(--sab-env),var(--sab-min));--sal:var(--sal-env);--sar:var(--sar-env);
-  --sw:clamp(190px,28vw,260px);--m:12px;--bs:48px;--ab:84px;--gp:8px;--tap:44px;
+  --sw:clamp(190px,28vw,260px);--u:1;--m:calc(12px * var(--u));--bs:calc(48px * var(--u));--ab:calc(84px * var(--u));--gp:8px;--tap:44px;
 }
 html{height:100%;box-sizing:border-box;background:var(--night);-webkit-text-size-adjust:100%;text-size-adjust:100%}
 html,body{position:fixed;top:0;left:0;right:0;bottom:0;width:100%}
@@ -351,7 +353,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 .plus{flex:none;width:44px;height:44px;border-radius:10px;border:1px solid rgba(242,196,107,.6);background:transparent;color:var(--gold);font:700 22px/1 var(--f-ui)}
 .plus:disabled{opacity:.25;cursor:default}
 
-#sheet{position:absolute;inset:0;background:rgba(5,8,18,.6);display:flex;align-items:flex-end;justify-content:center;
+#sheet{position:absolute;inset:0;z-index:10;background:rgba(5,8,18,.6);display:flex;align-items:flex-end;justify-content:center;
   padding:max(12px,var(--sat)) max(12px,var(--sar)) max(12px,var(--sab)) max(12px,var(--sal))}
 .sh{width:100%;max-width:460px;max-height:100%;overflow-y:auto;background:var(--panel-solid);border:1px solid var(--line);border-radius:18px;padding:16px;display:grid;gap:12px;touch-action:pan-y}
 .sh-top{display:flex;gap:12px;align-items:center}
@@ -397,6 +399,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 .coop-mode{display:grid;gap:4px;padding:12px;border-radius:14px;border:1px solid var(--line);background:var(--panel-solid);color:var(--text);text-align:left;font:500 14px var(--f-ui)}
 .coop-mode b{font:700 17px var(--f-display);color:var(--gold)}
 .coop-mode small{color:var(--muted);font-size:12px;line-height:1.35}
+.coop-note{color:#ffd890;font-size:14px;border:1px solid rgba(242,196,107,.4);border-radius:10px;padding:8px 12px}
 .coop-wait{color:var(--muted);font-size:14px}
 .coop-net{color:var(--muted);font-size:13px;display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap}
 .ghost.sm{height:44px;padding:0 14px;font-size:13px}
@@ -439,6 +442,132 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 #gorges .glist,.si-scroll,.classes,#luCards,.sh-body{-webkit-mask-image:linear-gradient(#000 calc(100% - 22px),transparent);mask-image:linear-gradient(#000 calc(100% - 22px),transparent);padding-bottom:22px}
 @media (orientation:portrait){.classes{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 22px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 22px),transparent);padding-bottom:8px}}
 @media (orientation:landscape) and (max-height:520px){#lvlup .ov-card>p,#gorges .ov-card>p{display:none}.ov h1{font-size:32px}}
+/* ---- планшет (iPad): крупнее и шире; включается из JS (uiScale) при min-сторона ≥ 600 и грубом указателе ---- */
+html[data-ui=tab]{--gp:calc(10px * var(--u))}
+html[data-ui=tab] #stats{width:clamp(250px,30vw,400px);gap:12px;padding:8px 14px 8px 8px;border-radius:18px}
+html[data-ui=tab] .lv{width:58px;height:58px;font-size:25px}
+html[data-ui=tab] .bars{gap:6px}
+html[data-ui=tab] .bar{height:17px;border-radius:9px}
+html[data-ui=tab] .bar.xp{height:6px}
+html[data-ui=tab] .bar b{font-size:13px;line-height:17px}
+html[data-ui=tab] .res{font-size:15px;gap:7px}html[data-ui=tab] .res svg{width:15px;height:15px}
+html[data-ui=tab] .tbtn{height:58px;min-width:58px;font-size:17px;padding:0 20px;border-radius:16px;gap:10px}
+html[data-ui=tab] .tbtn svg{width:26px;height:26px}
+html[data-ui=tab] .tbtn small,html[data-ui=tab] #kills{font-size:14px}
+html[data-ui=tab] .nb{min-width:24px;height:24px;font-size:13px;line-height:24px;border-radius:12px}
+html[data-ui=tab] #topc{width:min(440px,36vw);gap:8px}
+html[data-ui=tab] #bossbar b{font-size:20px}html[data-ui=tab] #bossbar .bar{height:14px}
+html[data-ui=tab] #threat,html[data-ui=tab] #gprog{font-size:14px;padding:7px 14px;border-radius:12px}
+html[data-ui=tab] #threat .bar,html[data-ui=tab] #gprog .bar{width:130px;height:7px}
+html[data-ui=tab] #zoneTag{font-size:19px;padding:7px 16px}html[data-ui=tab] #zoneTag small{font-size:14px}
+html[data-ui=tab] #atk svg{width:calc(40px * var(--u));height:calc(40px * var(--u))}
+html[data-ui=tab] .sk svg{width:calc(26px * var(--u));height:calc(26px * var(--u))}
+html[data-ui=tab] .sk .t{font-size:calc(15px * var(--u))}
+html[data-ui=tab] .sk .eb{width:20px;height:20px}html[data-ui=tab] .sk .eb svg{width:13px;height:13px}
+html[data-ui=tab] .sk .mb{font-size:11px}
+html[data-ui=tab] #joy{width:calc(100px * var(--u));height:calc(100px * var(--u));margin:calc(-50px * var(--u)) 0 0 calc(-50px * var(--u));
+  left:calc(var(--m) * 2 + 50px * var(--u) + var(--sal));top:calc(100% - var(--m) * 2 - 50px * var(--u) - var(--sab))}
+html[data-ui=tab] #knob{width:calc(56px * var(--u));height:calc(56px * var(--u));margin:calc(-28px * var(--u)) 0 0 calc(-28px * var(--u))}
+html[data-ui=tab] #pad{right:calc(var(--m) * 2 + var(--sar));bottom:calc(var(--m) * 2 + var(--sab))}
+html[data-ui=tab] .fl{font-size:20px}
+html[data-ui=tab] #toast{font-size:18px;padding:12px 22px;border-radius:14px;top:calc(var(--m) + var(--sat) + 150px);max-width:min(720px,calc(100% - 32px))}
+html[data-ui=tab] #banner b{font-size:clamp(40px,6vw,68px)}html[data-ui=tab] #banner span{font-size:20px}
+html[data-ui=tab] #mpCard{width:clamp(200px,24vw,280px);padding:8px 13px 9px;top:calc(var(--m) + var(--sat) + 84px * var(--u))}
+html[data-ui=tab] #mpCard b{font-size:17px}html[data-ui=tab] #mpCard div{font-size:14px}html[data-ui=tab] #mpCard .bar{height:11px}
+html[data-ui=tab] #mpCombo{font-size:24px;top:calc(var(--m) + var(--sat) + 64px)}
+html[data-ui=tab] #mpHint{font-size:18px;padding:11px 22px;bottom:calc(var(--sab) + 28px * var(--u) + 84px * var(--u) * 2.6)}
+@media (orientation:portrait){
+  html[data-ui=tab] #topc{top:calc(var(--sat) + var(--m) + 104px);width:min(520px,calc(100% - 40px))}
+  html[data-ui=tab] #toast{top:calc(var(--sat) + 270px)}
+  html[data-ui=tab] #mpCard{top:calc(var(--sat) + 210px)}
+  html[data-ui=tab] #mpCombo{top:calc(var(--sat) + var(--m) + 110px)}
+  html[data-ui=tab] #mpHint{bottom:calc(var(--sab) + 460px)}
+}
+/* выбор героя */
+html[data-ui=tab] #select{grid-template-columns:minmax(400px,34vw) 1fr minmax(400px,36vw)}
+html[data-ui=tab] .sel-left{padding:20px 20px 20px max(24px,env(safe-area-inset-left,0px));gap:14px}
+html[data-ui=tab] .sel-right{padding:20px max(24px,env(safe-area-inset-right,0px)) 20px 20px;gap:14px}
+html[data-ui=tab] .sel-title h1{font-size:44px}html[data-ui=tab] .sel-title p{font-size:16px}
+html[data-ui=tab] .classes{gap:10px}
+html[data-ui=tab] .cls{padding:10px 3px 9px;font-size:14px;gap:5px;border-radius:15px;min-height:88px}
+html[data-ui=tab] .cls .ico{width:46px;height:46px}html[data-ui=tab] .cls .ico svg{width:26px;height:26px}html[data-ui=tab] .cls .lvb{font-size:12px}
+html[data-ui=tab] .si-top .ico{width:68px;height:68px}html[data-ui=tab] .si-top .ico svg{width:36px;height:36px}
+html[data-ui=tab] .si-top h2{font-size:32px}html[data-ui=tab] .si-top p{font-size:15px}
+html[data-ui=tab] .si-desc{font-size:17px}html[data-ui=tab] .si-rolebar,html[data-ui=tab] .si-nums,html[data-ui=tab] .si-hint,html[data-ui=tab] .si-prog{font-size:15px}
+html[data-ui=tab] .si-stat{font-size:15px;grid-template-columns:96px 1fr}html[data-ui=tab] .si-stat .bar{height:8px}
+html[data-ui=tab] .si-sig div{font-size:16px}html[data-ui=tab] .si-sig .ico{width:36px;height:36px}html[data-ui=tab] .si-sig .ico svg{width:20px;height:20px}
+html[data-ui=tab] .sel-btns{gap:10px}html[data-ui=tab] .sel-btns .btn{height:56px;font-size:18px}
+html[data-ui=tab] .rchip{font-size:15px;padding:7px 12px}
+@media (orientation:portrait){
+  html[data-ui=tab] #select{grid-template-columns:minmax(0,1fr);grid-template-rows:auto 1fr auto}
+  html[data-ui=tab] .sel-left{padding:22px max(24px,env(safe-area-inset-right,0px)) 26px max(24px,env(safe-area-inset-left,0px))}
+  html[data-ui=tab] .classes{grid-template-columns:repeat(7,minmax(0,1fr));grid-auto-flow:row;grid-auto-columns:auto;overflow-x:hidden;overflow-y:auto;touch-action:pan-y;max-height:34vh}
+  html[data-ui=tab] .sel-right{max-height:58vh;padding:26px max(24px,env(safe-area-inset-right,0px)) 20px max(24px,env(safe-area-inset-left,0px));display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:30px;row-gap:12px;grid-auto-flow:row dense;align-content:start}
+  html[data-ui=tab] .si-top,html[data-ui=tab] .si-els,html[data-ui=tab] .si-desc,html[data-ui=tab] .si-rolebar,html[data-ui=tab] .si-nums{grid-column:1}
+  html[data-ui=tab] .si-stats,html[data-ui=tab] .si-sig,html[data-ui=tab] .si-prog{grid-column:2;display:grid}
+  html[data-ui=tab] .si-stats{grid-row:1/span 2}
+  html[data-ui=tab] .sel-btns,html[data-ui=tab] .si-hint{grid-column:1/-1}
+  html[data-ui=tab] .sel-btns{grid-template-columns:repeat(2,minmax(0,1fr))}
+  html[data-ui=tab] .sel-btns .big,html[data-ui=tab] .sel-btns #selPlay{grid-column:1/-1}
+}
+/* экраны-карточки */
+html[data-ui=tab] .ov-card{max-width:680px;gap:18px}
+html[data-ui=tab] .ov h1{font-size:clamp(48px,8vw,76px)}
+html[data-ui=tab] .ov p{font-size:18px}
+html[data-ui=tab] .big{height:64px;font-size:21px;min-width:260px;border-radius:16px}
+html[data-ui=tab] .ghost{height:54px;font-size:17px;padding:0 26px;border-radius:14px}
+html[data-ui=tab] .btn{height:52px;font-size:17px;padding:0 20px;border-radius:13px}
+html[data-ui=tab] .ov input[type=text],html[data-ui=tab] .ov input[type=search]{height:60px;font-size:21px;width:min(420px,100%)}
+html[data-ui=tab] #lvlup .ov-card,html[data-ui=tab] #gorges .ov-card,html[data-ui=tab] #win .ov-card{max-width:940px}
+html[data-ui=tab] .cards{gap:16px}html[data-ui=tab] .card{padding:20px 14px;gap:10px}
+html[data-ui=tab] .card .ico{width:72px;height:72px}html[data-ui=tab] .card .ico svg{width:38px;height:38px}
+html[data-ui=tab] .card b{font-size:20px}html[data-ui=tab] .card small,html[data-ui=tab] .card .var{font-size:15px}html[data-ui=tab] .card .tag{font-size:13px}
+html[data-ui=tab] .glist{grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px}
+html[data-ui=tab] .grow{padding:14px 16px;min-height:64px}html[data-ui=tab] .grow b{font-size:26px;width:36px}html[data-ui=tab] .grow span{font-size:17px}html[data-ui=tab] .grow small{font-size:14px}
+html[data-ui=tab] .coop-modes{width:min(640px,100%);gap:12px}html[data-ui=tab] .coop-mode{padding:16px;min-height:88px}
+html[data-ui=tab] .coop-mode b{font-size:21px}html[data-ui=tab] .coop-mode small{font-size:15px}
+html[data-ui=tab] .coop-players,html[data-ui=tab] .coop-link{width:min(560px,100%)}
+html[data-ui=tab] .coop-link{height:56px;font-size:17px!important}
+html[data-ui=tab] .coop-pl{padding:14px 16px}html[data-ui=tab] .coop-pl b{font-size:19px}html[data-ui=tab] .coop-pl span{font-size:16px}
+html[data-ui=tab] .coop-wait{font-size:17px}
+/* книга чар */
+html[data-ui=tab] .bk-head{padding:12px 20px;gap:14px}
+html[data-ui=tab] .bk-title{font-size:30px}
+html[data-ui=tab] .tabs{padding:4px;border-radius:15px}
+html[data-ui=tab] .tab{height:50px;padding:0 22px;font-size:17px;border-radius:12px}
+html[data-ui=tab] .x{width:54px;height:54px;border-radius:15px}html[data-ui=tab] .x svg{width:24px;height:24px}
+html[data-ui=tab] #pendingBar{padding:12px 20px;font-size:17px}html[data-ui=tab] #pendingBar button{height:44px;padding:0 18px;font-size:16px}
+html[data-ui=tab] .filters{padding:14px 20px;gap:10px}
+html[data-ui=tab] #q{height:54px;font-size:18px;max-width:640px}
+html[data-ui=tab] .chip{height:44px;padding:0 16px;font-size:16px;border-radius:22px}
+html[data-ui=tab] .chip svg{width:20px;height:20px}html[data-ui=tab] .chip .dot{width:12px;height:12px}
+html[data-ui=tab] .found{font-size:15px}
+html[data-ui=tab] .list{padding:0 20px 24px;grid-template-columns:repeat(auto-fill,minmax(400px,1fr));gap:10px}
+html[data-ui=tab] .row{padding:11px 14px;gap:14px;min-height:72px;border-radius:14px}
+html[data-ui=tab] .ico{width:50px;height:50px}html[data-ui=tab] .ico svg{width:28px;height:28px}
+html[data-ui=tab] .nm{font-size:18px}html[data-ui=tab] .nm i{font-size:15px}html[data-ui=tab] .meta{font-size:14px}html[data-ui=tab] .badge{font-size:13px}
+html[data-ui=tab] .bd{padding:20px}
+html[data-ui=tab] .bd-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,400px),1fr));gap:20px 34px}
+html[data-ui=tab] .bd h3,html[data-ui=tab] .branch h3{font-size:23px}
+html[data-ui=tab] .hint{font-size:16px}
+html[data-ui=tab] .slots{grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:10px}
+html[data-ui=tab] .rchip,html[data-ui=tab] .react{font-size:16px}
+html[data-ui=tab] .react{padding:10px 14px}
+html[data-ui=tab] .toggle{font-size:16px}html[data-ui=tab] .toggle input{width:26px;height:26px}
+html[data-ui=tab] .bd-actions{gap:12px}
+html[data-ui=tab] .tl-pts{font-size:26px}
+html[data-ui=tab] .branches{grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:22px}
+html[data-ui=tab] .node{padding:12px 14px;gap:14px}html[data-ui=tab] .node .nt b{font-size:17px}html[data-ui=tab] .node .nt span{font-size:14px}html[data-ui=tab] .node .pts{font-size:14px}
+html[data-ui=tab] .plus{width:56px;height:56px;font-size:28px;border-radius:14px}
+html[data-ui=tab] .vchip{padding:11px 14px;font-size:15px;min-height:44px;border-radius:11px}
+html[data-ui=tab] .vars{gap:8px}
+html[data-ui=tab] #sheet{align-items:center}
+html[data-ui=tab] .sh{max-width:600px;padding:24px;gap:16px;border-radius:22px}
+html[data-ui=tab] .sh-top .ico{width:68px;height:68px}html[data-ui=tab] .sh-top h2{font-size:27px}html[data-ui=tab] .sh-top p{font-size:15px}
+html[data-ui=tab] .lead{font-size:18px}html[data-ui=tab] .note{font-size:16px}html[data-ui=tab] .rank{font-size:16px}
+html[data-ui=tab] .stats{grid-template-columns:repeat(auto-fit,minmax(110px,1fr))}html[data-ui=tab] .stats div{font-size:13px;padding:10px 12px}html[data-ui=tab] .stats b{font-size:20px}
+html[data-ui=tab] .tagc{font-size:13px;padding:3px 10px}
+html[data-ui=tab] .sh-act .btn{min-width:150px}
 </style>
 
 <div id="app">
@@ -588,6 +717,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 
 <script src="vendor/three.min.js"></script>
 <script src="net-relay.js"></script>
+<script src="campaign.js"></script>
 <script>
 'use strict';
 (function(){
@@ -851,7 +981,7 @@ const AFFIX=[['fire','Огненный'],['fast','Быстрый'],['armor','Б�
 const SAVE_KEY='tysyacha-char-v3';
 let SAVE={cur:null,q:'auto',chars:{}};
 function loadSave(hot){let d=hot&&hot.SAVE?hot.SAVE:null;if(!d){try{const raw=localStorage.getItem(SAVE_KEY);if(raw)d=JSON.parse(raw);}catch(e){}}
-  if(d&&d.chars&&typeof d.chars==='object'){SAVE.cur=CLASS_BY[d.cur]?d.cur:null;SAVE.q=['auto','high','mid','low'].includes(d.q)?d.q:'auto';SAVE.chars=d.chars;}}
+  if(d&&d.chars&&typeof d.chars==='object'){SAVE.cur=CLASS_BY[d.cur]?d.cur:null;SAVE.q=['auto','high','mid','low'].includes(d.q)?d.q:'auto';SAVE.chars=d.chars;SAVE.camp=window.TCCF?(d.camp&&typeof d.camp==='object'?d.camp:null):null;}}
 let CLS=null,S=null,LEARNED=new Set(),EQUIPPED=new Set();
 function newChar(c){const s={lvl:1,xp:0,kills:0,ess:0,learned:[],ranks:{},talents:{},active:Array(8).fill(null),passive:Array(42).fill(null),sandbox:false,auto:false,bosses:0,gorge:0};
   s.active[0]=sid(c.p,c.pa[0],'swift');s.active[1]=sid(c.s,c.sa[0],'mighty');
@@ -904,7 +1034,7 @@ let RESO=new Array(10).fill(1),RESO_N=new Array(10).fill(0);
 const app=$('#app'),canvas=$('#c');
 const renderer=new THREE.WebGLRenderer({canvas,antialias:false,powerPreference:'high-performance'});
 const isGL2=renderer.capabilities.isWebGL2;
-const PR_MAX=Math.min(window.devicePixelRatio||1,1.5);
+let UI_U=1,PR_MAX=Math.min(window.devicePixelRatio||1,1.5);
 let pr=PR_MAX;renderer.setPixelRatio(pr);
 renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFShadowMap;
 const scene=new THREE.Scene();
@@ -2224,7 +2354,7 @@ AIX.b_heart=(en,dt,dx,dz,dist,sp)=>{
 // =====================================================================
 let spawnT=1,ambT=0,mode='select';
 let MPon=false,MPH=false,MPG=false;const MP={role:null,peer:null,coop:false,combo:0,comboT:0,peerId:null,ping:0,nick:''};
-const input={jx:0,jy:0,attack:false,keys:{},moveTo:null,mouseAttack:false};
+const input={gx:0,gy:0,jx:0,jy:0,attack:false,keys:{},moveTo:null,mouseAttack:false};
 const camYaw=Math.PI/4,camPitch=1.06;
 const camT=new THREE.Vector3();
 function updatePlayer(dt){
@@ -2234,6 +2364,7 @@ function updatePlayer(dt){
   let mx=input.jx,my=input.jy;const K=input.keys;
   const kx=(K.KeyD||K.ArrowRight?1:0)-(K.KeyA||K.ArrowLeft?1:0),ky=(K.KeyS||K.ArrowDown?1:0)-(K.KeyW||K.ArrowUp?1:0);
   if(kx||ky){mx=kx;my=ky;const l=Math.hypot(mx,my);mx/=l;my/=l;}
+  else if(input.gx||input.gy){mx=input.gx;my=input.gy;}
   const len=Math.min(1,Math.hypot(mx,my)),spd=P.speed*(P.slowT>0?.6:1)*(WHIRLS.length?1.1:1);
   const fx_=-Math.sin(camYaw),fz=-Math.cos(camYaw),rx=-fz,rz=fx_;
   let moving=false;
@@ -2287,7 +2418,7 @@ function updateEnemies(dt){
     if(en.affix.has('regen'))en.hp=Math.min(en.maxHp,en.hp+en.maxHp*.015*dt);
     en.dotT-=dt;if(en.dotT<=0){en.dotT=.5;let d=0;if(en.burnT>0)d+=en.burnDps*.5;if(en.poisT>0)d+=en.poisN*en.poisDps*.5;
       if(d>=.5){dealDamage(en,d,-1,{dot:true,depth:3,dotCol:en.burnT>0?'#ffa366':'#b5f07a'});if(en.dead)continue;}}
-    const tp=mpTarget(en),dx=(tp?tp.pos.x:P.pos.x)-en.pos.x,dz=(tp?tp.pos.z:P.pos.z)-en.pos.z,dist=Math.hypot(dx,dz)||.001,TD=tp?false:P.dead;
+    const tp=(GZ&&GZ.camp&&en.cg&&TCC.goal(en))||mpTarget(en),dx=(tp?tp.pos.x:P.pos.x)-en.pos.x,dz=(tp?tp.pos.z:P.pos.z)-en.pos.z,dist=Math.hypot(dx,dz)||.001,TD=tp?false:P.dead;
     if(dist>50&&!en.boss&&!en.noDespawn){removeEnemy(i);continue;}
     if(!TD&&dist<(PLAY==='gorge'?18:13))en.aggro=true;
     if((TD||dist>36)&&!en.boss&&!en.noDespawn)en.aggro=false;
@@ -2344,9 +2475,9 @@ function updateCamera(dt){
   moon.position.set(P.pos.x-25,60,P.pos.z+18);moon.target.position.set(P.pos.x,0,P.pos.z);}
 function die(){P.dead=true;P.hp=0;hero.g.rotation.z=1.4;hero.g.position.y=.2;if(MPon&&mpAllyUp()){mpDowned();saveSoon();return;}dieFull();}
 function dieFull(){P.dead=true;P.hp=0;hero.g.rotation.z=1.4;hero.g.position.y=.2;const lost=PLAY==='world'?Math.floor(S.ess*.2):0;S.ess-=lost;
-  $('#deadTxt').textContent=PLAY==='gorge'&&GZ?'Ущелье '+GZ.g+' «'+GORGES[GZ.g-1]+'» не пройдено. Опыт, чары и эссенция сохранены, попробуй ещё раз или прокачайся в свободном мире.':CLS.name+', уровень '+S.lvl+'. Врагов побеждено: '+S.kills+'. Потеряно '+lost+' эссенции. Чары, билд и таланты на месте.';
+  $('#deadTxt').textContent=PLAY==='gorge'&&GZ&&GZ.camp?(GZ.failText||'Уровень '+GZ.camp.k+' «'+GZ.camp.name+'» не пройден: оба героя пали.')+' Опыт, чары и эссенция сохранены — хозяин комнаты может начать уровень заново.':PLAY==='gorge'&&GZ?'Ущелье '+GZ.g+' «'+GORGES[GZ.g-1]+'» не пройдено. Опыт, чары и эссенция сохранены, попробуй ещё раз или прокачайся в свободном мире.':CLS.name+', уровень '+S.lvl+'. Врагов побеждено: '+S.kills+'. Потеряно '+lost+' эссенции. Чары, билд и таланты на месте.';
   $('#reviveBtn').textContent=PLAY==='gorge'?'Пройти заново':'Воскреснуть';later(1,()=>{$('#dead').hidden=false;syncPause();});saveSoon();}
-function revive(){if(MPon){mpReviveBtn();return;}if(PLAY==='gorge'&&GZ){startGorge(GZ.g);return;}P.dead=false;$('#dead').hidden=true;hero.g.rotation.z=0;hero.g.position.y=0;P.pos.set(0,0,0);P.prev.set(0,0,0);P.hp=P.maxHp;P.mp=P.maxMp;
+function revive(){if(MPon){mpReviveBtn();return;}if(PLAY==='gorge'&&GZ){startGorge(GZ.g,GZ.camp);return;}P.dead=false;$('#dead').hidden=true;hero.g.rotation.z=0;hero.g.position.y=0;P.pos.set(0,0,0);P.prev.set(0,0,0);P.hp=P.maxHp;P.mp=P.maxMp;
   for(let i=ENEMIES.length-1;i>=0;i--){if(!ENEMIES[i].boss&&ENEMIES[i].pos.length()<24)removeEnemy(i);}
   if(BOSS){const i=ENEMIES.indexOf(BOSS);if(i>=0)removeEnemy(i);BOSS=null;threat=Math.floor(THREAT_MAX*.6);}
   for(let i=EPROJ.length-1;i>=0;i--){dropProjVis(EPROJ[i].o);EPROJ.splice(i,1);}
@@ -2412,7 +2543,7 @@ function toWorld(x,z){const t=camYaw+Math.PI,c=Math.cos(t),s=Math.sin(t);return 
 function gcx(z){const b=GZ.bend;return Math.sin(z*b[2]+GZ.seed)*b[0]+Math.sin(z*b[3]+GZ.seed*2.3)*b[1];}
 function ghw(z){let w=GZ.bw;for(const a of GZ.arenas){const d=Math.abs(z-a.z);if(d<a.len)w=Math.max(w,GZ.bw+(a.w-GZ.bw)*Math.cos(d/a.len*Math.PI/2));}return w;}
 function setGorgeLight(th){const d=th||{hemi:[0xa8bdf0,0x2a3320,.85],moon:[0xdbe4ff,.85],fogd:[42,118]};hemi.color.set(d.hemi[0]);hemi.groundColor.set(d.hemi[1]);hemi.intensity=d.hemi[2];moon.color.set(d.moon[0]);moon.intensity=d.moon[1];scene.fog.near=d.fogd[0];scene.fog.far=d.fogd[1];}
-function clearGorge(){while(gorgeGroup.children.length)gorgeGroup.remove(gorgeGroup.children[0]);GDISP.forEach(d=>d&&d.dispose&&d.dispose());GDISP.length=0;GZ=null;gorgeGroup.visible=false;setGorgeLight(null);}
+function clearGorge(){if(TCC)TCC.clear();while(gorgeGroup.children.length)gorgeGroup.remove(gorgeGroup.children[0]);GDISP.forEach(d=>d&&d.dispose&&d.dispose());GDISP.length=0;GZ=null;gorgeGroup.visible=false;setGorgeLight(null);}
 function gdeco(k){if(GGEO[k])return GGEO[k];const T=THREE,C=(g,c,f)=>geoC(g,c,f),Dd=(r,y,x,z,c)=>C(new T.DodecahedronGeometry(r,0).translate(x||0,y,z||0),c,1);let g;
  switch(k){
  case 'cairn':g=merge([Dd(.6,.35,0,0,0x8a8a90),Dd(.4,.9,.1,0,0x9a9aa0),Dd(.25,1.25,0,.05,0xaaaab0)]);break;
@@ -2436,10 +2567,10 @@ const GLOWK={crystalp:1,crystalg:1,crystalb:1,crack:1};
 function webMesh(w){const p=[],R=w,Hh=2.4;for(let i=0;i<10;i++){const a=i/10*Math.PI*2;p.push(0,0,0,Math.cos(a)*R,Math.sin(a)*Hh,0);}
   for(let r=1;r<=4;r++){for(let i=0;i<10;i++){const a=i/10*Math.PI*2,b=(i+1)/10*Math.PI*2,k=r/4,s=.9+Math.sin(i*3+r)*.05;p.push(Math.cos(a)*R*k*s,Math.sin(a)*Hh*k*s,0,Math.cos(b)*R*k*s,Math.sin(b)*Hh*k*s,0);}}
   const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(p,3));const m=new THREE.LineSegments(g,new THREE.LineBasicMaterial({color:0xe8f0ff,transparent:true,opacity:.45}));GDISP.push(g,m.material);return m;}
-function buildGorge(g){clearGorge();const th=GT[g-1],tier=Math.min(2,Math.floor((g-1)/4)),L=clamp(150+g*10+th.dL,150,290);
+function buildGorge(g,camp){clearGorge();const th=GT[g-1],tier=Math.min(2,Math.floor((g-1)/4)),L=camp?camp.L:clamp(150+g*10+th.dL,150,290);
   GZ={g,tier,th,L,seed:g*1.7,bend:th.bend,bw:th.bw,arenas:[],enc:[],obs:[],haz:[],z0:-3,z1:L+1,bossZ:L-22,lv:Math.max(1,g*2-1),prog:0,bossSpawned:false,open:false,won:false,flames:[],ambC:new THREE.Color(th.amb||th.glow),hzT:0,seen:new Set()};
-  const nEnc=Math.floor((L-60)/26);for(let i=0;i<nEnc;i++){const z=30+i*26;GZ.arenas.push({z:z+4,len:9,w:th.aw});const kind=th.seq[i%th.seq.length];GZ.enc.push({z,i,done:false,elite:g>=2&&i%3===2,kind:kind.split('+')[0],next:kind.split('+')[1]||null,units:[]});}
-  GZ.arenas.push({z:GZ.bossZ+4,len:20,w:15});
+  if(camp)TCC.shape(GZ,camp);else{const nEnc=Math.floor((L-60)/26);for(let i=0;i<nEnc;i++){const z=30+i*26;GZ.arenas.push({z:z+4,len:9,w:th.aw});const kind=th.seq[i%th.seq.length];GZ.enc.push({z,i,done:false,elite:g>=2&&i%3===2,kind:kind.split('+')[0],next:kind.split('+')[1]||null,units:[]});}
+  GZ.arenas.push({z:GZ.bossZ+4,len:20,w:15});}
   const add=o=>{gorgeGroup.add(o);return o;},D=GDISP;
   const gl=L+90,geo=new THREE.PlaneGeometry(100,gl,50,Math.round(gl/2.2));geo.rotateX(-Math.PI/2);geo.translate(0,0,L/2);
   const pos=geo.attributes.position,cols=[],cG=new THREE.Color(th.ground),cP=new THREE.Color(th.path),cR=new THREE.Color(th.wall).multiplyScalar(.42),t=new THREE.Color();
@@ -2499,17 +2630,17 @@ function buildGorge(g){clearGorge();const th=GT[g-1],tier=Math.min(2,Math.floor(
   D.push(ring.geometry,ringM,inner.geometry,inM,sm);
   GZ.portal={pg,ring,ringM,inM,w:toWorld(gcx(pz),pz)};
   gorgeGroup.rotation.y=camYaw+Math.PI;gorgeGroup.visible=true;}
-function startGorge(g){SAVE.chars[CLS.id]=S;SAVE.cur=CLS.id;save();mode='game';PLAY='gorge';
+function startGorge(g,camp){SAVE.chars[CLS.id]=S;SAVE.cur=CLS.id;save();mode='game';PLAY='gorge';
   for(const id of ['#select','#gorges','#win','#dead'])$(id).hidden=true;$('#hud').hidden=false;
-  clearWorld();mpSeeded(g*7919+13,()=>buildGorge(g));worldGroup.visible=false;const th=GZ.th;scene.fog.color.set(th.fog);scene.background.set(th.bg);setGorgeLight(th);
+  clearWorld();mpSeeded(g*7919+13,()=>buildGorge(g,camp));worldGroup.visible=false;const th=GZ.th;scene.fog.color.set(th.fog);scene.background.set(th.bg);setGorgeLight(th);
   const w=toWorld(gcx(3),3);P.pos.set(w.x,0,w.z);P.prev.copy(P.pos);if(MPon)mpStartPos();P.dead=false;hero.g.rotation.z=0;hero.g.position.y=0;P.hp=P.maxHp;P.mp=P.maxMp;
   P.face=Math.atan2(-Math.sin(camYaw),-Math.cos(camYaw));hero.g.rotation.y=P.face;camT.set(P.pos.x,1.2,P.pos.z);
   $('#gName').textContent='Ущелье '+g;hudCache.hk=null;
-  banner('Ущелье '+g,th.n+' · враги '+GZ.lv+' уровня');fxPillar(P.pos.x,P.pos.z,1.2,7,CLS.color,1);syncPause();}
+  banner('Ущелье '+g,th.n+' · враги '+GZ.lv+' уровня');fxPillar(P.pos.x,P.pos.z,1.2,7,CLS.color,1);if(camp)TCC.begin(camp);syncPause();}
 function exitGorge(){clearGorge();PLAY='world';worldGroup.visible=true;scene.fog.color.set(FOGC);scene.background.set(0x0e1630);}
 function spawnMob(tid,x,z,lv,o){o=o||{};const t=MOBS[tid],m=spawnEnemy(tid,x,z,lv,o),list=[m];
   if(t.pack&&!o.noPack&&!o.elite){const k=Math.ceil(t.pack*.6)-1;for(let i=0;i<k;i++)list.push(spawnEnemy(tid,x+rand(-1.5,1.5),z+rand(-1.5,1.5),lv,Object.assign({},o,{elite:false})));}return list;}
-function spawnEncounter(e,second){const th=GZ.th,k=second?e.next:e.kind,n=Math.min(7,2+Math.ceil(GZ.g/2)),pool=th.m[k]||th.m.norm,lv=()=>GZ.lv+(Math.random()<.25?1:0),out=[];GZ.seen.add(k);
+function spawnEncounter(e,second){const th=GZ.th,k=second?e.next:e.kind,n=GZ.camp?GZ.camp.n:Math.min(7,2+Math.ceil(GZ.g/2)),pool=th.m[k]||th.m.norm,lv=()=>GZ.lv+(Math.random()<.25?1:0),out=[];GZ.seen.add(k);
   const put=(tid,lz,lx,o)=>{const w=toWorld(lx,lz);for(const m of spawnMob(tid,w.x,w.z,lv(),Object.assign({gorge:true},o)))out.push(m);};
   const pl=toLocal(P.pos.x,P.pos.z);
   if(k==='swarm'){const m=Math.min(12,n*2);for(let i=0;i<m;i++){const lz=e.z+rand(0,9);put(pickW(pool),lz,gcx(lz)+rand(-5,5),{noPack:true});}}
@@ -2524,14 +2655,15 @@ function spawnGorgeBoss(){const lz=GZ.bossZ+5,w=toWorld(gcx(lz),lz),tid=GZ.th.bo
   $('#bossName').textContent=MOBS[tid].name+' · ур. '+lv;banner(MOBS[tid].name,'Страж ущелья «'+GZ.th.n+'»',true);shake=.6;fxPillar(w.x,w.z,2.5,10,RED,1);}
 function updateGorge(dt){if(!GZ)return;const l=toLocal(P.pos.x,P.pos.z);GZ.prog=Math.max(GZ.prog,clamp(l.z/(GZ.L-2),0,1));
   const lead=mpLeadZ(l.z);if(!MPG){for(const e of GZ.enc){if(!e.done&&lead>e.z-20){e.done=true;spawnEncounter(e);}else if(e.done&&e.next&&!e.second&&e.units.length&&e.units.every(u=>u.dead)){e.second=true;spawnEncounter(e,true);}}
-  if(!GZ.bossSpawned&&lead>GZ.bossZ-14){GZ.bossSpawned=true;spawnGorgeBoss();}}
-  if(GZ.bossSpawned&&!BOSS&&!GZ.open){GZ.open=true;GZ.portal.ringM.color.set(GZ.th.glow);banner('Выход открыт',MPon?'Откройте сундук вдвоём и входите в портал вместе':'Войди в портал в конце ущелья');if(MPH)mpChestSpawn();}
+  if(!GZ.camp&&!GZ.bossSpawned&&lead>GZ.bossZ-14){GZ.bossSpawned=true;spawnGorgeBoss();}}
+  if(GZ.camp)TCC.update(dt);
+  if(!GZ.camp&&GZ.bossSpawned&&!BOSS&&!GZ.open){GZ.open=true;GZ.portal.ringM.color.set(GZ.th.glow);banner('Выход открыт',MPon?'Откройте сундук вдвоём и входите в портал вместе':'Войди в портал в конце ущелья');if(MPH)mpChestSpawn();}
   for(let i=0;i<GZ.flames.length;i++)GZ.flames[i].material.opacity=.45+.25*Math.sin(time*9+i*1.3);
   GZ.hzT-=dt;let inMud=false;for(const h of GZ.haz){if(Math.hypot(l.x-h.x,l.z-h.z)<h.r){if(h.kind==='mud')inMud=true;else if(GZ.hzT<=0&&!P.dead){GZ.hzT=.5;hurtPlayer(Math.round((h.kind==='lava'?4.5:3)+GZ.lv*(h.kind==='lava'?1.3:.9)),null,{dot:true});colBurst(h.kind==='lava'?FIREC:ACID,P.pos.x,.3,P.pos.z,5,2,.3,3);}}}
   if(inMud)P.slowT=Math.max(P.slowT,.25);
   const pw=GZ.portal;pw.ring.rotation.z+=dt*(GZ.open?2.5:.3);
   if(GZ.open){pw.inM.opacity=.45+.15*Math.sin(time*4);if(Math.random()<.7){const a=rand(0,TAU),c=new THREE.Color(GZ.th.glow);emit(SPARK,pw.w.x+rand(-.8,.8),2.1+Math.sin(a)*1.5,pw.w.z+rand(-.8,.8),0,rand(.5,1.5),0,c,.9,-1,1);}
-    if(!GZ.won&&Math.hypot(P.pos.x-pw.w.x,P.pos.z-pw.w.z)<2.4){if(MPon)mpPortal();else gorgeWin();}}}
+    if(!GZ.won&&Math.hypot(P.pos.x-pw.w.x,P.pos.z-pw.w.z)<2.4){if(GZ.camp)TCC.portal();else if(MPon)mpPortal();else gorgeWin();}}}
 function gorgeWin(){GZ.won=true;const g=GZ.g,first=g>(S.gorge|0);if(first)S.gorge=g;
   const xp=Math.round(xpNeed(Math.max(1,S.lvl))*(first?.5:.25)),ess=30*g+(first?50*g:0),sc=first?2:1;
   gainXp(xp);S.ess+=ess;for(let i=0;i<sc;i++)learnRandom();save();
@@ -2544,8 +2676,8 @@ function renderGorgeList(){const done=MP.pickGorge?Math.max(S.gorge|0,MP.peer?MP
 function openGorges(){renderGorgeList();$('#gorges').hidden=false;}
 $('#glist').addEventListener('click',e=>{const b=e.target.closest('.grow');if(!b||b.disabled)return;if(MP.pickGorge&&MP.role==='host'){mpHostStart('gorge',+b.dataset.g);return;}startGorge(+b.dataset.g);});
 $('#gBack').addEventListener('click',()=>{$('#gorges').hidden=true;if(MP.pickGorge){MP.pickGorge=false;mpOpenLobby();}});
-$('#winNext').addEventListener('click',()=>{if(MPon){if(MPH&&GZ)mpHostStart('gorge',GZ.g+1);return;}if(GZ)startGorge(GZ.g+1);});
-$('#winWorld').addEventListener('click',()=>{if(MPon){if(MPH)mpHostStart('world');return;}startGame();});
+$('#winNext').addEventListener('click',()=>{if(GZ&&GZ.camp){TCC.next();return;}if(MPon){if(MPH&&GZ)mpHostStart('gorge',GZ.g+1);return;}if(GZ)startGorge(GZ.g+1);});
+$('#winWorld').addEventListener('click',()=>{if(GZ&&GZ.camp){TCC.toLevels();return;}if(MPon){if(MPH)mpHostStart('world');return;}startGame();});
 $('#winHeroes').addEventListener('click',()=>toSelect());
 
 // =====================================================================
@@ -2573,8 +2705,8 @@ function updateAim(){if(!aimSt||!aimSt.on||P.dead){hideAim();return;}const A=aim
 const tgtRing=new THREE.Mesh(FXG.ring,new THREE.MeshBasicMaterial({color:0xf2c46b,transparent:true,opacity:.85,depthWrite:false}));tgtRing.visible=false;scene.add(tgtRing);
 function updateTargetRing(){const t=target&&!target.dead&&mode==='game'?target:null;tgtRing.visible=!!t;if(t){tgtRing.position.set(t.pos.x,.09,t.pos.z);const s=t.r*1.7;tgtRing.scale.set(s,1,s);tgtRing.rotation.y=time*2;}}
 const ARC=[[112,178],[112,146],[112,114],[112,82],[172,178],[172,146],[172,114],[172,82]];
-for(let i=0;i<8;i++){const b=document.createElement('button');b.type='button';b.className='sk';const [r,a]=ARC[i];
-  b.style.setProperty('--x',(Math.cos(a*Math.PI/180)*r).toFixed(1)+'px');b.style.setProperty('--y',(-Math.sin(a*Math.PI/180)*r).toFixed(1)+'px');
+for(let i=0;i<8;i++){const b=document.createElement('button');b.type='button';b.className='sk';b.dataset.k=i+1;b.dataset.g=['LB','RB','LT','RT','X','Y','B','↑'][i];const [r,a]=ARC[i];
+  b.style.setProperty('--x','calc('+(Math.cos(a*Math.PI/180)*r).toFixed(1)+'px * var(--u))');b.style.setProperty('--y','calc('+(-Math.sin(a*Math.PI/180)*r).toFixed(1)+'px * var(--u))');
   pad.appendChild(b);SKB.push({b,id:-2,p:-1,t:'',low:null});
   b.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();
     const id=S.active[i];if(id==null){openBook('lib',{type:'active',index:i});return;}
@@ -2635,7 +2767,7 @@ canvas.addEventListener('pointerdown',e=>{
   if(x<r.width*.5&&joyId===null){joyId=e.pointerId;joyO={x,y};joy.style.left=x+'px';joy.style.top=y+'px';joy.classList.add('on');knob.style.transform='';}
   else{const en=enemyAtScreen(e.clientX,e.clientY,70);if(en){target=en;fxRing(en.pos.x,en.pos.z,.3,en.r*2,GOLD,.3,.8);}}});
 canvas.addEventListener('pointermove',e=>{
-  if(e.pointerId===joyId){const r=app.getBoundingClientRect();let dx=e.clientX-r.left-joyO.x,dy=e.clientY-r.top-joyO.y;const l=Math.hypot(dx,dy),mx=52;
+  if(e.pointerId===joyId){const r=app.getBoundingClientRect();let dx=e.clientX-r.left-joyO.x,dy=e.clientY-r.top-joyO.y;const l=Math.hypot(dx,dy),mx=52*UI_U;
     if(l>mx){dx*=mx/l;dy*=mx/l;}input.jx=dx/mx;input.jy=dy/mx;knob.style.transform=`translate(${dx}px,${dy}px)`;}
   else if(e.pointerId===mouseId&&!input.mouseAttack){const g=screenToGround(e.clientX,e.clientY);if(g)input.moveTo=g;}});
 function endPtr(e){if(e.pointerId===joyId){joyId=null;input.jx=input.jy=0;joy.classList.remove('on');joy.style.left='';joy.style.top='';knob.style.transform='';}
@@ -2645,9 +2777,11 @@ const atk=$('#atk');
 atk.addEventListener('pointerdown',e=>{e.preventDefault();input.attack=true;atk.classList.add('down');try{atk.setPointerCapture(e.pointerId);}catch(_){}});
 ['pointerup','pointercancel'].forEach(ev=>atk.addEventListener(ev,()=>{input.attack=false;atk.classList.remove('down');}));
 document.addEventListener('contextmenu',e=>e.preventDefault());
+let KB_SEEN=false;
 window.addEventListener('keydown',e=>{
   if(e.target&&e.target.tagName==='INPUT')return;
   if(mode!=='game')return;
+  if(!KB_SEEN&&/^(Key|Digit|Numpad|Arrow|Space|Tab)/.test(e.code)){KB_SEEN=true;document.documentElement.classList.add('kb');toast('Клавиатура: WASD — ход, Пробел — атака, 1–8 — чары, B — книга, T — таланты');}
   if(e.code==='KeyB'||e.code==='Tab'){e.preventDefault();bookOpen?closeBook():openBook('lib');return;}
   if(e.code==='KeyT'){e.preventDefault();bookOpen?closeBook():openBook('tal');return;}
   if(e.code==='Escape'&&bookOpen){closeBook();return;}
@@ -2860,14 +2994,28 @@ function botAdj(){try{return Math.max(0,Math.min(120,+localStorage.getItem('tcBo
 function envPx(side){const d=document.createElement('div');d.style.cssText='position:absolute;visibility:hidden;pointer-events:none;padding-'+side+':env(safe-area-inset-'+side+',0px)';document.body.appendChild(d);const v=parseFloat(getComputedStyle(d)['padding'+side[0].toUpperCase()+side.slice(1)])||0;d.remove();return v;}
 function fitApp(){const sa=navigator.standalone||matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches;const els=[document.documentElement,document.body,app];const adj=botAdj();if(!sa&&!adj){els.forEach(x=>{x.style.height='';x.style.bottom='';});return;}let h=Math.round(Math.min(innerHeight,window.visualViewport?visualViewport.height+visualViewport.offsetTop:innerHeight));
 h=Math.max(300,h-adj);els.forEach(x=>{x.style.bottom='auto';x.style.height=h+'px';});const cut=navigator.standalone&&/iPhone/.test(navigator.userAgent)&&innerHeight>=innerWidth&&Math.abs(innerHeight+envPx('top')-screen.height)<4;const rs=document.documentElement.style;if(cut){rs.setProperty('--sab-env','0px');rs.setProperty('--sat-env','0px');}else{rs.removeProperty('--sab-env');rs.removeProperty('--sat-env');}document.documentElement.classList.toggle('ios-cut',!!cut);}
-function resize(){fitApp();W=app.clientWidth;H=app.clientHeight;renderer.setSize(W,H,false);camera.aspect=W/H;camera.fov=W<H?56:42;camera.updateProjectionMatrix();makeRT();
+function uiScale(){const mn=Math.min(innerWidth,innerHeight),tab=mn>=600&&matchMedia('(pointer:coarse)').matches;const u=tab?Math.min(1.5,Math.max(1.2,mn/520)):1;if(u!==UI_U||document.documentElement.dataset.ui!==(tab?'tab':'')){UI_U=u;document.documentElement.dataset.ui=tab?'tab':'';document.documentElement.style.setProperty('--u',u.toFixed(2));}}
+function prCap(){const c=Math.min(window.devicePixelRatio||1,1.5,Math.max(1,Math.sqrt(3.1e6/Math.max(1,innerWidth*innerHeight))));if(Math.abs(c-PR_MAX)>.01){PR_MAX=c;if(pr>PR_MAX){pr=PR_MAX;renderer.setPixelRatio(pr);}}}
+function resize(){uiScale();prCap();fitApp();W=app.clientWidth;H=app.clientHeight;renderer.setSize(W,H,false);camera.aspect=W/H;camera.fov=W<H?56:42;camera.updateProjectionMatrix();makeRT();
   }
 window.addEventListener('resize',resize);window.addEventListener('orientationchange',()=>setTimeout(resize,250));if(/[?&]dbg=1/.test(location.search)){const d=document.createElement('div');d.style.cssText='position:fixed;left:4px;top:40%;z-index:99;background:#000c;color:#0f0;font:12px monospace;padding:4px;pointer-events:none';document.body.appendChild(d);setInterval(()=>{d.textContent='inner '+innerWidth+'x'+innerHeight+' screen '+screen.width+'x'+screen.height+' app '+app.clientWidth+'x'+app.clientHeight+' sa '+(navigator.standalone?1:0)+' top '+app.getBoundingClientRect().top;},500);}
 function perf(dt){perfAcc+=dt;perfN++;if(perfAcc<2)return;const fps=perfN/perfAcc;perfAcc=0;perfN=0;if(SAVE.q!=='auto')return;
   if(fps<44){perfGood=0;if(pr>1.01){pr=Math.max(1,pr-.25);renderer.setPixelRatio(pr);resize();}else if(Q.shadow){Q.shadow=false;moon.castShadow=false;}else if(Q.pp){Q.pp=false;}else if(pr>.75){pr=Math.max(.75,pr-.25);renderer.setPixelRatio(pr);resize();}}
   else if(fps>57){if(++perfGood>=3&&pr<PR_MAX&&(Q.pp||pr<1)){pr=Math.min(PR_MAX,pr+.25);renderer.setPixelRatio(pr);resize();perfGood=0;}}else perfGood=0;}
+const PAD={on:false,prev:[],atk:false},PAD_SLOT=[[4,0],[5,1],[6,2],[7,3],[2,4],[3,5],[1,6],[12,7]];
+function pollPad(){const gps=navigator.getGamepads?navigator.getGamepads():[];let g=null;for(const x of gps)if(x&&x.connected){g=x;break;}
+  if(!g){if(PAD.on){PAD.on=false;input.gx=input.gy=0;if(PAD.atk){PAD.atk=false;input.attack=false;}}return;}
+  if(!PAD.on){PAD.on=true;document.documentElement.classList.add('pad');}
+  let x=g.axes[0]||0,y=g.axes[1]||0;const l=Math.hypot(x,y);if(l<.22)x=y=0;else{const k=Math.min(1,(l-.22)/.78)/l;x*=k;y*=k;}
+  input.gx=x;input.gy=y;const b=i=>!!(g.buttons[i]&&g.buttons[i].pressed),edge=i=>b(i)&&!PAD.prev[i];
+  if(mode==='game'){
+    if(edge(9)){if(bookOpen)closeBook();else if(!luOpen)openBook('lib');}
+    else if(bookOpen){if(edge(1))closeBook();if(PAD.atk){PAD.atk=false;input.attack=false;}input.gx=input.gy=0;}
+    else if(!luOpen){const a=b(0);if(a!==PAD.atk){PAD.atk=a;input.attack=a;}for(const [i,sl] of PAD_SLOT)if(edge(i))trySlot(sl,true);}
+  }
+  PAD.prev=g.buttons.map(v=>v.pressed);}
 function loop(now){
-  requestAnimationFrame(loop);
+  requestAnimationFrame(loop);pollPad();
   const dt=Math.min(.05,(now-last)/1000);last=now;
   if(bookOpen&&!MPon)return;
   if(!WARMED&&mode==='game')warmMobs();
@@ -3067,7 +3215,8 @@ function mpOnMsg(m,id){
     case 'ka':break;
     case 'full':mpOnFull();break;
     case 'hi':mpOnHi(m);break;
-    case 'rdy':if(MPH&&MP.active&&mode==='game'){if(MP.peer)MP.peer.on=true;mpHostResync();}break;
+    case 'rs':if(MPH&&MP.active&&mode==='game'&&performance.now()-(MP.rsHostAt||0)>800){MP.rsHostAt=performance.now();mpHostResync2();}break;
+    case 'rdy':if(MPH&&MP.active&&mode==='game'){if(MP.peer){MP.peer.on=true;mpPeerModelMake();}mpHostResync();}break;
     case 'start':mpOnStart(m);break;
     case 'stop':mpOnStop();break;
     case 'bye':mpOnBye();break;
@@ -3092,6 +3241,7 @@ function mpOnMsg(m,id){
     case 'ch':mpChestMake(m.x,m.z);break;
     case 'cho':mpChestOpened();break;
     case 'pl':break;
+    case 'camp':if(TCC)TCC.onMsg(m);break;
   }
 }
 function mpOnFull(){MP.status='full';MP.err='Комната занята: там уже двое.';mpCloseRoom();mpRenderLobby();}
@@ -3104,6 +3254,7 @@ function mpOnHi(m){
   if(first&&MP.active&&MPH){/* гость вернулся, пока идёт игра: ждёт его «rdy» или сам войдёт */}
   if(first)mpHello();
   if(MP.role==='guest')mpSend({t:'rdy'});
+  if(MPH&&TCC)TCC.sendProg();
   if(MP.active&&pr.on)mpPeerModelMake();
   mpRenderLobby();}
 
@@ -3131,7 +3282,7 @@ function mpHostStart(play,g){
   mpApplyStart(play,MP.g);}
 function mpOnStart(m){
   if(MPH)return;
-  MP.coop=true;MPon=true;MPG=true;MPH=false;MP.role='guest';MP.err='';
+  MP.coop=true;MPon=true;MPG=true;MPH=false;MP.role='guest';MP.err='';MP.notice='';
   if(MP.peer)MP.peer.on=true;
   for(const id of ['#coop','#gorges','#win','#dead'])$(id).hidden=true;
   mpApplyStart(m.p,m.g|0);}
@@ -3141,17 +3292,24 @@ function mpApplyStart(play,g){
   if(CLS)MP.myEl=EL[CLS.p];
   mpPeerModelMake();mpSelfLabel();
   $('#mpHud').hidden=false;
-  if(play==='gorge')startGorge(g);else startGame();
+  if(play==='camp'&&TCC)TCC.start(g);else if(play==='gorge')startGorge(g);else startGame();
   syncPause();}
+// лёгкая досылка без перезапуска игры у гостя: гость увидел расхождение (потерялся 'sp' или 'k' после обрыва связи)
+function mpHostResync2(){
+  for(const en of ENEMIES){if(!en.dead)mpSend(mpSpawnMsg(en));}
+  if(GZ)mpSend({t:'gs',o:GZ.open?1:0,bs:GZ.bossSpawned?1:0});
+  if(TCC&&MP.play==='camp')TCC.resync();
+  if(MP.chest)mpSend({t:'ch',x:MP.chest.x,z:MP.chest.z});}
 function mpHostResync(){
   mpSend({t:'start',p:MP.play,g:MP.g,j:1});
   for(const en of ENEMIES){if(!en.dead)mpSend(mpSpawnMsg(en));}
   if(GZ)mpSend({t:'gs',o:GZ.open?1:0,bs:GZ.bossSpawned?1:0});
+  if(TCC&&MP.play==='camp')TCC.resync();
   if(MP.chest)mpSend({t:'ch',x:MP.chest.x,z:MP.chest.z});
 }
 function mpOnStop(){ // хост вышел в меню
   MP.noEcho=true;mpEndSession();if(mode==='game')toSelect();MP.noEcho=false;
-  MP.status='lobby';MP.err='';$('#coop').hidden=false;mpRenderLobby();}
+  MP.status='lobby';MP.err='';MP.notice='Хозяин комнаты вышел из игры. Он выберет уровень заново — игра начнётся сама.';$('#coop').hidden=false;mpRenderLobby();}
 function mpOnBye(){ // напарник вышел в меню, мы продолжаем одни
   if(MP.peer){MP.peer.on=false;mpPeerModelDrop();}
   if(MP.active&&MPH){hint((MP.peer?MP.peer.nick:'Напарник')+' вышел в меню. Он может вернуться из «Играть вместе».',6);if(P.dead&&MP.down){MP.down=false;dieFull();}}
@@ -3166,7 +3324,7 @@ function mpEndSession(){
   if(MP.peerId)MP.status='lobby';}
 function mpSessionClear(){
   MP.byUid.clear();MP.hitQ.length=0;MP.combo=0;MP.comboT=0;MP.revT=0;MP.down=false;MP.tBroken=false;MP.plCd=14;MP.plBoss=null;
-  mpPlatesDrop();mpChestDrop();if(MP.tether){scene.remove(MP.tether.g);MP.tether=null;}
+  mpPlatesDrop();mpChestDrop();if(TCC)TCC.clear();if(MP.tether){scene.remove(MP.tether.g);MP.tether=null;}
   if(MP.rv){scene.remove(MP.rv.ring,MP.rv.disc);MP.rv=null;}
   if(MP.selfLbl){scene.remove(MP.selfLbl);MP.selfLbl.material.map.dispose();MP.selfLbl.material.dispose();MP.selfLbl=null;}
   $('#mpCombo').hidden=true;$('#mpHint').hidden=true;}
@@ -3230,9 +3388,22 @@ function mpOnSnap(m){
     if(!en.tg)en.pos.set(x,0,z);
     if(!en.ib)en.ib=new Interp();en.ib.push(ts,x,z);
     en.tg={x,z,f:E[i+3]/100,fl:E[i+5],jy:E[i+6]/50};en.hp=hp;}
+  mpReconcile(E);
   MP.combo=m.cb|0;MP.comboT=m.ct||0;
   if(m.pl){MP.pl={a:{x:m.pl.a[0],z:m.pl.a[1]},b:{x:m.pl.b[0],z:m.pl.b[1]},p:m.pl.p,tl:m.pl.tl,oa:m.pl.oa,ob:m.pl.ob,need:3};}else MP.pl=null;
   if(MP.chest&&m.ch!=null)MP.chest.t=m.ch;}
+// сверка с хостом: снимок — полный список живых врагов. Потерянный 'sp' → просим досылку, потерянный 'k' → убираем «призрака»
+function mpReconcile(E){
+  const now=performance.now(),seen=new Set();let unk=false;
+  for(let i=0;i+6<E.length;i+=7){const u=E[i];seen.add(u);
+    if(!MP.byUid.has(u)){if(!MP.unkAt)MP.unkAt=new Map();if(!MP.unkAt.has(u))MP.unkAt.set(u,now);if(now-MP.unkAt.get(u)>900)unk=true;}
+    else if(MP.unkAt)MP.unkAt.delete(u);}
+  if(MP.unkAt)for(const u of [...MP.unkAt.keys()])if(!seen.has(u))MP.unkAt.delete(u);
+  if(unk&&now-(MP.rsAt||0)>1500){MP.rsAt=now;mpSend({t:'rs'});}
+  for(const [u,en] of [...MP.byUid]){
+    if(seen.has(u)){en.missAt=0;continue;}
+    if(!en.missAt){en.missAt=now;continue;}
+    if(now-en.missAt>1500){MP.byUid.delete(u);if(en===BOSS)BOSS=null;if(!en.dead){const k=ENEMIES.indexOf(en);if(k>=0)removeEnemy(k);}}}}
 function mpStepRemote(en,dt){
   en.flash-=dt;const t=en.tg;if(!t)return;
   const ox=en.pos.x,oz=en.pos.z;if(en.ib&&en.ib.at(ENEMY_DELAY,IP_OUT)){en.pos.x=IP_OUT.x;en.pos.z=IP_OUT.z;}else{en.pos.x=t.x;en.pos.z=t.z;}
@@ -3537,11 +3708,11 @@ function mpRenderLobby(){
     const playing=MP.active&&mode==='game';
     h=`<h1>Комната ${esc(MP.code)}</h1>${mpPlayersHtml()}`;
     if(MP.role==='host'){
-      h+=`<p>Выбери, во что играем. Вдвоём враги крепче в 1,6 раза, а награда достаётся обоим.</p>
-      <div class="coop-modes"><button class="coop-mode" data-a="mode-gorge" type="button"><b>Связка · ущелья</b><small>Нить стихий между вами, реакции вдвоём, подъём напарника, приём стража с двумя плитами и общий сундук.</small></button>
-      <button class="coop-mode" data-a="mode-world" type="button"><b>Вместе в свободном мире</b><small>Спокойная охота: враги, боссы, нить и подъём напарника. Можно просто бродить рядом.</small></button></div>
+      h+=`<p>Выбери, во что играем. Вдвоём враги крепче в 1,6 раза, а награда достаётся обоим. Нить стихий, реакции вдвоём и подъём напарника работают в обоих режимах.</p>
+      <div class="coop-modes"><button class="coop-mode" data-a="mode-camp" type="button"><b>Прохождение вдвоём</b><small>8 уровней с целями: засады, алтарь, кристалл, две плиты, страж, побег, охота и финал. Звёзды и общий сундук.</small></button>
+      <button class="coop-mode" data-a="mode-world" type="button"><b>Свободный мир</b><small>Открытый мир без цели: бродите вдвоём, охотьтесь, зовите боссов. Спокойная песочница.</small></button></div>${TCC?TCC.lobbyStrip():''}
       ${playing?'<button class="ghost" data-a="close" type="button">Вернуться в игру</button>':''}`;}
-    else h+=`<p class="coop-wait"><span class="spin"></span>Хозяин комнаты выбирает режим. Игра начнётся сама.</p>${playing?'<button class="ghost" data-a="close" type="button">Вернуться в игру</button>':''}`;
+    else h+=`${MP.notice?'<p class="coop-note">'+esc(MP.notice)+'</p>':''}<p class="coop-wait"><span class="spin"></span>Хозяин комнаты выбирает режим. Игра начнётся сама.</p>${TCC?TCC.lobbyStrip():''}${playing?'<button class="ghost" data-a="close" type="button">Вернуться в игру</button>':''}`;
     h+=`<div class="coop-row"><button class="ghost" data-a="hero" type="button">Сменить героя</button><button class="ghost" data-a="leave" type="button">Выйти из комнаты</button></div>`;}
   c.innerHTML=h;}
 $('#coopCard').addEventListener('click',e=>{
@@ -3556,6 +3727,7 @@ $('#coopCard').addEventListener('click',e=>{
   else if(a==='copy'){const v=mpUrl(MP.code);if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(v).then(()=>{b.textContent='Скопировано';}).catch(()=>{const i=$('#linkIn');i.select();});else{const i=$('#linkIn');i.select();try{document.execCommand('copy');b.textContent='Скопировано';}catch(e2){}}}
   else if(a==='share'){const v=mpUrl(MP.code);if(navigator.share)navigator.share({title:'Тысяча чар',text:'Заходи ко мне в «Тысячу чар» — сыграем вдвоём!',url:v}).catch(()=>{});else{const i=$('#linkIn');if(navigator.clipboard)navigator.clipboard.writeText(v);i.select();b.textContent='Ссылка скопирована';}}
   else if(a==='mode-gorge'){$('#coop').hidden=true;MP.pickGorge=true;renderGorgeList();$('#gorges').hidden=false;}
+  else if(a==='mode-camp'&&TCC){$('#coop').hidden=true;TCC.openSelect();}
   else if(a==='mode-world')mpHostStart('world');
   else if(a==='hero'){$('#coop').hidden=true;if(MPon&&!MP.active){MPon=false;}if(MP.active&&mode==='game'){toSelect();}}});
 $('#coopCard').addEventListener('keydown',e=>{e.stopPropagation();if(e.key==='Enter'&&e.target.id==='codeIn'){const v=e.target.value.trim();if(v)mpJoin(v);}});
@@ -3580,6 +3752,8 @@ function mpInit(){
     setTimeout(()=>{try{if(MP.peerId)mpHello();}catch(e){}},700);};
   document.addEventListener('visibilitychange',mpBack);window.addEventListener('pageshow',mpBack);window.addEventListener('online',mpBack);}
 
+const TCC=window.TCCF?window.TCCF({THREE,clamp,rand,randi,lerp,TAU,toLocal,toWorld,gcx,ghw,spawnMob,spawnEnemy,pickW,banner,hint,float,fxPillar,fxRing,colBurst,GOLD,RED,FXG,emit,SPARK,glowSprite,hurtPlayer,kill,dieFull,syncPause,toSelect,mpSend,MP,P,save,gainXp,learnRandom,xpNeed,scene,camera,gorgeGroup,WORLD_ANIM,ENEMIES,mpHostStart,mpOpenLobby,mpChestSpawn,mpRenderLobby,startGorge,
+  get GZ(){return GZ;},get BOSS(){return BOSS;},setBOSS:v=>{BOSS=v;},shake:v=>{shake=Math.max(shake,v);},get S(){return S;},get SAVE(){return SAVE;},get MPon(){return MPon;},get MPH(){return MPH;},get MPG(){return MPG;},get mode(){return mode;},get paused(){return paused;},get time(){return time;}}):null;
 function start(hot){
   loadSave(hot||{});
   W=app.clientWidth;H=app.clientHeight;applyQuality(true);

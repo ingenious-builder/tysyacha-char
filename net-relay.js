@@ -68,7 +68,7 @@
         var m; try { m = JSON.parse(e.data); } catch (x) { return; }
         if (m.event === 'phx_reply') {
           if (m.ref === joinRef) {
-            if (m.payload && m.payload.status === 'ok') { joined = true; tries = 0; lastErr = ''; st.connects++; sendHello(false); flush(); }
+            if (m.payload && m.payload.status === 'ok') { joined = true; tries = 0; lastErr = ''; st.connects++; for (var pid in peers) peers[pid].lastSeen = Date.now(); /* сами были без связи — напарника не списываем */ sendHello(false); flush(); }
             else { lastErr = 'join: ' + JSON.stringify(m.payload && m.payload.response || m.payload).slice(0, 120); try { w.close(); } catch (x) {} }
           } else if (m.ref === hbRef) { hbAt = 0; }
           else if (m.payload && m.payload.status === 'error' && m.topic === 'phoenix') { lastErr = 'heartbeat error'; }
@@ -138,7 +138,13 @@
       var by = {}, order = [], i, it;
       for (i = 0; i < queue.length; i++) { it = queue[i]; var t = it.to || ''; if (!by[t]) { by[t] = []; order.push(t); } by[t].push([it.a, it.d]); }
       queue = [];
-      for (i = 0; i < order.length; i++) { var env = { k: 'd', m: by[order[i]] }; if (order[i]) env.to = order[i]; emitEnv(env); }
+      var left = [];
+      for (i = 0; i < order.length; i++) {
+        var env = { k: 'd', m: by[order[i]] }; if (order[i]) env.to = order[i];
+        // сокет закрылся — сообщения не теряем, а возвращаем в очередь (уйдут после переподключения)
+        if (!emitEnv(env)) for (var j = 0; j < by[order[i]].length; j++) left.push({ a: by[order[i]][j][0], d: by[order[i]][j][1], to: order[i] });
+      }
+      if (left.length) { queue = left.concat(queue); if (queue.length > 300) queue.splice(0, queue.length - 300); }
     }
     function enqueue(a, d, to) {
       if (closed) return Promise.resolve();
@@ -154,6 +160,7 @@
     helloTimer = setInterval(function () { if (joined) sendHello(false); }, helloMs);
     prTimer = setInterval(function () {
       var now = Date.now();
+      if (!joined) return; // пока у самих нет связи, молчание напарника ничего не значит
       for (var id in peers) if (now - peers[id].lastSeen > silenceMs) drop(id);
     }, 1000);
 
