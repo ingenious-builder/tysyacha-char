@@ -464,7 +464,7 @@ html[data-ui=tab] #topc{width:min(440px,36vw);gap:8px}
 html[data-ui=tab] #bossbar b{font-size:20px}html[data-ui=tab] #bossbar .bar{height:14px}
 html[data-ui=tab] #threat,html[data-ui=tab] #gprog{font-size:14px;padding:7px 14px;border-radius:12px}
 html[data-ui=tab] #threat .bar,html[data-ui=tab] #gprog .bar{width:130px;height:7px}
-html[data-ui=tab] #zoneTag{font-size:19px;padding:7px 16px}html[data-ui=tab] #zoneTag small{font-size:14px}
+html[data-ui=tab] #topc{gap:10px}html[data-ui=tab] #tabLibN,html[data-ui=tab] #tabBuildN{font-size:13px}@media (orientation:landscape){html[data-ui=tab] #verTag{left:auto;transform:none;right:max(10px,var(--sar));bottom:calc(var(--sab) + 4px)}html[data-ui=tab] #select .sel-right{padding-bottom:34px}}html[data-ui=tab] #zoneTag{font-size:19px;padding:7px 16px}html[data-ui=tab] #zoneTag small{font-size:14px}
 html[data-ui=tab] #atk svg{width:calc(40px * var(--u));height:calc(40px * var(--u))}
 html[data-ui=tab] .sk svg{width:calc(26px * var(--u));height:calc(26px * var(--u))}
 html[data-ui=tab] .sk .t{font-size:calc(15px * var(--u))}
@@ -488,32 +488,61 @@ html[data-ui=tab] #mpHint{font-size:18px;padding:11px 22px;bottom:calc(var(--sab
   html[data-ui=tab] #mpCombo{top:calc(var(--sat) + var(--m) + 110px)}
   html[data-ui=tab] #mpHint{bottom:calc(var(--sab) + 460px)}
 }
+/* мини-карта: только планшет, только свободный мир */
+#mm{display:none}
+html[data-ui=tab] #mm{display:block;position:absolute;pointer-events:none;width:calc(92px * var(--u));height:calc(92px * var(--u));right:calc(var(--m) + var(--sar));top:calc(var(--m) + var(--sat) + 70px);border-radius:50%;box-shadow:0 2px 12px #0008}
+html[data-ui=tab] #mm[hidden]{display:none}
+@media (orientation:portrait){html[data-ui=tab] #mm{top:calc(var(--m) + var(--sat) + 4px)}}
+@media (orientation:portrait) and (max-width:620px){html[data-ui=tab] #mm{display:none}}
+/* iPad портрет: кнопки меню над джойстиком, без «побед» поверх стика */
+@media (orientation:portrait){html[data-ui=tab] #topr{bottom:calc(var(--m) * 2 + var(--sab) + 100px * var(--u) + 18px)}html[data-ui=tab] #kills{display:none}}
+/* iPad альбом: полоса босса по центру между панелью героя и кнопками */
+@media (orientation:landscape){html[data-ui=tab] #topc{left:50%;transform:translateX(-50%);width:min(420px,calc(100% - 2 * (clamp(250px,30vw,400px) + 28px)))}html[data-ui=tab] #bossbar b{font-size:17px}}
 /* выбор героя */
-html[data-ui=tab] #select{grid-template-columns:minmax(400px,34vw) 1fr minmax(400px,36vw)}
-html[data-ui=tab] .sel-left{padding:20px 20px 20px max(24px,env(safe-area-inset-left,0px));gap:14px}
-html[data-ui=tab] .sel-right{padding:20px max(24px,env(safe-area-inset-right,0px)) 20px 20px;gap:14px}
+html[data-ui=tab] #select{grid-template-columns:minmax(440px,36vw) 1fr minmax(400px,34vw)}
+html[data-ui=tab] .sel-left{padding:calc(var(--sat) + 18px) 20px 20px max(24px,env(safe-area-inset-left,0px));gap:14px}
+html[data-ui=tab] .sel-right{padding:calc(var(--sat) + 18px) max(24px,env(safe-area-inset-right,0px)) 20px 40px;gap:14px}
 html[data-ui=tab] .sel-title h1{font-size:44px}html[data-ui=tab] .sel-title p{font-size:16px}
 html[data-ui=tab] .classes{gap:10px}
-html[data-ui=tab] .cls{padding:10px 3px 9px;font-size:14px;gap:5px;border-radius:15px;min-height:88px}
-html[data-ui=tab] .cls .ico{width:46px;height:46px}html[data-ui=tab] .cls .ico svg{width:26px;height:26px}html[data-ui=tab] .cls .lvb{font-size:12px}
+html[data-ui=tab] .cls{padding:10px 4px 9px;font-size:14px;gap:5px;border-radius:15px;min-height:96px;align-content:start}
+html[data-ui=tab] .cls .n{white-space:normal;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.15}
+html[data-ui=tab] .cls .ico{width:46px;height:46px}html[data-ui=tab] .cls .ico svg{width:26px;height:26px}html[data-ui=tab] .cls .lvb{font-size:13px}
+html[data-ui=tab] #verTag{font-size:13px;padding:8px 14px}
+#tip{position:absolute;z-index:80;pointer-events:none;max-width:min(320px,70vw);padding:8px 12px;border-radius:10px;background:rgba(10,13,26,.96);border:1px solid var(--gold);color:var(--text);font:500 14px/1.3 var(--f-ui);box-shadow:0 6px 24px #0008;opacity:0;transition:opacity .12s}
+#tip.on{opacity:1}#tip b{display:block;font-weight:700;color:var(--gold)}#tip kbd{font:600 12px var(--f-ui);padding:1px 6px;border:1px solid var(--line);border-radius:5px;margin-left:6px}
+@media (hover:hover) and (pointer:fine){button{cursor:pointer}.sk:hover,.tbtn:hover,.btn:hover,.big:hover,.ghost:hover,.cls:hover,.row:hover,.card:hover,.grow:hover,.tab:hover,.chip:hover,.node:hover .plus{filter:brightness(1.18)}}
+html.kb :focus-visible,html.pad :focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+html[data-ui=tab] #tip{font-size:16px;padding:10px 14px}
+/* iPad в узком окне (Split View 1/2, 1/3, Stage Manager): телефонная раскладка + мелкие поправки только для iPad */
+html.ipad:not([data-ui=tab]) .sel-title{padding-right:60px}html.ipad #select>#verTag{align-self:start;min-height:0;flex:none}html.ipad:not([data-ui=tab]) #verTag{padding:3px 8px}
+@media (max-width:640px){html.ipad:not([data-ui=tab]) #tabLibN,html.ipad:not([data-ui=tab]) #tabBuildN,html.ipad:not([data-ui=tab]) .bk-title{display:none}html.ipad:not([data-ui=tab]) .tabs{margin-left:0}}
+html[data-ui=tab] .si-top{padding-right:72px}html[data-ui=tab] .nv,html[data-ui=tab] .card .mb,html[data-ui=tab] .row .mb,html[data-ui=tab] .sh .mb,html[data-ui=tab] .nm .mb{font-size:13px}html[data-ui=tab] .bd small,html[data-ui=tab] .branch small,html[data-ui=tab] .branches small{font-size:14px}
 html[data-ui=tab] .si-top .ico{width:68px;height:68px}html[data-ui=tab] .si-top .ico svg{width:36px;height:36px}
 html[data-ui=tab] .si-top h2{font-size:32px}html[data-ui=tab] .si-top p{font-size:15px}
 html[data-ui=tab] .si-desc{font-size:17px}html[data-ui=tab] .si-rolebar,html[data-ui=tab] .si-nums,html[data-ui=tab] .si-hint,html[data-ui=tab] .si-prog{font-size:15px}
 html[data-ui=tab] .si-stat{font-size:15px;grid-template-columns:96px 1fr}html[data-ui=tab] .si-stat .bar{height:8px}
 html[data-ui=tab] .si-sig div{font-size:16px}html[data-ui=tab] .si-sig .ico{width:36px;height:36px}html[data-ui=tab] .si-sig .ico svg{width:20px;height:20px}
-html[data-ui=tab] .sel-btns{gap:10px}html[data-ui=tab] .sel-btns .btn{height:56px;font-size:18px}
+html[data-ui=tab] .sel-right .sel-btns{position:static;margin:0;padding:0;background:none;gap:10px}html[data-ui=tab] .cls .n{height:2.35em;flex:none}html[data-ui=tab] .cls{min-height:0;grid-template-rows:auto auto auto;height:auto}html[data-ui=tab] .classes{grid-auto-rows:min-content}html[data-ui=tab] .sel-btns .btn{font-size:16px}html[data-ui=tab] .sel-right{background:linear-gradient(270deg,rgba(10,13,26,.96) 88%,rgba(10,13,26,0))}html[data-ui=tab] .si-scroll{padding-bottom:22px}html[data-ui=tab] .si-top p{overflow-wrap:anywhere}html[data-ui=tab] .sel-btns .btn{height:56px;font-size:18px}
 html[data-ui=tab] .rchip{font-size:15px;padding:7px 12px}
 @media (orientation:portrait){
   html[data-ui=tab] #select{grid-template-columns:minmax(0,1fr);grid-template-rows:auto 1fr auto}
-  html[data-ui=tab] .sel-left{padding:22px max(24px,env(safe-area-inset-right,0px)) 26px max(24px,env(safe-area-inset-left,0px))}
+  html[data-ui=tab] .sel-left{padding:calc(var(--sat) + 18px) max(24px,env(safe-area-inset-right,0px)) 26px max(24px,env(safe-area-inset-left,0px))}
+  html[data-ui=tab] .sel-title{padding-right:84px;margin-bottom:16px}
   html[data-ui=tab] .classes{grid-template-columns:repeat(7,minmax(0,1fr));grid-auto-flow:row;grid-auto-columns:auto;overflow-x:hidden;overflow-y:auto;touch-action:pan-y;max-height:34vh}
-  html[data-ui=tab] .sel-right{max-height:58vh;padding:26px max(24px,env(safe-area-inset-right,0px)) 20px max(24px,env(safe-area-inset-left,0px));display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:30px;row-gap:12px;grid-auto-flow:row dense;align-content:start}
+  html[data-ui=tab] #select>#verTag{grid-area:t;justify-self:end;align-self:start}
+  html[data-ui=tab] .sel-right{background:rgba(10,13,26,.96);max-height:min(58vh,calc(100vh - 360px));min-height:260px;padding:22px max(24px,env(safe-area-inset-right,0px)) 18px max(24px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:14px;overflow:hidden}
+  html[data-ui=tab] .si-scroll{max-height:none;flex:1 1 auto;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:30px;row-gap:12px;grid-auto-flow:row dense;align-content:start}
   html[data-ui=tab] .si-top,html[data-ui=tab] .si-els,html[data-ui=tab] .si-desc,html[data-ui=tab] .si-rolebar,html[data-ui=tab] .si-nums{grid-column:1}
+  html[data-ui=tab] .si-rolebar,html[data-ui=tab] .si-nums{display:block}html[data-ui=tab] .si-nums{display:flex}
   html[data-ui=tab] .si-stats,html[data-ui=tab] .si-sig,html[data-ui=tab] .si-prog{grid-column:2;display:grid}
   html[data-ui=tab] .si-stats{grid-row:1/span 2}
-  html[data-ui=tab] .sel-btns,html[data-ui=tab] .si-hint{grid-column:1/-1}
+  html[data-ui=tab] .si-hint{grid-column:1/-1;display:block}
   html[data-ui=tab] .sel-btns{grid-template-columns:repeat(2,minmax(0,1fr))}
   html[data-ui=tab] .sel-btns .big,html[data-ui=tab] .sel-btns #selPlay{grid-column:1/-1}
+}
+@media (orientation:portrait) and (max-height:1250px){
+  html[data-ui=tab] .classes{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:104px;overflow-x:auto;overflow-y:hidden;touch-action:pan-x;max-height:none;padding:8px 24px 10px;scroll-padding:0 24px}
+  html[data-ui=tab] .sel-right{max-height:min(66vh,calc(100vh - 330px))}
 }
 /* экраны-карточки */
 html[data-ui=tab] .ov-card{max-width:680px;gap:18px}
@@ -537,6 +566,7 @@ html[data-ui=tab] .coop-pl{padding:14px 16px}html[data-ui=tab] .coop-pl b{font-s
 html[data-ui=tab] .coop-wait{font-size:17px}
 /* книга чар */
 html[data-ui=tab] .bk-head{padding:12px 20px;gap:14px}
+@media (max-width:900px){html[data-ui=tab] .bk-head{padding:10px 14px;gap:10px}html[data-ui=tab] .bk-title{font-size:23px}html[data-ui=tab] .tab{padding:0 10px;font-size:16px}html[data-ui=tab] #heroBtn{padding:0 14px}html[data-ui=tab] .bk-title{min-width:0;overflow:hidden;text-overflow:ellipsis}html[data-ui=tab] .tabs{flex:none}}
 html[data-ui=tab] .bk-title{font-size:30px}
 html[data-ui=tab] .tabs{padding:4px;border-radius:15px}
 html[data-ui=tab] .tab{height:50px;padding:0 22px;font-size:17px;border-radius:12px}
@@ -591,6 +621,14 @@ html[data-ui=tab] .sh-act .btn{min-width:150px}
 #upg .ub{grid-column:1/-1;display:flex;gap:8px}#upg .ub .btn{flex:1;height:44px}
 @media (orientation:portrait){#upg{top:calc(var(--sat) + 268px)}}
 @media (orientation:landscape) and (max-height:520px){#upg{transform:translateX(-62%);width:min(360px,calc(100% - 330px))}}
+/* iPad, правки по рецензии 2 */
+html[data-ui=tab] .sel-left{background:linear-gradient(90deg,rgba(10,13,26,.96) 95%,rgba(10,13,26,0))}
+html[data-ui=tab] .sel-btns .btn{white-space:nowrap;padding:0 8px}
+@media (orientation:landscape) and (max-height:800px){html[data-ui=tab] .si-stats{display:none}html[data-ui=tab] .sel-title p{font-size:14px}html[data-ui=tab] .sel-btns .btn{font-size:15px;height:50px}}
+html[data-ui=tab] .sk::after{font-size:15px;padding:3px 6px;border-radius:7px;right:6px;top:4px}
+#nickOv{background:#0b0f1e}
+#threat em{font-style:normal}#threat .tt{display:none}html[data-ui=tab] #threat .tt{display:inline}html[data-ui=tab] #threat .tp{display:none}
+@media (max-width:1250px){html[data-ui=tab] #kills{display:none}}
 </style>
 
 <div id="app">
@@ -609,7 +647,7 @@ html[data-ui=tab] .sh-act .btn{min-width:150px}
     </div>
     <div id="topc">
       <div id="bossbar" hidden><b id="bossName"></b><div class="bar"><i id="bossI"></i></div></div>
-      <div id="threat"><span>Босс</span><div class="bar"><i id="threatI"></i></div></div>
+      <div id="threat"><span><em class="tp">Босс</em><em class="tt">До босса</em></span><div class="bar"><i id="threatI"></i></div></div>
       <div id="gprog" hidden><span id="gName"></span><div class="bar"><i id="gI"></i></div></div>
       <div id="zoneTag"><span id="zoneName"></span><small id="zoneSub"></small></div>
     </div>
@@ -618,6 +656,7 @@ html[data-ui=tab] .sh-act .btn{min-width:150px}
       <button class="tbtn" id="autoBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/><circle cx="12" cy="12" r="3"/></svg><span id="autoTxt">Авто</span></button>
       <button class="tbtn" id="bookBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2 2 2 0 0 0 2 2h13"/><path d="M12 7l1.2 2.6L16 10l-2 2 .5 2.8L12 13.5 9.5 14.8 10 12l-2-2 2.8-.4z"/></svg>Чары <small id="bookCount">0/50</small><span class="nb" id="tpBadge" hidden></span></button>
     </div>
+    <canvas id="mm" width="176" height="176" hidden aria-hidden="true"></canvas>
     <div id="joy"><div id="knob"></div></div>
     <div id="pad">
       <button id="atk" type="button" aria-label="Атака"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19L15 9"/><circle cx="17" cy="7" r="3"/><path d="M17 1.5v1.5M22.5 7H21M20.9 3.1l-1 1M13.1 3.1l1 1"/></svg></button>
@@ -2910,9 +2949,23 @@ function updateAim(){if(!aimSt||!aimSt.on||P.dead){hideAim();return;}const A=aim
 const tgtRing=new THREE.Mesh(FXG.ring,new THREE.MeshBasicMaterial({color:0xf2c46b,transparent:true,opacity:.85,depthWrite:false}));tgtRing.visible=false;scene.add(tgtRing);
 function updateTargetRing(){const t=target&&!target.dead&&mode==='game'?target:null;tgtRing.visible=!!t;if(t){tgtRing.position.set(t.pos.x,.09,t.pos.z);const s=t.r*1.7;tgtRing.scale.set(s,1,s);tgtRing.rotation.y=time*2;}}
 const ARC=[[112,178],[112,146],[112,114],[112,82],[172,178],[172,146],[172,114],[172,82]];
+let SLOT_SPLIT=null;
+// Слоты: одна дуга вокруг атаки (телефон, портрет); на планшете в альбоме внешний ряд (5–8) уходит дугой вокруг левого стика — под оба больших пальца
+const SPLIT_ARC=[[142,8],[142,38],[142,68],[142,98]];
+function placeSlot(i){const b=SKB[i].b;let r,a,dx=0,dy=0;
+  if(SLOT_SPLIT&&i>=4){[r,a]=SPLIT_ARC[i-4];dx=SLOT_SPLIT.dx;dy=SLOT_SPLIT.dy;b.style.setProperty('--x',(dx+Math.cos(a*Math.PI/180)*r*UI_U).toFixed(1)+'px');b.style.setProperty('--y',(dy-Math.sin(a*Math.PI/180)*r*UI_U).toFixed(1)+'px');return;}
+  [r,a]=ARC[i];b.style.setProperty('--x','calc('+(Math.cos(a*Math.PI/180)*r).toFixed(1)+'px * var(--u))');b.style.setProperty('--y','calc('+(-Math.sin(a*Math.PI/180)*r).toFixed(1)+'px * var(--u))');}
+function layoutSlots(){const tabL=document.documentElement.dataset.ui==='tab'&&innerWidth>innerHeight;let ns=null;
+  if(tabL){const u=UI_U,m=12*u,Wd=app.clientWidth,Hd=app.clientHeight,sl=envPx('left'),sr=envPx('right'),sb=envPx('bottom');
+    const px=Wd-(m*2+sr)-42*u,py=Hd-(m*2+sb)-42*u;   // центр #pad
+    const hx=m*2+50*u+sl,hy=Hd-m*2-50*u-sb;           // «дом» левого стика
+    ns={dx:hx-px,dy:hy-py};}
+  const ch=(!ns)!==(!SLOT_SPLIT)||(ns&&SLOT_SPLIT&&(Math.abs(ns.dx-SLOT_SPLIT.dx)>.5||Math.abs(ns.dy-SLOT_SPLIT.dy)>.5));
+  if(ch){SLOT_SPLIT=ns;SKB.forEach((_,i)=>placeSlot(i));}}
+
 for(let i=0;i<8;i++){const b=document.createElement('button');b.type='button';b.className='sk';b.dataset.k=i+1;b.dataset.g=['LB','RB','LT','RT','X','Y','B','↑'][i];const [r,a]=ARC[i];
-  b.style.setProperty('--x','calc('+(Math.cos(a*Math.PI/180)*r).toFixed(1)+'px * var(--u))');b.style.setProperty('--y','calc('+(-Math.sin(a*Math.PI/180)*r).toFixed(1)+'px * var(--u))');
   pad.appendChild(b);SKB.push({b,id:-2,p:-1,t:'',low:null});
+  placeSlot(i);
   b.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();
     const id=S.active[i];if(id==null){openBook('lib',{type:'active',index:i});return;}
     b.classList.add('down');aimSt={i,pid:e.pointerId,x:e.clientX,y:e.clientY,dx:0,dy:0,on:false,sk:SKILLS[id]};try{b.setPointerCapture(e.pointerId);}catch(_){}});
@@ -2922,9 +2975,9 @@ for(let i=0;i<8;i++){const b=document.createElement('button');b.type='button';b.
   b.addEventListener('pointercancel',()=>{aimSt=null;b.classList.remove('down');hideAim();});}
 function updateHudSlots(){const n=activeSlots();
   SKB.forEach((s,i)=>{const id=i<n?S.active[i]:null;s.b.hidden=i>=n;if(i>=n)return;
-    if(id==null){s.b.className='sk empty';delete s.b.dataset.r;s.b.textContent='+';s.b.style.removeProperty('--c');s.id=-1;s.b.setAttribute('aria-label','Пустой слот '+(i+1));return;}
+    if(id==null){s.b.className='sk empty';delete s.b.dataset.r;s.b.textContent='+';s.b.dataset.tip='Пустой слот|'+(i+1);s.b.style.removeProperty('--c');s.id=-1;s.b.setAttribute('aria-label','Пустой слот '+(i+1));return;}
     const sk=SKILLS[id];s.b.className='sk';s.b.dataset.r=rarOf(sk);s.b.style.setProperty('--c',sk.E.hex);s.b.innerHTML=svg(sk.F.id)+modBadge(sk)+'<span class="cd"></span><span class="t"></span>';
-    s.b.setAttribute('aria-label',skName(sk));s.id=id;s.p=-1;s.t='';s.low=null;s.cdEl=s.b.querySelector('.cd');s.tEl=s.b.querySelector('.t');});
+    s.b.setAttribute('aria-label',skName(sk));s.b.dataset.tip=skName(sk)+'|'+(i+1);s.id=id;s.p=-1;s.t='';s.low=null;s.cdEl=s.b.querySelector('.cd');s.tEl=s.b.querySelector('.t');});
   const tot=EQUIPPED.size,cap_=activeSlots()+passiveSlots();
   $('#bookCount').textContent=tot+'/'+cap_;$('#tabBuildN').textContent=tot+'/'+cap_;
   $('#tabLibN').textContent=(S.sandbox?CLS.pool.size:[...LEARNED].filter(id=>CLS.pool.has(id)).length)+'/'+CLS.pool.size;
@@ -2946,6 +2999,16 @@ function updateHud(){
     const low=P.mp<skMana(sk);if(low!==s.low){s.low=low;s.b.classList.toggle('low',low);}}
   hurtFlash=Math.max(0,hurtFlash-.03);const lowHp=P.hp/P.maxHp<.3?.35+.15*Math.sin(time*6):0;
   const ho=Math.max(hurtFlash,lowHp).toFixed(2);if(hudCache.ho!==ho){hudCache.ho=ho;hurtEl.style.opacity=ho;}}
+const mmEl=$('#mm'),mmCx=mmEl.getContext('2d');let mmT=0;
+function drawMini(){const show=mode==='game'&&PLAY==='world'&&document.documentElement.dataset.ui==='tab';if(mmEl.hidden===show)mmEl.hidden=!show;if(!show)return;
+  const n=performance.now();if(n-mmT<110)return;mmT=n;const S2=176,R=S2/2-4,k=R/WORLD,c=mmCx,m=(x,z)=>[S2/2+x*k,S2/2+z*k];
+  c.clearRect(0,0,S2,S2);c.save();c.beginPath();c.arc(S2/2,S2/2,S2/2-1,0,TAU);c.fillStyle='rgba(10,14,28,.62)';c.fill();c.clip();
+  for(const r of [31,62,84]){c.beginPath();c.arc(S2/2,S2/2,r*k,0,TAU);c.strokeStyle='rgba(255,255,255,.16)';c.lineWidth=1.5;c.stroke();}
+  c.fillStyle='rgba(255,90,80,.85)';for(const en of ENEMIES){if(en.dead||en===BOSS)continue;const [x,y]=m(en.pos.x,en.pos.z);c.fillRect(x-1.5,y-1.5,3,3);}
+  if(BOSS&&BOSS.pos){const [x,y]=m(BOSS.pos.x,BOSS.pos.z);c.beginPath();c.arc(x,y,6,0,TAU);c.fillStyle='#ff4a3a';c.fill();c.strokeStyle='#fff';c.lineWidth=2;c.stroke();}
+  if(MPon&&mpPeerUp()){const [x,y]=m(MP.peer.pos.x,MP.peer.pos.z);c.beginPath();c.arc(x,y,6.5,0,TAU);c.fillStyle='#4fd18b';c.fill();c.strokeStyle='#04210f';c.lineWidth=2;c.stroke();}
+  {const [x,y]=m(P.pos.x,P.pos.z);c.beginPath();c.arc(x,y,6.5,0,TAU);c.fillStyle='#fff';c.fill();c.strokeStyle='#2a6cff';c.lineWidth=3;c.stroke();}
+  c.restore();c.beginPath();c.arc(S2/2,S2/2,S2/2-1.5,0,TAU);c.strokeStyle='rgba(255,255,255,.45)';c.lineWidth=2;c.stroke();}
 let toastT=0;
 function toast(t,ms){const el=$('#toast');el.textContent=t;el.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('on'),ms||1900);}
 let banT=0;
@@ -2983,13 +3046,27 @@ atk.addEventListener('pointerdown',e=>{e.preventDefault();input.attack=true;atk.
 ['pointerup','pointercancel'].forEach(ev=>atk.addEventListener(ev,()=>{input.attack=false;atk.classList.remove('down');}));
 document.addEventListener('contextmenu',e=>e.preventDefault());
 let KB_SEEN=false;
+// Подсказки при наведении мыши/трекпада/пера (iPad с Magic Keyboard): data-tip="Название|клавиша"
+{const tip=document.createElement('div');tip.id='tip';app.appendChild(tip);let cur=null;
+ const hide=()=>{cur=null;tip.classList.remove('on');};
+ document.addEventListener('pointerover',e=>{if(e.pointerType!=='mouse'&&e.pointerType!=='pen'){hide();return;}const t=e.target.closest&&e.target.closest('[data-tip]');if(!t){hide();return;}if(t===cur)return;cur=t;
+   const [n,k]=t.dataset.tip.split('|');tip.innerHTML='<b>'+n+(k?'<kbd>'+k+'</kbd>':'')+'</b>';tip.classList.add('on');
+   const r=t.getBoundingClientRect(),a=app.getBoundingClientRect();let x=r.left-a.left+r.width/2-tip.offsetWidth/2,y=r.top-a.top-tip.offsetHeight-8;if(y<4)y=r.bottom-a.top+8;
+   tip.style.left=Math.max(4,Math.min(a.width-tip.offsetWidth-4,x))+'px';tip.style.top=Math.max(4,y)+'px';});
+ document.addEventListener('pointerdown',hide,true);window.addEventListener('blur',hide);}
+window.addEventListener('keydown',e=>{if(mode!=='select'||e.target&&/INPUT|TEXTAREA/.test(e.target.tagName))return;if(!$('#nickOv').hidden||!$('#coop').hidden||!$('#gorges').hidden)return;
+  const i=CLASSES.findIndex(c=>c.id===selId);if(i<0)return;
+  const cols=Math.max(1,getComputedStyle($('#classes')).gridTemplateColumns.split(' ').length);const mv={ArrowRight:1,ArrowLeft:-1,ArrowDown:cols,ArrowUp:-cols}[e.code];
+  if(mv!==undefined){e.preventDefault();const j=Math.max(0,Math.min(CLASSES.length-1,i+mv));if(j!==i){selectClass(CLASSES[j].id);const b=$('#classes').querySelector('.cls.on');if(b&&b.scrollIntoView)b.scrollIntoView({block:'nearest'});}return;}
+  if(e.code==='Enter'&&!/BUTTON/.test((e.target&&e.target.tagName)||'')){const b=$('#selPlay');if(b){e.preventDefault();b.click();}}});
+
 window.addEventListener('keydown',e=>{
   if(e.target&&e.target.tagName==='INPUT')return;
   if(mode!=='game')return;
-  if(!KB_SEEN&&/^(Key|Digit|Numpad|Arrow|Space|Tab)/.test(e.code)){KB_SEEN=true;document.documentElement.classList.add('kb');toast('Клавиатура: WASD — ход, Пробел — атака, 1–8 — чары, B — книга, T — таланты');}
+  if(!KB_SEEN&&/^(Key|Digit|Numpad|Arrow|Space|Tab)/.test(e.code)){KB_SEEN=true;document.documentElement.classList.add('kb');toast('Клавиатура: WASD или стрелки — ход, Пробел — атака, 1–8 — чары, Tab или B — книга, T — таланты');}
   if(e.code==='KeyB'||e.code==='Tab'){e.preventDefault();bookOpen?closeBook():openBook('lib');return;}
   if(e.code==='KeyT'){e.preventDefault();bookOpen?closeBook():openBook('tal');return;}
-  if(e.code==='Escape'&&bookOpen){closeBook();return;}
+  if(e.code==='Escape'){e.preventDefault();if(bookOpen)closeBook();else if(!luOpen)openBook('lib');return;}
   if(bookOpen||luOpen)return;
   input.keys[e.code]=true;
   if(e.code==='Space'){e.preventDefault();input.attack=true;}
@@ -3006,7 +3083,7 @@ $('#reviveBtn').addEventListener('click',revive);$('#deadMenu').addEventListener
 // =====================================================================
 let selId=null,selFx=0;
 function diffDots(n){return '●'.repeat(n)+'○'.repeat(3-n);}
-function renderClasses(){$('#classes').innerHTML=CLASSES.map(c=>{const sv=SAVE.chars[c.id];return `<button type="button" class="cls${c.id===selId?' on':''}" data-c="${c.id}" style="--c:${c.hex}"><span class="ico" style="--c:${c.hex}">${svg(c.icon)}</span><span class="n">${c.name}</span><span class="lvb">${sv&&sv.mx?'М '+mastLvlOf(sv.mx):' '}</span></button>`;}).join('');}
+function renderClasses(){$('#classes').innerHTML=CLASSES.map(c=>{const sv=SAVE.chars[c.id];return `<button type="button" class="cls${c.id===selId?' on':''}" data-c="${c.id}" data-tip="${c.name}" style="--c:${c.hex}"><span class="ico" style="--c:${c.hex}">${svg(c.icon)}</span><span class="n">${c.name}</span><span class="lvb">${sv&&sv.mx?'М '+mastLvlOf(sv.mx):' '}</span></button>`;}).join('');}
 function mastHtml(c,sv){const mx=sv?sv.mx||0:0,l=mastLvlOf(mx),b=Math.min(10,l),lo=l?mastCum(l):0,hi=mastCum(Math.min(MAST_MAX,l+1)),f=l>=MAST_MAX?1:clamp((mx-lo)/Math.max(1,hi-lo),0,1);
   const nx=MAST_MS.find(m=>m[0]>l),bk=sv&&sv.book?sv.book.filter(v=>c.pool.has(v)).length:0;
   return `<div class="si-mast fr${mastFrame(l)}" style="--c:${c.hex}"><div class="sm-h"><b>Мастерство ${l}</b><span>${mastTitle(l)}</span></div><div class="bar"><i style="transform:scaleX(${f.toFixed(3)})"></i></div>
@@ -3228,13 +3305,14 @@ $('#heroBtn').addEventListener('click',toSelect);
 // =====================================================================
 let paused=true,last=performance.now(),perfAcc=0,perfN=0,perfGood=0,W=1,H=1,saveClock=0;
 function syncPause(){paused=mode!=='game'||(!MPon&&(bookOpen||luOpen))||!$('#dead').hidden||!$('#win').hidden;}
+const IS_PAD=/iPad/.test(navigator.userAgent)||(/Mac/.test(navigator.platform)&&navigator.maxTouchPoints>1);if(IS_PAD)document.documentElement.classList.add('ipad');
 function botAdj(){try{return Math.max(0,Math.min(120,+localStorage.getItem('tcBot')||0));}catch(e){return 0;}}
 function envPx(side){const d=document.createElement('div');d.style.cssText='position:absolute;visibility:hidden;pointer-events:none;padding-'+side+':env(safe-area-inset-'+side+',0px)';document.body.appendChild(d);const v=parseFloat(getComputedStyle(d)['padding'+side[0].toUpperCase()+side.slice(1)])||0;d.remove();return v;}
 function fitApp(){const sa=navigator.standalone||matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches;const els=[document.documentElement,document.body,app];const adj=botAdj();if(!sa&&!adj){els.forEach(x=>{x.style.height='';x.style.bottom='';});return;}let h=Math.round(Math.min(innerHeight,window.visualViewport?visualViewport.height+visualViewport.offsetTop:innerHeight));
 h=Math.max(300,h-adj);els.forEach(x=>{x.style.bottom='auto';x.style.height=h+'px';});const cut=navigator.standalone&&/iPhone/.test(navigator.userAgent)&&innerHeight>=innerWidth&&Math.abs(innerHeight+envPx('top')-screen.height)<4;const rs=document.documentElement.style;if(cut){rs.setProperty('--sab-env','0px');rs.setProperty('--sat-env','0px');}else{rs.removeProperty('--sab-env');rs.removeProperty('--sat-env');}document.documentElement.classList.toggle('ios-cut',!!cut);}
 function uiScale(){const mn=Math.min(innerWidth,innerHeight),tab=mn>=600&&matchMedia('(pointer:coarse)').matches;const u=tab?Math.min(1.5,Math.max(1.2,mn/520)):1;if(u!==UI_U||document.documentElement.dataset.ui!==(tab?'tab':'')){UI_U=u;document.documentElement.dataset.ui=tab?'tab':'';document.documentElement.style.setProperty('--u',u.toFixed(2));}}
 function prCap(){const c=Math.min(window.devicePixelRatio||1,1.5,Math.max(1,Math.sqrt(3.1e6/Math.max(1,innerWidth*innerHeight))));if(Math.abs(c-PR_MAX)>.01){PR_MAX=c;if(pr>PR_MAX){pr=PR_MAX;renderer.setPixelRatio(pr);}}}
-function resize(){uiScale();prCap();fitApp();W=app.clientWidth;H=app.clientHeight;renderer.setSize(W,H,false);camera.aspect=W/H;camera.fov=W<H?56:42;camera.updateProjectionMatrix();makeRT();
+function resize(){uiScale();prCap();fitApp();layoutSlots();W=app.clientWidth;H=app.clientHeight;renderer.setSize(W,H,false);camera.aspect=W/H;camera.fov=W<H?56:42;camera.updateProjectionMatrix();makeRT();
   }
 window.addEventListener('resize',resize);window.addEventListener('orientationchange',()=>setTimeout(resize,250));if(/[?&]dbg=1/.test(location.search)){const d=document.createElement('div');d.style.cssText='position:fixed;left:4px;top:40%;z-index:99;background:#000c;color:#0f0;font:12px monospace;padding:4px;pointer-events:none';document.body.appendChild(d);setInterval(()=>{d.textContent='inner '+innerWidth+'x'+innerHeight+' screen '+screen.width+'x'+screen.height+' app '+app.clientWidth+'x'+app.clientHeight+' sa '+(navigator.standalone?1:0)+' top '+app.getBoundingClientRect().top;},500);}
 function perf(dt){perfAcc+=dt;perfN++;if(perfAcc<2)return;const fps=perfN/perfAcc;perfAcc=0;perfN=0;if(SAVE.q!=='auto')return;
@@ -3273,7 +3351,7 @@ function loop(now){
   for(const f of WORLD_ANIM)f();
   updateGfx(paused&&mode!=='select'?0:dt);
   updatePoints(SPARK,paused&&mode!=='select'?0:dt);updatePoints(PUFF,paused&&mode!=='select'?0:dt);
-  updateCamera(dt);updateFloats(paused?0:dt,W,H);if(mode==='game'){updateHud();if(MPon)mpHud();}
+  updateCamera(dt);updateFloats(paused?0:dt,W,H);if(mode==='game'){updateHud();drawMini();if(MPon)mpHud();}
   render();}
 document.addEventListener('visibilitychange',()=>{if(document.hidden)save();});
 
