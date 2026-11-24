@@ -1295,7 +1295,7 @@ function novaFx(sk,x,z,r){const id=sk.E.id,col=sk.E.color;fxShock(x,z,r,col);elS
 const ICEC=new THREE.Color(0xbfeaff),EARTHC=new THREE.Color(0x8a6a4a);
 
 const TELE=[];
-function tele(shape,o,dur,onDone){const t=Object.assign({shape,dur,t:0,onDone,cancel:false},o);
+function tele(shape,o,dur,onDone){const t=Object.assign({shape,dur,t:0,onDone:swapWrap(onDone),cancel:false},o);
   if(shape==='circle'){t.base=takeMesh('disc');t.fill=takeMesh('disc');t.edge=takeMesh('ring');
     for(const m of [t.base,t.fill,t.edge]){m.material.color.copy(RED);m.position.set(o.x,.07,o.z);}
     t.base.scale.set(o.r,1,o.r);t.base.material.opacity=.16;t.edge.scale.set(o.r,1,o.r);t.fill.material.opacity=.3;t.fill.scale.set(.01,1,.01);t.fill.position.y=.075;}
@@ -1589,7 +1589,7 @@ function buildMob(tid){
 const ENEMIES=[];let UID=0;
 function spawnEnemy(tid,x,z,lv,o){o=o||{};const t=MOBS[tid],mdl=buildMob(tid);rimify(mdl.g,o.elite?0xffd070:t.boss?0xff7a6a:0x8fb0ff,o.elite||t.boss?.6:.42);
   const sc=o.champ?1.6:o.elite?1.3:o.mini?.6:1;mdl.g.scale.setScalar(sc);
-  const hpMul=(o.champ?2:1)*(o.elite?3.5:1)*(o.mini?.3:1)*(t.boss?1.3:2.2)*(o.hpMul||1)*(MPH&&MP.coop?1.6:1),dmgMul=(o.elite?1.4:1)*(o.mini?.6:1)*(t.boss?1:.9);
+  const hpMul=(o.champ?2:1)*(o.elite?3.5:1)*(o.mini?.3:1)*(t.boss?1.3:2.2)*(o.hpMul||1)*(MPH&&MP.coop?COOP.hp:1),dmgMul=(o.elite?1.4:1)*(o.mini?.6:1)*(t.boss?1:.9);
   const en={uid:++UID,tid,t,lv,sc,elite:!!o.elite,mini:!!o.mini,boss:!!t.boss,r:t.r*sc,mass:t.mass*(o.elite?2:1),
     maxHp:Math.round(t.hp*(1+.42*(lv-1))*hpMul),dmg:Math.round(t.dmg*(1+.22*(lv-1))*dmgMul),spd:t.spd*rand(.92,1.08),
     xp:Math.round(t.xp*1.3*(1+.25*(lv-1))*(o.elite?5:1)*(o.mini?.3:1)),pos:mdl.g.position,g:mdl.g,mats:mdl.mats,A:mdl.A,
@@ -1654,7 +1654,7 @@ function updateEProj(dt){for(let i=EPROJ.length-1;i>=0;i--){const p=EPROJ[i],g=p
 // FLOATING TEXT, SCHEDULER
 // =====================================================================
 const LATER=[];
-function later(t,fn){LATER.push({t,fn});}
+function later(t,fn){LATER.push({t,fn:swapWrap(fn)});}
 function updateLater(dt){for(let i=LATER.length-1;i>=0;i--){const l=LATER[i];l.t-=dt;if(l.t<=0){LATER.splice(i,1);l.fn();}}}
 const FL=[];let flI=0;
 (function(){const layer=$('#floats');for(let i=0;i<44;i++){const d=document.createElement('div');d.className='fl';layer.appendChild(d);FL.push({el:d,t:0,life:0,on:false,pos:new THREE.Vector3(),vis:false});}})();
@@ -2404,7 +2404,8 @@ function animateHero(dt,moving){
 const FF3=new THREE.Color(0xd8643a),FF0=new THREE.Color(0x8fb84a),FF1=new THREE.Color(0x3a9a8a),FF2=new THREE.Color(0x5a60a8);
 function updateEnemies(dt){
   const maxN=Math.min(30,5+mpLvl()*2);
-  if(PLAY==='world'){if(!MPG){spawnT-=dt;if(spawnT<=0){spawnT=mpLvl()<4?3.6:2.5;if(aliveCount()<maxN+(MPH&&MP.peer?5:0))spawnPack();}if(!BOSS&&threat>=THREAT_MAX)spawnBoss();}}else updateGorge(dt);
+  if(PLAY==='world'){if(!MPG){spawnT-=dt;if(spawnT<=0){spawnT=mpLvl()<4?3.6:2.5;if(aliveCount()<maxN+(MPH&&MP.peer?COOP.cap:0))spawnPack();}if(!BOSS&&threat>=THREAT_MAX)spawnBoss();}}else updateGorge(dt);
+  if(MPH&&MP.peer)mpCountAggro();
   for(let i=ENEMIES.length-1;i>=0;i--){const en=ENEMIES[i];
     if(en.dead){en.deathT+=dt;const k=en.deathT/.4;en.g.scale.setScalar(Math.max(.01,(1-k)*en.sc));en.g.position.y=-k*.3;if(k>=1)removeEnemy(i);continue;}
     if(en.remote){mpStepRemote(en,dt);enemyVisuals(en,dt);continue;}
@@ -3227,7 +3228,7 @@ function mpOnMsg(m,id){
     case 'k':mpGuestKill(m);break;
     case 'rm':mpGuestRemove(m);break;
     case 'H':if(MPH)for(const h of m.a)mpHostHit(h);break;
-    case 'hurt':hurtPlayer(m.d,{blindT:m.b?1:0,affix:m.f?new Set(['frost']):null},{slow:m.s||0,dot:!!m.dt});break;
+    case 'hurt':if(MPG||MP.role==='guest'){hurtPlayer(m.d,{blindT:m.b?1:0,affix:m.f?new Set(['frost']):null},{slow:m.s||0,dot:!!m.dt});mpSendPos();}break;
     case 'te':mpGuestTele(m);break;
     case 'ez':if(MPG)addEZ(m.x,m.z,m.r,m.du,m.dp,new THREE.Color(m.c));break;
     case 'ep':mpGuestEProj(m);break;
@@ -3338,17 +3339,35 @@ const mpAllyUp=()=>MPon&&mpPeerUp();
 const mpLvl=()=>MPH&&MP.peer&&MP.peer.on?Math.max(1,Math.round((S.lvl+(MP.peer.lvl||S.lvl))/2)):S.lvl;
 function mpSpawnCenter(){if(MPH&&mpPeerUp()&&(P.dead||Math.random()<.5))return MP.peer.pos;return P.pos;}
 function mpLeadZ(z){if(MPH&&MP.peer&&MP.peer.on&&GZ){const l=toLocal(MP.peer.pos.x,MP.peer.pos.z);return Math.max(z,l.z);}return z;}
+// агро делится: враг держит цель ~2,5 с; выбирает героя по расстоянию с «штрафом» за каждого врага, уже идущего на него
+// коэффициенты кооператива: крепость врагов и добавка к лимиту живых врагов (для двоих)
+const COOP={hp:1.6,cap:5};
+const MPAG={h:0,p:0,at:-9};
+function mpCountAggro(){let h=0,p=0;for(const e of ENEMIES){if(e.dead||!e.aggro||e.boss||e.remote)continue;if(e.tgW==='p')p++;else if(e.tgW==='h')h++;}MPAG.h=h;MPAG.p=p;}
 function mpTarget(en){
-  if(!MPH||!mpPeerUp())return null;const pr=MP.peer;if(P.dead)return pr;
-  const dh=Math.hypot(P.pos.x-en.pos.x,P.pos.z-en.pos.z),dp=Math.hypot(pr.pos.x-en.pos.x,pr.pos.z-en.pos.z);return dp<dh?pr:null;}
-let SWP=false;const _sw={x:0,z:0,vx:0,vz:0,d:false};
-function mpSwapIn(tp){SWP=true;_sw.x=P.pos.x;_sw.z=P.pos.z;_sw.vx=P.vel.x;_sw.vz=P.vel.z;_sw.d=P.dead;P.pos.x=tp.pos.x;P.pos.z=tp.pos.z;P.vel.x=tp.vel.x;P.vel.z=tp.vel.z;P.dead=false;return true;}
-function mpSwapOut(){P.pos.x=_sw.x;P.pos.z=_sw.z;P.vel.x=_sw.vx;P.vel.z=_sw.vz;P.dead=_sw.d;SWP=false;}
+  if(!MPH||!mpPeerUp()){en.tgW=null;return null;}const pr=MP.peer;if(P.dead){en.tgW='p';return pr;}
+  const dh=Math.hypot(P.pos.x-en.pos.x,P.pos.z-en.pos.z),dp=Math.hypot(pr.pos.x-en.pos.x,pr.pos.z-en.pos.z),near=dp<dh?'p':'h',dn=Math.min(dh,dp),df=Math.max(dh,dp);
+  if(en.boss||dn>17||df>dn*1.8+5||en.noDespawn&&en.t.boss){en.tgW=near;return near==='p'?pr:null;}
+  if(!(en.tgUntil>time)||!en.tgW){const ch=MPAG.h-(en.tgW==='h'?1:0),cp=MPAG.p-(en.tgW==='p'?1:0);
+    const old=en.tgW;en.tgW=(dp+1.4*cp<dh+1.4*ch)?'p':'h';en.tgUntil=time+2+rand(0,1.2);
+    if(en.aggro&&old!==en.tgW){if(old==='h')MPAG.h--;else if(old==='p')MPAG.p--;if(en.tgW==='h')MPAG.h++;else MPAG.p++;}}
+  if(en.tgW==='h'&&dh>dp+8)en.tgW='p';else if(en.tgW==='p'&&dp>dh+8)en.tgW='h';
+  return en.tgW==='p'?pr:null;}
+let SWP=false,SWT=null;const _sw={x:0,z:0,vx:0,vz:0,d:false};
+// отложенные действия врага (стрела, залп, удар по кругу) должны целиться в того героя, на кого враг нацелился при замахе, а не в хоста
+function swapWrap(fn){if(!SWP||!SWT||typeof fn!=='function')return fn;const tp=SWT;
+  return function(){if(SWP||!MPH||MP.peer!==tp||!mpPeerUp())return fn.apply(this,arguments);mpSwapIn(tp);try{return fn.apply(this,arguments);}finally{mpSwapOut();}};}
+function mpSwapIn(tp){SWP=true;SWT=tp;_sw.x=P.pos.x;_sw.z=P.pos.z;_sw.vx=P.vel.x;_sw.vz=P.vel.z;_sw.d=P.dead;P.pos.x=tp.pos.x;P.pos.z=tp.pos.z;P.vel.x=tp.vel.x;P.vel.z=tp.vel.z;P.dead=false;return true;}
+function mpSwapOut(){P.pos.x=_sw.x;P.pos.z=_sw.z;P.vel.x=_sw.vx;P.vel.z=_sw.vz;P.dead=_sw.d;SWP=false;SWT=null;}
 // урон от врагов: проверяем обоих героев; гостю шлём «hurt», он применяет его сам (броня, щит)
 function foeHurt(test,dmg,src,o){
   let hit=false;const hx=SWP?_sw.x:P.pos.x,hz=SWP?_sw.z:P.pos.z,hd=SWP?_sw.d:P.dead;
   if(!(o&&o.peerOnly)&&!hd&&test(hx,hz)){hurtPlayer(dmg,src,o);hit=true;}
-  if(MPH&&mpPeerUp()&&test(MP.peer.pos.x,MP.peer.pos.z)){mpSend({t:'hurt',d:dmg,b:src&&src.blindT>0?1:0,f:src&&src.affix&&src.affix.has&&src.affix.has('frost')?1:0,s:o&&o.slow||0,dt:o&&o.dot?1:0});hit=true;}
+  if(MPH&&mpPeerUp()){const pp=MP.peer.pos,pv=MP.peer.vel;let ph=test(pp.x,pp.z);
+    // задержка сети ~0,1–0,2 с: гость мог чуть сместиться — допуск вдоль его движения, не больше 1,3 м
+    if(!ph){const sp=Math.hypot(pv.x,pv.z);if(sp>.4){const k=Math.min(.2,1.3/sp);ph=test(pp.x+pv.x*k,pp.z+pv.z*k);}}
+    if(ph){const m={t:'hurt',d:dmg,b:src&&src.blindT>0?1:0,f:src&&src.affix&&src.affix.has&&src.affix.has('frost')?1:0,s:o&&o.slow||0,dt:o&&o.dot?1:0};
+      if(src&&src.pos){m.x=r2(src.pos.x);m.z=r2(src.pos.z);}mpSend(m);hit=true;}}
   return hit;}
 
 // ---------- враги: хост → гость ----------
