@@ -462,6 +462,20 @@ html[data-ui=tab] #mm{top:calc(var(--m) + var(--sat) + 70px);width:calc(92px * v
 .coop-mode small{color:var(--muted);font-size:12px;line-height:1.35}
 .coop-note{color:#ffd890;font-size:14px;border:1px solid rgba(242,196,107,.4);border-radius:10px;padding:8px 12px}
 .coop-wait{color:var(--muted);font-size:14px}
+/* ---- настройки (шестерёнка): выход в меню с подтверждением ---- */
+#setOv{z-index:25}
+#setOv .ov-card{max-width:440px}
+#setOv h1{font-size:clamp(30px,8vw,44px)}
+.set-exit{display:grid;gap:10px;padding:14px;border-radius:16px;border:1px solid rgba(229,72,77,.45);background:rgba(229,72,77,.08)}
+.set-out{justify-self:stretch;min-width:0;height:56px;padding:0 16px;border-radius:14px;border:1px solid rgba(229,72,77,.75);background:linear-gradient(180deg,#5a1f27,#3a141b);color:#ffd2d4;font:700 19px var(--f-ui);display:flex;align-items:center;justify-content:center;gap:10px}
+.set-out svg{width:22px;height:22px;flex:none}
+.set-out.arm{background:linear-gradient(180deg,#e5484d,#a8282e);color:#fff;border-color:#ff8a8e}
+.set-warn{color:#ffc9cb!important;font-size:14px!important;text-align:left;line-height:1.45}
+.set-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.set-row .ghost{flex:1 1 160px}
+#setBtn{padding:0 11px}
+html[data-ui=tab] .set-out{height:64px;font-size:21px}
+@media (max-height:500px){#setOv h1{display:none}#setOv .ov-card{max-width:640px;gap:8px}.set-exit{padding:10px;gap:8px}.set-out{height:48px}#setOv .big{height:46px}}
 .coop-net{color:var(--muted);font-size:13px;display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap}
 .ghost.sm{height:44px;padding:0 14px;font-size:13px}
 .coop-diag{margin:0;text-align:left;white-space:pre-wrap;word-break:break-word;font:12px/1.45 var(--f-ui);color:var(--muted);background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:10px;padding:8px 10px;max-width:100%}
@@ -538,6 +552,7 @@ body.inlob #select{visibility:hidden}
 .lob-info b{font:700 15px var(--f-display);color:var(--gold)}
 .lob-info small{font-size:11px;color:var(--muted);line-height:1.25}
 .lob-warn{margin:0;text-align:center;font-size:12px;color:#ffd890}
+.lob-note{margin:0;text-align:center;font-size:13px;line-height:1.35;color:#ffd890;border:1px solid rgba(242,196,107,.4);border-radius:10px;padding:6px 10px}
 .lob-btns{display:flex;gap:8px;align-items:center}
 .lob-btns .btn,.lob-btns .big,.lob-btns .ghost{height:48px;min-width:0;margin:0}
 .lob-rdy{flex:1 1 0;font:700 15px var(--f-ui)}
@@ -776,6 +791,7 @@ html[data-ui=tab] .sk::after{font-size:15px;padding:3px 6px;border-radius:7px;ri
       <span id="kills"></span>
       <button class="tbtn" id="autoBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/><circle cx="12" cy="12" r="3"/></svg><span id="autoTxt">Авто</span></button>
       <button class="tbtn" id="bookBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2 2 2 0 0 0 2 2h13"/><path d="M12 7l1.2 2.6L16 10l-2 2 .5 2.8L12 13.5 9.5 14.8 10 12l-2-2 2.8-.4z"/></svg>Чары <small id="bookCount">0/50</small><span class="nb" id="tpBadge" hidden></span></button>
+      <button class="tbtn" id="setBtn" type="button" aria-label="Настройки и выход в меню" title="Настройки и выход в меню (Esc)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
     </div>
     <div id="mm" hidden><canvas id="mmc" width="168" height="168"></canvas><div id="mmL"></div></div>
     <div id="joy"><div id="knob"></div></div>
@@ -830,6 +846,20 @@ html[data-ui=tab] .sk::after{font-size:15px;padding:3px 6px;border-radius:7px;ri
       <p id="winTxt"></p>
       <div class="row2"><button class="big" id="winNext" type="button">Следующее ущелье</button></div>
       <div class="row2"><button class="ghost" id="winWorld" type="button">В свободный мир</button><button class="ghost" id="winHeroes" type="button">К выбору героя</button></div>
+    </div>
+  </div>
+
+  <div id="setOv" class="ov" hidden>
+    <div class="ov-card" id="setCard" role="dialog" aria-label="Настройки">
+      <h1>Настройки</h1>
+      <p id="setSub" hidden>Игра вдвоём не ставится на паузу — враги не ждут.</p>
+      <div class="set-exit">
+        <button class="set-out" id="exitBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg><span id="exitTxt">Выйти в меню</span></button>
+        <p class="set-warn" id="exitWarn" hidden></p>
+        <button class="ghost" id="exitNo" type="button" hidden>Нет, остаться</button>
+      </div>
+      <div class="set-row"><button class="ghost" id="setGfx" type="button">Графика и отступ снизу</button></div>
+      <button class="big" id="setClose" type="button">Продолжить игру</button>
     </div>
   </div>
 
@@ -3693,11 +3723,11 @@ window.addEventListener('keydown',e=>{if(mode!=='select'||e.target&&/INPUT|TEXTA
 window.addEventListener('keydown',e=>{
   if(e.target&&e.target.tagName==='INPUT')return;
   if(mode!=='game')return;
-  if(!KB_SEEN&&/^(Key|Digit|Numpad|Arrow|Space|Tab)/.test(e.code)){KB_SEEN=true;document.documentElement.classList.add('kb');toast('Клавиатура: WASD или стрелки — ход, Пробел — атака, 1–8 — чары, Tab или B — книга, T — таланты');}
+  if(!KB_SEEN&&/^(Key|Digit|Numpad|Arrow|Space|Tab)/.test(e.code)){KB_SEEN=true;document.documentElement.classList.add('kb');toast('Клавиатура: WASD или стрелки — ход, Пробел — атака, 1–8 — чары, Tab или B — книга, T — таланты, Esc — настройки и выход в меню');}
   if(e.code==='KeyB'||e.code==='Tab'){e.preventDefault();bookOpen?closeBook():openBook('lib');return;}
   if(e.code==='KeyT'){e.preventDefault();bookOpen?closeBook():openBook('tal');return;}
-  if(e.code==='Escape'){e.preventDefault();if(bookOpen)closeBook();else if(!luOpen)openBook('lib');return;}
-  if(bookOpen||luOpen)return;
+  if(e.code==='Escape'){e.preventDefault();if(setOpen)closeSettings();else if(bookOpen)closeBook();else if(!luOpen&&$('#dead').hidden&&$('#win').hidden)openSettings();return;}
+  if(bookOpen||luOpen||setOpen)return;
   input.keys[e.code]=true;
   if(e.code==='Space'){e.preventDefault();input.attack=true;}
   const m=/^(?:Digit|Numpad)([1-8])$/.exec(e.code);if(m){if(e.code[0]==='N')e.preventDefault();trySlot(+m[1]-1,true);}});
@@ -3740,7 +3770,7 @@ function setClass(id){CLS=CLASS_BY[id];S=validChar(SAVE.chars[id],CLS);LEARNED=n
 function startGame(){SAVE.chars[CLS.id]=S;SAVE.cur=CLS.id;beginRun('world',0,1);save();mode='game';for(const id of ['#select','#gorges','#win','#dead'])$(id).hidden=true;$('#hud').hidden=false;clearWorld();exitGorge();P.face=0;hero.g.rotation.z=0;hero.g.position.y=0;P.hp=P.maxHp;P.mp=P.maxMp;hudCache.hk=null;
   if(MPon)mpStartPos();if(!MPG)for(let i=0;i<3;i++)spawnPack();zoneTag(0);syncPause();camT.set(P.pos.x,1.2,P.pos.z);
   fxPillar(0,0,1.2,7,CLS.color,1);colBurst(CLS.color,0,1,0,40,5,1,-1);toast(CLS.name+': '+CLS.pool.size+' чар класса, изучено '+LEARNED.size);}
-function toSelect(){if(MPon)mpLeaveGame();runEnd();save();closeBook();mode='select';clearWorld();exitGorge();$('#hud').hidden=true;$('#select').hidden=false;for(const id of ['#gorges','#win','#dead'])$(id).hidden=true;hero.g.rotation.z=0;hero.g.position.y=0;selectClass(CLS.id);syncPause();if(NEWVER&&!MPon)location.reload();}
+function toSelect(){closeSettings();if(MPon)mpLeaveGame();runEnd();save();closeBook();mode='select';clearWorld();exitGorge();$('#hud').hidden=true;$('#select').hidden=false;for(const id of ['#gorges','#win','#dead'])$(id).hidden=true;hero.g.rotation.z=0;hero.g.position.y=0;selectClass(CLS.id);syncPause();if(NEWVER&&!MPon)location.reload();}
 let NEWVER=false;window.addEventListener('tc-newversion',async()=>{try{const t=await(await fetch('sw.js?'+Date.now(),{cache:'no-store'})).text();const m=t.match(/VERSION\s*=\s*['"]([^'"]+)['"]/);if(m&&m[1]===APP_BUILD)return;}catch(e){}NEWVER=true;if(mode==='select'&&!MPon)location.reload();else toast('Вышла новая версия — обновится, когда выйдешь в меню');});
 
 // =====================================================================
@@ -3766,7 +3796,7 @@ $('#luSkip').addEventListener('click',()=>{S.ess+=20+S.lvl*5;closeLevelUp();});
 // =====================================================================
 // BOOK
 // =====================================================================
-let bookOpen=false,bookTab='lib',pending=null;
+let bookOpen=false,bookTab='lib',pending=null,setOpen=false,exitArmAt=0;
 const F_={type:'learned',el:-1,form:-1,q:''};
 let LIST=[],shown=0;
 const listEl=$('#list');
@@ -3996,17 +4026,41 @@ function showTab(t){bookTab=t;$('#tabLib').classList.toggle('on',t==='lib');$('#
   $('#lib').hidden=t!=='lib';$('#build').hidden=t!=='build';$('#tal').hidden=t!=='tal';
   if(t==='lib')renderList();else if(t==='build')renderBuild();else renderTalents();}
 $('#tabLib').addEventListener('click',()=>showTab('lib'));$('#tabBuild').addEventListener('click',()=>showTab('build'));$('#tabTal').addEventListener('click',()=>showTab('tal'));
-function openBook(tab,p){bookOpen=true;hideUpg();input.attack=false;input.jx=input.jy=0;joyId=null;mouseId=null;input.mouseAttack=false;input.moveTo=null;joy.classList.remove('on');aimSt=null;hideAim();
+function openBook(tab,p){if(setOpen)closeSettings();bookOpen=true;hideUpg();input.attack=false;input.jx=input.jy=0;joyId=null;mouseId=null;input.mouseAttack=false;input.moveTo=null;joy.classList.remove('on');aimSt=null;hideAim();
   $('#book').hidden=false;$('#bkTitle').textContent=CLS.name;syncPause();if(p&&p.type)F_.type='learned';F_.el=-1;F_.form=-1;setPending(p||null);renderFilters();showTab(tab||'lib');}
 function closeBook(){bookOpen=false;closeSheet();setPending(null);$('#book').hidden=true;syncPause();save();}
 $('#bkClose').addEventListener('click',closeBook);
-$('#heroBtn').addEventListener('click',toSelect);
+$('#heroBtn').addEventListener('click',()=>{if(mode==='game'){closeBook();openSettings(true);}else toSelect();});
+
+// ---------- настройки (шестерёнка): выход в меню с подтверждением вторым нажатием ----------
+function exitWarnTxt(){
+  const camp=!!(GZ&&GZ.camp),gorge=PLAY==='gorge'&&!camp,pn=MP.peer&&MP.peer.nick?MP.peer.nick:'Напарник';
+  let t='Забег закончится: уровень '+S.lvl+', таланты и билд этого забега пропадут — '+(camp?'уровень прохождения придётся проходить сначала':gorge?'ущелье '+(GZ?GZ.g:'')+' придётся проходить сначала':'следующий заход начнётся с 1-го уровня')+'. Останутся мастерство, Книга чар и пройденные ущелья.';
+  if(MPon&&MPH&&MP.peer&&MP.peer.on)t+=' '+pn+' тоже вернётся в меню — игра закончится у обоих. Комната останется: начать заново можно через «Играть вместе».';
+  else if(MPon&&MPG)t+=' Выйдешь только ты — '+pn+' продолжит играть. Вернуться к нему можно через «Играть вместе».';
+  return t;}
+function armExit(v){exitArmAt=v?performance.now():0;const b=$('#exitBtn');b.classList.toggle('arm',!!v);
+  $('#exitTxt').textContent=v?'Точно выйти? Нажми ещё раз':'Выйти в меню';
+  $('#exitWarn').hidden=!v;$('#exitNo').hidden=!v;if(v)$('#exitWarn').textContent=exitWarnTxt();}
+function openSettings(arm){if(mode!=='game')return;if(bookOpen)closeBook();setOpen=true;hideUpg();
+  input.keys={};input.attack=false;input.jx=input.jy=0;joyId=null;mouseId=null;input.mouseAttack=false;input.moveTo=null;joy.classList.remove('on');aimSt=null;hideAim();
+  $('#setSub').hidden=!MPon;armExit(!!arm);$('#setOv').hidden=false;syncPause();}
+function closeSettings(){if(!setOpen)return;setOpen=false;armExit(false);$('#setOv').hidden=true;syncPause();}
+$('#setBtn').addEventListener('click',()=>{setOpen?closeSettings():openSettings();});
+$('#exitBtn').addEventListener('click',()=>{
+  if(!exitArmAt){armExit(true);return;}
+  if(performance.now()-exitArmAt<350)return; // случайный двойной тап не выкидывает сразу
+  toSelect();});
+$('#exitNo').addEventListener('click',()=>armExit(false));
+$('#setClose').addEventListener('click',closeSettings);
+$('#setGfx').addEventListener('click',()=>{closeSettings();openBook('build');const q=$('#qChips');if(q&&q.scrollIntoView)q.scrollIntoView({block:'center'});});
+$('#setOv').addEventListener('click',e=>{if(e.target===e.currentTarget)closeSettings();});
 
 // =====================================================================
 // LOOP
 // =====================================================================
 let paused=true,last=performance.now(),perfAcc=0,perfN=0,perfGood=0,W=1,H=1,saveClock=0;
-function syncPause(){paused=mode!=='game'||(!MPon&&(bookOpen||luOpen))||!$('#dead').hidden||!$('#win').hidden;}
+function syncPause(){paused=mode!=='game'||(!MPon&&(bookOpen||luOpen||setOpen))||!$('#dead').hidden||!$('#win').hidden;}
 const IS_PAD=/iPad/.test(navigator.userAgent)||(/Mac/.test(navigator.platform)&&navigator.maxTouchPoints>1);if(IS_PAD)document.documentElement.classList.add('ipad');
 function botAdj(){try{return Math.max(0,Math.min(120,+localStorage.getItem('tcBot')||0));}catch(e){return 0;}}
 function envPx(side){const d=document.createElement('div');d.style.cssText='position:absolute;visibility:hidden;pointer-events:none;padding-'+side+':env(safe-area-inset-'+side+',0px)';document.body.appendChild(d);const v=parseFloat(getComputedStyle(d)['padding'+side[0].toUpperCase()+side.slice(1)])||0;d.remove();return v;}
@@ -4371,7 +4425,7 @@ function mpHostResync(){
 }
 function mpOnStop(){ // хост вышел в меню
   MP.noEcho=true;mpEndSession();if(mode==='game')toSelect();MP.noEcho=false;
-  MP.status='lobby';MP.err='';MP.notice='Хозяин комнаты вышел из игры. Он выберет уровень заново — игра начнётся сама.';$('#coop').hidden=false;mpRenderLobby();}
+  MP.status='lobby';MP.err='';MP.notice=(MP.peer&&MP.peer.nick?MP.peer.nick:'Хозяин комнаты')+' вышел в меню — забег закончился. Когда он снова нажмёт «В бой», игра начнётся сама. Не хочешь ждать — «Выйти».';$('#coop').hidden=false;mpRenderLobby();}
 function mpOnBye(){ // напарник вышел в меню, мы продолжаем одни
   if(!MP.peer&&MP.role==='host'&&!MP.active){MP.verBad=null;if(MP.err==='ver')MP.err='';MP.status='waiting';}
   if(MP.peer){MP.peer.on=false;mpPeerModelDrop();}
@@ -5001,7 +5055,7 @@ function lobRender(c){
   c.innerHTML=`<div class="lobby"><div id="lobTop" class="lob-top"><div class="lob-title"><b>Комната ${esc(MP.code)}</b><small>${host?'Ты — хозяин':'Ты — гость'}</small></div><button type="button" class="lob-net" id="lobNet" data-a="diag" data-v="${mpVia()}">${esc(lobNetText())}</button></div>
   <pre id="mpDiag" class="coop-diag lob-diag" ${mpDiag.open?'':'hidden'}>${esc(mpDiag.open?mpNetDetail():'')}</pre>
   <div class="lobtag" id="lobTagL">${lobTagHtml(L)}</div><div class="lobtag" id="lobTagR">${lobTagHtml(R)}</div>
-  <div class="lob-panel" id="lobPanel"><div class="lob-cls">${cls}</div>${mid}${warn?'<p class="lob-warn">Друг ещё не готов. Нажми ещё раз, чтобы начать без него.</p>':''}<div class="lob-btns">${btns}</div></div></div>`;
+  <div class="lob-panel" id="lobPanel"><div class="lob-cls">${cls}</div>${mid}${!host&&MP.notice?'<p class="lob-note" id="lobNote">'+esc(MP.notice)+'</p>':''}${warn?'<p class="lob-warn">Друг ещё не готов. Нажми ещё раз, чтобы начать без него.</p>':''}<div class="lob-btns">${btns}</div></div></div>`;
   const nc=c.querySelector('.lob-cls');if(nc){nc.scrollLeft=sx;if(!sx){const on=nc.querySelector('.on');if(on)nc.scrollLeft=Math.max(0,on.offsetLeft-nc.clientWidth/2+30);}}}
 function lobPickClass(id){
   if(!CLASS_BY[id]||id===CLS.id)return;
@@ -5028,7 +5082,7 @@ coopEl.addEventListener('click',e=>{
 
 function mpLeaveRoom(){
   if(MP.active||MPon){MP.noEcho=false;if(mode==='game'){mpEndSession();toSelect();}else mpEndSession();}
-  mpSend({t:'bye'});mpCloseRoom();LOB.wasLinked=false;LOB.ready=false;MP.role=null;MP.code='';MP.status='idle';MP.err='';MP.peer=null;
+  mpSend({t:'bye'});mpCloseRoom();LOB.wasLinked=false;LOB.ready=false;MP.role=null;MP.code='';MP.status='idle';MP.err='';MP.notice='';MP.peer=null;
   $('#coop').hidden=true;if(mode==='select')renderSelInfo();}
 
 // ---------- запуск: ник и ссылка-приглашение ----------
