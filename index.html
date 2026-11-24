@@ -3609,7 +3609,7 @@ const MMCOL=['#35583a','#2a4640','#4d4945','#4d302c','#a9c6da','#4a2a22','#a89c7
 function mmUpdate(dt){
   const show=mode==='game'&&PLAY==='world';if(mmEl.hidden===show)mmEl.hidden=!show;if(!show)return;
   mmT-=dt;if(mmT>0)return;mmT=.12;
-  const sz=mmC.width,c=sz/2,Rw=mmBig?260:95,k=c/Rw,pl=toLocal(P.pos.x,P.pos.z),M=(x,z)=>{const l=toLocal(x,z);return [c+(l.x-pl.x)*k,c-(l.z-pl.z)*k];};
+  const sz=mmC.width,c=sz/2,Rw=mmBig?260:95,k=c/Rw,pl=toLocal(P.pos.x,P.pos.z),M=(x,z)=>{const l=toLocal(x,z);return [c-(l.x-pl.x)*k,c-(l.z-pl.z)*k];};/* toLocal.x смотрит влево экрана (так удобно ущельям) — на карте его зеркалим, иначе шаг вправо рисовался влево (Артём 25.11) */
   const g=mmX;g.clearRect(0,0,sz,sz);g.save();g.beginPath();g.arc(c,c,c-1,0,TAU);g.clip();
   g.fillStyle=MMCOL[7];g.fillRect(0,0,sz,sz);const o=M(0,0);
   for(let i=6;i>=0;i--){g.fillStyle=MMCOL[i];g.beginPath();g.arc(o[0],o[1],REG_R[i]*k,0,TAU);g.fill();}
@@ -3619,9 +3619,9 @@ function mmUpdate(dt){
   if(MP.peer&&MP.peer.on&&MP.peer.pos){let p=M(MP.peer.pos.x,MP.peer.pos.z);const dx=p[0]-c,dy=p[1]-c,dl=Math.hypot(dx,dy),lim=c-8;if(dl>lim){p=[c+dx/dl*lim,c+dy/dl*lim];}
     g.fillStyle='#5ae0ff';g.strokeStyle='#04202a';g.lineWidth=2;g.beginPath();g.arc(p[0],p[1],4.2,0,TAU);g.fill();g.stroke();
     const nk=(MP.peer.nick||'').slice(0,7);g.font='700 17px sans-serif';g.textAlign='center';g.strokeStyle='#000';g.lineWidth=3;g.strokeText(nk,p[0],p[1]+(p[1]>c?-8:19));g.fillStyle='#bff3ff';g.fillText(nk,p[0],p[1]+(p[1]>c?-8:19));}
-  const rp=Math.hypot(P.pos.x,P.pos.z);if(rp>1&&P.zone<7){const ld=toLocal(P.pos.x/rp,P.pos.z/rp),bx=c+ld.x*(c-9),by=c-ld.z*(c-9),ang=Math.atan2(ld.x,ld.z);
+  const rp=Math.hypot(P.pos.x,P.pos.z);if(rp>1&&P.zone<7){const ld=toLocal(P.pos.x/rp,P.pos.z/rp),bx=c-ld.x*(c-9),by=c-ld.z*(c-9),ang=Math.atan2(-ld.x,ld.z);
     g.save();g.translate(bx,by);g.rotate(ang);g.fillStyle='#ff5a3c';g.beginPath();g.moveTo(0,-8);g.lineTo(6,4);g.lineTo(-6,4);g.closePath();g.fill();g.restore();}
-  const lf=toLocal(Math.sin(P.face),Math.cos(P.face)),fx=lf.x,fy=-lf.z,al=Math.atan2(fx,-fy);
+  const lf=toLocal(Math.sin(P.face),Math.cos(P.face)),fx=-lf.x,fy=-lf.z,al=Math.atan2(fx,-fy);
   g.save();g.translate(c,c);g.rotate(al);g.fillStyle='#ffd36b';g.strokeStyle='#201400';g.lineWidth=2;g.beginPath();g.moveTo(0,-9);g.lineTo(6.5,7);g.lineTo(0,4);g.lineTo(-6.5,7);g.closePath();g.fill();g.stroke();g.restore();
   g.restore();
   const z=zoneOf(P.pos.x,P.pos.z),t=ZONES[z].name+'|ур. '+enemyLvAt(P.pos.x,P.pos.z)+(z>=3?' ⚠':'');if(t!==mmTxt){mmTxt=t;const [a,b]=t.split('|');mmL.innerHTML='<b>'+a+'</b>враги '+b;}}
@@ -4072,7 +4072,7 @@ const r2=x=>Math.round(x*100)/100;
 function mpRng(seed){let a=seed>>>0;return()=>{a=(a+0x6D2B79F5)>>>0;let t=a;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296;};}
 function mpSeeded(seed,fn){if(!MPon){fn();return;}const old=Math.random;Math.random=mpRng(seed);try{fn();}finally{Math.random=old;}}
 
-const APP_BUILD='v13.5';window.APP_BUILD=APP_BUILD;// = VERSION в sw.js; при выпуске менять в обоих местах (кооператив сверяет сборки игроков)
+const APP_BUILD='v13.6';window.APP_BUILD=APP_BUILD;// = VERSION в sw.js; при выпуске менять в обоих местах (кооператив сверяет сборки игроков)
 const MP_APP='ingenious-builder/tysyacha-char/v1';
 const MP_RELAYS=['nos.lol','nostr.mom','nostr.sathoarder.com','relay.fountain.fm','multiplexer.huszonegy.world'].map(u=>'wss://'+u);
 // TURN убран: openrelay.metered.ca закрыт (DNS не резолвится, relay-кандидатов нет). STUN у Trystero свой (Google и др.).
@@ -5067,7 +5067,7 @@ if(H_&&H_.ready)H_.ready(start);else start((H_&&H_.data)||{});
 <script>
 // версия, проверка обновлений и диагностика экрана
 (function(){
-const CUR=window.APP_BUILD||'v13.5';let reg=null;
+const CUR=window.APP_BUILD||'v13.6';let reg=null;
 const $=id=>document.getElementById(id);
 function showUpd(v){if($('updBar'))return;const b=document.createElement('div');b.id='updBar';b.innerHTML='<span>Есть обновление '+v+'</span><button type="button">Обновить</button>';b.querySelector('button').onclick=async()=>{b.firstChild.textContent='Обновляю…';try{if(reg)await reg.update();}catch(e){}try{const ks=await caches.keys();await Promise.all(ks.filter(k=>k.startsWith('tysyacha-char-')).map(k=>caches.delete(k)));}catch(e){}try{if(reg&&reg.waiting)reg.waiting.postMessage('skip');}catch(e){}appUpdateNow();};($('app')||document.body).appendChild(b);}
 async function chk(){try{const r=await fetch('sw.js?'+Date.now(),{cache:'no-store'});const t=await r.text();const m=t.match(/VERSION\s*=\s*['"]([^'"]+)['"]/);if(m&&m[1]!==CUR)showUpd(m[1]);}catch(e){}}
