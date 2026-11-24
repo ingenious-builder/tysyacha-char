@@ -424,13 +424,24 @@ html[data-ui=tab] #mpHint{font-size:18px;padding:11px 22px;bottom:calc(var(--sab
   html[data-ui=tab] #mpHint{bottom:calc(var(--sab) + 460px)}
 }
 /* выбор героя */
-html[data-ui=tab] #select{grid-template-columns:minmax(400px,34vw) 1fr minmax(400px,36vw)}
-html[data-ui=tab] .sel-left{padding:20px 20px 20px max(24px,env(safe-area-inset-left,0px));gap:14px}
-html[data-ui=tab] .sel-right{padding:20px max(24px,env(safe-area-inset-right,0px)) 20px 20px;gap:14px}
+html[data-ui=tab] #select{grid-template-columns:minmax(440px,36vw) 1fr minmax(400px,34vw)}
+html[data-ui=tab] .sel-left{padding:calc(var(--sat) + 18px) 20px 20px max(24px,env(safe-area-inset-left,0px));gap:14px}
+html[data-ui=tab] .sel-right{padding:calc(var(--sat) + 18px) max(24px,env(safe-area-inset-right,0px)) 20px 20px;gap:14px}
 html[data-ui=tab] .sel-title h1{font-size:44px}html[data-ui=tab] .sel-title p{font-size:16px}
 html[data-ui=tab] .classes{gap:10px}
-html[data-ui=tab] .cls{padding:10px 3px 9px;font-size:14px;gap:5px;border-radius:15px;min-height:88px}
-html[data-ui=tab] .cls .ico{width:46px;height:46px}html[data-ui=tab] .cls .ico svg{width:26px;height:26px}html[data-ui=tab] .cls .lvb{font-size:12px}
+html[data-ui=tab] .cls{padding:10px 4px 9px;font-size:14px;gap:5px;border-radius:15px;min-height:96px;align-content:start}
+html[data-ui=tab] .cls .n{white-space:normal;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.15}
+html[data-ui=tab] .cls .ico{width:46px;height:46px}html[data-ui=tab] .cls .ico svg{width:26px;height:26px}html[data-ui=tab] .cls .lvb{font-size:13px}
+html[data-ui=tab] #verTag{font-size:13px;padding:8px 14px}
+#tip{position:absolute;z-index:80;pointer-events:none;max-width:min(320px,70vw);padding:8px 12px;border-radius:10px;background:rgba(10,13,26,.96);border:1px solid var(--gold);color:var(--text);font:500 14px/1.3 var(--f-ui);box-shadow:0 6px 24px #0008;opacity:0;transition:opacity .12s}
+#tip.on{opacity:1}#tip b{display:block;font-weight:700;color:var(--gold)}#tip kbd{font:600 12px var(--f-ui);padding:1px 6px;border:1px solid var(--line);border-radius:5px;margin-left:6px}
+@media (hover:hover) and (pointer:fine){button{cursor:pointer}.sk:hover,.tbtn:hover,.btn:hover,.big:hover,.ghost:hover,.cls:hover,.row:hover,.card:hover,.grow:hover,.tab:hover,.chip:hover,.node:hover .plus{filter:brightness(1.18)}}
+html.kb :focus-visible,html.pad :focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+html[data-ui=tab] #tip{font-size:16px;padding:10px 14px}
+/* iPad в узком окне (Split View 1/2, 1/3, Stage Manager): телефонная раскладка + мелкие поправки только для iPad */
+html.ipad:not([data-ui=tab]) .sel-title{padding-right:60px}html.ipad #select>#verTag{align-self:start;min-height:0;flex:none}html.ipad:not([data-ui=tab]) #verTag{padding:3px 8px}
+@media (max-width:640px){html.ipad:not([data-ui=tab]) #tabLibN,html.ipad:not([data-ui=tab]) #tabBuildN,html.ipad:not([data-ui=tab]) .bk-title{display:none}html.ipad:not([data-ui=tab]) .tabs{margin-left:0}}
+html[data-ui=tab] .si-top{padding-right:72px}html[data-ui=tab] .nv,html[data-ui=tab] .card .mb,html[data-ui=tab] .row .mb,html[data-ui=tab] .sh .mb,html[data-ui=tab] .nm .mb{font-size:13px}html[data-ui=tab] .bd small,html[data-ui=tab] .branch small,html[data-ui=tab] .branches small{font-size:14px}
 html[data-ui=tab] .si-top .ico{width:68px;height:68px}html[data-ui=tab] .si-top .ico svg{width:36px;height:36px}
 html[data-ui=tab] .si-top h2{font-size:32px}html[data-ui=tab] .si-top p{font-size:15px}
 html[data-ui=tab] .si-desc{font-size:17px}html[data-ui=tab] .si-rolebar,html[data-ui=tab] .si-nums,html[data-ui=tab] .si-hint,html[data-ui=tab] .si-prog{font-size:15px}
@@ -440,7 +451,8 @@ html[data-ui=tab] .sel-btns{gap:10px}html[data-ui=tab] .sel-btns .btn{height:56p
 html[data-ui=tab] .rchip{font-size:15px;padding:7px 12px}
 @media (orientation:portrait){
   html[data-ui=tab] #select{grid-template-columns:minmax(0,1fr);grid-template-rows:auto 1fr auto}
-  html[data-ui=tab] .sel-left{padding:22px max(24px,env(safe-area-inset-right,0px)) 26px max(24px,env(safe-area-inset-left,0px))}
+  html[data-ui=tab] .sel-left{padding:calc(var(--sat) + 18px) max(24px,env(safe-area-inset-right,0px)) 26px max(24px,env(safe-area-inset-left,0px))}
+  html[data-ui=tab] .sel-title{padding-right:84px;margin-bottom:16px}
   html[data-ui=tab] .classes{grid-template-columns:repeat(7,minmax(0,1fr));grid-auto-flow:row;grid-auto-columns:auto;overflow-x:hidden;overflow-y:auto;touch-action:pan-y;max-height:34vh}
   html[data-ui=tab] .sel-right{max-height:58vh;padding:26px max(24px,env(safe-area-inset-right,0px)) 20px max(24px,env(safe-area-inset-left,0px));display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:30px;row-gap:12px;grid-auto-flow:row dense;align-content:start}
   html[data-ui=tab] .si-top,html[data-ui=tab] .si-els,html[data-ui=tab] .si-desc,html[data-ui=tab] .si-rolebar,html[data-ui=tab] .si-nums{grid-column:1}
@@ -472,6 +484,7 @@ html[data-ui=tab] .coop-pl{padding:14px 16px}html[data-ui=tab] .coop-pl b{font-s
 html[data-ui=tab] .coop-wait{font-size:17px}
 /* книга чар */
 html[data-ui=tab] .bk-head{padding:12px 20px;gap:14px}
+@media (max-width:900px){html[data-ui=tab] .bk-head{padding:10px 14px;gap:10px}html[data-ui=tab] .bk-title{font-size:23px}html[data-ui=tab] .tab{padding:0 10px;font-size:16px}html[data-ui=tab] #heroBtn{padding:0 14px}html[data-ui=tab] .bk-title{min-width:0;overflow:hidden;text-overflow:ellipsis}html[data-ui=tab] .tabs{flex:none}}
 html[data-ui=tab] .bk-title{font-size:30px}
 html[data-ui=tab] .tabs{padding:4px;border-radius:15px}
 html[data-ui=tab] .tab{height:50px;padding:0 22px;font-size:17px;border-radius:12px}
@@ -550,7 +563,7 @@ html[data-ui=tab] .sh-act .btn{min-width:150px}
     </div>
     <div></div>
     <div class="sel-right" id="selInfo"></div>
-    <div id="verTag">v8.3</div>
+    <div id="verTag">v8.4</div>
   </div>
 
   <div id="lvlup" class="ov" hidden>
@@ -2638,9 +2651,23 @@ function updateAim(){if(!aimSt||!aimSt.on||P.dead){hideAim();return;}const A=aim
 const tgtRing=new THREE.Mesh(FXG.ring,new THREE.MeshBasicMaterial({color:0xf2c46b,transparent:true,opacity:.85,depthWrite:false}));tgtRing.visible=false;scene.add(tgtRing);
 function updateTargetRing(){const t=target&&!target.dead&&mode==='game'?target:null;tgtRing.visible=!!t;if(t){tgtRing.position.set(t.pos.x,.09,t.pos.z);const s=t.r*1.7;tgtRing.scale.set(s,1,s);tgtRing.rotation.y=time*2;}}
 const ARC=[[110,175],[110,145],[110,115],[110,85],[168,175],[168,145],[168,115],[168,85]];
+let SLOT_SPLIT=null;
+// Слоты: одна дуга вокруг атаки (телефон, портрет); на планшете в альбоме внешний ряд (5–8) уходит дугой вокруг левого стика — под оба больших пальца
+const SPLIT_ARC=[[142,8],[142,38],[142,68],[142,98]];
+function placeSlot(i){const b=SKB[i].b;let r,a,dx=0,dy=0;
+  if(SLOT_SPLIT&&i>=4){[r,a]=SPLIT_ARC[i-4];dx=SLOT_SPLIT.dx;dy=SLOT_SPLIT.dy;b.style.setProperty('--x',(dx+Math.cos(a*Math.PI/180)*r*UI_U).toFixed(1)+'px');b.style.setProperty('--y',(dy-Math.sin(a*Math.PI/180)*r*UI_U).toFixed(1)+'px');return;}
+  [r,a]=ARC[i];b.style.setProperty('--x','calc('+(Math.cos(a*Math.PI/180)*r).toFixed(1)+'px * var(--u))');b.style.setProperty('--y','calc('+(-Math.sin(a*Math.PI/180)*r).toFixed(1)+'px * var(--u))');}
+function layoutSlots(){const tabL=document.documentElement.dataset.ui==='tab'&&innerWidth>innerHeight;let ns=null;
+  if(tabL){const u=UI_U,m=12*u,Wd=app.clientWidth,Hd=app.clientHeight,sl=envPx('left'),sr=envPx('right'),sb=envPx('bottom');
+    const px=Wd-(m*2+sr)-42*u,py=Hd-(m*2+sb)-42*u;   // центр #pad
+    const hx=m*2+50*u+sl,hy=Hd-m*2-50*u-sb;           // «дом» левого стика
+    ns={dx:hx-px,dy:hy-py};}
+  const ch=(!ns)!==(!SLOT_SPLIT)||(ns&&SLOT_SPLIT&&(Math.abs(ns.dx-SLOT_SPLIT.dx)>.5||Math.abs(ns.dy-SLOT_SPLIT.dy)>.5));
+  if(ch){SLOT_SPLIT=ns;SKB.forEach((_,i)=>placeSlot(i));}}
+
 for(let i=0;i<8;i++){const b=document.createElement('button');b.type='button';b.className='sk';b.dataset.k=i+1;b.dataset.g=['LB','RB','LT','RT','X','Y','B','↑'][i];const [r,a]=ARC[i];
-  b.style.setProperty('--x','calc('+(Math.cos(a*Math.PI/180)*r).toFixed(1)+'px * var(--u))');b.style.setProperty('--y','calc('+(-Math.sin(a*Math.PI/180)*r).toFixed(1)+'px * var(--u))');
   pad.appendChild(b);SKB.push({b,id:-2,p:-1,t:'',low:null});
+  placeSlot(i);
   b.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();
     const id=S.active[i];if(id==null){openBook('lib',{type:'active',index:i});return;}
     b.classList.add('down');aimSt={i,pid:e.pointerId,x:e.clientX,y:e.clientY,dx:0,dy:0,on:false,sk:SKILLS[id]};try{b.setPointerCapture(e.pointerId);}catch(_){}});
@@ -2650,9 +2677,9 @@ for(let i=0;i<8;i++){const b=document.createElement('button');b.type='button';b.
   b.addEventListener('pointercancel',()=>{aimSt=null;b.classList.remove('down');hideAim();});}
 function updateHudSlots(){const n=activeSlots();
   SKB.forEach((s,i)=>{const id=i<n?S.active[i]:null;s.b.hidden=i>=n;if(i>=n)return;
-    if(id==null){s.b.className='sk empty';s.b.textContent='+';s.b.style.removeProperty('--c');s.id=-1;s.b.setAttribute('aria-label','Пустой слот '+(i+1));return;}
+    if(id==null){s.b.className='sk empty';s.b.dataset.tip='Пустой слот|'+(i+1);s.b.textContent='+';s.b.style.removeProperty('--c');s.id=-1;s.b.setAttribute('aria-label','Пустой слот '+(i+1));return;}
     const sk=SKILLS[id];s.b.className='sk';s.b.style.setProperty('--c',sk.E.hex);s.b.innerHTML=svg(sk.F.id)+modBadge(sk)+'<span class="cd"></span><span class="t"></span>';
-    s.b.setAttribute('aria-label',skName(sk));s.id=id;s.p=-1;s.t='';s.low=null;s.cdEl=s.b.querySelector('.cd');s.tEl=s.b.querySelector('.t');});
+    s.b.setAttribute('aria-label',skName(sk));s.b.dataset.tip=skName(sk)+'|'+(i+1);s.id=id;s.p=-1;s.t='';s.low=null;s.cdEl=s.b.querySelector('.cd');s.tEl=s.b.querySelector('.t');});
   const tot=EQUIPPED.size,cap_=activeSlots()+passiveSlots();
   $('#bookCount').textContent=tot+'/'+cap_;$('#tabBuildN').textContent=tot+'/'+cap_;
   $('#tabLibN').textContent=(S.sandbox?CLS.pool.size:[...LEARNED].filter(id=>CLS.pool.has(id)).length)+'/'+CLS.pool.size;
@@ -2711,10 +2738,24 @@ atk.addEventListener('pointerdown',e=>{e.preventDefault();input.attack=true;atk.
 ['pointerup','pointercancel'].forEach(ev=>atk.addEventListener(ev,()=>{input.attack=false;atk.classList.remove('down');}));
 document.addEventListener('contextmenu',e=>e.preventDefault());
 let KB_SEEN=false;
+// Подсказки при наведении мыши/трекпада/пера (iPad с Magic Keyboard): data-tip="Название|клавиша"
+{const tip=document.createElement('div');tip.id='tip';app.appendChild(tip);let cur=null;
+ const hide=()=>{cur=null;tip.classList.remove('on');};
+ document.addEventListener('pointerover',e=>{if(e.pointerType!=='mouse'&&e.pointerType!=='pen'){hide();return;}const t=e.target.closest&&e.target.closest('[data-tip]');if(!t){hide();return;}if(t===cur)return;cur=t;
+   const [n,k]=t.dataset.tip.split('|');tip.innerHTML='<b>'+n+(k?'<kbd>'+k+'</kbd>':'')+'</b>';tip.classList.add('on');
+   const r=t.getBoundingClientRect(),a=app.getBoundingClientRect();let x=r.left-a.left+r.width/2-tip.offsetWidth/2,y=r.top-a.top-tip.offsetHeight-8;if(y<4)y=r.bottom-a.top+8;
+   tip.style.left=Math.max(4,Math.min(a.width-tip.offsetWidth-4,x))+'px';tip.style.top=Math.max(4,y)+'px';});
+ document.addEventListener('pointerdown',hide,true);window.addEventListener('blur',hide);}
+window.addEventListener('keydown',e=>{if(mode!=='select'||e.target&&/INPUT|TEXTAREA/.test(e.target.tagName))return;if(!$('#nickOv').hidden||!$('#coop').hidden||!$('#gorges').hidden)return;
+  const i=CLASSES.findIndex(c=>c.id===selId);if(i<0)return;
+  const cols=Math.max(1,getComputedStyle($('#classes')).gridTemplateColumns.split(' ').length);const mv={ArrowRight:1,ArrowLeft:-1,ArrowDown:cols,ArrowUp:-cols}[e.code];
+  if(mv!==undefined){e.preventDefault();const j=Math.max(0,Math.min(CLASSES.length-1,i+mv));if(j!==i){selectClass(CLASSES[j].id);const b=$('#classes').querySelector('.cls.on');if(b&&b.scrollIntoView)b.scrollIntoView({block:'nearest'});}return;}
+  if(e.code==='Enter'&&!/BUTTON/.test((e.target&&e.target.tagName)||'')){const b=$('#selPlay');if(b){e.preventDefault();b.click();}}});
+
 window.addEventListener('keydown',e=>{
   if(e.target&&e.target.tagName==='INPUT')return;
   if(mode!=='game')return;
-  if(!KB_SEEN&&/^(Key|Digit|Numpad|Arrow|Space|Tab)/.test(e.code)){KB_SEEN=true;document.documentElement.classList.add('kb');toast('Клавиатура: WASD — ход, Пробел — атака, 1–8 — чары, B — книга, T — таланты');}
+  if(!KB_SEEN&&/^(Key|Digit|Numpad|Arrow|Space|Tab)/.test(e.code)){KB_SEEN=true;document.documentElement.classList.add('kb');toast('Клавиатура: WASD или стрелки — ход, Пробел — атака, 1–8 — чары, Tab или B — книга, T — таланты');}
   if(e.code==='KeyB'||e.code==='Tab'){e.preventDefault();bookOpen?closeBook():openBook('lib');return;}
   if(e.code==='KeyT'){e.preventDefault();bookOpen?closeBook():openBook('tal');return;}
   if(e.code==='Escape'&&bookOpen){closeBook();return;}
@@ -2734,7 +2775,7 @@ $('#reviveBtn').addEventListener('click',revive);$('#deadMenu').addEventListener
 // =====================================================================
 let selId=null,selFx=0;
 function diffDots(n){return '●'.repeat(n)+'○'.repeat(3-n);}
-function renderClasses(){$('#classes').innerHTML=CLASSES.map(c=>{const sv=SAVE.chars[c.id];return `<button type="button" class="cls${c.id===selId?' on':''}" data-c="${c.id}" style="--c:${c.hex}"><span class="ico" style="--c:${c.hex}">${svg(c.icon)}</span><span class="n">${c.name}</span><span class="lvb">${sv?'ур. '+(sv.lvl|0):' '}</span></button>`;}).join('');}
+function renderClasses(){$('#classes').innerHTML=CLASSES.map(c=>{const sv=SAVE.chars[c.id];return `<button type="button" class="cls${c.id===selId?' on':''}" data-c="${c.id}" data-tip="${c.name}" style="--c:${c.hex}"><span class="ico" style="--c:${c.hex}">${svg(c.icon)}</span><span class="n">${c.name}</span><span class="lvb">${sv?'ур. '+(sv.lvl|0):' '}</span></button>`;}).join('');}
 function renderSelInfo(){const c=CLASS_BY[selId],sv=SAVE.chars[c.id],E1=ELEMENTS[EL[c.p]],E2=ELEMENTS[EL[c.s]];const R=REACT[rkey(EL[c.p],EL[c.s])];
   const stat=(n,v,mx)=>`<div class="si-stat" style="--c:${c.hex}">${n}<div class="bar"><i style="transform:scaleX(${clamp(v/mx,.08,1).toFixed(2)})"></i></div></div>`;
   const sig=[[c.p,c.pa[0]],[c.p,c.pa[2]],[c.s,c.sa[0]],[c.p,c.pp[0]]].map(([e,f])=>{const sk=SKILLS[sid(e,f,'mighty')];return `<div><span class="ico${sk.active?'':' p'}" style="--c:${sk.E.hex}">${svg(sk.F.id)}</span><span>${sk.base} — ${sk.F.role.toLowerCase()}</span></div>`;}).join('');
@@ -2923,7 +2964,7 @@ $('#heroBtn').addEventListener('click',toSelect);
 // =====================================================================
 let paused=true,last=performance.now(),perfAcc=0,perfN=0,perfGood=0,W=1,H=1,saveClock=0;
 function syncPause(){paused=mode!=='game'||(!MPon&&(bookOpen||luOpen))||!$('#dead').hidden||!$('#win').hidden;}
-const IS_PAD=/iPad/.test(navigator.userAgent)||(/Mac/.test(navigator.platform)&&navigator.maxTouchPoints>1);
+const IS_PAD=/iPad/.test(navigator.userAgent)||(/Mac/.test(navigator.platform)&&navigator.maxTouchPoints>1);if(IS_PAD)document.documentElement.classList.add('ipad');
 function botAdj(){try{return Math.max(0,Math.min(120,+localStorage.getItem('tcBot')||0));}catch(e){return 0;}}
 function envPx(side){const d=document.createElement('div');d.style.cssText='position:absolute;visibility:hidden;pointer-events:none;padding-'+side+':env(safe-area-inset-'+side+',0px)';document.body.appendChild(d);const v=parseFloat(getComputedStyle(d)['padding'+side[0].toUpperCase()+side.slice(1)])||0;d.remove();return v;}
 function fitApp(){const sa=navigator.standalone||matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches;const els=[document.documentElement,document.body,app];const adj=botAdj();if(!sa&&!adj){els.forEach(x=>{x.style.height='';x.style.bottom='';});return;}let h=Math.round(Math.min(innerHeight,window.visualViewport?visualViewport.height+visualViewport.offsetTop:innerHeight));
@@ -2931,7 +2972,7 @@ if(navigator.standalone&&/iPhone/.test(navigator.userAgent)&&innerHeight>=innerW
 h=Math.max(300,h-adj);els.forEach(x=>{x.style.bottom='auto';x.style.height=h+'px';});const cut=navigator.standalone&&/iPhone/.test(navigator.userAgent)&&innerHeight>=innerWidth&&Math.abs(innerHeight+envPx('top')-screen.height)<4;document.documentElement.style.setProperty('--sab',cut?'0px':'env(safe-area-inset-bottom,0px)');document.documentElement.classList.toggle('ios-cut',!!cut);}
 function uiScale(){const mn=Math.min(innerWidth,innerHeight),tab=mn>=600&&matchMedia('(pointer:coarse)').matches;const u=tab?Math.min(1.5,Math.max(1.2,mn/520)):1;if(u!==UI_U||document.documentElement.dataset.ui!==(tab?'tab':'')){UI_U=u;document.documentElement.dataset.ui=tab?'tab':'';document.documentElement.style.setProperty('--u',u.toFixed(2));}}
 function prCap(){const c=Math.min(window.devicePixelRatio||1,1.5,Math.max(1,Math.sqrt(3.1e6/Math.max(1,innerWidth*innerHeight))));if(Math.abs(c-PR_MAX)>.01){PR_MAX=c;if(pr>PR_MAX){pr=PR_MAX;renderer.setPixelRatio(pr);}}}
-function resize(){uiScale();prCap();fitApp();W=app.clientWidth;H=app.clientHeight;renderer.setSize(W,H,false);camera.aspect=W/H;camera.fov=W<H?56:42;camera.updateProjectionMatrix();makeRT();
+function resize(){uiScale();prCap();fitApp();layoutSlots();W=app.clientWidth;H=app.clientHeight;renderer.setSize(W,H,false);camera.aspect=W/H;camera.fov=W<H?56:42;camera.updateProjectionMatrix();makeRT();
   }
 window.addEventListener('resize',resize);window.addEventListener('orientationchange',()=>setTimeout(resize,250));if(/[?&]dbg=1/.test(location.search)){const d=document.createElement('div');d.style.cssText='position:fixed;left:4px;top:40%;z-index:99;background:#000c;color:#0f0;font:12px monospace;padding:4px;pointer-events:none';document.body.appendChild(d);setInterval(()=>{d.textContent='inner '+innerWidth+'x'+innerHeight+' screen '+screen.width+'x'+screen.height+' app '+app.clientWidth+'x'+app.clientHeight+' sa '+(navigator.standalone?1:0)+' top '+app.getBoundingClientRect().top;},500);}
 function perf(dt){perfAcc+=dt;perfN++;if(perfAcc<2)return;const fps=perfN/perfAcc;perfAcc=0;perfN=0;if(SAVE.q!=='auto')return;
@@ -3680,7 +3721,7 @@ if(H_&&H_.ready)H_.ready(start);else start((H_&&H_.data)||{});
 <script>
 // версия, проверка обновлений и диагностика экрана
 (function(){
-const CUR='v8.3';let reg=null;
+const CUR='v8.4';let reg=null;
 const $=id=>document.getElementById(id);
 function showUpd(v){if($('updBar'))return;const b=document.createElement('div');b.id='updBar';b.innerHTML='<span>Есть обновление '+v+'</span><button type="button">Обновить</button>';b.querySelector('button').onclick=async()=>{b.firstChild.textContent='Обновляю…';try{if(reg)await reg.update();}catch(e){}try{const ks=await caches.keys();await Promise.all(ks.filter(k=>k.startsWith('tysyacha-char-')).map(k=>caches.delete(k)));}catch(e){}try{if(reg&&reg.waiting)reg.waiting.postMessage('skip');}catch(e){}location.reload();};($('app')||document.body).appendChild(b);}
 async function chk(){try{const r=await fetch('sw.js?'+Date.now(),{cache:'no-store'});const t=await r.text();const m=t.match(/VERSION\s*=\s*['"]([^'"]+)['"]/);if(m&&m[1]!==CUR)showUpd(m[1]);}catch(e){}}
