@@ -2823,13 +2823,14 @@ const r2=x=>Math.round(x*100)/100;
 function mpRng(seed){let a=seed>>>0;return()=>{a=(a+0x6D2B79F5)>>>0;let t=a;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296;};}
 function mpSeeded(seed,fn){if(!MPon){fn();return;}const old=Math.random;Math.random=mpRng(seed);try{fn();}finally{Math.random=old;}}
 
+const APP_BUILD='v8';// = VERSION в sw.js; при выпуске менять в обоих местах (кооператив сверяет сборки игроков)
 const MP_APP='ingenious-builder/tysyacha-char/v1';
 const MP_RELAYS=['nos.lol','nostr.mom','nostr.sathoarder.com','relay.fountain.fm','multiplexer.huszonegy.world'].map(u=>'wss://'+u);
 // TURN убран: openrelay.metered.ca закрыт (DNS не резолвится, relay-кандидатов нет). STUN у Trystero свой (Google и др.).
 // Запасной канал «через сервер»: Supabase Realtime (broadcast), net-relay.js. Ключ — только публичный publishable, секретного в браузере нет.
 const MP_SB={url:'wss://mugzpapozmuryzkfqldr.supabase.co/realtime/v1/websocket',key:'sb_publishable_2vCpEK1hJ3X-pmTtjbY8ZA_w9WUdvUu'};
 const NICK_KEY='tysyacha-nick',ROOM_KEY='tysyacha-room';
-Object.assign(MP,{active:false,play:'world',g:0,status:'idle',err:'',code:'',joinCode:null,lastRx:0,pingAt:0,byUid:new Map(),hitQ:[],pickGorge:false,down:false,revT:0,tBroken:false,pl:null,plCd:0,chest:null,wiped:false,hint:'',hintT:0});
+Object.assign(MP,{verBad:null,pingQ:[],pingRaw:0,active:false,play:'world',g:0,status:'idle',err:'',code:'',joinCode:null,lastRx:0,pingAt:0,byUid:new Map(),hitQ:[],pickGorge:false,down:false,revT:0,tBroken:false,pl:null,plCd:0,chest:null,wiped:false,hint:'',hintT:0});
 let mpLib=null,mpRoom=null,mpSendFn=null,mpTimer=0,mpSeq=0,mpHintUntil=0;
 // два канала одной комнаты: P2P (Trystero) и «через сервер» (Supabase). Id пира у обоих одинаковый (selfId задаём сами).
 let mpTry=null,mpTrySend=null,mpRel=null,mpRelSend=null,mpP2P=new Set(),mpSrv=new Set(),mpOpenGen=0;
@@ -2898,6 +2899,7 @@ function mpNetDetail(){
   const L=[],n=mpDiag.nostr,rs=mpRel?mpRel.status():null;
   L.push('Канал: '+(mpVia()==='p2p'?'P2P':mpVia()==='relay'?'через сервер':'нет'));
   L.push('Сервер связи (Supabase): '+(rs?(rs.joined?'подключён':'не подключён ('+rs.ws+(rs.lastErr?', '+rs.lastErr:'')+', попыток '+rs.tries+')')+(rs.rtt?', отклик '+Math.round(rs.rtt)+' мс':'')+', игроков в канале: '+rs.peers+', принято '+rs.rx+', отправлено '+rs.tx:'не запущен'));
+  if(MP.ping)L.push('Пинг туда-обратно: '+Math.round(MP.ping)+' мс (медиана из 5), в одну сторону примерно '+Math.round(MP.ping/2)+' мс'+(mpVia()==='relay'?'; через сервер сообщение идёт игрок → сервер → игрок, пинг считает дорогу туда и обратно: 4 участка':''));
   L.push('Реле nostr (поиск P2P): '+(n?(n.done<n.total?'проверяем… ':'')+n.ok+' из '+n.total+' отвечают':'не проверялись'));
   L.push('P2P / ICE: '+mpIceInfo());
   L.push('Код комнаты: '+MP.code+', роль: '+(MP.role==='host'?'хозяин':'гость'));
@@ -2935,6 +2937,7 @@ function mpCloseRoom(){
   mpOpenGen++;
   try{if(mpRel)mpRel.leave();}catch(e){}try{if(mpTry)mpTry.leave();}catch(e){}
   mpRel=null;mpRelSend=null;mpTry=null;mpTrySend=null;mpP2P.clear();mpSrv.clear();
+  MP.verBad=null;MP.pingQ=[];MP.ping=0;
   mpRoom=null;mpSendFn=null;MP.peerId=null;MP.peer&&mpPeerModelDrop();MP.peer=null;clearInterval(mpTimer);}
 // вход/выход пира на одном из каналов; для игры пир один, канал выбирается на лету
 function mpChanJoin(ch,id){
@@ -2950,6 +2953,7 @@ function mpPeerJoin(id){
   MP.peerId=id;MP.lastRx=performance.now();MP.status='linked';mpHello();mpRenderLobby();}
 function mpPeerLeave(id){if(id!==MP.peerId)return;mpPeerGone('left');}
 function mpPeerGone(why){
+  MP.verBad=null;if(MP.err==='ver')MP.err='';
   const nick=MP.peer?MP.peer.nick:'Напарник';MP.peerId=null;
   if(MP.peer){mpPeerModelDrop();MP.peer=null;}
   MP.status=MP.role==='host'?'waiting':'joining';MP.t0=performance.now();
@@ -2958,10 +2962,17 @@ function mpPeerGone(why){
     else{mpGuestLost();}
   }else mpRenderLobby();
 }
+// у напарника другая сборка игры: показываем понятный экран и не пускаем в игру (иначе молчаливые сбои)
+function mpVerMismatch(m){
+  const first=!MP.verBad||MP.verBad.b!==m.b;
+  MP.verBad={n:nickClean(m.n)||'Напарник',b:m.b||'старая'};MP.err='ver';MP.status='linked';
+  if(MP.peer){mpPeerModelDrop();MP.peer=null;}
+  if(first)mpSend({t:'ver',b:APP_BUILD,n:mpNick()});
+  $('#coop').hidden=false;mpRenderLobby();syncPause();}
 function mpGuestLost(){
   // хост пропал: ждём его возвращения по той же ссылке
   $('#coop').hidden=false;MP.err='lost';mpRenderLobby();syncPause();}
-function mpHello(){mpSend({t:'hi',n:mpNick(),c:CLS.id,l:S.lvl,g:S.gorge|0,r:MP.role,v:1});}
+function mpHello(){mpSend({t:'hi',n:mpNick(),c:CLS.id,l:S.lvl,g:S.gorge|0,r:MP.role,v:1,b:APP_BUILD});}
 function mpTick(){
   const now=performance.now();
   if(!(mpTick.n=(mpTick.n||0)+1)%20&&!$('#coop').hidden)mpRefreshNet();
@@ -2972,7 +2983,7 @@ function mpTick(){
       if(MP.hitQ.length){mpSend({t:'H',a:MP.hitQ.splice(0,60)});}
       if(MPH)mpSendSnap();
     }else if(now-MP.kaAt>2000||!MP.kaAt){MP.kaAt=now;mpSend({t:'ka'});}
-    if(now-MP.pingAt>2500){MP.pingAt=now;try{const pr=mpP2P.has(MP.peerId)&&mpTry?mpTry:mpRel;if(pr)pr.ping(MP.peerId).then(ms=>{MP.ping=ms;}).catch(()=>{});}catch(e){}}
+    if(now-MP.pingAt>2500){MP.pingAt=now;try{const pr=mpP2P.has(MP.peerId)&&mpTry?mpTry:mpRel;if(pr)pr.ping(MP.peerId).then(ms=>{MP.pingRaw=ms;const q=MP.pingQ;q.push(ms);if(q.length>5)q.shift();MP.ping=q.slice().sort((a,b)=>a-b)[q.length>>1];}).catch(()=>{});}catch(e){}}
   }else if(MP.role&&MP.code&&mpRoom&&now-MP.t0>(MP.role==='guest'?25000:60000)){MP.t0=now;mpOpen(MP.role,MP.code);}
 }
 function mpSendPos(){
@@ -2982,10 +2993,13 @@ function mpSendPos(){
 function mpOnMsg(m,id){
   if(!m||id!==MP.peerId){if(m&&m.t==='full')return mpOnFull();return;}
   MP.lastRx=performance.now();
+  if(MP.verBad&&m.t!=='hi'&&m.t!=='ver'&&m.t!=='bye'&&m.t!=='ka')return;
   switch(m.t){
     case 'ka':break;
+    case 'ver':if(m.b!==APP_BUILD)mpVerMismatch(m);break;
     case 'full':mpOnFull();break;
     case 'hi':mpOnHi(m);break;
+    case 'need':if(MPH&&MP.active&&mode==='game'&&MP.peer&&MP.peer.on&&m.u)for(const u of m.u.slice(0,24)){const en=ENEMIES.find(e=>e.uid===u&&!e.dead);if(en)mpSend(mpSpawnMsg(en));}break;
     case 'rdy':if(MPH&&MP.active&&mode==='game'){if(MP.peer)MP.peer.on=true;mpHostResync();}break;
     case 'start':mpOnStart(m);break;
     case 'stop':mpOnStop();break;
@@ -3015,6 +3029,8 @@ function mpOnMsg(m,id){
 }
 function mpOnFull(){MP.status='full';MP.err='Комната занята: там уже двое.';mpCloseRoom();mpRenderLobby();}
 function mpOnHi(m){
+  if(m.b!==APP_BUILD){mpVerMismatch(m);return;}
+  if(MP.verBad){MP.verBad=null;MP.err='';mpRenderLobby();}
   const cls=CLASS_BY[m.c]?m.c:'pyro';
   const first=!MP.peer;
   if(first)MP.peer={ib:new Interp(),on:false,pos:new THREE.Vector3(),vel:new THREE.Vector3(),tx:0,tz:0,tf:0,dead:false,hp:100,maxHp:100,walk:0,castT:0,hero:null,lbl:null,placed:false,mv:0,sh:0,rp:0};
@@ -3043,6 +3059,7 @@ function mpJoin(code){
   if(MP.role==='guest'&&MP.code===code&&MP.peerId){mpSend({t:'rdy'});mpRenderLobby();return;}
   mpOpen('guest',code);}
 function mpHostStart(play,g){
+  if(MP.verBad)return;
   MP.coop=true;MPon=true;MPH=true;MPG=false;MP.pickGorge=false;MP.play=play;MP.g=g|0;
   for(const id of ['#coop','#gorges','#win','#dead'])$(id).hidden=true;
   if(MP.peer)MP.peer.on=true;
@@ -3132,7 +3149,7 @@ function mpSendSnap(){
 function mpGuestSpawn(m){
   if(!MPG||mode!=='game'||MP.byUid.has(m.u))return;
   const en=spawnEnemy(m.id,m.x,m.z,m.lv,{elite:!!m.el,champ:!!m.ch,mini:!!m.mi,gorge:!!m.g,affixList:m.af,aggro:true});
-  en.uid=m.u;en.remote=true;en.maxHp=m.mh;en.hp=m.h;en.xp=m.xp;en.noDespawn=true;en.aggro=true;en.tg=null;MP.byUid.set(m.u,en);
+  en.snapAt=performance.now();en.uid=m.u;en.remote=true;en.maxHp=m.mh;en.hp=m.h;en.xp=m.xp;en.noDespawn=true;en.aggro=true;en.tg=null;MP.byUid.set(m.u,en);
   if(m.b){BOSS=en;if(GZ)GZ.bossSpawned=true;$('#bossName').textContent=MOBS[m.id].name+' · ур. '+m.lv;
     banner(MOBS[m.id].name,PLAY==='gorge'&&GZ?'Страж ущелья «'+GZ.th.n+'»':'Босс пришёл за вами',true);shake=.6;fxPillar(m.x,m.z,2.5,10,RED,1);}}
 function mpGuestKill(m){
@@ -3142,7 +3159,12 @@ function mpGuestKill(m){
 function mpGuestRemove(m){const en=MP.byUid.get(m.u);if(!en)return;MP.byUid.delete(m.u);if(en===BOSS)BOSS=null;const i=ENEMIES.indexOf(en);if(i>=0)removeEnemy(i);}
 function mpOnSnap(m){
   if(!MPG)return;
-  const E=m.e,ts=m.ts!=null?m.ts:performance.now();
+  const E=m.e,ts=m.ts!=null?m.ts:performance.now(),now=performance.now();
+  // самолечение: снимок хоста — полный список живых врагов. Чего нет у нас — просим у хоста; что у нас есть, а в снимках нет — убираем
+  let need=null;const seen=new Set();
+  for(let i=0;i+6<E.length;i+=7){const u=E[i];seen.add(u);const en=MP.byUid.get(u);if(en)en.snapAt=now;else(need||(need=[])).push(u);}
+  if(need&&now-(MP.needAt||0)>1000){MP.needAt=now;mpSend({t:'need',u:need.slice(0,24)});}
+  if(MP.byUid.size){for(const [u,en] of MP.byUid){if(!seen.has(u)&&now-(en.snapAt||0)>1800)mpGuestRemove({u});}}
   for(let i=0;i+6<E.length;i+=7){const en=MP.byUid.get(E[i]);if(!en||en.dead)continue;
     const x=E[i+1]/20,z=E[i+2]/20,hp=E[i+4];
     const dh=en.hp-hp;if(dh>=1&&time-(en.selfHit||-9)>.45)float({x:en.pos.x,y:en.hy-1.7,z:en.pos.z},String(Math.round(dh)),'#cfd8ff',12);
@@ -3438,6 +3460,9 @@ function mpRenderLobby(){
     <button class="big" data-a="create" type="button">Создать комнату</button>
     <div class="coop-row"><input id="codeIn" type="text" placeholder="Код комнаты" maxlength="8" autocomplete="off" autocapitalize="characters" spellcheck="false" style="width:170px"><button class="btn" data-a="join" type="button">Войти</button></div>
     <button class="ghost" data-a="close" type="button">Назад</button>`;}
+  else if(MP.verBad){
+    h=`<h1>Другая версия игры</h1><p>У игрока «${esc(MP.verBad.n)}» другая версия игры (у него ${esc(MP.verBad.b)}, у тебя ${esc(APP_BUILD)}). Закройте приложение и откройте снова — обновление подхватится само. Если не помогло, нажмите «Обновить игру».</p>
+    <button class="big" data-a="upd" type="button">Обновить игру</button><button class="ghost" data-a="leave" type="button">Выйти из комнаты</button>`;}
   else if(MP.status==='error'||MP.status==='full'){
     h=`<h1>Не получилось</h1><p>${esc(MP.err)}</p><button class="big" data-a="retry" type="button">Ещё раз</button><button class="ghost" data-a="leave" type="button">Выйти из комнаты</button>`;}
   else if(MP.err==='lost'&&MPG&&!MP.peerId){
@@ -3472,6 +3497,7 @@ $('#coopCard').addEventListener('click',e=>{
   else if(a==='join'){const v=($('#codeIn').value||'').trim();if(v)mpJoin(v);}
   else if(a==='retry'){const r=MP.role,c=MP.code;if(r==='host')mpCreate(false);else mpOpen('guest',c);}
   else if(a==='leave'){mpLeaveRoom();}
+  else if(a==='upd'){appUpdateNow();}
   else if(a==='copy'){const v=mpUrl(MP.code);if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(v).then(()=>{b.textContent='Скопировано';}).catch(()=>{const i=$('#linkIn');i.select();});else{const i=$('#linkIn');i.select();try{document.execCommand('copy');b.textContent='Скопировано';}catch(e2){}}}
   else if(a==='share'){const v=mpUrl(MP.code);if(navigator.share)navigator.share({title:'Тысяча чар',text:'Заходи ко мне в «Тысячу чар» — сыграем вдвоём!',url:v}).catch(()=>{});else{const i=$('#linkIn');if(navigator.clipboard)navigator.clipboard.writeText(v);i.select();b.textContent='Ссылка скопирована';}}
   else if(a==='mode-gorge'){$('#coop').hidden=true;MP.pickGorge=true;renderGorgeList();$('#gorges').hidden=false;}
@@ -3515,6 +3541,24 @@ if(H_&&H_.ready)H_.ready(start);else start((H_&&H_.data)||{});
 </script>
 <script>
 // PWA: сервис-воркер (офлайн-кэш). Новая версия подхватывается сама.
+// ---------- проверка свежести игры при старте и при возврате ----------
+function appUpdateNow(){
+  const go=()=>{try{const u=new URL(location.href);u.searchParams.set('v',Date.now());location.replace(u.toString());}catch(e){location.reload();}};
+  const jobs=[];
+  try{if(navigator.serviceWorker)jobs.push(navigator.serviceWorker.getRegistrations().then(rs=>Promise.all(rs.map(r=>r.unregister()))));}catch(e){}
+  try{if(window.caches)jobs.push(caches.keys().then(ks=>Promise.all(ks.map(k=>caches.delete(k)))));}catch(e){}
+  Promise.all(jobs).catch(()=>{}).then(go);setTimeout(go,2500);}
+let updAt=0;
+function appCheckUpdate(){
+  const n=Date.now();if(n-updAt<60000||!location.protocol.startsWith('http'))return;updAt=n;
+  fetch('sw.js?c='+n,{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{
+    const m=/VERSION\s*=\s*['"]([^'"]+)['"]/.exec(t||'');if(!m||m[1]===APP_BUILD||document.getElementById('updBar'))return;
+    const b=document.createElement('div');b.id='updBar';
+    b.style.cssText='position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 8px);transform:translateX(-50%);z-index:99999;max-width:calc(100% - 24px);display:flex;gap:10px;align-items:center;padding:8px 12px;border-radius:12px;background:#2a2410;border:1px solid #d9b24c;color:#ffe9a8;font:600 14px system-ui,sans-serif;box-shadow:0 6px 24px #000a';
+    b.innerHTML='<span>Вышла новая версия игры ('+m[1]+')</span><button type="button" style="padding:6px 12px;border-radius:9px;border:0;background:#d9b24c;color:#241a00;font:700 14px system-ui,sans-serif">Обновить</button><button type="button" aria-label="Скрыть" style="border:0;background:none;color:#ffe9a8;font-size:18px;padding:0 4px">×</button>';
+    b.children[1].onclick=appUpdateNow;b.children[2].onclick=()=>b.remove();document.body.appendChild(b);}).catch(()=>{});}
+window.addEventListener('load',()=>setTimeout(appCheckUpdate,1500));
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)appCheckUpdate();});
 if('serviceWorker' in navigator&&location.protocol.startsWith('http')){
   const had=!!navigator.serviceWorker.controller;let fired=false;
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!had||fired)return;fired=true;window.dispatchEvent(new Event('tc-newversion'));});
