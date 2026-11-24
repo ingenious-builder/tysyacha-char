@@ -348,6 +348,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 .coop-mode{display:grid;gap:4px;padding:12px;border-radius:14px;border:1px solid var(--line);background:var(--panel-solid);color:var(--text);text-align:left;font:500 14px var(--f-ui)}
 .coop-mode b{font:700 17px var(--f-display);color:var(--gold)}
 .coop-mode small{color:var(--muted);font-size:12px;line-height:1.35}
+.coop-note{color:#ffd890;font-size:14px;border:1px solid rgba(242,196,107,.4);border-radius:10px;padding:8px 12px}
 .coop-wait{color:var(--muted);font-size:14px}
 .coop-net{color:var(--muted);font-size:13px;display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap}
 .ghost.sm{height:30px;padding:0 12px;font-size:12px}
@@ -516,7 +517,11 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 </div>
 
 <script src="vendor/three.min.js"></script>
+<<<<<<< HEAD
 <script src="net-relay.js"></script>
+=======
+<script src="campaign.js"></script>
+>>>>>>> feat/campaign
 <script>
 'use strict';
 (function(){
@@ -780,7 +785,7 @@ const AFFIX=[['fire','Огненный'],['fast','Быстрый'],['armor','Б�
 const SAVE_KEY='tysyacha-char-v3';
 let SAVE={cur:null,q:'auto',chars:{}};
 function loadSave(hot){let d=hot&&hot.SAVE?hot.SAVE:null;if(!d){try{const raw=localStorage.getItem(SAVE_KEY);if(raw)d=JSON.parse(raw);}catch(e){}}
-  if(d&&d.chars&&typeof d.chars==='object'){SAVE.cur=CLASS_BY[d.cur]?d.cur:null;SAVE.q=['auto','high','mid','low'].includes(d.q)?d.q:'auto';SAVE.chars=d.chars;}}
+  if(d&&d.chars&&typeof d.chars==='object'){SAVE.cur=CLASS_BY[d.cur]?d.cur:null;SAVE.q=['auto','high','mid','low'].includes(d.q)?d.q:'auto';SAVE.chars=d.chars;SAVE.camp=window.TCCF?(d.camp&&typeof d.camp==='object'?d.camp:null):null;}}
 let CLS=null,S=null,LEARNED=new Set(),EQUIPPED=new Set();
 function newChar(c){const s={lvl:1,xp:0,kills:0,ess:0,learned:[],ranks:{},talents:{},active:Array(8).fill(null),passive:Array(42).fill(null),sandbox:false,auto:false,bosses:0,gorge:0};
   s.active[0]=sid(c.p,c.pa[0],'swift');s.active[1]=sid(c.s,c.sa[0],'mighty');
@@ -2216,7 +2221,7 @@ function updateEnemies(dt){
     if(en.affix.has('regen'))en.hp=Math.min(en.maxHp,en.hp+en.maxHp*.015*dt);
     en.dotT-=dt;if(en.dotT<=0){en.dotT=.5;let d=0;if(en.burnT>0)d+=en.burnDps*.5;if(en.poisT>0)d+=en.poisN*en.poisDps*.5;
       if(d>=.5){dealDamage(en,d,-1,{dot:true,depth:3,dotCol:en.burnT>0?'#ffa366':'#b5f07a'});if(en.dead)continue;}}
-    const tp=mpTarget(en),dx=(tp?tp.pos.x:P.pos.x)-en.pos.x,dz=(tp?tp.pos.z:P.pos.z)-en.pos.z,dist=Math.hypot(dx,dz)||.001,TD=tp?false:P.dead;
+    const tp=(GZ&&GZ.camp&&en.cg&&TCC.goal(en))||mpTarget(en),dx=(tp?tp.pos.x:P.pos.x)-en.pos.x,dz=(tp?tp.pos.z:P.pos.z)-en.pos.z,dist=Math.hypot(dx,dz)||.001,TD=tp?false:P.dead;
     if(dist>50&&!en.boss&&!en.noDespawn){removeEnemy(i);continue;}
     if(!TD&&dist<(PLAY==='gorge'?18:13))en.aggro=true;
     if((TD||dist>36)&&!en.boss&&!en.noDespawn)en.aggro=false;
@@ -2267,9 +2272,9 @@ function updateCamera(dt){
   moon.position.set(P.pos.x-25,60,P.pos.z+18);moon.target.position.set(P.pos.x,0,P.pos.z);}
 function die(){P.dead=true;P.hp=0;hero.g.rotation.z=1.4;hero.g.position.y=.2;if(MPon&&mpAllyUp()){mpDowned();saveSoon();return;}dieFull();}
 function dieFull(){P.dead=true;P.hp=0;hero.g.rotation.z=1.4;hero.g.position.y=.2;const lost=PLAY==='world'?Math.floor(S.ess*.2):0;S.ess-=lost;
-  $('#deadTxt').textContent=PLAY==='gorge'&&GZ?'Ущелье '+GZ.g+' «'+GORGES[GZ.g-1]+'» не пройдено. Опыт, чары и эссенция сохранены, попробуй ещё раз или прокачайся в свободном мире.':CLS.name+', уровень '+S.lvl+'. Врагов побеждено: '+S.kills+'. Потеряно '+lost+' эссенции. Чары, билд и таланты на месте.';
+  $('#deadTxt').textContent=PLAY==='gorge'&&GZ&&GZ.camp?(GZ.failText||'Уровень '+GZ.camp.k+' «'+GZ.camp.name+'» не пройден: оба героя пали.')+' Опыт, чары и эссенция сохранены — хозяин комнаты может начать уровень заново.':PLAY==='gorge'&&GZ?'Ущелье '+GZ.g+' «'+GORGES[GZ.g-1]+'» не пройдено. Опыт, чары и эссенция сохранены, попробуй ещё раз или прокачайся в свободном мире.':CLS.name+', уровень '+S.lvl+'. Врагов побеждено: '+S.kills+'. Потеряно '+lost+' эссенции. Чары, билд и таланты на месте.';
   $('#reviveBtn').textContent=PLAY==='gorge'?'Пройти заново':'Воскреснуть';later(1,()=>{$('#dead').hidden=false;syncPause();});saveSoon();}
-function revive(){if(MPon){mpReviveBtn();return;}if(PLAY==='gorge'&&GZ){startGorge(GZ.g);return;}P.dead=false;$('#dead').hidden=true;hero.g.rotation.z=0;hero.g.position.y=0;P.pos.set(0,0,0);P.prev.set(0,0,0);P.hp=P.maxHp;P.mp=P.maxMp;
+function revive(){if(MPon){mpReviveBtn();return;}if(PLAY==='gorge'&&GZ){startGorge(GZ.g,GZ.camp);return;}P.dead=false;$('#dead').hidden=true;hero.g.rotation.z=0;hero.g.position.y=0;P.pos.set(0,0,0);P.prev.set(0,0,0);P.hp=P.maxHp;P.mp=P.maxMp;
   for(let i=ENEMIES.length-1;i>=0;i--){if(!ENEMIES[i].boss&&ENEMIES[i].pos.length()<24)removeEnemy(i);}
   if(BOSS){const i=ENEMIES.indexOf(BOSS);if(i>=0)removeEnemy(i);BOSS=null;threat=Math.floor(THREAT_MAX*.6);}
   for(let i=EPROJ.length-1;i>=0;i--){dropProjVis(EPROJ[i].o);EPROJ.splice(i,1);}
@@ -2335,7 +2340,7 @@ function toWorld(x,z){const t=camYaw+Math.PI,c=Math.cos(t),s=Math.sin(t);return 
 function gcx(z){const b=GZ.bend;return Math.sin(z*b[2]+GZ.seed)*b[0]+Math.sin(z*b[3]+GZ.seed*2.3)*b[1];}
 function ghw(z){let w=GZ.bw;for(const a of GZ.arenas){const d=Math.abs(z-a.z);if(d<a.len)w=Math.max(w,GZ.bw+(a.w-GZ.bw)*Math.cos(d/a.len*Math.PI/2));}return w;}
 function setGorgeLight(th){const d=th||{hemi:[0xa8bdf0,0x2a3320,.85],moon:[0xdbe4ff,.85],fogd:[42,118]};hemi.color.set(d.hemi[0]);hemi.groundColor.set(d.hemi[1]);hemi.intensity=d.hemi[2];moon.color.set(d.moon[0]);moon.intensity=d.moon[1];scene.fog.near=d.fogd[0];scene.fog.far=d.fogd[1];}
-function clearGorge(){while(gorgeGroup.children.length)gorgeGroup.remove(gorgeGroup.children[0]);GDISP.forEach(d=>d&&d.dispose&&d.dispose());GDISP.length=0;GZ=null;gorgeGroup.visible=false;setGorgeLight(null);}
+function clearGorge(){if(TCC)TCC.clear();while(gorgeGroup.children.length)gorgeGroup.remove(gorgeGroup.children[0]);GDISP.forEach(d=>d&&d.dispose&&d.dispose());GDISP.length=0;GZ=null;gorgeGroup.visible=false;setGorgeLight(null);}
 function gdeco(k){if(GGEO[k])return GGEO[k];const T=THREE,C=(g,c,f)=>geoC(g,c,f),Dd=(r,y,x,z,c)=>C(new T.DodecahedronGeometry(r,0).translate(x||0,y,z||0),c,1);let g;
  switch(k){
  case 'cairn':g=merge([Dd(.6,.35,0,0,0x8a8a90),Dd(.4,.9,.1,0,0x9a9aa0),Dd(.25,1.25,0,.05,0xaaaab0)]);break;
@@ -2359,10 +2364,10 @@ const GLOWK={crystalp:1,crystalg:1,crystalb:1,crack:1};
 function webMesh(w){const p=[],R=w,Hh=2.4;for(let i=0;i<10;i++){const a=i/10*Math.PI*2;p.push(0,0,0,Math.cos(a)*R,Math.sin(a)*Hh,0);}
   for(let r=1;r<=4;r++){for(let i=0;i<10;i++){const a=i/10*Math.PI*2,b=(i+1)/10*Math.PI*2,k=r/4,s=.9+Math.sin(i*3+r)*.05;p.push(Math.cos(a)*R*k*s,Math.sin(a)*Hh*k*s,0,Math.cos(b)*R*k*s,Math.sin(b)*Hh*k*s,0);}}
   const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(p,3));const m=new THREE.LineSegments(g,new THREE.LineBasicMaterial({color:0xe8f0ff,transparent:true,opacity:.45}));GDISP.push(g,m.material);return m;}
-function buildGorge(g){clearGorge();const th=GT[g-1],tier=Math.min(2,Math.floor((g-1)/4)),L=clamp(150+g*10+th.dL,150,290);
+function buildGorge(g,camp){clearGorge();const th=GT[g-1],tier=Math.min(2,Math.floor((g-1)/4)),L=camp?camp.L:clamp(150+g*10+th.dL,150,290);
   GZ={g,tier,th,L,seed:g*1.7,bend:th.bend,bw:th.bw,arenas:[],enc:[],obs:[],haz:[],z0:-3,z1:L+1,bossZ:L-22,lv:Math.max(1,g*2-1),prog:0,bossSpawned:false,open:false,won:false,flames:[],ambC:new THREE.Color(th.amb||th.glow),hzT:0,seen:new Set()};
-  const nEnc=Math.floor((L-60)/26);for(let i=0;i<nEnc;i++){const z=30+i*26;GZ.arenas.push({z:z+4,len:9,w:th.aw});const kind=th.seq[i%th.seq.length];GZ.enc.push({z,i,done:false,elite:g>=2&&i%3===2,kind:kind.split('+')[0],next:kind.split('+')[1]||null,units:[]});}
-  GZ.arenas.push({z:GZ.bossZ+4,len:20,w:15});
+  if(camp)TCC.shape(GZ,camp);else{const nEnc=Math.floor((L-60)/26);for(let i=0;i<nEnc;i++){const z=30+i*26;GZ.arenas.push({z:z+4,len:9,w:th.aw});const kind=th.seq[i%th.seq.length];GZ.enc.push({z,i,done:false,elite:g>=2&&i%3===2,kind:kind.split('+')[0],next:kind.split('+')[1]||null,units:[]});}
+  GZ.arenas.push({z:GZ.bossZ+4,len:20,w:15});}
   const add=o=>{gorgeGroup.add(o);return o;},D=GDISP;
   const gl=L+90,geo=new THREE.PlaneGeometry(100,gl,50,Math.round(gl/2.2));geo.rotateX(-Math.PI/2);geo.translate(0,0,L/2);
   const pos=geo.attributes.position,cols=[],cG=new THREE.Color(th.ground),cP=new THREE.Color(th.path),cR=new THREE.Color(th.wall).multiplyScalar(.42),t=new THREE.Color();
@@ -2422,17 +2427,17 @@ function buildGorge(g){clearGorge();const th=GT[g-1],tier=Math.min(2,Math.floor(
   D.push(ring.geometry,ringM,inner.geometry,inM,sm);
   GZ.portal={pg,ring,ringM,inM,w:toWorld(gcx(pz),pz)};
   gorgeGroup.rotation.y=camYaw+Math.PI;gorgeGroup.visible=true;}
-function startGorge(g){SAVE.chars[CLS.id]=S;SAVE.cur=CLS.id;save();mode='game';PLAY='gorge';
+function startGorge(g,camp){SAVE.chars[CLS.id]=S;SAVE.cur=CLS.id;save();mode='game';PLAY='gorge';
   for(const id of ['#select','#gorges','#win','#dead'])$(id).hidden=true;$('#hud').hidden=false;
-  clearWorld();mpSeeded(g*7919+13,()=>buildGorge(g));worldGroup.visible=false;const th=GZ.th;scene.fog.color.set(th.fog);scene.background.set(th.bg);setGorgeLight(th);
+  clearWorld();mpSeeded(g*7919+13,()=>buildGorge(g,camp));worldGroup.visible=false;const th=GZ.th;scene.fog.color.set(th.fog);scene.background.set(th.bg);setGorgeLight(th);
   const w=toWorld(gcx(3),3);P.pos.set(w.x,0,w.z);P.prev.copy(P.pos);if(MPon)mpStartPos();P.dead=false;hero.g.rotation.z=0;hero.g.position.y=0;P.hp=P.maxHp;P.mp=P.maxMp;
   P.face=Math.atan2(-Math.sin(camYaw),-Math.cos(camYaw));hero.g.rotation.y=P.face;camT.set(P.pos.x,1.2,P.pos.z);
   $('#gName').textContent='Ущелье '+g;hudCache.hk=null;
-  banner('Ущелье '+g,th.n+' · враги '+GZ.lv+' уровня');fxPillar(P.pos.x,P.pos.z,1.2,7,CLS.color,1);syncPause();}
+  banner('Ущелье '+g,th.n+' · враги '+GZ.lv+' уровня');fxPillar(P.pos.x,P.pos.z,1.2,7,CLS.color,1);if(camp)TCC.begin(camp);syncPause();}
 function exitGorge(){clearGorge();PLAY='world';worldGroup.visible=true;scene.fog.color.set(FOGC);scene.background.set(0x0e1630);}
 function spawnMob(tid,x,z,lv,o){o=o||{};const t=MOBS[tid],m=spawnEnemy(tid,x,z,lv,o),list=[m];
   if(t.pack&&!o.noPack&&!o.elite){const k=Math.ceil(t.pack*.6)-1;for(let i=0;i<k;i++)list.push(spawnEnemy(tid,x+rand(-1.5,1.5),z+rand(-1.5,1.5),lv,Object.assign({},o,{elite:false})));}return list;}
-function spawnEncounter(e,second){const th=GZ.th,k=second?e.next:e.kind,n=Math.min(7,2+Math.ceil(GZ.g/2)),pool=th.m[k]||th.m.norm,lv=()=>GZ.lv+(Math.random()<.25?1:0),out=[];GZ.seen.add(k);
+function spawnEncounter(e,second){const th=GZ.th,k=second?e.next:e.kind,n=GZ.camp?GZ.camp.n:Math.min(7,2+Math.ceil(GZ.g/2)),pool=th.m[k]||th.m.norm,lv=()=>GZ.lv+(Math.random()<.25?1:0),out=[];GZ.seen.add(k);
   const put=(tid,lz,lx,o)=>{const w=toWorld(lx,lz);for(const m of spawnMob(tid,w.x,w.z,lv(),Object.assign({gorge:true},o)))out.push(m);};
   const pl=toLocal(P.pos.x,P.pos.z);
   if(k==='swarm'){const m=Math.min(12,n*2);for(let i=0;i<m;i++){const lz=e.z+rand(0,9);put(pickW(pool),lz,gcx(lz)+rand(-5,5),{noPack:true});}}
@@ -2447,14 +2452,15 @@ function spawnGorgeBoss(){const lz=GZ.bossZ+5,w=toWorld(gcx(lz),lz),tid=GZ.th.bo
   $('#bossName').textContent=MOBS[tid].name+' · ур. '+lv;banner(MOBS[tid].name,'Страж ущелья «'+GZ.th.n+'»',true);shake=.6;fxPillar(w.x,w.z,2.5,10,RED,1);}
 function updateGorge(dt){if(!GZ)return;const l=toLocal(P.pos.x,P.pos.z);GZ.prog=Math.max(GZ.prog,clamp(l.z/(GZ.L-2),0,1));
   const lead=mpLeadZ(l.z);if(!MPG){for(const e of GZ.enc){if(!e.done&&lead>e.z-20){e.done=true;spawnEncounter(e);}else if(e.done&&e.next&&!e.second&&e.units.length&&e.units.every(u=>u.dead)){e.second=true;spawnEncounter(e,true);}}
-  if(!GZ.bossSpawned&&lead>GZ.bossZ-14){GZ.bossSpawned=true;spawnGorgeBoss();}}
-  if(GZ.bossSpawned&&!BOSS&&!GZ.open){GZ.open=true;GZ.portal.ringM.color.set(GZ.th.glow);banner('Выход открыт',MPon?'Откройте сундук вдвоём и входите в портал вместе':'Войди в портал в конце ущелья');if(MPH)mpChestSpawn();}
+  if(!GZ.camp&&!GZ.bossSpawned&&lead>GZ.bossZ-14){GZ.bossSpawned=true;spawnGorgeBoss();}}
+  if(GZ.camp)TCC.update(dt);
+  if(!GZ.camp&&GZ.bossSpawned&&!BOSS&&!GZ.open){GZ.open=true;GZ.portal.ringM.color.set(GZ.th.glow);banner('Выход открыт',MPon?'Откройте сундук вдвоём и входите в портал вместе':'Войди в портал в конце ущелья');if(MPH)mpChestSpawn();}
   for(let i=0;i<GZ.flames.length;i++)GZ.flames[i].material.opacity=.45+.25*Math.sin(time*9+i*1.3);
   GZ.hzT-=dt;let inMud=false;for(const h of GZ.haz){if(Math.hypot(l.x-h.x,l.z-h.z)<h.r){if(h.kind==='mud')inMud=true;else if(GZ.hzT<=0&&!P.dead){GZ.hzT=.5;hurtPlayer(Math.round((h.kind==='lava'?4.5:3)+GZ.lv*(h.kind==='lava'?1.3:.9)),null,{dot:true});colBurst(h.kind==='lava'?FIREC:ACID,P.pos.x,.3,P.pos.z,5,2,.3,3);}}}
   if(inMud)P.slowT=Math.max(P.slowT,.25);
   const pw=GZ.portal;pw.ring.rotation.z+=dt*(GZ.open?2.5:.3);
   if(GZ.open){pw.inM.opacity=.45+.15*Math.sin(time*4);if(Math.random()<.7){const a=rand(0,TAU),c=new THREE.Color(GZ.th.glow);emit(SPARK,pw.w.x+rand(-.8,.8),2.1+Math.sin(a)*1.5,pw.w.z+rand(-.8,.8),0,rand(.5,1.5),0,c,.9,-1,1);}
-    if(!GZ.won&&Math.hypot(P.pos.x-pw.w.x,P.pos.z-pw.w.z)<2.4){if(MPon)mpPortal();else gorgeWin();}}}
+    if(!GZ.won&&Math.hypot(P.pos.x-pw.w.x,P.pos.z-pw.w.z)<2.4){if(GZ.camp)TCC.portal();else if(MPon)mpPortal();else gorgeWin();}}}
 function gorgeWin(){GZ.won=true;const g=GZ.g,first=g>(S.gorge|0);if(first)S.gorge=g;
   const xp=Math.round(xpNeed(Math.max(1,S.lvl))*(first?.5:.25)),ess=30*g+(first?50*g:0),sc=first?2:1;
   gainXp(xp);S.ess+=ess;for(let i=0;i<sc;i++)learnRandom();save();
@@ -2467,8 +2473,8 @@ function renderGorgeList(){const done=MP.pickGorge?Math.max(S.gorge|0,MP.peer?MP
 function openGorges(){renderGorgeList();$('#gorges').hidden=false;}
 $('#glist').addEventListener('click',e=>{const b=e.target.closest('.grow');if(!b||b.disabled)return;if(MP.pickGorge&&MP.role==='host'){mpHostStart('gorge',+b.dataset.g);return;}startGorge(+b.dataset.g);});
 $('#gBack').addEventListener('click',()=>{$('#gorges').hidden=true;if(MP.pickGorge){MP.pickGorge=false;mpOpenLobby();}});
-$('#winNext').addEventListener('click',()=>{if(MPon){if(MPH&&GZ)mpHostStart('gorge',GZ.g+1);return;}if(GZ)startGorge(GZ.g+1);});
-$('#winWorld').addEventListener('click',()=>{if(MPon){if(MPH)mpHostStart('world');return;}startGame();});
+$('#winNext').addEventListener('click',()=>{if(GZ&&GZ.camp){TCC.next();return;}if(MPon){if(MPH&&GZ)mpHostStart('gorge',GZ.g+1);return;}if(GZ)startGorge(GZ.g+1);});
+$('#winWorld').addEventListener('click',()=>{if(GZ&&GZ.camp){TCC.toLevels();return;}if(MPon){if(MPH)mpHostStart('world');return;}startGame();});
 $('#winHeroes').addEventListener('click',()=>toSelect());
 
 // =====================================================================
@@ -2986,7 +2992,7 @@ function mpOnMsg(m,id){
     case 'ka':break;
     case 'full':mpOnFull();break;
     case 'hi':mpOnHi(m);break;
-    case 'rdy':if(MPH&&MP.active&&mode==='game'){if(MP.peer)MP.peer.on=true;mpHostResync();}break;
+    case 'rdy':if(MPH&&MP.active&&mode==='game'){if(MP.peer){MP.peer.on=true;mpPeerModelMake();}mpHostResync();}break;
     case 'start':mpOnStart(m);break;
     case 'stop':mpOnStop();break;
     case 'bye':mpOnBye();break;
@@ -3011,6 +3017,7 @@ function mpOnMsg(m,id){
     case 'ch':mpChestMake(m.x,m.z);break;
     case 'cho':mpChestOpened();break;
     case 'pl':break;
+    case 'camp':if(TCC)TCC.onMsg(m);break;
   }
 }
 function mpOnFull(){MP.status='full';MP.err='Комната занята: там уже двое.';mpCloseRoom();mpRenderLobby();}
@@ -3023,6 +3030,7 @@ function mpOnHi(m){
   if(first&&MP.active&&MPH){/* гость вернулся, пока идёт игра: ждёт его «rdy» или сам войдёт */}
   if(first)mpHello();
   if(MP.role==='guest')mpSend({t:'rdy'});
+  if(MPH&&TCC)TCC.sendProg();
   if(MP.active&&pr.on)mpPeerModelMake();
   mpRenderLobby();}
 
@@ -3050,7 +3058,7 @@ function mpHostStart(play,g){
   mpApplyStart(play,MP.g);}
 function mpOnStart(m){
   if(MPH)return;
-  MP.coop=true;MPon=true;MPG=true;MPH=false;MP.role='guest';MP.err='';
+  MP.coop=true;MPon=true;MPG=true;MPH=false;MP.role='guest';MP.err='';MP.notice='';
   if(MP.peer)MP.peer.on=true;
   for(const id of ['#coop','#gorges','#win','#dead'])$(id).hidden=true;
   mpApplyStart(m.p,m.g|0);}
@@ -3060,17 +3068,18 @@ function mpApplyStart(play,g){
   if(CLS)MP.myEl=EL[CLS.p];
   mpPeerModelMake();mpSelfLabel();
   $('#mpHud').hidden=false;
-  if(play==='gorge')startGorge(g);else startGame();
+  if(play==='camp'&&TCC)TCC.start(g);else if(play==='gorge')startGorge(g);else startGame();
   syncPause();}
 function mpHostResync(){
   mpSend({t:'start',p:MP.play,g:MP.g,j:1});
   for(const en of ENEMIES){if(!en.dead)mpSend(mpSpawnMsg(en));}
   if(GZ)mpSend({t:'gs',o:GZ.open?1:0,bs:GZ.bossSpawned?1:0});
+  if(TCC&&MP.play==='camp')TCC.resync();
   if(MP.chest)mpSend({t:'ch',x:MP.chest.x,z:MP.chest.z});
 }
 function mpOnStop(){ // хост вышел в меню
   MP.noEcho=true;mpEndSession();if(mode==='game')toSelect();MP.noEcho=false;
-  MP.status='lobby';MP.err='';$('#coop').hidden=false;mpRenderLobby();}
+  MP.status='lobby';MP.err='';MP.notice='Хозяин комнаты вышел из игры. Он выберет уровень заново — игра начнётся сама.';$('#coop').hidden=false;mpRenderLobby();}
 function mpOnBye(){ // напарник вышел в меню, мы продолжаем одни
   if(MP.peer){MP.peer.on=false;mpPeerModelDrop();}
   if(MP.active&&MPH){hint((MP.peer?MP.peer.nick:'Напарник')+' вышел в меню. Он может вернуться из «Играть вместе».',6);if(P.dead&&MP.down){MP.down=false;dieFull();}}
@@ -3085,7 +3094,7 @@ function mpEndSession(){
   if(MP.peerId)MP.status='lobby';}
 function mpSessionClear(){
   MP.byUid.clear();MP.hitQ.length=0;MP.combo=0;MP.comboT=0;MP.revT=0;MP.down=false;MP.tBroken=false;MP.plCd=14;MP.plBoss=null;
-  mpPlatesDrop();mpChestDrop();if(MP.tether){scene.remove(MP.tether.g);MP.tether=null;}
+  mpPlatesDrop();mpChestDrop();if(TCC)TCC.clear();if(MP.tether){scene.remove(MP.tether.g);MP.tether=null;}
   if(MP.rv){scene.remove(MP.rv.ring,MP.rv.disc);MP.rv=null;}
   if(MP.selfLbl){scene.remove(MP.selfLbl);MP.selfLbl.material.map.dispose();MP.selfLbl.material.dispose();MP.selfLbl=null;}
   $('#mpCombo').hidden=true;$('#mpHint').hidden=true;}
@@ -3456,11 +3465,11 @@ function mpRenderLobby(){
     const playing=MP.active&&mode==='game';
     h=`<h1>Комната ${esc(MP.code)}</h1>${mpPlayersHtml()}`;
     if(MP.role==='host'){
-      h+=`<p>Выбери, во что играем. Вдвоём враги крепче в 1,6 раза, а награда достаётся обоим.</p>
-      <div class="coop-modes"><button class="coop-mode" data-a="mode-gorge" type="button"><b>Связка · ущелья</b><small>Нить стихий между вами, реакции вдвоём, подъём напарника, приём стража с двумя плитами и общий сундук.</small></button>
-      <button class="coop-mode" data-a="mode-world" type="button"><b>Вместе в свободном мире</b><small>Спокойная охота: враги, боссы, нить и подъём напарника. Можно просто бродить рядом.</small></button></div>
+      h+=`<p>Выбери, во что играем. Вдвоём враги крепче в 1,6 раза, а награда достаётся обоим. Нить стихий, реакции вдвоём и подъём напарника работают в обоих режимах.</p>
+      <div class="coop-modes"><button class="coop-mode" data-a="mode-camp" type="button"><b>Прохождение вдвоём</b><small>8 уровней с целями: засады, алтарь, кристалл, две плиты, страж, побег, охота и финал. Звёзды и общий сундук.</small></button>
+      <button class="coop-mode" data-a="mode-world" type="button"><b>Свободный мир</b><small>Открытый мир без цели: бродите вдвоём, охотьтесь, зовите боссов. Спокойная песочница.</small></button></div>${TCC?TCC.lobbyStrip():''}
       ${playing?'<button class="ghost" data-a="close" type="button">Вернуться в игру</button>':''}`;}
-    else h+=`<p class="coop-wait"><span class="spin"></span>Хозяин комнаты выбирает режим. Игра начнётся сама.</p>${playing?'<button class="ghost" data-a="close" type="button">Вернуться в игру</button>':''}`;
+    else h+=`${MP.notice?'<p class="coop-note">'+esc(MP.notice)+'</p>':''}<p class="coop-wait"><span class="spin"></span>Хозяин комнаты выбирает режим. Игра начнётся сама.</p>${TCC?TCC.lobbyStrip():''}${playing?'<button class="ghost" data-a="close" type="button">Вернуться в игру</button>':''}`;
     h+=`<div class="coop-row"><button class="ghost" data-a="hero" type="button">Сменить героя</button><button class="ghost" data-a="leave" type="button">Выйти из комнаты</button></div>`;}
   c.innerHTML=h;}
 $('#coopCard').addEventListener('click',e=>{
@@ -3475,6 +3484,7 @@ $('#coopCard').addEventListener('click',e=>{
   else if(a==='copy'){const v=mpUrl(MP.code);if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(v).then(()=>{b.textContent='Скопировано';}).catch(()=>{const i=$('#linkIn');i.select();});else{const i=$('#linkIn');i.select();try{document.execCommand('copy');b.textContent='Скопировано';}catch(e2){}}}
   else if(a==='share'){const v=mpUrl(MP.code);if(navigator.share)navigator.share({title:'Тысяча чар',text:'Заходи ко мне в «Тысячу чар» — сыграем вдвоём!',url:v}).catch(()=>{});else{const i=$('#linkIn');if(navigator.clipboard)navigator.clipboard.writeText(v);i.select();b.textContent='Ссылка скопирована';}}
   else if(a==='mode-gorge'){$('#coop').hidden=true;MP.pickGorge=true;renderGorgeList();$('#gorges').hidden=false;}
+  else if(a==='mode-camp'&&TCC){$('#coop').hidden=true;TCC.openSelect();}
   else if(a==='mode-world')mpHostStart('world');
   else if(a==='hero'){$('#coop').hidden=true;if(MPon&&!MP.active){MPon=false;}if(MP.active&&mode==='game'){toSelect();}}});
 $('#coopCard').addEventListener('keydown',e=>{e.stopPropagation();if(e.key==='Enter'&&e.target.id==='codeIn'){const v=e.target.value.trim();if(v)mpJoin(v);}});
@@ -3499,6 +3509,8 @@ function mpInit(){
     setTimeout(()=>{try{if(MP.peerId)mpHello();}catch(e){}},700);};
   document.addEventListener('visibilitychange',mpBack);window.addEventListener('pageshow',mpBack);window.addEventListener('online',mpBack);}
 
+const TCC=window.TCCF?window.TCCF({THREE,clamp,rand,randi,lerp,TAU,toLocal,toWorld,gcx,ghw,spawnMob,spawnEnemy,pickW,banner,hint,float,fxPillar,fxRing,colBurst,GOLD,RED,FXG,emit,SPARK,glowSprite,hurtPlayer,kill,dieFull,syncPause,toSelect,mpSend,MP,P,save,gainXp,learnRandom,xpNeed,scene,camera,gorgeGroup,WORLD_ANIM,ENEMIES,mpHostStart,mpOpenLobby,mpChestSpawn,mpRenderLobby,startGorge,
+  get GZ(){return GZ;},get BOSS(){return BOSS;},setBOSS:v=>{BOSS=v;},shake:v=>{shake=Math.max(shake,v);},get S(){return S;},get SAVE(){return SAVE;},get MPon(){return MPon;},get MPH(){return MPH;},get MPG(){return MPG;},get mode(){return mode;},get paused(){return paused;},get time(){return time;}}):null;
 function start(hot){
   loadSave(hot||{});
   W=app.clientWidth;H=app.clientHeight;applyQuality(true);
