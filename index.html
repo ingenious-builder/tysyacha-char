@@ -2633,7 +2633,7 @@ function buildGorge(g,camp){clearGorge();const th=GT[g-1],tier=Math.min(2,Math.f
   gorgeGroup.rotation.y=camYaw+Math.PI;gorgeGroup.visible=true;}
 function startGorge(g,camp){SAVE.chars[CLS.id]=S;SAVE.cur=CLS.id;save();mode='game';PLAY='gorge';
   for(const id of ['#select','#gorges','#win','#dead'])$(id).hidden=true;$('#hud').hidden=false;
-  clearWorld();mpSeeded(g*7919+13,()=>buildGorge(g,camp));worldGroup.visible=false;const th=GZ.th;scene.fog.color.set(th.fog);scene.background.set(th.bg);setGorgeLight(th);
+  clearWorld();mpSeeded(g*7919+13,()=>buildGorge(g,camp));worldGroup.visible=false;const th=GZ.th;if(MPH&&MP.coop)GZ.lv=Math.max(GZ.lv,mpLvl());scene.fog.color.set(th.fog);scene.background.set(th.bg);setGorgeLight(th);
   const w=toWorld(gcx(3),3);P.pos.set(w.x,0,w.z);P.prev.copy(P.pos);if(MPon)mpStartPos();P.dead=false;hero.g.rotation.z=0;hero.g.position.y=0;P.hp=P.maxHp;P.mp=P.maxMp;
   P.face=Math.atan2(-Math.sin(camYaw),-Math.cos(camYaw));hero.g.rotation.y=P.face;camT.set(P.pos.x,1.2,P.pos.z);
   $('#gName').textContent='Ущелье '+g;hudCache.hk=null;
@@ -3288,7 +3288,7 @@ function mpOnStart(m){
   for(const id of ['#coop','#gorges','#win','#dead'])$(id).hidden=true;
   mpApplyStart(m.p,m.g|0);}
 function mpApplyStart(play,g){
-  mpSessionClear();
+  mpSessionClear();mpNoSandbox();
   MP.active=true;MP.play=play;MP.g=g;MP.status='playing';MP.wiped=false;
   if(CLS)MP.myEl=EL[CLS.p];
   mpPeerModelMake();mpSelfLabel();
@@ -3336,7 +3336,10 @@ function mpReviveBtn(){
 // ---------- ближайший живой герой и подмена цели для ИИ врагов ----------
 const mpPeerUp=()=>!!(MP.peer&&MP.peer.on&&!MP.peer.dead&&MP.peer.hero);
 const mpAllyUp=()=>MPon&&mpPeerUp();
-const mpLvl=()=>MPH&&MP.peer&&MP.peer.on?Math.max(1,Math.round((S.lvl+(MP.peer.lvl||S.lvl))/2)):S.lvl;
+// уровень врагов в коопе — с перекосом к сильнейшему (3/4 большего + 1/4 меньшего), чтобы враги были опасны и сильному герою
+const mpLvl=()=>{if(!(MPH&&MP.peer&&MP.peer.on))return S.lvl;const a=S.lvl,b=MP.peer.lvl||a;return Math.max(1,Math.round(Math.max(a,b)*.75+Math.min(a,b)*.25));};
+// тестовый режим в игре вдвоём не работает: у друга он дал бы 50 слотов и все чары
+function mpNoSandbox(){if(!S.sandbox)return;S.sandbox=false;const cb=$('#sandbox');if(cb)cb.checked=false;const na=activeSlots(),np=passiveSlots();for(let i=na;i<S.active.length;i++)S.active[i]=null;for(let i=np;i<S.passive.length;i++)S.passive[i]=null;computeStats();recalcStats();onBuildChanged();toast('Тестовый режим выключен: в игре вдвоём он не работает');}
 function mpSpawnCenter(){if(MPH&&mpPeerUp()&&(P.dead||Math.random()<.5))return MP.peer.pos;return P.pos;}
 function mpLeadZ(z){if(MPH&&MP.peer&&MP.peer.on&&GZ){const l=toLocal(MP.peer.pos.x,MP.peer.pos.z);return Math.max(z,l.z);}return z;}
 // агро делится: враг держит цель ~2,5 с; выбирает героя по расстоянию с «штрафом» за каждого врага, уже идущего на него
@@ -3727,7 +3730,7 @@ function mpRenderLobby(){
     const playing=MP.active&&mode==='game';
     h=`<h1>Комната ${esc(MP.code)}</h1>${mpPlayersHtml()}`;
     if(MP.role==='host'){
-      h+=`<p>Выбери, во что играем. Вдвоём враги крепче в 1,6 раза, а награда достаётся обоим. Нить стихий, реакции вдвоём и подъём напарника работают в обоих режимах.</p>
+      h+=`<p>Выбери, во что играем. Вдвоём враги крепче вдвое, а награда достаётся обоим. Нить стихий, реакции вдвоём и подъём напарника работают в обоих режимах.</p>
       <div class="coop-modes"><button class="coop-mode" data-a="mode-camp" type="button"><b>Прохождение вдвоём</b><small>8 уровней с целями: засады, алтарь, кристалл, две плиты, страж, побег, охота и финал. Звёзды и общий сундук.</small></button>
       <button class="coop-mode" data-a="mode-world" type="button"><b>Свободный мир</b><small>Открытый мир без цели: бродите вдвоём, охотьтесь, зовите боссов. Спокойная песочница.</small></button></div>${TCC?TCC.lobbyStrip():''}
       ${playing?'<button class="ghost" data-a="close" type="button">Вернуться в игру</button>':''}`;}
