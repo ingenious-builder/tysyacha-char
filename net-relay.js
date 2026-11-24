@@ -162,9 +162,10 @@
     return {
       selfId: selfId,
       topic: topic,
-      makeAction: function (name) {
-        var cbs = actions[name] = actions[name] || [];
-        return [function (data, peerId) { return enqueue(name, data, typeof peerId === 'string' ? peerId : ''); }, function (cb) { cbs.push(cb); }];
+      makeAction: function (name, opt) {
+        var cbs = actions[name] = actions[name] || [], now = !!(opt && opt.now);
+        // opt.now — срочные сообщения (сигнализация P2P): уходят сразу, без ожидания пачки
+        return [function (data, peerId) { var r = enqueue(name, data, typeof peerId === 'string' ? peerId : ''); if (now) { clearTimeout(flushTimer); flush(); } return r; }, function (cb) { cbs.push(cb); }];
       },
       onPeerJoin: function (cb) { joinCbs.push(cb); },
       onPeerLeave: function (cb) { leaveCbs.push(cb); },

@@ -1,8 +1,8 @@
 // Сервис-воркер «Тысячи чар»: офлайн-кэш и обновление без залипания на старой версии.
 // При каждом выпуске меняй VERSION — старый кэш удалится, новая версия подхватится сама.
-const VERSION='v7';
+const VERSION='v8';
 const CACHE='tysyacha-char-'+VERSION;
-const CORE=['./','index.html','manifest.webmanifest','vendor/three.min.js','net-relay.js','vendor/trystero-nostr-0.21.5.js','icons/icon-192.png','icons/icon-512.png','icons/maskable-512.png','icons/apple-touch-icon.png'];
+const CORE=['./','index.html','manifest.webmanifest','vendor/three.min.js','net-relay.js','net-p2p.js','vendor/trystero-nostr-0.21.5.js','icons/icon-192.png','icons/icon-512.png','icons/maskable-512.png','icons/apple-touch-icon.png'];
 self.addEventListener('install',e=>{
   e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()));
 });
