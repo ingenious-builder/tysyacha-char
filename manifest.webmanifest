@@ -1,0 +1,20 @@
+{
+  "name": "Тысяча чар",
+  "short_name": "Тысяча чар",
+  "description": "Action-RPG в браузере: 20 героев, 10 стихий, 12 ущелий и кооператив на двоих.",
+  "lang": "ru",
+  "id": "./",
+  "start_url": "./?source=pwa",
+  "scope": "./",
+  "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone"],
+  "orientation": "any",
+  "background_color": "#0d1120",
+  "theme_color": "#0d1120",
+  "categories": ["games"],
+  "icons": [
+    {"src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+    {"src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}
