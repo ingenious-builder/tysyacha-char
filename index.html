@@ -2263,7 +2263,7 @@ function die(){P.dead=true;P.hp=0;hero.g.rotation.z=1.4;hero.g.position.y=.2;if(
 function dieFull(){P.dead=true;P.hp=0;hero.g.rotation.z=1.4;hero.g.position.y=.2;const lost=PLAY==='world'?Math.floor(S.ess*.2):0;S.ess-=lost;
   $('#deadTxt').textContent=PLAY==='gorge'&&GZ&&GZ.camp?(GZ.failText||'Уровень '+GZ.camp.k+' «'+GZ.camp.name+'» не пройден: оба героя пали.')+' Опыт, чары и эссенция сохранены — хозяин комнаты может начать уровень заново.':PLAY==='gorge'&&GZ?'Ущелье '+GZ.g+' «'+GORGES[GZ.g-1]+'» не пройдено. Опыт, чары и эссенция сохранены, попробуй ещё раз или прокачайся в свободном мире.':CLS.name+', уровень '+S.lvl+'. Врагов побеждено: '+S.kills+'. Потеряно '+lost+' эссенции. Чары, билд и таланты на месте.';
   $('#reviveBtn').textContent=PLAY==='gorge'?'Пройти заново':'Воскреснуть';later(1,()=>{$('#dead').hidden=false;syncPause();});saveSoon();}
-function revive(){if(MPon){mpReviveBtn();return;}if(PLAY==='gorge'&&GZ){startGorge(GZ.g);return;}P.dead=false;$('#dead').hidden=true;hero.g.rotation.z=0;hero.g.position.y=0;P.pos.set(0,0,0);P.prev.set(0,0,0);P.hp=P.maxHp;P.mp=P.maxMp;
+function revive(){if(MPon){mpReviveBtn();return;}if(PLAY==='gorge'&&GZ){startGorge(GZ.g,GZ.camp);return;}P.dead=false;$('#dead').hidden=true;hero.g.rotation.z=0;hero.g.position.y=0;P.pos.set(0,0,0);P.prev.set(0,0,0);P.hp=P.maxHp;P.mp=P.maxMp;
   for(let i=ENEMIES.length-1;i>=0;i--){if(!ENEMIES[i].boss&&ENEMIES[i].pos.length()<24)removeEnemy(i);}
   if(BOSS){const i=ENEMIES.indexOf(BOSS);if(i>=0)removeEnemy(i);BOSS=null;threat=Math.floor(THREAT_MAX*.6);}
   for(let i=EPROJ.length-1;i>=0;i--){dropProjVis(EPROJ[i].o);EPROJ.splice(i,1);}
