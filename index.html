@@ -73,21 +73,20 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 #zoneTag small{display:block;font:400 11px var(--f-ui);color:var(--muted)}
 #zoneTag.on{opacity:1}
 
-#pad{position:absolute;right:calc(var(--m) + var(--sar));bottom:calc(var(--m) + var(--sab));display:grid;grid-template-columns:repeat(4,var(--bs)) var(--ab);grid-template-rows:repeat(2,var(--bs));gap:var(--gp);pointer-events:none}
-#atk{grid-column:5;grid-row:1/3;align-self:end;justify-self:end;width:var(--ab);height:var(--ab);border-radius:50%;border:2px solid rgba(255,255,255,.35);
+#pad{position:absolute;right:calc(var(--m) + var(--sar));bottom:calc(var(--m) + var(--sab));width:var(--ab);height:var(--ab);pointer-events:none}
+#atk{position:absolute;inset:0;border-radius:50%;border:2px solid rgba(255,255,255,.35);
   background:radial-gradient(circle at 40% 35%,#ffffff33,#ffffff10 60%,#0000 70%),rgba(20,26,48,.75);display:grid;place-items:center}
 #atk svg{width:40px;height:40px}
 #atk.down{transform:scale(.93);background-color:rgba(60,70,110,.85)}
-.sk{position:relative;width:var(--bs);height:var(--bs);border-radius:50%;padding:0;
+.sk{position:absolute;left:50%;top:50%;width:var(--bs);height:var(--bs);margin:calc(var(--bs) / -2) 0 0 calc(var(--bs) / -2);border-radius:50%;padding:0;
   border:2px solid var(--c,#fff);background:radial-gradient(circle at 40% 35%,color-mix(in srgb,var(--c,#fff) 78%,#0e1222),color-mix(in srgb,var(--c,#fff) 38%,#0e1222) 85%);
-  display:grid;place-items:center;overflow:hidden}
+  display:grid;place-items:center;overflow:hidden;transform:translate(var(--x),var(--y))}
 .sk svg{width:26px;height:26px;position:relative;z-index:1;filter:drop-shadow(0 1px 1px #000)}
 .sk .cd{position:absolute;inset:0;border-radius:50%;background:conic-gradient(rgba(5,8,18,.8) calc(var(--p,0) * 360deg),transparent 0);z-index:2}
 .sk .t{position:absolute;inset:0;display:grid;place-items:center;z-index:3;font:700 15px var(--f-ui);text-shadow:0 1px 3px #000;font-variant-numeric:tabular-nums}
 .sk.low{filter:grayscale(.7) brightness(.7)}
 .sk.empty{border:2px dashed rgba(255,255,255,.35);background:rgba(14,18,34,.55);color:rgba(255,255,255,.6);font-size:26px;line-height:1}
-.sk.down{transform:scale(.92)}
-@media (orientation:portrait){#pad{grid-template-columns:repeat(4,var(--bs));grid-template-rows:repeat(2,var(--bs)) var(--ab)}#atk{grid-column:3/5;grid-row:3}}
+.sk.down{transform:translate(var(--x),var(--y)) scale(.92)}
 
 #joy{position:absolute;width:112px;height:112px;margin:-56px 0 0 -56px;border-radius:50%;
   left:calc(var(--m) + 56px + var(--sal));top:calc(100% - var(--m) - 56px - var(--sab));
@@ -107,6 +106,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 #banner b{display:block;font:700 clamp(28px,7vw,46px)/1.1 var(--f-display);color:var(--gold);text-shadow:0 2px 12px rgba(0,0,0,.8);text-wrap:balance}
 #banner.red b{color:#ff9d8a}
 #banner span{font:500 15px var(--f-ui);text-shadow:0 1px 4px #000}
+@media (orientation:landscape) and (max-height:420px){#banner{top:37%}#banner b{font-size:30px}}
 #gprog{display:flex;gap:8px;align-items:center;font:500 11px var(--f-ui);color:var(--text);background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:5px 10px;white-space:nowrap}
 #gprog .bar{width:90px;height:5px}
 #gprog .bar i{background:var(--gold)}
@@ -2266,7 +2266,7 @@ function updateAim(){if(!aimSt||!aimSt.on||P.dead){hideAim();return;}const A=aim
   else{const len=F==='strike'?3+3.4*R:sk.F.range;aimLine.visible=true;aimLine.position.set(P.pos.x,.1,P.pos.z);aimLine.rotation.y=Math.atan2(A.dir.x,A.dir.z);aimLine.scale.set(F==='strike'?2.4*R:F==='beam'?1.1*R:.9,1,len);}}
 const tgtRing=new THREE.Mesh(FXG.ring,new THREE.MeshBasicMaterial({color:0xf2c46b,transparent:true,opacity:.85,depthWrite:false}));tgtRing.visible=false;scene.add(tgtRing);
 function updateTargetRing(){const t=target&&!target.dead&&mode==='game'?target:null;tgtRing.visible=!!t;if(t){tgtRing.position.set(t.pos.x,.09,t.pos.z);const s=t.r*1.7;tgtRing.scale.set(s,1,s);tgtRing.rotation.y=time*2;}}
-const ARC=[[102,180],[102,150],[102,120],[102,90],[168,180],[168,150],[168,120],[168,90]];
+const ARC=[[110,180],[110,150],[110,120],[110,90],[170,160],[170,136.7],[170,113.3],[170,90]];
 for(let i=0;i<8;i++){const b=document.createElement('button');b.type='button';b.className='sk';const [r,a]=ARC[i];
   b.style.setProperty('--x',(Math.cos(a*Math.PI/180)*r).toFixed(1)+'px');b.style.setProperty('--y',(-Math.sin(a*Math.PI/180)*r).toFixed(1)+'px');
   pad.appendChild(b);SKB.push({b,id:-2,p:-1,t:'',low:null});
