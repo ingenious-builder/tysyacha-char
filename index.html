@@ -622,6 +622,7 @@ html[data-ui=tab] .sh-act .btn{min-width:150px}
     </section>
     <section id="build" class="pane" hidden>
       <div class="bd">
+        <div class="bd-actions"><button class="btn gold" id="bestBuild" type="button">Лучший билд</button><button class="btn" id="randBuild" type="button">Случайный билд</button><button class="btn warn" id="clearBuild" type="button">Снять всё</button><button class="btn" id="undoBuild" type="button" hidden>↶ Отменить</button></div>
         <div class="bd-grid">
           <div>
             <section><h3>Активные <small id="actN"></small></h3><p class="hint">Кнопки справа на экране. Новые слоты открываются с уровнем.</p><div class="slots act" id="slotsA"></div></section>
@@ -630,7 +631,6 @@ html[data-ui=tab] .sh-act .btn{min-width:150px}
           <div>
             <section><h3>Резонанс стихий</h3><p class="hint" id="resoHint"></p><div class="reso" id="reso"></div></section>
             <section><h3>Реакция класса</h3><p class="hint">Удар одной стихией по врагу с меткой другой вызывает реакцию.</p><div class="reacts" id="reacts"></div></section>
-            <div class="bd-actions"><button class="btn gold" id="bestBuild" type="button">Лучший билд</button><button class="btn" id="randBuild" type="button">Случайный билд</button><button class="btn warn" id="clearBuild" type="button">Снять всё</button></div>
             <p class="hint" id="bpow"></p>
             <label class="toggle"><input type="checkbox" id="autoBest">Ставить сильнее автоматически (иначе — плашка с вопросом)</label>
             <label class="toggle"><input type="checkbox" id="sandbox">Тестовый режим: все чары класса изучены, 50 слотов открыты, +30 очков талантов</label>
@@ -1031,10 +1031,12 @@ function rarMap(){const k=CLS.id;if(RAR_CACHE[k])return RAR_CACHE[k];const out=n
   return RAR_CACHE[k]=out;}
 const rarOf=sk=>rarMap().get(sk.id)|0;
 const slotNm=(act,i)=>(act?'слоте ':'пассивном слоте ')+(i+1);
-function weakest(act){if(WKC&&WKC[act?'a':'p']!==undefined)return WKC[act?'a':'p'];if(!WKC)WKC={};
+function weakest(act,oc){const key=(act?'a':'p')+(oc||'');if(WKC&&WKC[key]!==undefined)return WKC[key];if(!WKC)WKC={};
   const arr=act?S.active:S.passive,n=act?activeSlots():passiveSlots();let b=null,bp=1e18;
-  for(let i=0;i<n;i++){const id=arr[i];if(id==null)continue;const p=pwr(SKILLS[id]);if(p<bp){bp=p;b=id;}}
-  return WKC[act?'a':'p']=b==null?null:b;}
+  // единственную защитную или мобильную чару в билде не трогаем, если новая — другой категории
+  const cc={};if(act)for(let i=0;i<n;i++){const id=arr[i];if(id!=null){const c=FP[SKILLS[id].F.id].cat;cc[c]=(cc[c]||0)+1;}}
+  for(let i=0;i<n;i++){const id=arr[i];if(id==null)continue;const c=FP[SKILLS[id].F.id].cat;if(act&&(c==='def'||c==='mov')&&cc[c]===1&&c!==oc)continue;const p=pwr(SKILLS[id]);if(p<bp){bp=p;b=id;}}
+  return WKC[key]=b==null?null:b;}
 // чем заменить: тот же вид -> иначе слабейшая того же типа (если у формы уже две — слабейшая из них). null — места хватает или замена не выгодна
 function upgradeFor(sk,hyp){
   if(EQUIPPED.has(sk.id)||(!hyp&&!isLearned(sk.id)))return null;
@@ -1043,7 +1045,7 @@ function upgradeFor(sk,hyp){
   if(tgt==null){
     if(act){const same=[];for(let i=0;i<n;i++){const v=arr[i];if(v!=null&&SKILLS[v].f===sk.f)same.push(v);}
       if(same.length>=2||(same.length&&free))tgt=same.reduce((a,b)=>pwr(SKILLS[a])<=pwr(SKILLS[b])?a:b);}
-    if(tgt==null){if(free)return null;tgt=weakest(act);}}
+    if(tgt==null){if(free)return null;tgt=weakest(act,FP[sk.F.id].cat);}}
   if(tgt==null)return null;
   const T_=SKILLS[tgt],cnt=RESO_N.slice();cnt[T_.e]--;cnt[sk.e]++;
   const tp=pwr(T_),cp=skPower(sk,cnt),gain=cp/tp-1;
@@ -1057,18 +1059,23 @@ function bestBuildPlan(){
   const na=activeSlots(),np=passiveSlots(),L=classSkills().filter(x=>isLearned(x.id));
   const cnt=new Array(10).fill(0),usedB=new Set(),formN={},cats={};
   const run=(list,n,act)=>{const res=[];
-    while(res.length<n){let best=null,bs=-1;
-      for(const sk of list){if(usedB.has(sk.bk))continue;const fc=formN[sk.f]||0;if(fc>=(act?2:3))continue;
+    const pick=cf=>{let best=null,bs=-1;
+      for(const sk of list){if(usedB.has(sk.bk))continue;const ct=FP[sk.F.id].cat;if(cf&&ct!==cf)continue;const fc=formN[sk.f]||0;if(fc>=(act?2:3))continue;
         cnt[sk.e]++;let sc=skPower(sk,cnt);cnt[sk.e]--;
-        if(fc)sc*=Math.pow(.82,fc);const ct=FP[sk.F.id].cat;if(act&&!cats[ct])sc*=CATB[ct]||1;
+        if(fc)sc*=Math.pow(.82,fc);if(act&&!cats[ct])sc*=CATB[ct]||1;
         if(sc>bs){bs=sc;best=sk;}}
-      if(!best)break;res.push(best.id);usedB.add(best.bk);formN[best.f]=(formN[best.f]||0)+1;cnt[best.e]++;cats[FP[best.F.id].cat]=1;}
+      if(!best)return false;res.push(best.id);usedB.add(best.bk);formN[best.f]=(formN[best.f]||0)+1;cnt[best.e]++;cats[FP[best.F.id].cat]=1;return true;};
+    // обязательные слоты: защита и движение (если изучены и есть место для атаки)
+    if(act)for(const c of ['def','mov'])if(res.length<n-1)pick(c);
+    while(res.length<n&&pick());
     return res;};
   const a=run(L.filter(x=>x.active),na,true);
   CR_OVR=a.reduce((r,id)=>r+1/skCycle(SKILLS[id]),0)||.6;
   let p;try{p=run(L.filter(x=>!x.active),np,false);}finally{CR_OVR=null;}
   return {a,p};}
-function applyBestBuild(){const before=buildPower().all,pl=bestBuildPlan();
+let BUNDO=null;
+function snapBuild(){BUNDO={cls:CLS.id,a:S.active.slice(),p:S.passive.slice()};}
+function applyBestBuild(){const before=buildPower().all,pl=bestBuildPlan();snapBuild();
   for(let i=0;i<8;i++)S.active[i]=i<pl.a.length?pl.a[i]:null;for(let i=0;i<42;i++)S.passive[i]=i<pl.p.length?pl.p[i]:null;
   onBuildChanged();const after=buildPower().all;return {before,after,n:pl.a.length+pl.p.length};}
 // распыление в эссенцию
@@ -1768,7 +1775,7 @@ function checkUpgrade(id){if(mode!=='game'||S.sandbox)return;const sk=SKILLS[id]
   if(S.autoBest){applyUpgrade(sk,u);toast('Автозамена: «'+skName(sk)+'» вместо «'+skName(SKILLS[u.tgt])+'» (+'+pct(u.gain)+'%)');return;}
   showUpg(sk,u);}
 function applyUpgrade(sk,u){putInSlot(sk.id,sk.active?'active':'passive',u.idx);}
-function showUpg(sk,u){UPG=sk.id;const T_=SKILLS[u.tgt],r=rarOf(sk),el=$('#upg');el.dataset.r=r;
+function showUpg(sk,u){if(luOpen||bookOpen){hideUpg();return;}UPG=sk.id;const T_=SKILLS[u.tgt],r=rarOf(sk),el=$('#upg');el.dataset.r=r;
   $('#upgIco').innerHTML=svg(sk.F.id)+modBadge(sk);$('#upgIco').style.setProperty('--c',sk.E.hex);$('#upgIco').dataset.r=r;$('#upgIco').className='ico'+(sk.active?'':' p');
   $('#upgT').textContent='Новая чара сильнее «'+skName(T_)+'» в '+slotNm(u.act,u.idx);
   $('#upgS').textContent=skName(sk)+' · '+RARITY[r].n+' · сила '+Math.round(u.cp)+' (+'+pct(u.gain)+'%)';
@@ -2894,8 +2901,8 @@ const knownBase=sk=>{for(const id of LEARNED)if(SKILLS[id].bk===sk.bk)return tru
 function cardStat(sk){return sk.active?`${fmt(skDmg(sk))} урона · ${skMana(sk)} маны · ${fmt(skCd(sk))} с`:`${fmt(skDmg(sk))} урона · пассивная`;}
 function cardPow(sk){const r=rarOf(sk),u=upgradeFor(sk,true),arr=sk.active?S.active:S.passive,n=sk.active?activeSlots():passiveSlots();
   const free=baseSlot(sk)==null&&arr.findIndex((v,i)=>i<n&&v==null)>=0&&formSlot(sk)==null;
-  return `<small class="pw" data-r="${r}">${RARITY[r].n} · сила ${Math.round(pwr(sk))}${free?' · встанет в свободный слот':u?' · ↑ сильнее «'+skName(SKILLS[u.tgt])+'» на '+pct(u.gain)+'%':''}</small>`;}
-function openLevelUp(){const ch=rollChoices();if(!ch.length){luQueue=0;return;}luOpen=true;syncPause();
+  return `<small class="pw" data-r="${r}">${RARITY[r].n} ${sk.active?'актив.':'пассив.'} · сила ${Math.round(pwr(sk))}${free?' · встанет в свободный слот':u?' · ↑ сильнее «'+skName(SKILLS[u.tgt])+'» на '+pct(u.gain)+'%':''}</small>`;}
+function openLevelUp(){const ch=rollChoices();if(!ch.length){luQueue=0;return;}luOpen=true;hideUpg();syncPause();
   $('#luTitle').textContent='Уровень '+S.lvl;$('#luSub').textContent='Выбери новые чары. Если есть свободный слот, они сразу встанут в билд.'+(tpFree()?' Очков талантов: '+tpFree()+'.':'');
   $('#luCards').innerHTML=ch.map(sk=>`<button type="button" class="card" data-id="${sk.id}"><span class="ico${sk.active?'':' p'}" data-r="${rarOf(sk)}" style="--c:${sk.E.hex}">${svg(sk.F.id)}${modBadge(sk)}</span><span class="ct"><span class="tag">${sk.F.role} · ${sk.E.name}${knownBase(sk)?'<i class="nv">вариант известной</i>':'<i class="nv">новая чара</i>'}</span><b>${sk.base}</b><span class="var">${sk.M.name}: ${sk.M.desc}</span><small>${cap(skLead(sk))}</small><small>${cardStat(sk)}</small>${cardPow(sk)}</span></button>`).join('');
   $('#luSkip').textContent='Пропустить: +'+(20+S.lvl*5)+' эссенции';$('#lvlup').hidden=false;}
@@ -2927,7 +2934,7 @@ const learnedVars=bk=>{let n=0;for(let m=0;m<NM;m++)if(isLearned(bk*NM+m))n++;re
 function rowHtml(sk,nv){const eq=EQUIPPED.has(sk.id),ln=isLearned(sk.id),lv=learnedVars(sk.bk),r=rarOf(sk),u=ln&&!eq?upgradeFor(sk):null;
   const other=!eq&&ln?[...EQUIPPED].find(id=>SKILLS[id].bk===sk.bk):null;
   return `<button type="button" class="row${eq?' eq':''}${ln?'':' locked'}" data-id="${sk.id}"><span class="ico${sk.active?'':' p'}" data-r="${r}" style="--c:${sk.E.hex}">${svg(sk.F.id)}${modBadge(sk)}</span>
-  <span class="rt"><span class="nm">${sk.base} <i>· ${sk.M.name}</i></span><span class="meta">${sk.F.role} · ${RARITY[r].n} · <b class="pw" data-r="${r}">сила ${Math.round(pwr(sk))}</b> · ${ln?(rk(sk.id)>1?'ур. '+rk(sk.id)+' · ':'')+(lv>1?'вариантов '+lv+'/'+NM:cardStat(sk)):'не изучено'}</span></span>${eq?'<span class="badge">в билде</span>':u?`<span class="badge rec">↑ +${pct(u.gain)}%</span>`:other!=null?'<span class="badge">есть вариант в билде</span>':''}</button>`;}
+  <span class="rt"><span class="nm">${sk.base} <i>· ${sk.M.name}</i></span><span class="meta">${sk.F.role} · ${RARITY[r].n} ${sk.active?'актив.':'пассив.'} · <b class="pw" data-r="${r}">сила ${Math.round(pwr(sk))}</b> · ${ln?(rk(sk.id)>1?'ур. '+rk(sk.id)+' · ':'')+(lv>1?'вариантов '+lv+'/'+NM:cardStat(sk)):'не изучено'}</span></span>${eq?'<span class="badge">в билде</span>':u?`<span class="badge rec">↑ +${pct(u.gain)}%</span>`:other!=null?'<span class="badge">есть вариант в билде</span>':''}</button>`;}
 function classSkills(){const a=[];CLS.pool.forEach(id=>a.push(SKILLS[id]));const er=e=>e===CLS.p?0:e===CLS.s?1:2;a.sort((x,y)=>er(x.E.id)-er(y.E.id)||x.f-y.f||x.m-y.m);return a;}
 const F2_={sort:'power',weak:false};let WEAKN=0,WEAKE=0;
 function renderSort(){$('#fSort').innerHTML=chip('По силе',F2_.sort==='power','data-sort="power"')+chip('По стихии',F2_.sort==='el','data-sort="el"')+
@@ -2941,12 +2948,12 @@ function renderList(keep){
     if(q)return q.split(/\s+/).every(w=>sk.key.includes(w));return true;});
   {const gr=new Map(),sc=x=>(isLearned(x.id)?1e6:0)+pwr(x);for(const sk of L){const o=gr.get(sk.bk);if(!o||sc(sk)>sc(o))gr.set(sk.bk,sk);}L=[...gr.values()];}
   const ln=x=>isLearned(x.id)?1:0;
-  if(F2_.sort==='power')L.sort((x,y)=>ln(y)-ln(x)||pwr(y)-pwr(x));
+  if(F2_.sort==='power')L.sort((x,y)=>ln(y)-ln(x)||(+y.active)-(+x.active)||pwr(y)-pwr(x));
   else if(pending&&pending.type)L.sort((a,b)=>ln(b)-ln(a));
   WEAKN=0;WEAKE=0;{const wk=F_.type==='learned'&&!q&&!S.sandbox?L.filter(isWeak):[];WEAKN=wk.length;wk.forEach(x=>WEAKE+=dustValue(x));
     if(!F2_.weak&&WEAKN){const ws=new Set(wk);L=L.filter(x=>!ws.has(x));}}
   LIST=L;renderSort();
-  $('#found').textContent=LIST.length?('Найдено: '+LIST.length+(WEAKN&&!F2_.weak?' · слабых свёрнуто: '+WEAKN:'')):'';
+  $('#found').textContent=LIST.length?('Найдено: '+LIST.length+' · редкость — среди своего типа (активные и пассивные отдельно)'+(WEAKN&&!F2_.weak?' · слабых свёрнуто: '+WEAKN:'')):'';
   listEl.scrollTop=0;shown=0;listEl.innerHTML=LIST.length?'':'<p class="hint" style="padding:12px 0">'+(F_.type==='learned'?'Среди изученных таких нет. Новые чары выпадают в свитках и даются за уровень.':'Ничего не нашлось. Сбрось фильтры или поищи по-другому.')+'</p>';
   more();if(keep){while(shown<LIST.length&&listEl.scrollHeight<st+listEl.clientHeight+50)more();listEl.scrollTop=st;}}
 $('#fSort').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
@@ -2977,7 +2984,8 @@ function renderBuild(){
   const R=REACT[rkey(EL[CLS.p],EL[CLS.s])];const has=RESO_N[R.a]>0&&RESO_N[R.b]>0;
   $('#reacts').innerHTML=`<div class="react${has?' ok':''}"><span class="pair"><i style="--c:${ELEMENTS[R.a].hex}"></i><i style="--c:${ELEMENTS[R.b].hex}"></i></span><span><b>${R.name}</b> · ${ELEMENTS[R.a].name} + ${ELEMENTS[R.b].name}: ${R.desc}.${has?'':' Возьми в билд чары обеих стихий.'}</span></div>`;
   $('#sandbox').checked=S.sandbox;$('#autoBest').checked=!!S.autoBest;renderQuality();
-  const bp=buildPower();$('#bpow').textContent='Сила билда: '+Math.round(bp.all)+' (активные '+Math.round(bp.a)+', пассивные '+Math.round(bp.p)+'). Сила чары — условный урон в секунду с учётом перезарядки, маны, стихий и ранга.';}
+  $('#undoBuild').hidden=!(BUNDO&&BUNDO.cls===CLS.id);const bp=buildPower();$('#bpow').textContent='Сила билда: '+Math.round(bp.all)+' (активные '+Math.round(bp.a)+', пассивные '+Math.round(bp.p)+'). Сила чары — условный урон в секунду с учётом перезарядки, маны, стихий и ранга.';}
+$('#undoBuild').addEventListener('click',()=>{if(!BUNDO||BUNDO.cls!==CLS.id){BUNDO=null;renderBuild();return;}for(let i=0;i<8;i++)S.active[i]=BUNDO.a[i]??null;for(let i=0;i<42;i++)S.passive[i]=BUNDO.p[i]??null;BUNDO=null;onBuildChanged();renderBuild();toast('Билд возвращён');});
 $('#autoBest').addEventListener('change',e=>{S.autoBest=e.target.checked;saveSoon();toast(S.autoBest?'Сильные чары будут вставать сами':'Сильные чары — через плашку с вопросом');});
 $('#bestBuild').addEventListener('click',()=>{const r=applyBestBuild();toast(r.n?('Лучший билд: сила '+Math.round(r.before)+' → '+Math.round(r.after)+(r.before>0?' ('+(r.after>=r.before?'+':'')+pct(r.after/r.before-1)+'%)':'')):'Нет изученных чар для билда');});
 $('#upgYes').addEventListener('click',()=>{if(UPG==null)return;const sk=SKILLS[UPG],u=upgradeFor(sk);hideUpg();if(!u){toast('Уже не актуально');return;}applyUpgrade(sk,u);toast('«'+skName(sk)+'» вместо «'+skName(SKILLS[u.tgt])+'»');});
@@ -2993,12 +3001,12 @@ $('#slotsA').addEventListener('click',onSlotClick);$('#slotsP').addEventListener
 $('#sandbox').addEventListener('change',e=>{S.sandbox=e.target.checked;if(S.sandbox){const na=activeSlots(),np=passiveSlots(),all=classSkills().map(x=>x.id),uf=new Set(),ub=new Set();for(const a of [S.active,S.passive])for(const v of a)if(v!=null){uf.add(SKILLS[v].f);ub.add(SKILLS[v].bk);}
     const fillS=(arr,n,act)=>{const idx=[];for(let i=0;i<n;i++)if(arr[i]==null)idx.push(i);const got=pickDistinct(all.filter(id=>SKILLS[id].active===act),idx.length,act?uf:new Set(),ub);got.forEach((id,k)=>arr[idx[k]]=id);};fillS(S.active,na,true);fillS(S.passive,Math.min(np,12),false);}
     computeStats();recalcStats();onBuildChanged();renderBuild();toast(S.sandbox?'Тестовый режим: всё открыто':'Обычный режим: прогресс по уровням');});
-$('#randBuild').addEventListener('click',()=>{const na=activeSlots(),np=passiveSlots();const L=classSkills().filter(s=>isLearned(s.id));const A_=L.filter(s=>s.active).map(s=>s.id),P_=L.filter(s=>!s.active).map(s=>s.id);
+$('#randBuild').addEventListener('click',()=>{snapBuild();const na=activeSlots(),np=passiveSlots();const L=classSkills().filter(s=>isLearned(s.id));const A_=L.filter(s=>s.active).map(s=>s.id),P_=L.filter(s=>!s.active).map(s=>s.id);
   const pick=(arr,n)=>pickDistinct(arr,n);
   const a=pick(A_,na),p=pick(P_,np);for(let i=0;i<8;i++)S.active[i]=i<a.length?a[i]:null;for(let i=0;i<42;i++)S.passive[i]=i<p.length?p[i]:null;onBuildChanged();toast('Собран билд: '+(a.length+p.length)+' чар');});
 let clearArm=0;
 $('#clearBuild').addEventListener('click',e=>{const b=e.currentTarget;if(!clearArm){b.textContent='Точно снять все?';clearArm=setTimeout(()=>{clearArm=0;b.textContent='Снять всё';},3000);return;}
-  clearTimeout(clearArm);clearArm=0;b.textContent='Снять всё';S.active.fill(null);S.passive.fill(null);onBuildChanged();toast('Билд пуст');});
+  clearTimeout(clearArm);clearArm=0;b.textContent='Снять всё';snapBuild();S.active.fill(null);S.passive.fill(null);onBuildChanged();toast('Билд пуст');});
 const QMODES=[['auto','Авто'],['high','Высокая'],['mid','Средняя'],['low','Низкая']];
 function renderQuality(){$('#qChips').innerHTML=QMODES.map(([k,l])=>chip(l,SAVE.q===k,`data-q="${k}"`)).join('');
   $('#qHint').textContent=({auto:'Начинает с высокой и сама снижает, если телефон не тянет.',high:'Свечение, тени, полное разрешение.',mid:'Свечение без теней.',low:'Без свечения и теней, ниже разрешение.'})[SAVE.q]+' Сейчас: '+(Q.pp?'свечение':'без свечения')+', '+(Q.shadow?'тени':'без теней')+', масштаб '+pr.toFixed(2)+'.';}
@@ -3062,7 +3070,7 @@ function showTab(t){bookTab=t;$('#tabLib').classList.toggle('on',t==='lib');$('#
   $('#lib').hidden=t!=='lib';$('#build').hidden=t!=='build';$('#tal').hidden=t!=='tal';
   if(t==='lib')renderList();else if(t==='build')renderBuild();else renderTalents();}
 $('#tabLib').addEventListener('click',()=>showTab('lib'));$('#tabBuild').addEventListener('click',()=>showTab('build'));$('#tabTal').addEventListener('click',()=>showTab('tal'));
-function openBook(tab,p){bookOpen=true;input.attack=false;input.jx=input.jy=0;joyId=null;mouseId=null;input.mouseAttack=false;input.moveTo=null;joy.classList.remove('on');aimSt=null;hideAim();
+function openBook(tab,p){bookOpen=true;hideUpg();input.attack=false;input.jx=input.jy=0;joyId=null;mouseId=null;input.mouseAttack=false;input.moveTo=null;joy.classList.remove('on');aimSt=null;hideAim();
   $('#book').hidden=false;$('#bkTitle').textContent=CLS.name;syncPause();if(p&&p.type)F_.type='learned';F_.el=-1;F_.form=-1;setPending(p||null);renderFilters();showTab(tab||'lib');}
 function closeBook(){bookOpen=false;closeSheet();setPending(null);$('#book').hidden=true;syncPause();save();}
 $('#bkClose').addEventListener('click',closeBook);
