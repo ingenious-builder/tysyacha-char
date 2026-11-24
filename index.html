@@ -3158,7 +3158,7 @@ function renderQuality(){$('#qChips').innerHTML=QMODES.map(([k,l])=>chip(l,SAVE.
   $('#qHint').textContent=({auto:'Начинает с высокой и сама снижает, если телефон не тянет.',high:'Свечение, тени, полное разрешение.',mid:'Свечение без теней.',low:'Без свечения и теней, ниже разрешение.'})[SAVE.q]+' Сейчас: '+(Q.pp?'свечение':'без свечения')+', '+(Q.shadow?'тени':'без теней')+', масштаб '+pr.toFixed(2)+'.';}
 {const sh=()=>{$('#botV').textContent=botAdj()+' px';};sh();const st=d=>{try{localStorage.setItem('tcBot',String(Math.max(0,Math.min(120,botAdj()+d))));}catch(e){}sh();resize();};$('#botM').onclick=()=>st(-8);$('#botP').onclick=()=>st(8);}
 $('#qChips').addEventListener('click',e=>{const b=e.target.closest('[data-q]');if(!b)return;SAVE.q=b.dataset.q;applyQuality(true);renderQuality();save();});
-function applyQuality(reset){const q=SAVE.q;
+function applyQuality(reset){const q=/[?&]test=1(&|$)/.test(location.search)?"low":SAVE.q;
   if(q==='high'||(q==='auto'&&reset)){Q.pp=true;Q.shadow=true;pr=PR_MAX;}else if(q==='mid'){Q.pp=true;Q.shadow=false;pr=Math.min(PR_MAX,1.25);}else if(q==='low'){Q.pp=false;Q.shadow=false;pr=Math.min(PR_MAX,1);}
   moon.castShadow=Q.shadow;renderer.setPixelRatio(pr);resize();}
 
