@@ -1,4 +1,6 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"><meta name="theme-color" content="#0d1120"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Тысяча чар"><meta name="application-name" content="Тысяча чар"><meta name="description" content="Тысяча чар — action-RPG в браузере: 20 героев, 10 стихий, 12 ущелий и кооператив на двоих."><link rel="manifest" href="manifest.webmanifest"><link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png"><link rel="apple-touch-icon" href="icons/apple-touch-icon.png"><style>:root{color-scheme:light;box-sizing:border-box}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"><meta name="theme-color" content="#0d1120"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Тысяча чар"><meta name="application-name" content="Тысяча чар"><meta name="description" content="Тысяча чар — action-RPG в браузере: 20 героев, 10 стихий, 12 ущелий и кооператив на двоих."><link rel="manifest" href="manifest.webmanifest"><link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png"><link rel="apple-touch-icon" href="icons/apple-touch-icon.png"><style>:root{color-scheme:light;box-sizing:border-box}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}.sk::after{display:none;position:absolute;right:4px;top:2px;z-index:5;font:700 11px/1 var(--f-ui);color:#fff;background:rgba(8,10,22,.8);border-radius:5px;padding:2px 4px;pointer-events:none}
+html.kb .sk::after{display:block;content:attr(data-k)}html.pad .sk::after{display:block;content:attr(data-g)}
+</style></head><body>
 <title>Тысяча чар</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,7 +26,7 @@
   --f-ui:'Rubik', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   color-scheme:dark;
   --sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px);--sal:env(safe-area-inset-left,0px);--sar:env(safe-area-inset-right,0px);
-  --m:12px;--bs:48px;--ab:84px;--gp:8px;
+  --u:1;--m:calc(12px * var(--u));--bs:calc(48px * var(--u));--ab:calc(84px * var(--u));--gp:8px;
 }
 html{height:100%;box-sizing:border-box;background:var(--night)}
 html,body{position:fixed;top:0;left:0;right:0;bottom:0;width:100%}
@@ -370,6 +372,132 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 @media (max-height:420px){#mpHint{bottom:calc(var(--sab) + 70px)}}
 @media (max-width:520px){.coop-modes{grid-template-columns:minmax(0,1fr)}}
 
+/* ---- планшет (iPad): крупнее и шире; включается из JS (uiScale) при min-сторона ≥ 600 и грубом указателе ---- */
+html[data-ui=tab]{--gp:calc(10px * var(--u))}
+html[data-ui=tab] #stats{width:clamp(250px,30vw,400px);gap:12px;padding:8px 14px 8px 8px;border-radius:18px}
+html[data-ui=tab] .lv{width:58px;height:58px;font-size:25px}
+html[data-ui=tab] .bars{gap:6px}
+html[data-ui=tab] .bar{height:17px;border-radius:9px}
+html[data-ui=tab] .bar.xp{height:6px}
+html[data-ui=tab] .bar b{font-size:13px;line-height:17px}
+html[data-ui=tab] .res{font-size:15px;gap:7px}html[data-ui=tab] .res svg{width:15px;height:15px}
+html[data-ui=tab] .tbtn{height:58px;min-width:58px;font-size:17px;padding:0 20px;border-radius:16px;gap:10px}
+html[data-ui=tab] .tbtn svg{width:26px;height:26px}
+html[data-ui=tab] .tbtn small,html[data-ui=tab] #kills{font-size:14px}
+html[data-ui=tab] .nb{min-width:24px;height:24px;font-size:13px;line-height:24px;border-radius:12px}
+html[data-ui=tab] #topc{width:min(440px,36vw);gap:8px}
+html[data-ui=tab] #bossbar b{font-size:20px}html[data-ui=tab] #bossbar .bar{height:14px}
+html[data-ui=tab] #threat,html[data-ui=tab] #gprog{font-size:14px;padding:7px 14px;border-radius:12px}
+html[data-ui=tab] #threat .bar,html[data-ui=tab] #gprog .bar{width:130px;height:7px}
+html[data-ui=tab] #zoneTag{font-size:19px;padding:7px 16px}html[data-ui=tab] #zoneTag small{font-size:14px}
+html[data-ui=tab] #atk svg{width:calc(40px * var(--u));height:calc(40px * var(--u))}
+html[data-ui=tab] .sk svg{width:calc(26px * var(--u));height:calc(26px * var(--u))}
+html[data-ui=tab] .sk .t{font-size:calc(15px * var(--u))}
+html[data-ui=tab] .sk .eb{width:20px;height:20px}html[data-ui=tab] .sk .eb svg{width:13px;height:13px}
+html[data-ui=tab] .sk .mb{font-size:11px}
+html[data-ui=tab] #joy{width:calc(100px * var(--u));height:calc(100px * var(--u));margin:calc(-50px * var(--u)) 0 0 calc(-50px * var(--u));
+  left:calc(var(--m) * 2 + 50px * var(--u) + var(--sal));top:calc(100% - var(--m) * 2 - 50px * var(--u) - var(--sab))}
+html[data-ui=tab] #knob{width:calc(56px * var(--u));height:calc(56px * var(--u));margin:calc(-28px * var(--u)) 0 0 calc(-28px * var(--u))}
+html[data-ui=tab] #pad{right:calc(var(--m) * 2 + var(--sar));bottom:calc(var(--m) * 2 + var(--sab))}
+html[data-ui=tab] .fl{font-size:20px}
+html[data-ui=tab] #toast{font-size:18px;padding:12px 22px;border-radius:14px;top:calc(var(--m) + var(--sat) + 150px);max-width:min(720px,calc(100% - 32px))}
+html[data-ui=tab] #banner b{font-size:clamp(40px,6vw,68px)}html[data-ui=tab] #banner span{font-size:20px}
+html[data-ui=tab] #mpCard{width:clamp(200px,24vw,280px);padding:8px 13px 9px;top:calc(var(--m) + var(--sat) + 84px * var(--u))}
+html[data-ui=tab] #mpCard b{font-size:17px}html[data-ui=tab] #mpCard div{font-size:14px}html[data-ui=tab] #mpCard .bar{height:11px}
+html[data-ui=tab] #mpCombo{font-size:24px;top:calc(var(--m) + var(--sat) + 64px)}
+html[data-ui=tab] #mpHint{font-size:18px;padding:11px 22px;bottom:calc(var(--sab) + 28px * var(--u) + 84px * var(--u) * 2.6)}
+@media (orientation:portrait){
+  html[data-ui=tab] #topc{top:calc(var(--sat) + var(--m) + 104px);width:min(520px,calc(100% - 40px))}
+  html[data-ui=tab] #toast{top:calc(var(--sat) + 270px)}
+  html[data-ui=tab] #mpCard{top:calc(var(--sat) + 210px)}
+  html[data-ui=tab] #mpCombo{top:calc(var(--sat) + var(--m) + 110px)}
+  html[data-ui=tab] #mpHint{bottom:calc(var(--sab) + 460px)}
+}
+/* выбор героя */
+html[data-ui=tab] #select{grid-template-columns:minmax(400px,34vw) 1fr minmax(400px,36vw)}
+html[data-ui=tab] .sel-left{padding:20px 20px 20px max(24px,env(safe-area-inset-left,0px));gap:14px}
+html[data-ui=tab] .sel-right{padding:20px max(24px,env(safe-area-inset-right,0px)) 20px 20px;gap:14px}
+html[data-ui=tab] .sel-title h1{font-size:44px}html[data-ui=tab] .sel-title p{font-size:16px}
+html[data-ui=tab] .classes{gap:10px}
+html[data-ui=tab] .cls{padding:10px 3px 9px;font-size:14px;gap:5px;border-radius:15px;min-height:88px}
+html[data-ui=tab] .cls .ico{width:46px;height:46px}html[data-ui=tab] .cls .ico svg{width:26px;height:26px}html[data-ui=tab] .cls .lvb{font-size:12px}
+html[data-ui=tab] .si-top .ico{width:68px;height:68px}html[data-ui=tab] .si-top .ico svg{width:36px;height:36px}
+html[data-ui=tab] .si-top h2{font-size:32px}html[data-ui=tab] .si-top p{font-size:15px}
+html[data-ui=tab] .si-desc{font-size:17px}html[data-ui=tab] .si-rolebar,html[data-ui=tab] .si-nums,html[data-ui=tab] .si-hint,html[data-ui=tab] .si-prog{font-size:15px}
+html[data-ui=tab] .si-stat{font-size:15px;grid-template-columns:96px 1fr}html[data-ui=tab] .si-stat .bar{height:8px}
+html[data-ui=tab] .si-sig div{font-size:16px}html[data-ui=tab] .si-sig .ico{width:36px;height:36px}html[data-ui=tab] .si-sig .ico svg{width:20px;height:20px}
+html[data-ui=tab] .sel-btns{gap:10px}html[data-ui=tab] .sel-btns .btn{height:56px;font-size:18px}
+html[data-ui=tab] .rchip{font-size:15px;padding:7px 12px}
+@media (orientation:portrait){
+  html[data-ui=tab] #select{grid-template-columns:minmax(0,1fr);grid-template-rows:auto 1fr auto}
+  html[data-ui=tab] .sel-left{padding:22px max(24px,env(safe-area-inset-right,0px)) 26px max(24px,env(safe-area-inset-left,0px))}
+  html[data-ui=tab] .classes{grid-template-columns:repeat(7,minmax(0,1fr));grid-auto-flow:row;grid-auto-columns:auto;overflow-x:hidden;overflow-y:auto;touch-action:pan-y;max-height:34vh}
+  html[data-ui=tab] .sel-right{max-height:58vh;padding:26px max(24px,env(safe-area-inset-right,0px)) 20px max(24px,env(safe-area-inset-left,0px));display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:30px;row-gap:12px;grid-auto-flow:row dense;align-content:start}
+  html[data-ui=tab] .si-top,html[data-ui=tab] .si-els,html[data-ui=tab] .si-desc,html[data-ui=tab] .si-rolebar,html[data-ui=tab] .si-nums{grid-column:1}
+  html[data-ui=tab] .si-stats,html[data-ui=tab] .si-sig,html[data-ui=tab] .si-prog{grid-column:2;display:grid}
+  html[data-ui=tab] .si-stats{grid-row:1/span 2}
+  html[data-ui=tab] .sel-btns,html[data-ui=tab] .si-hint{grid-column:1/-1}
+  html[data-ui=tab] .sel-btns{grid-template-columns:repeat(2,minmax(0,1fr))}
+  html[data-ui=tab] .sel-btns .big,html[data-ui=tab] .sel-btns #selPlay{grid-column:1/-1}
+}
+/* экраны-карточки */
+html[data-ui=tab] .ov-card{max-width:680px;gap:18px}
+html[data-ui=tab] .ov h1{font-size:clamp(48px,8vw,76px)}
+html[data-ui=tab] .ov p{font-size:18px}
+html[data-ui=tab] .big{height:64px;font-size:21px;min-width:260px;border-radius:16px}
+html[data-ui=tab] .ghost{height:54px;font-size:17px;padding:0 26px;border-radius:14px}
+html[data-ui=tab] .btn{height:52px;font-size:17px;padding:0 20px;border-radius:13px}
+html[data-ui=tab] .ov input[type=text],html[data-ui=tab] .ov input[type=search]{height:60px;font-size:21px;width:min(420px,100%)}
+html[data-ui=tab] #lvlup .ov-card,html[data-ui=tab] #gorges .ov-card,html[data-ui=tab] #win .ov-card{max-width:940px}
+html[data-ui=tab] .cards{gap:16px}html[data-ui=tab] .card{padding:20px 14px;gap:10px}
+html[data-ui=tab] .card .ico{width:72px;height:72px}html[data-ui=tab] .card .ico svg{width:38px;height:38px}
+html[data-ui=tab] .card b{font-size:20px}html[data-ui=tab] .card small,html[data-ui=tab] .card .var{font-size:15px}html[data-ui=tab] .card .tag{font-size:13px}
+html[data-ui=tab] .glist{grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px}
+html[data-ui=tab] .grow{padding:14px 16px;min-height:64px}html[data-ui=tab] .grow b{font-size:26px;width:36px}html[data-ui=tab] .grow span{font-size:17px}html[data-ui=tab] .grow small{font-size:14px}
+html[data-ui=tab] .coop-modes{width:min(640px,100%);gap:12px}html[data-ui=tab] .coop-mode{padding:16px;min-height:88px}
+html[data-ui=tab] .coop-mode b{font-size:21px}html[data-ui=tab] .coop-mode small{font-size:15px}
+html[data-ui=tab] .coop-players,html[data-ui=tab] .coop-link{width:min(560px,100%)}
+html[data-ui=tab] .coop-link{height:56px;font-size:17px!important}
+html[data-ui=tab] .coop-pl{padding:14px 16px}html[data-ui=tab] .coop-pl b{font-size:19px}html[data-ui=tab] .coop-pl span{font-size:16px}
+html[data-ui=tab] .coop-wait{font-size:17px}
+/* книга чар */
+html[data-ui=tab] .bk-head{padding:12px 20px;gap:14px}
+html[data-ui=tab] .bk-title{font-size:30px}
+html[data-ui=tab] .tabs{padding:4px;border-radius:15px}
+html[data-ui=tab] .tab{height:50px;padding:0 22px;font-size:17px;border-radius:12px}
+html[data-ui=tab] .x{width:54px;height:54px;border-radius:15px}html[data-ui=tab] .x svg{width:24px;height:24px}
+html[data-ui=tab] #pendingBar{padding:12px 20px;font-size:17px}html[data-ui=tab] #pendingBar button{height:44px;padding:0 18px;font-size:16px}
+html[data-ui=tab] .filters{padding:14px 20px;gap:10px}
+html[data-ui=tab] #q{height:54px;font-size:18px;max-width:640px}
+html[data-ui=tab] .chip{height:44px;padding:0 16px;font-size:16px;border-radius:22px}
+html[data-ui=tab] .chip svg{width:20px;height:20px}html[data-ui=tab] .chip .dot{width:12px;height:12px}
+html[data-ui=tab] .found{font-size:15px}
+html[data-ui=tab] .list{padding:0 20px 24px;grid-template-columns:repeat(auto-fill,minmax(400px,1fr));gap:10px}
+html[data-ui=tab] .row{padding:11px 14px;gap:14px;min-height:72px;border-radius:14px}
+html[data-ui=tab] .ico{width:50px;height:50px}html[data-ui=tab] .ico svg{width:28px;height:28px}
+html[data-ui=tab] .nm{font-size:18px}html[data-ui=tab] .nm i{font-size:15px}html[data-ui=tab] .meta{font-size:14px}html[data-ui=tab] .badge{font-size:13px}
+html[data-ui=tab] .bd{padding:20px}
+html[data-ui=tab] .bd-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,400px),1fr));gap:20px 34px}
+html[data-ui=tab] .bd h3,html[data-ui=tab] .branch h3{font-size:23px}
+html[data-ui=tab] .hint{font-size:16px}
+html[data-ui=tab] .slots{grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:10px}
+html[data-ui=tab] .rchip,html[data-ui=tab] .react{font-size:16px}
+html[data-ui=tab] .react{padding:10px 14px}
+html[data-ui=tab] .toggle{font-size:16px}html[data-ui=tab] .toggle input{width:26px;height:26px}
+html[data-ui=tab] .bd-actions{gap:12px}
+html[data-ui=tab] .tl-pts{font-size:26px}
+html[data-ui=tab] .branches{grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:22px}
+html[data-ui=tab] .node{padding:12px 14px;gap:14px}html[data-ui=tab] .node .nt b{font-size:17px}html[data-ui=tab] .node .nt span{font-size:14px}html[data-ui=tab] .node .pts{font-size:14px}
+html[data-ui=tab] .plus{width:56px;height:56px;font-size:28px;border-radius:14px}
+html[data-ui=tab] .vchip{padding:11px 14px;font-size:15px;min-height:44px;border-radius:11px}
+html[data-ui=tab] .vars{gap:8px}
+html[data-ui=tab] #sheet{align-items:center}
+html[data-ui=tab] .sh{max-width:600px;padding:24px;gap:16px;border-radius:22px}
+html[data-ui=tab] .sh-top .ico{width:68px;height:68px}html[data-ui=tab] .sh-top h2{font-size:27px}html[data-ui=tab] .sh-top p{font-size:15px}
+html[data-ui=tab] .lead{font-size:18px}html[data-ui=tab] .note{font-size:16px}html[data-ui=tab] .rank{font-size:16px}
+html[data-ui=tab] .stats{grid-template-columns:repeat(auto-fit,minmax(110px,1fr))}html[data-ui=tab] .stats div{font-size:13px;padding:10px 12px}html[data-ui=tab] .stats b{font-size:20px}
+html[data-ui=tab] .tagc{font-size:13px;padding:3px 10px}
+html[data-ui=tab] .sh-act .btn{min-width:150px}
 </style>
 
 <div id="app">
@@ -835,7 +963,7 @@ let RESO=new Array(10).fill(1),RESO_N=new Array(10).fill(0);
 const app=$('#app'),canvas=$('#c');
 const renderer=new THREE.WebGLRenderer({canvas,antialias:false,powerPreference:'high-performance'});
 const isGL2=renderer.capabilities.isWebGL2;
-const PR_MAX=Math.min(window.devicePixelRatio||1,1.5);
+let UI_U=1,PR_MAX=Math.min(window.devicePixelRatio||1,1.5);
 let pr=PR_MAX;renderer.setPixelRatio(pr);
 renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFShadowMap;
 const scene=new THREE.Scene();
@@ -2155,7 +2283,7 @@ AIX.b_heart=(en,dt,dx,dz,dist,sp)=>{
 // =====================================================================
 let spawnT=1,ambT=0,mode='select';
 let MPon=false,MPH=false,MPG=false;const MP={role:null,peer:null,coop:false,combo:0,comboT:0,peerId:null,ping:0,nick:''};
-const input={jx:0,jy:0,attack:false,keys:{},moveTo:null,mouseAttack:false};
+const input={gx:0,gy:0,jx:0,jy:0,attack:false,keys:{},moveTo:null,mouseAttack:false};
 const camYaw=Math.PI/4,camPitch=1.06;
 const camT=new THREE.Vector3();
 function updatePlayer(dt){
@@ -2165,6 +2293,7 @@ function updatePlayer(dt){
   let mx=input.jx,my=input.jy;const K=input.keys;
   const kx=(K.KeyD||K.ArrowRight?1:0)-(K.KeyA||K.ArrowLeft?1:0),ky=(K.KeyS||K.ArrowDown?1:0)-(K.KeyW||K.ArrowUp?1:0);
   if(kx||ky){mx=kx;my=ky;const l=Math.hypot(mx,my);mx/=l;my/=l;}
+  else if(input.gx||input.gy){mx=input.gx;my=input.gy;}
   const len=Math.min(1,Math.hypot(mx,my)),spd=P.speed*(P.slowT>0?.6:1)*(WHIRLS.length?1.1:1);
   const fx_=-Math.sin(camYaw),fz=-Math.cos(camYaw),rx=-fz,rz=fx_;
   let moving=false;
@@ -2499,8 +2628,8 @@ function updateAim(){if(!aimSt||!aimSt.on||P.dead){hideAim();return;}const A=aim
 const tgtRing=new THREE.Mesh(FXG.ring,new THREE.MeshBasicMaterial({color:0xf2c46b,transparent:true,opacity:.85,depthWrite:false}));tgtRing.visible=false;scene.add(tgtRing);
 function updateTargetRing(){const t=target&&!target.dead&&mode==='game'?target:null;tgtRing.visible=!!t;if(t){tgtRing.position.set(t.pos.x,.09,t.pos.z);const s=t.r*1.7;tgtRing.scale.set(s,1,s);tgtRing.rotation.y=time*2;}}
 const ARC=[[110,175],[110,145],[110,115],[110,85],[168,175],[168,145],[168,115],[168,85]];
-for(let i=0;i<8;i++){const b=document.createElement('button');b.type='button';b.className='sk';const [r,a]=ARC[i];
-  b.style.setProperty('--x',(Math.cos(a*Math.PI/180)*r).toFixed(1)+'px');b.style.setProperty('--y',(-Math.sin(a*Math.PI/180)*r).toFixed(1)+'px');
+for(let i=0;i<8;i++){const b=document.createElement('button');b.type='button';b.className='sk';b.dataset.k=i+1;b.dataset.g=['LB','RB','LT','RT','X','Y','B','↑'][i];const [r,a]=ARC[i];
+  b.style.setProperty('--x','calc('+(Math.cos(a*Math.PI/180)*r).toFixed(1)+'px * var(--u))');b.style.setProperty('--y','calc('+(-Math.sin(a*Math.PI/180)*r).toFixed(1)+'px * var(--u))');
   pad.appendChild(b);SKB.push({b,id:-2,p:-1,t:'',low:null});
   b.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();
     const id=S.active[i];if(id==null){openBook('lib',{type:'active',index:i});return;}
@@ -2561,7 +2690,7 @@ canvas.addEventListener('pointerdown',e=>{
   if(x<r.width*.5&&joyId===null){joyId=e.pointerId;joyO={x,y};joy.style.left=x+'px';joy.style.top=y+'px';joy.classList.add('on');knob.style.transform='';}
   else{const en=enemyAtScreen(e.clientX,e.clientY,70);if(en){target=en;fxRing(en.pos.x,en.pos.z,.3,en.r*2,GOLD,.3,.8);}}});
 canvas.addEventListener('pointermove',e=>{
-  if(e.pointerId===joyId){const r=app.getBoundingClientRect();let dx=e.clientX-r.left-joyO.x,dy=e.clientY-r.top-joyO.y;const l=Math.hypot(dx,dy),mx=52;
+  if(e.pointerId===joyId){const r=app.getBoundingClientRect();let dx=e.clientX-r.left-joyO.x,dy=e.clientY-r.top-joyO.y;const l=Math.hypot(dx,dy),mx=52*UI_U;
     if(l>mx){dx*=mx/l;dy*=mx/l;}input.jx=dx/mx;input.jy=dy/mx;knob.style.transform=`translate(${dx}px,${dy}px)`;}
   else if(e.pointerId===mouseId&&!input.mouseAttack){const g=screenToGround(e.clientX,e.clientY);if(g)input.moveTo=g;}});
 function endPtr(e){if(e.pointerId===joyId){joyId=null;input.jx=input.jy=0;joy.classList.remove('on');joy.style.left='';joy.style.top='';knob.style.transform='';}
@@ -2571,9 +2700,11 @@ const atk=$('#atk');
 atk.addEventListener('pointerdown',e=>{e.preventDefault();input.attack=true;atk.classList.add('down');try{atk.setPointerCapture(e.pointerId);}catch(_){}});
 ['pointerup','pointercancel'].forEach(ev=>atk.addEventListener(ev,()=>{input.attack=false;atk.classList.remove('down');}));
 document.addEventListener('contextmenu',e=>e.preventDefault());
+let KB_SEEN=false;
 window.addEventListener('keydown',e=>{
   if(e.target&&e.target.tagName==='INPUT')return;
   if(mode!=='game')return;
+  if(!KB_SEEN&&/^(Key|Digit|Numpad|Arrow|Space|Tab)/.test(e.code)){KB_SEEN=true;document.documentElement.classList.add('kb');toast('Клавиатура: WASD — ход, Пробел — атака, 1–8 — чары, B — книга, T — таланты');}
   if(e.code==='KeyB'||e.code==='Tab'){e.preventDefault();bookOpen?closeBook():openBook('lib');return;}
   if(e.code==='KeyT'){e.preventDefault();bookOpen?closeBook():openBook('tal');return;}
   if(e.code==='Escape'&&bookOpen){closeBook();return;}
@@ -2782,14 +2913,28 @@ $('#heroBtn').addEventListener('click',toSelect);
 let paused=true,last=performance.now(),perfAcc=0,perfN=0,perfGood=0,W=1,H=1,saveClock=0;
 function syncPause(){paused=mode!=='game'||(!MPon&&(bookOpen||luOpen))||!$('#dead').hidden||!$('#win').hidden;}
 function fitApp(){const sa=navigator.standalone||matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches;const els=[document.documentElement,document.body,app];if(!sa){els.forEach(x=>{x.style.height='';x.style.bottom='';});return;}const h=Math.round(Math.min(innerHeight,window.visualViewport?visualViewport.height+visualViewport.offsetTop:innerHeight));els.forEach(x=>{x.style.bottom='auto';x.style.height=h+'px';});}
-function resize(){fitApp();W=app.clientWidth;H=app.clientHeight;renderer.setSize(W,H,false);camera.aspect=W/H;camera.fov=W<H?56:42;camera.updateProjectionMatrix();makeRT();
+function uiScale(){const mn=Math.min(innerWidth,innerHeight),tab=mn>=600&&matchMedia('(pointer:coarse)').matches;const u=tab?Math.min(1.5,Math.max(1.2,mn/520)):1;if(u!==UI_U||document.documentElement.dataset.ui!==(tab?'tab':'')){UI_U=u;document.documentElement.dataset.ui=tab?'tab':'';document.documentElement.style.setProperty('--u',u.toFixed(2));}}
+function prCap(){const c=Math.min(window.devicePixelRatio||1,1.5,Math.max(1,Math.sqrt(3.1e6/Math.max(1,innerWidth*innerHeight))));if(Math.abs(c-PR_MAX)>.01){PR_MAX=c;if(pr>PR_MAX){pr=PR_MAX;renderer.setPixelRatio(pr);}}}
+function resize(){uiScale();prCap();fitApp();W=app.clientWidth;H=app.clientHeight;renderer.setSize(W,H,false);camera.aspect=W/H;camera.fov=W<H?56:42;camera.updateProjectionMatrix();makeRT();
   }
 window.addEventListener('resize',resize);window.addEventListener('orientationchange',()=>setTimeout(resize,250));if(/[?&]dbg=1/.test(location.search)){const d=document.createElement('div');d.style.cssText='position:fixed;left:4px;top:40%;z-index:99;background:#000c;color:#0f0;font:12px monospace;padding:4px;pointer-events:none';document.body.appendChild(d);setInterval(()=>{d.textContent='inner '+innerWidth+'x'+innerHeight+' screen '+screen.width+'x'+screen.height+' app '+app.clientWidth+'x'+app.clientHeight+' sa '+(navigator.standalone?1:0)+' top '+app.getBoundingClientRect().top;},500);}
 function perf(dt){perfAcc+=dt;perfN++;if(perfAcc<2)return;const fps=perfN/perfAcc;perfAcc=0;perfN=0;if(SAVE.q!=='auto')return;
   if(fps<44){perfGood=0;if(pr>1.01){pr=Math.max(1,pr-.25);renderer.setPixelRatio(pr);resize();}else if(Q.shadow){Q.shadow=false;moon.castShadow=false;}else if(Q.pp){Q.pp=false;}else if(pr>.75){pr=Math.max(.75,pr-.25);renderer.setPixelRatio(pr);resize();}}
   else if(fps>57){if(++perfGood>=3&&pr<PR_MAX&&(Q.pp||pr<1)){pr=Math.min(PR_MAX,pr+.25);renderer.setPixelRatio(pr);resize();perfGood=0;}}else perfGood=0;}
+const PAD={on:false,prev:[],atk:false},PAD_SLOT=[[4,0],[5,1],[6,2],[7,3],[2,4],[3,5],[1,6],[12,7]];
+function pollPad(){const gps=navigator.getGamepads?navigator.getGamepads():[];let g=null;for(const x of gps)if(x&&x.connected){g=x;break;}
+  if(!g){if(PAD.on){PAD.on=false;input.gx=input.gy=0;if(PAD.atk){PAD.atk=false;input.attack=false;}}return;}
+  if(!PAD.on){PAD.on=true;document.documentElement.classList.add('pad');}
+  let x=g.axes[0]||0,y=g.axes[1]||0;const l=Math.hypot(x,y);if(l<.22)x=y=0;else{const k=Math.min(1,(l-.22)/.78)/l;x*=k;y*=k;}
+  input.gx=x;input.gy=y;const b=i=>!!(g.buttons[i]&&g.buttons[i].pressed),edge=i=>b(i)&&!PAD.prev[i];
+  if(mode==='game'){
+    if(edge(9)){if(bookOpen)closeBook();else if(!luOpen)openBook('lib');}
+    else if(bookOpen){if(edge(1))closeBook();if(PAD.atk){PAD.atk=false;input.attack=false;}input.gx=input.gy=0;}
+    else if(!luOpen){const a=b(0);if(a!==PAD.atk){PAD.atk=a;input.attack=a;}for(const [i,sl] of PAD_SLOT)if(edge(i))trySlot(sl,true);}
+  }
+  PAD.prev=g.buttons.map(v=>v.pressed);}
 function loop(now){
-  requestAnimationFrame(loop);
+  requestAnimationFrame(loop);pollPad();
   const dt=Math.min(.05,(now-last)/1000);last=now;
   if(bookOpen&&!MPon)return;
   if(!WARMED&&mode==='game')warmMobs();
