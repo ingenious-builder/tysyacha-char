@@ -48,7 +48,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 .bar.mp i{background:var(--mp)}
 .bar.xp{height:4px}
 .bar.xp i{background:var(--gold)}
-.bar b{position:absolute;inset:0;font:500 10px/12px var(--f-ui);text-align:center;font-variant-numeric:tabular-nums;text-shadow:0 1px 2px #000}
+.bar b{position:absolute;inset:0;overflow:hidden;white-space:nowrap;font:500 10px/12px var(--f-ui);text-align:center;font-variant-numeric:tabular-nums;text-shadow:0 1px 2px #000}
 .res{display:flex;align-items:center;gap:5px;font:500 11px/1 var(--f-ui);color:var(--ess);font-variant-numeric:tabular-nums}
 .res svg{width:11px;height:11px;flex:none}
 
@@ -79,7 +79,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 #atk svg{width:40px;height:40px}
 #atk.down{transform:scale(.93);background-color:rgba(60,70,110,.85)}
 .sk{position:relative;width:var(--bs);height:var(--bs);border-radius:50%;padding:0;
-  border:2px solid var(--c,#fff);background:radial-gradient(circle at 40% 35%,color-mix(in srgb,var(--c,#fff) 55%,transparent),rgba(14,18,34,.9) 75%);
+  border:2px solid var(--c,#fff);background:radial-gradient(circle at 40% 35%,color-mix(in srgb,var(--c,#fff) 78%,#0e1222),color-mix(in srgb,var(--c,#fff) 38%,#0e1222) 85%);
   display:grid;place-items:center;overflow:hidden}
 .sk svg{width:26px;height:26px;position:relative;z-index:1;filter:drop-shadow(0 1px 1px #000)}
 .sk .cd{position:absolute;inset:0;border-radius:50%;background:conic-gradient(rgba(5,8,18,.8) calc(var(--p,0) * 360deg),transparent 0);z-index:2}
@@ -101,6 +101,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 #toast{position:absolute;left:50%;top:calc(var(--m) + var(--sat) + 124px);transform:translateX(-50%);max-width:calc(100% - 32px);padding:9px 16px;border-radius:12px;
   background:var(--panel);border:1px solid var(--line);font:500 14px var(--f-ui);text-align:center;opacity:0;transition:opacity .25s;pointer-events:none}
 #toast.on{opacity:1}
+#app:has(#banner.on) #toast{opacity:0!important}
 #banner{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);width:max-content;max-width:calc(100% - 32px);text-align:center;pointer-events:none;opacity:0;transition:opacity .4s}
 #banner.on{opacity:1}
 #banner b{display:block;font:700 clamp(28px,7vw,46px)/1.1 var(--f-display);color:var(--gold);text-shadow:0 2px 12px rgba(0,0,0,.8);text-wrap:balance}
@@ -219,10 +220,14 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 .row{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:8px 10px;border-radius:12px;border:1px solid transparent;background:rgba(255,255,255,.035)}
 .row.eq{border-color:rgba(242,196,107,.45);background:rgba(242,196,107,.07)}
 .row.locked{opacity:.5}
-.ico{flex:none;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;border:2px solid var(--c);background:radial-gradient(circle at 40% 35%,color-mix(in srgb,var(--c) 50%,transparent),#0e1222 75%)}
+.ico{flex:none;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;border:2px solid var(--c);background:radial-gradient(circle at 40% 35%,color-mix(in srgb,var(--c) 78%,#0e1222),color-mix(in srgb,var(--c) 38%,#0e1222) 85%)}
 .ico svg{width:22px;height:22px}
 .ico.p{border-radius:11px}
 .ico,.slot{position:relative}
+.eb{position:absolute;left:-3px;top:-3px;width:17px;height:17px;border-radius:50%;background:#0b0e1c;border:1px solid var(--c);display:grid;place-items:center;z-index:4;pointer-events:none}
+.eb svg{width:11px;height:11px}
+.sk .eb{left:3px;top:3px;border:0;background:rgba(8,10,22,.7);width:15px;height:15px}
+.sk .eb svg{width:10px;height:10px}
 .mb{position:absolute;right:-3px;bottom:-3px;min-width:15px;padding:1px 3px;border-radius:7px;background:rgba(8,10,22,.88);border:1px solid rgba(255,233,168,.55);color:#ffe9a8;font:700 10px/1.25 var(--f-ui);font-style:normal;text-align:center;z-index:4;pointer-events:none}
 .sk .mb{right:5px;bottom:3px;border:0;background:rgba(8,10,22,.75);font-size:9px;min-width:0;padding:0 2px}
 .vars{display:flex;flex-wrap:wrap;gap:5px}
@@ -462,6 +467,7 @@ const randi=(a,b)=>Math.floor(rand(a,b+1));
 const clamp=(v,a,b)=>v<a?a:v>b?b:v;
 const lerp=(a,b,t)=>a+(b-a)*t;
 const cap=s=>s[0].toUpperCase()+s.slice(1);
+const big=n=>{n=Math.round(n);return n>=1e9?(n/1e9).toFixed(1).replace('.0','')+' млрд':n>=1e6?(n/1e6).toFixed(1).replace('.0','')+' млн':n>=1e5?Math.round(n/1e3)+' тыс':String(n);};
 const fmt=n=>n>=100?Math.round(n).toString():n>=10?n.toFixed(0):n.toFixed(1).replace('.0','');
 const pickW=arr=>{let t=0;for(const a of arr)t+=a[1];let r=Math.random()*t;for(const a of arr){r-=a[1];if(r<=0)return a[0];}return arr[0][0];};
 
@@ -579,7 +585,9 @@ for(let e=0;e<10;e++)for(let f=0;f<NF;f++)for(let m=0;m<NM;m++){
 const sid=(e,f,m)=>EL[e]*PER_EL+FORM[f]*NM+MOD[m];
 const skName=sk=>sk.base+' · '+sk.M.name;
 const MODG=['+','»','×3','◎','♥','✸','✦','≈'];
-const modBadge=sk=>`<i class="mb" title="${sk.M.name}">${MODG[sk.m]}</i>`;
+const ELG={fire:'<path d="M12 3c1 4 5 6 5 11a5 5 0 0 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-6 1-10z"/>',ice:'<path d="M12 3v18M4 7.5l16 9M20 7.5l-16 9"/>',storm:'<path d="M13 2L5 14h6l-1 8 8-12h-6z"/>',poison:'<path d="M12 3c4 5 6 8 6 11a6 6 0 0 1-12 0c0-3 2-6 6-11z"/>',shadow:'<path d="M17 3a9 9 0 1 0 4 14 7 7 0 0 1-4-14z"/>',light:'<circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/>',earth:'<path d="M2 20L9 7l4 7 3-4 6 10z"/>',wind:'<path d="M3 8h11a3 3 0 1 0-3-3M3 13h15a3 3 0 1 1-3 3M3 18h7"/>',blood:'<path d="M12 2c3 4 6 7 6 11a6 6 0 0 1-12 0c0-4 3-7 6-11z"/>',arcane:'<path d="M12 2l3 7 7 3-7 3-3 7-3-7-7-3 7-3z"/>'};
+const elBadge=sk=>{const c=sk.E.hex;return '<i class="eb" style="--c:'+c+'"><svg viewBox="0 0 24 24" fill="'+c+'" fill-opacity=".35" stroke="'+c+'" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">'+ELG[sk.E.id]+'</svg></i>';};
+const modBadge=sk=>elBadge(sk)+`<i class="mb" title="${sk.M.name}">${MODG[sk.m]}</i>`;
 const skLead=sk=>sk.F.how+', '+sk.E.short+'.';
 
 const rkey=(a,b)=>a<b?a*16+b:b*16+a;
@@ -1286,9 +1294,13 @@ function dropLoot(en){const tot=Math.max(1,Math.round(en.xp*.55));const n=en.bos
   for(let i=0;i<n;i++)dropItem('ess',en.pos.x,en.pos.z,Math.max(1,Math.round(tot/n)));
   const sc=en.boss?3:en.champ?2:Math.random()<(en.elite?.45:.04)?1:0;for(let i=0;i<sc;i++)dropItem('scroll',en.pos.x,en.pos.z);
   if(en.boss||en.elite||Math.random()<.1)dropItem('hp',en.pos.x,en.pos.z);}
+const formSlot=sk=>{if(!sk.active)return null;for(const v of S.active)if(v!=null&&v!==sk.id&&SKILLS[v].f===sk.f)return v;return null;};
+function pickDistinct(ids,n,usedF,usedB){const c=ids.slice(),r=[];for(let i=c.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[c[i],c[j]]=[c[j],c[i]];}
+  usedF=usedF||new Set();usedB=usedB||new Set();for(const id of c){if(r.length>=n)break;const k=SKILLS[id];if(usedF.has(k.f)||usedB.has(k.bk))continue;usedF.add(k.f);usedB.add(k.bk);r.push(id);}
+  for(const id of c){if(r.length>=n)break;const k=SKILLS[id];if(usedB.has(k.bk))continue;usedB.add(k.bk);r.push(id);}return r;}
 const baseSlot=sk=>{for(const a of [S.active,S.passive])for(const v of a)if(v!=null&&v!==sk.id&&SKILLS[v].bk===sk.bk)return v;return null;};
 function learn(id,autoEquip){if(!LEARNED.has(id)){LEARNED.add(id);S.learned.push(id);}
-  if(autoEquip&&!EQUIPPED.has(id)&&baseSlot(SKILLS[id])==null){const sk=SKILLS[id],arr=sk.active?S.active:S.passive,n=sk.active?activeSlots():passiveSlots();const idx=arr.findIndex((v,i)=>i<n&&v==null);if(idx>=0)arr[idx]=id;}
+  if(autoEquip&&!EQUIPPED.has(id)&&baseSlot(SKILLS[id])==null&&formSlot(SKILLS[id])==null){const sk=SKILLS[id],arr=sk.active?S.active:S.passive,n=sk.active?activeSlots():passiveSlots();const idx=arr.findIndex((v,i)=>i<n&&v==null);if(idx>=0)arr[idx]=id;}
   onBuildChanged();saveSoon();}
 function unlearnedPool(){const a=[];CLS.pool.forEach(id=>{if(!LEARNED.has(id))a.push(SKILLS[id]);});return a;}
 // свитки и выбор уровня: сначала новые базы чар (а не ещё один вариант уже известной), чары ядра класса втрое чаще
@@ -2280,7 +2292,7 @@ function setTxt(el,key,val){if(hudCache[key]!==val){hudCache[key]=val;el.textCon
 function updateHud(){
   hpI.style.transform='scaleX('+(Math.max(0,P.hp)/P.maxHp).toFixed(3)+')';shI.style.transform='scaleX('+Math.min(1,P.shield/P.maxHp).toFixed(3)+')';
   mpI.style.transform='scaleX('+(P.mp/P.maxMp).toFixed(3)+')';xpI.style.transform='scaleX('+(S.xp/xpNeed(S.lvl)).toFixed(3)+')';
-  setTxt(hpT,'hp',Math.ceil(Math.max(0,P.hp))+' / '+P.maxHp+(P.shield>0?' +'+Math.ceil(P.shield):''));setTxt(mpT,'mp',Math.floor(P.mp)+' / '+P.maxMp);setTxt(lvNum,'lv',String(S.lvl));
+  setTxt(hpT,'hp',big(Math.ceil(Math.max(0,P.hp)))+' / '+big(P.maxHp)+(P.shield>0?' +'+big(Math.ceil(P.shield)):''));setTxt(mpT,'mp',big(Math.floor(P.mp))+' / '+big(P.maxMp));setTxt(lvNum,'lv',String(S.lvl));
   setTxt(killsEl,'k',S.kills+' побед');setTxt(essT,'e',S.ess+' эссенции');
   const hb=!!BOSS,gm=PLAY==='gorge',hk=hb+'|'+gm;if(hudCache.hk!==hk){hudCache.hk=hk;bossbar.hidden=!hb;threatEl.hidden=hb||gm;gprogEl.hidden=hb||!gm;}
   if(gm&&GZ)gI.style.transform='scaleX('+GZ.prog.toFixed(3)+')';
@@ -2455,9 +2467,11 @@ function onSlotClick(e){const b=e.target.closest('.slot');if(!b)return;const kin
   if(arr[i]==null){setPending({type:kind==='a'?'active':'passive',index:i});F_.type='learned';renderFilters();showTab('lib');return;}
   openSheet(arr[i]);}
 $('#slotsA').addEventListener('click',onSlotClick);$('#slotsP').addEventListener('click',onSlotClick);
-$('#sandbox').addEventListener('change',e=>{S.sandbox=e.target.checked;computeStats();recalcStats();onBuildChanged();renderBuild();toast(S.sandbox?'Тестовый режим: всё открыто':'Обычный режим: прогресс по уровням');});
+$('#sandbox').addEventListener('change',e=>{S.sandbox=e.target.checked;if(S.sandbox){const na=activeSlots(),np=passiveSlots(),all=classSkills().map(x=>x.id),uf=new Set(),ub=new Set();for(const a of [S.active,S.passive])for(const v of a)if(v!=null){uf.add(SKILLS[v].f);ub.add(SKILLS[v].bk);}
+    const fillS=(arr,n,act)=>{const idx=[];for(let i=0;i<n;i++)if(arr[i]==null)idx.push(i);const got=pickDistinct(all.filter(id=>SKILLS[id].active===act),idx.length,act?uf:new Set(),ub);got.forEach((id,k)=>arr[idx[k]]=id);};fillS(S.active,na,true);fillS(S.passive,Math.min(np,12),false);}
+    computeStats();recalcStats();onBuildChanged();renderBuild();toast(S.sandbox?'Тестовый режим: всё открыто':'Обычный режим: прогресс по уровням');});
 $('#randBuild').addEventListener('click',()=>{const na=activeSlots(),np=passiveSlots();const L=classSkills().filter(s=>isLearned(s.id));const A_=L.filter(s=>s.active).map(s=>s.id),P_=L.filter(s=>!s.active).map(s=>s.id);
-  const pick=(arr,n)=>{const c=arr.slice(),sb=new Set(),r=[];for(let i=c.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[c[i],c[j]]=[c[j],c[i]];}for(const id of c){if(r.length>=n)break;const b=SKILLS[id].bk;if(sb.has(b))continue;sb.add(b);r.push(id);}return r;};
+  const pick=(arr,n)=>pickDistinct(arr,n);
   const a=pick(A_,na),p=pick(P_,np);for(let i=0;i<8;i++)S.active[i]=i<a.length?a[i]:null;for(let i=0;i<42;i++)S.passive[i]=i<p.length?p[i]:null;onBuildChanged();toast('Собран билд: '+(a.length+p.length)+' чар');});
 let clearArm=0;
 $('#clearBuild').addEventListener('click',e=>{const b=e.currentTarget;if(!clearArm){b.textContent='Точно снять все?';clearArm=setTimeout(()=>{clearArm=0;b.textContent='Снять всё';},3000);return;}
