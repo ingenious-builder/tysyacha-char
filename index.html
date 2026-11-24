@@ -27,12 +27,13 @@
   --m:12px;--bs:48px;--ab:84px;--gp:8px;
 }
 html{height:100%;box-sizing:border-box;background:var(--night)}
+html,body{position:fixed;top:0;left:0;right:0;bottom:0;width:100%}
 *,*::before,*::after{box-sizing:inherit}
 body{height:100%;margin:0;overflow:hidden;background:var(--night);color:var(--text);font-family:var(--f-ui);
   -webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;overscroll-behavior:none;-webkit-touch-callout:none}
 button{font:inherit;color:inherit;cursor:pointer}
 button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
-#app{position:relative;width:100%;height:100%;overflow:hidden;touch-action:none}
+#app{position:fixed;top:0;left:0;right:0;bottom:0;overflow:hidden;touch-action:none}
 #c{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
 #hud{position:absolute;inset:0;pointer-events:none}
 #hud button{pointer-events:auto;touch-action:none}
@@ -2769,9 +2770,10 @@ $('#heroBtn').addEventListener('click',toSelect);
 // =====================================================================
 let paused=true,last=performance.now(),perfAcc=0,perfN=0,perfGood=0,W=1,H=1,saveClock=0;
 function syncPause(){paused=mode!=='game'||(!MPon&&(bookOpen||luOpen))||!$('#dead').hidden||!$('#win').hidden;}
-function resize(){W=app.clientWidth;H=app.clientHeight;renderer.setSize(W,H,false);camera.aspect=W/H;camera.fov=W<H?56:42;camera.updateProjectionMatrix();makeRT();
+function fitApp(){const sa=navigator.standalone||matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches;if(!sa){app.style.height='';app.style.bottom='';return;}const port=innerHeight>=innerWidth,sh=port?Math.max(screen.height,screen.width):Math.min(screen.height,screen.width);const h=Math.max(innerHeight,document.documentElement.clientHeight,sh);app.style.bottom='auto';app.style.height=h+'px';}
+function resize(){fitApp();W=app.clientWidth;H=app.clientHeight;renderer.setSize(W,H,false);camera.aspect=W/H;camera.fov=W<H?56:42;camera.updateProjectionMatrix();makeRT();
   }
-window.addEventListener('resize',resize);
+window.addEventListener('resize',resize);window.addEventListener('orientationchange',()=>setTimeout(resize,250));if(/[?&]dbg=1/.test(location.search)){const d=document.createElement('div');d.style.cssText='position:fixed;left:4px;top:40%;z-index:99;background:#000c;color:#0f0;font:12px monospace;padding:4px;pointer-events:none';document.body.appendChild(d);setInterval(()=>{d.textContent='inner '+innerWidth+'x'+innerHeight+' screen '+screen.width+'x'+screen.height+' app '+app.clientWidth+'x'+app.clientHeight+' sa '+(navigator.standalone?1:0)+' top '+app.getBoundingClientRect().top;},500);}
 function perf(dt){perfAcc+=dt;perfN++;if(perfAcc<2)return;const fps=perfN/perfAcc;perfAcc=0;perfN=0;if(SAVE.q!=='auto')return;
   if(fps<44){perfGood=0;if(pr>1.01){pr=Math.max(1,pr-.25);renderer.setPixelRatio(pr);resize();}else if(Q.shadow){Q.shadow=false;moon.castShadow=false;}else if(Q.pp){Q.pp=false;}else if(pr>.75){pr=Math.max(.75,pr-.25);renderer.setPixelRatio(pr);resize();}}
   else if(fps>57){if(++perfGood>=3&&pr<PR_MAX&&(Q.pp||pr<1)){pr=Math.min(PR_MAX,pr+.25);renderer.setPixelRatio(pr);resize();perfGood=0;}}else perfGood=0;}
