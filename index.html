@@ -160,6 +160,10 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 .si-sig .ico svg{width:15px;height:15px}
 .si-sig span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .si-prog{margin:0;font-size:12px;color:var(--gold)}
+.si-mast{display:grid;gap:5px;padding:9px 11px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.04);font-size:12px;color:var(--muted)}
+.si-mast p{margin:0}.si-mast b{color:var(--gold)}.sm-h{display:flex;justify-content:space-between;color:var(--gold);font-size:13px}
+.si-mast .bar{height:7px;border-radius:4px;background:rgba(255,255,255,.1);overflow:hidden}.si-mast .bar i{display:block;height:100%;background:var(--c,#f2c46b);transform-origin:left}
+.si-mast.fr1{border-color:#9aa6c0}.si-mast.fr2{border-color:#f2c46b}.si-mast.fr3{border-color:#ffd86b;box-shadow:0 0 12px rgba(255,216,107,.5)}
 .sel-right .big{width:100%}
 .si-hint{margin:0;font-size:12px;color:var(--muted);line-height:1.4}
 .si-rolebar{margin:0;font-size:12px;color:var(--muted)}
@@ -910,9 +914,9 @@ const AFFIX=[['fire','Огненный'],['fast','Быстрый'],['armor','Б�
 const SAVE_KEY='tysyacha-char-v3';
 let SAVE={cur:null,q:'auto',chars:{}};
 function loadSave(hot){let d=hot&&hot.SAVE?hot.SAVE:null;if(!d){try{const raw=localStorage.getItem(SAVE_KEY);if(raw)d=JSON.parse(raw);}catch(e){}}
-  if(d&&d.chars&&typeof d.chars==='object'){SAVE.cur=CLASS_BY[d.cur]?d.cur:null;SAVE.q=['auto','high','mid','low'].includes(d.q)?d.q:'auto';SAVE.chars=d.chars;SAVE.camp=window.TCCF?(d.camp&&typeof d.camp==='object'?d.camp:null):null;}}
-let CLS=null,S=null,LEARNED=new Set(),EQUIPPED=new Set();
-function newChar(c){const s={lvl:1,xp:0,kills:0,ess:0,learned:[],ranks:{},talents:{},active:Array(8).fill(null),passive:Array(42).fill(null),sandbox:false,auto:false,bosses:0,gorge:0};
+  if(d&&d.chars&&typeof d.chars==='object'){SAVE.cur=CLASS_BY[d.cur]?d.cur:null;SAVE.q=['auto','high','mid','low'].includes(d.q)?d.q:'auto';SAVE.chars={};for(const id in d.chars){if(CLASS_BY[id])SAVE.chars[id]=validChar(d.chars[id],CLASS_BY[id]);}SAVE.camp=window.TCCF?(d.camp&&typeof d.camp==='object'?d.camp:null):null;}}
+let CLS=null,S=null,LEARNED=new Set(),EQUIPPED=new Set(),BOOK=new Set();
+function newChar(c){const s={lvl:1,xp:0,kills:0,ess:0,learned:[],ranks:{},talents:{},active:Array(8).fill(null),passive:Array(42).fill(null),sandbox:false,auto:false,bosses:0,gorge:0,mx:0,book:[],runs:0,mig:0};
   s.active[0]=sid(c.p,c.pa[0],'swift');s.active[1]=sid(c.s,c.sa[0],'mighty');
   s.passive[0]=sid(c.p,c.pp[0],'huge');
   s.learned=[...s.active,...s.passive].filter(v=>v!=null);return s;}
@@ -922,6 +926,13 @@ function validChar(d,c){if(!d||!Array.isArray(d.active)||!Array.isArray(d.passiv
   for(let i=0;i<8;i++){const v=d.active[i];s.active[i]=(v!=null&&c.pool.has(v)&&SKILLS[v].active)?v:null;}
   for(let i=0;i<42;i++){const v=d.passive[i];s.passive[i]=(v!=null&&c.pool.has(v)&&!SKILLS[v].active)?v:null;}
   const seenB=new Set();for(const a of [s.active,s.passive])for(let i=0;i<a.length;i++){if(a[i]==null)continue;const b=SKILLS[a[i]].bk;if(seenB.has(b))a[i]=null;else seenB.add(b);}
+  s.mx=Math.max(0,+d.mx||0);s.runs=d.runs|0;s.mig=d.mig|0;
+  if(d.mx==null){ // старое сохранение: уровень и опыт переходят в мастерство, изученное - в Книгу чар
+    const L0=clamp(d.lvl|0,1,99);let tot=Math.max(0,+d.xp||0);for(let l=1;l<L0;l++)tot+=xpNeed(l);
+    s.mx=Math.round(tot*.5+(Math.max(0,d.ess|0))/10);s.book=[...s.learned];s.mig=L0>1?L0:0;
+    const f=newChar(c);s.lvl=1;s.xp=0;s.ess=0;s.ranks={};s.talents={};s.active=f.active;s.passive=f.passive;s.learned=f.learned;
+    for(const id of f.learned)if(!s.book.includes(id))s.book.push(id);
+  }else{s.book=Array.isArray(d.book)?[...new Set(d.book.filter(v=>c.poolAll.has(v)))]:[...s.learned];for(const id of s.learned)if(!s.book.includes(id))s.book.push(id);}
   return s;}
 let saveTimer=0;
 function save(){if(CLS&&S){SAVE.chars[CLS.id]=S;SAVE.cur=CLS.id;}try{localStorage.setItem(SAVE_KEY,JSON.stringify(SAVE));}catch(e){}}
@@ -937,8 +948,22 @@ function equippedIds(){const a=[];const na=activeSlots(),np=passiveSlots();
   for(let i=0;i<np;i++)if(S.passive[i]!=null)a.push(S.passive[i]);return a;}
 const xpNeed=l=>Math.round(30*Math.pow(l,1.45));
 const lvlScale=()=>1+.12*(S.lvl-1);
+// ---- мастерство героя: постоянное, растёт от опыта всех забегов ----
+const MAST_MAX=25,mastCum=n=>60*n*n+360*n;
+function mastLvlOf(xp){let n=0;while(n<MAST_MAX&&xp>=mastCum(n+1))n++;return n;}
+const mastLvl=()=>mastLvlOf(S.mx);
+const mastB=()=>Math.min(10,mastLvl());
+const mastTp=()=>{const l=mastLvl();return (l>=5?1:0)+(l>=15?1:0);};
+const startPicks=()=>{const l=mastLvl();return (l>=10?1:0)+(l>=20?1:0);};
+const bookOn=()=>mastLvl()>=4;
+const MAST_MS=[[2,'аура героя'],[4,'Книга чар: знакомые чары чаще выпадают'],[5,'+1 очко талантов на старте забега'],[8,'рамка портрета'],[10,'стартовая чара на выбор'],[12,'цвет плаща'],[15,'ещё +1 очко талантов на старте'],[20,'вторая стартовая чара на выбор'],[25,'титул «Мастер» и золотая рамка']];
+const mastTitle=l=>l>=25?'Мастер':l>=20?'Знаток':l>=10?'Адепт':l>=4?'Ученик':'Новичок';
+const mastFrame=l=>l>=25?3:l>=8?(l>=15?2:1):0;
+function mastAdd(v){if(!S||!(v>0))return;const o=mastLvl();S.mx+=v;const n=mastLvl();if(n>o)mastUp(o,n);}
+function mastUp(o,n){computeStats();recalcStats();applyCosmetics();const ms=MAST_MS.filter(m=>m[0]>o&&m[0]<=n).map(m=>m[1]);
+  banner('Мастерство '+n,ms.length?'Открыто: '+ms.join(' · '):(n<=10?'+1% урона и здоровья навсегда':'Мастерство растёт'));saveSoon();}
 const T=id=>S.talents[id]||0;
-const tpTotal=()=>S.lvl-1+(S.sandbox?30:0);
+const tpTotal=()=>S.lvl-1+mastTp()+(S.sandbox?30:0);
 const tpSpent=()=>Object.values(S.talents).reduce((a,b)=>a+(b|0),0);
 const tpFree=()=>Math.max(0,tpTotal()-tpSpent());
 const branchPts=b=>TALENTS.filter(t=>t.b===b).reduce((a,t)=>a+T(t.id),0);
@@ -946,8 +971,8 @@ const rk=id=>S.ranks[id]||1;
 const rankCost=r=>Math.round(25*Math.pow(r,1.7));
 const ST={};
 function computeStats(){
-  ST.dmg=1+.06*T('power');ST.cdr=1-.04*T('cdr');ST.crit=.05+.04*T('crit');ST.resoPer=.03+.01*T('reso');ST.react=1+.25*T('react');
-  ST.hpMul=1+.1*T('vit');ST.armor=(1-.05*T('armor'))*(CLS.armor||1);ST.regen=2*T('regen');ST.leech=.02*T('leech');ST.wrath=1+.2*T('wrath');
+  ST.dmg=(1+.06*T('power'))*(1+.01*mastB());ST.cdr=1-.04*T('cdr');ST.crit=.05+.04*T('crit');ST.resoPer=.03+.01*T('reso');ST.react=1+.25*T('react');
+  ST.hpMul=(1+.1*T('vit'))*(1+.01*mastB());ST.armor=(1-.05*T('armor'))*(CLS.armor||1);ST.regen=2*T('regen');ST.leech=.02*T('leech');ST.wrath=1+.2*T('wrath');
   ST.mana=1+.1*T('mana');ST.summDmg=1+.2*T('summ');ST.summMax=3+T('summ');ST.luck=.03*T('luck');ST.cascade=1+.15*T('cascade');ST.orbitN=T('orbit');ST.orbitDmg=1+.15*T('orbit');}
 const WRATH=new Set(['strike','blink','revenge','whirl']),CASC=new Set(['doom','aura','trail','trap']);
 function skDmg(sk){const f=sk.F.id;let m=1;if(WRATH.has(f))m=ST.wrath;else if(CASC.has(f))m=ST.cascade;else if(f==='summon')m=ST.summDmg;else if(f==='orbit')m=ST.orbitDmg;
@@ -1450,7 +1475,7 @@ function buildHero(L){
   scene.add(g);
   return {g,body,armL:AL.a,armR:AR.a,orb,halo,pool,cape,capeBase,shieldM,D,legs,rims,al:0,ar:0,fists:L.weapon==='fists'};
 }
-function rebuildHero(){if(hero){scene.remove(hero.g);hero.D.forEach(d=>d.dispose());hero.halo.material.dispose();hero.pool.material.dispose();hero.shieldM.material.dispose();}hero=buildHero(CLS.look);hero.g.position.copy(P.pos);heroColor(CLS.color);}
+function rebuildHero(){if(hero){scene.remove(hero.g);hero.D.forEach(d=>d.dispose());hero.halo.material.dispose();hero.pool.material.dispose();hero.shieldM.material.dispose();}hero=buildHero(CLS.look);hero.g.position.copy(P.pos);heroColor(CLS.color);applyCosmetics();}
 function heroColor(c){if(hero.rims)for(const u of hero.rims)u.value.copy(c).lerp(WHITE,.4);hero.orb.material.color.copy(c).lerp(WHITE,.3);hero.halo.material.color.copy(c);hero.pool.material.color.copy(c);if(hero.fists)hero.g.traverse(o=>{if(o.userData&&o.userData.fist)o.material.color.copy(c);});}
 
 // =====================================================================
@@ -1637,13 +1662,13 @@ function pickDistinct(ids,n,usedF,usedB){const c=ids.slice(),r=[];for(let i=c.le
   usedF=usedF||new Set();usedB=usedB||new Set();for(const id of c){if(r.length>=n)break;const k=SKILLS[id];if(usedF.has(k.f)||usedB.has(k.bk))continue;usedF.add(k.f);usedB.add(k.bk);r.push(id);}
   for(const id of c){if(r.length>=n)break;const k=SKILLS[id];if(usedB.has(k.bk))continue;usedB.add(k.bk);r.push(id);}return r;}
 const baseSlot=sk=>{for(const a of [S.active,S.passive])for(const v of a)if(v!=null&&v!==sk.id&&SKILLS[v].bk===sk.bk)return v;return null;};
-function learn(id,autoEquip){if(!LEARNED.has(id)){LEARNED.add(id);S.learned.push(id);}
+function learn(id,autoEquip){if(!LEARNED.has(id)){LEARNED.add(id);S.learned.push(id);}if(!BOOK.has(id)){BOOK.add(id);S.book.push(id);}
   if(autoEquip&&!EQUIPPED.has(id)&&baseSlot(SKILLS[id])==null&&formSlot(SKILLS[id])==null){const sk=SKILLS[id],arr=sk.active?S.active:S.passive,n=sk.active?activeSlots():passiveSlots();const idx=arr.findIndex((v,i)=>i<n&&v==null);if(idx>=0)arr[idx]=id;}
   onBuildChanged();saveSoon();}
 function unlearnedPool(){const a=[];CLS.pool.forEach(id=>{if(!LEARNED.has(id))a.push(SKILLS[id]);});return a;}
 // свитки и выбор уровня: сначала новые базы чар (а не ещё один вариант уже известной), чары ядра класса втрое чаще
 function rollPool(){const all=unlearnedPool(),lb=new Set();LEARNED.forEach(id=>lb.add(SKILLS[id].bk));const nb=all.filter(s=>!lb.has(s.bk));return nb.length&&Math.random()<.9?nb:all;}
-function wpick(c){let t=0;const w=c.map(s=>CLS.core.has(s.bk)?3:1);for(const x of w)t+=x;let r=Math.random()*t;for(let i=0;i<c.length;i++){r-=w[i];if(r<=0)return c[i];}return c[0];}
+function wpick(c){let t=0;const bk=bookOn(),w=c.map(s=>(CLS.core.has(s.bk)?3:1)*(bk&&BOOK.has(s.id)?2.5:1));for(const x of w)t+=x;let r=Math.random()*t;for(let i=0;i<c.length;i++){r-=w[i];if(r<=0)return c[i];}return c[0];}
 function learnRandom(){const pool=rollPool();
   if(!pool.length||S.sandbox){S.ess+=60;toast('Свиток рассыпался в 60 эссенции');return;}
   const sk=wpick(pool);learn(sk.id,true);fxPillar(P.pos.x,P.pos.z,.8,5,GOLD,.7);colBurst(GOLD,P.pos.x,1.2,P.pos.z,20,4,.7,-2);
@@ -1737,11 +1762,46 @@ function hurtPlayer(d,src,o){o=o||{};if(P.dead||P.invulnT>0)return;let dmg=d*ST.
   if(P.hp<=0)die();}
 function shieldBurst(){const sk=P.shieldSk;P.shield=0;hero.shieldM.visible=false;if(!sk)return;P.shieldSk=null;const R=skR(sk);aoe(P.pos,3.6*R,P.shieldDmg*1.3,sk.e,{sk,depth:0,knockFrom:P.pos.clone()});novaFx(sk,P.pos.x,P.pos.z,3.6*R);}
 let luQueue=0,luDelay=0;
-function gainXp(x){S.xp+=x;let up=0;while(S.xp>=xpNeed(S.lvl)){S.xp-=xpNeed(S.lvl);S.lvl++;up++;}
+function gainXp(x){mastAdd(x*.5);S.xp+=x;let up=0;while(S.xp>=xpNeed(S.lvl)){S.xp-=xpNeed(S.lvl);S.lvl++;up++;}
   if(up){recalcStats();P.hp=P.maxHp;P.mp=P.maxMp;onBuildChanged();
     banner('Уровень '+S.lvl,'+'+up+' очк'+(up===1?'о':'а')+' талантов · слотов: '+activeSlots()+' + '+passiveSlots());
     fxPillar(P.pos.x,P.pos.z,1.2,7,GOLD,.9);fxRing(P.pos.x,P.pos.z,.5,5,GOLD,.7);colBurst(GOLD,P.pos.x,1,P.pos.z,40,5,1,-1);
     if(!S.sandbox){luQueue+=up;luDelay=1.1;}saveSoon();}}
+// =====================================================================
+// ЗАБЕГ: уровень, таланты, ранги и билд живут только в забеге
+// =====================================================================
+let RUN={on:false,kind:'',key:0,won:false,snap:null,keep:false};
+const RUNF=['lvl','xp','ess','ranks','talents','active','passive','learned'];
+const startLvlFor=el=>Math.max(1,el-2);
+function runSnap(fresh){const o={fresh:!!fresh};for(const k of RUNF)o[k]=JSON.parse(JSON.stringify(S[k]));return JSON.stringify(o);}
+function runRestore(js){const o=JSON.parse(js);for(const k of RUNF)S[k]=o[k];LEARNED=new Set(S.learned);return o;}
+function autoTalents(){const ord=[0,1,0,1,2];let n=tpTotal()-tpSpent()-mastTp(),g=0;
+  while(n>0&&g++<200){let done=false;for(let q=0;q<ord.length&&!done;q++){const b=ord[(g+q)%ord.length];
+    const list=TALENTS.filter(t=>t.b===b);for(let k=0;k<list.length;k++){const t=list[k];if(T(t.id)<t.max&&branchPts(b)>=k*2){S.talents[t.id]=T(t.id)+1;n--;done=true;break;}}}
+    if(!done)break;}}
+function runFresh(l0){const f=newChar(CLS);S.lvl=1;S.xp=0;S.ess=0;S.ranks={};S.talents={};
+  if(!S.sandbox){S.active=f.active;S.passive=f.passive;S.learned=f.learned;}
+  LEARNED=new Set(S.learned);for(const id of S.learned)if(!BOOK.has(id)){BOOK.add(id);S.book.push(id);}
+  computeStats();EQUIPPED=new Set(equippedIds());
+  if(!S.sandbox)for(let l=2;l<=l0;l++){S.lvl=l;const pool=rollPool();if(pool.length)learn(wpick(pool).id,true);}
+  S.lvl=Math.max(1,l0);if(!S.sandbox)autoTalents();S.ess=40*(S.lvl-1);}
+function runApply(){computeStats();recalcStats();P.hp=P.maxHp;P.mp=P.maxMp;onBuildChanged();luQueue=0;luOpen=false;$('#lvlup').hidden=true;}
+function runPicks(fresh){if(fresh&&!S.sandbox){const n=startPicks();if(n){luQueue+=n;luDelay=1.6;}}}
+function beginRun(kind,key,el){
+  if(RUN.keep){RUN.keep=false;if(RUN.on)return;}
+  const cont=RUN.on&&kind!=='world'&&RUN.kind===kind;
+  if(cont&&RUN.key===key&&RUN.snap){const o=runRestore(RUN.snap);RUN.won=false;runApply();runPicks(o.fresh);return;}
+  if(cont&&RUN.won&&key===RUN.key+1){RUN.snap=runSnap(false);RUN.key=key;RUN.won=false;return;}
+  S.runs=(S.runs|0)+1;runFresh(kind==='world'?1:startLvlFor(el));runApply();
+  RUN={on:true,kind,key,won:false,snap:runSnap(true),keep:false};runPicks(true);}
+function runWon(){RUN.won=true;}
+function runEnd(){RUN.on=false;RUN.snap=null;}
+// косметика мастерства: аура (2), цвет плаща (12)
+function applyCosmetics(){if(!hero||!S)return;const l=mastLvl();
+  if(hero.auraM){hero.g.remove(hero.auraM);hero.auraM=null;}
+  if(l>=2){const col=l>=25?0xf2c46b:CLS.color,m=new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:.5,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide}),
+    ring=new THREE.Mesh(new THREE.RingGeometry(.75,.9,28).rotateX(-Math.PI/2),m);ring.position.y=.06;hero.g.add(ring);hero.auraM=ring;hero.D.push(ring.geometry,m);}
+  if(hero.cape&&CLS.look.cape!=null){const base=new THREE.Color(CLS.look.cape);if(l>=12){base.lerp(new THREE.Color(l>=20?0xf2c46b:CLS.look.c2),l>=20?.55:.4);}hero.cape.material.color.copy(base);}}
 function bossDown(en){S.bosses++;threat=0;BOSS=null;banner(en.t.name+' повержен','Подбери свитки и эссенцию');shake=.8;saveSoon();}
 function spawnBoss(){if(BOSS)return;const C=mpSpawnCenter(),zb=WBOSS[zoneOf(C.x,C.z)],tid=zb[randi(0,zb.length-1)];const a=Math.atan2(-C.z,-C.x)+rand(-.8,.8);const x=C.x+Math.cos(a)*13,z=C.z+Math.sin(a)*13;
   const lv=mpLvl()+1+zoneOf(C.x,C.z)*2;BOSS=spawnEnemy(tid,x,z,lv);BOSS.skillCd=2.5;
@@ -2553,7 +2613,7 @@ function buildGorge(g,camp){clearGorge();const th=GT[g-1],tier=Math.min(2,Math.f
   D.push(ring.geometry,ringM,inner.geometry,inM,sm);
   GZ.portal={pg,ring,ringM,inM,w:toWorld(gcx(pz),pz)};
   gorgeGroup.rotation.y=camYaw+Math.PI;gorgeGroup.visible=true;}
-function startGorge(g,camp){SAVE.chars[CLS.id]=S;SAVE.cur=CLS.id;save();mode='game';PLAY='gorge';
+function startGorge(g,camp){SAVE.chars[CLS.id]=S;SAVE.cur=CLS.id;beginRun(camp?'camp':'gorge',camp?camp.k:g,camp?camp.lv:Math.max(1,g*2-1));save();mode='game';PLAY='gorge';
   for(const id of ['#select','#gorges','#win','#dead'])$(id).hidden=true;$('#hud').hidden=false;
   clearWorld();mpSeeded(g*7919+13,()=>buildGorge(g,camp));worldGroup.visible=false;const th=GZ.th;scene.fog.color.set(th.fog);scene.background.set(th.bg);setGorgeLight(th);
   const w=toWorld(gcx(3),3);P.pos.set(w.x,0,w.z);P.prev.copy(P.pos);if(MPon)mpStartPos();P.dead=false;hero.g.rotation.z=0;hero.g.position.y=0;P.hp=P.maxHp;P.mp=P.maxMp;
@@ -2587,15 +2647,15 @@ function updateGorge(dt){if(!GZ)return;const l=toLocal(P.pos.x,P.pos.z);GZ.prog=
   const pw=GZ.portal;pw.ring.rotation.z+=dt*(GZ.open?2.5:.3);
   if(GZ.open){pw.inM.opacity=.45+.15*Math.sin(time*4);if(Math.random()<.7){const a=rand(0,TAU),c=new THREE.Color(GZ.th.glow);emit(SPARK,pw.w.x+rand(-.8,.8),2.1+Math.sin(a)*1.5,pw.w.z+rand(-.8,.8),0,rand(.5,1.5),0,c,.9,-1,1);}
     if(!GZ.won&&Math.hypot(P.pos.x-pw.w.x,P.pos.z-pw.w.z)<2.4){if(GZ.camp)TCC.portal();else if(MPon)mpPortal();else gorgeWin();}}}
-function gorgeWin(){GZ.won=true;const g=GZ.g,first=g>(S.gorge|0);if(first)S.gorge=g;
+function gorgeWin(){GZ.won=true;runWon();const g=GZ.g,first=g>(S.gorge|0);if(first)S.gorge=g;
   const xp=Math.round(xpNeed(Math.max(1,S.lvl))*(first?.5:.25)),ess=30*g+(first?50*g:0),sc=first?2:1;
   gainXp(xp);S.ess+=ess;for(let i=0;i<sc;i++)learnRandom();save();
   $('#winTitle').textContent='Ущелье '+g+' пройдено';
   $('#winTxt').textContent='«'+GORGES[g-1]+'»'+(first?', впервые':'')+'. Награда: +'+xp+' опыта, +'+ess+' эссенции, свитков: '+sc+'.'+(g<12?' Открыто ущелье '+(g+1)+' «'+GORGES[g]+'».':' Это было последнее ущелье.');
   $('#banner').classList.remove('on');$('#toast').classList.remove('on');$('#winNext').hidden=g>=12;$('#win').hidden=false;if(MPon)mpWinUi();fxPillar(P.pos.x,P.pos.z,1.5,10,GOLD,1.2);syncPause();}
 function renderGorgeList(){const done=MP.pickGorge?Math.max(S.gorge|0,MP.peer?MP.peer.gorge|0:0):S.gorge|0;
-  $('#glist').innerHTML=GORGES.map((n,i)=>{const g=i+1,open=g<=done+1||S.sandbox,lv=Math.max(1,g*2-1);return `<button type="button" class="grow${g<=done?' done':''}" data-g="${g}" ${open?'':'disabled'}><b>${g}</b><span>${n}<small>враги ${lv} ур. · страж: ${MOBS[GT[i].boss].name} · ${g<=done?'пройдено':open?'доступно':'закрыто'}</small></span></button>`;}).join('');
-  $('#gSub').textContent=CLS.name+', уровень '+S.lvl+'. Двенадцать проходов между скалами: засады, элитные мобы и страж у выхода. Пройди ущелье, чтобы открыть следующее.';}
+  $('#glist').innerHTML=GORGES.map((n,i)=>{const g=i+1,open=g<=done+1||S.sandbox,lv=Math.max(1,g*2-1);return `<button type="button" class="grow${g<=done?' done':''}" data-g="${g}" ${open?'':'disabled'}><b>${g}</b><span>${n}<small>враги ${lv} ур. · старт ${startLvlFor(lv)} ур. · страж: ${MOBS[GT[i].boss].name} · ${g<=done?'пройдено':open?'доступно':'закрыто'}</small></span></button>`;}).join('');
+  $('#gSub').textContent=CLS.name+', мастерство '+mastLvl()+'. Каждое ущелье начинается с уровня по силе врагов (за два ниже), дальше забег идёт по цепочке. Двенадцать проходов между скалами: засады, элитные мобы и страж у выхода. Пройди ущелье, чтобы открыть следующее.';}
 function openGorges(){renderGorgeList();$('#gorges').hidden=false;}
 $('#glist').addEventListener('click',e=>{const b=e.target.closest('.grow');if(!b||b.disabled)return;if(MP.pickGorge&&MP.role==='host'){mpHostStart('gorge',+b.dataset.g);return;}startGorge(+b.dataset.g);});
 $('#gBack').addEventListener('click',()=>{$('#gorges').hidden=true;if(MP.pickGorge){MP.pickGorge=false;mpOpenLobby();}});
@@ -2665,7 +2725,7 @@ function updateHud(){
   hurtFlash=Math.max(0,hurtFlash-.03);const lowHp=P.hp/P.maxHp<.3?.35+.15*Math.sin(time*6):0;
   const ho=Math.max(hurtFlash,lowHp).toFixed(2);if(hudCache.ho!==ho){hudCache.ho=ho;hurtEl.style.opacity=ho;}}
 let toastT=0;
-function toast(t){const el=$('#toast');el.textContent=t;el.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('on'),1900);}
+function toast(t,ms){const el=$('#toast');el.textContent=t;el.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('on'),ms||1900);}
 let banT=0;
 function banner(b,s,red){$('#bannerB').textContent=b;$('#bannerS').textContent=s;const el=$('#banner');el.classList.toggle('red',!!red);el.classList.add('on');clearTimeout(banT);banT=setTimeout(()=>el.classList.remove('on'),2600);}
 let zoneT=0;
@@ -2724,7 +2784,13 @@ $('#reviveBtn').addEventListener('click',revive);$('#deadMenu').addEventListener
 // =====================================================================
 let selId=null,selFx=0;
 function diffDots(n){return '●'.repeat(n)+'○'.repeat(3-n);}
-function renderClasses(){$('#classes').innerHTML=CLASSES.map(c=>{const sv=SAVE.chars[c.id];return `<button type="button" class="cls${c.id===selId?' on':''}" data-c="${c.id}" style="--c:${c.hex}"><span class="ico" style="--c:${c.hex}">${svg(c.icon)}</span><span class="n">${c.name}</span><span class="lvb">${sv?'ур. '+(sv.lvl|0):' '}</span></button>`;}).join('');}
+function renderClasses(){$('#classes').innerHTML=CLASSES.map(c=>{const sv=SAVE.chars[c.id];return `<button type="button" class="cls${c.id===selId?' on':''}" data-c="${c.id}" style="--c:${c.hex}"><span class="ico" style="--c:${c.hex}">${svg(c.icon)}</span><span class="n">${c.name}</span><span class="lvb">${sv&&sv.mx?'М '+mastLvlOf(sv.mx):' '}</span></button>`;}).join('');}
+function mastHtml(c,sv){const mx=sv?sv.mx||0:0,l=mastLvlOf(mx),b=Math.min(10,l),lo=l?mastCum(l):0,hi=mastCum(Math.min(MAST_MAX,l+1)),f=l>=MAST_MAX?1:clamp((mx-lo)/Math.max(1,hi-lo),0,1);
+  const nx=MAST_MS.find(m=>m[0]>l),bk=sv&&sv.book?sv.book.filter(v=>c.pool.has(v)).length:0;
+  return `<div class="si-mast fr${mastFrame(l)}" style="--c:${c.hex}"><div class="sm-h"><b>Мастерство ${l}</b><span>${mastTitle(l)}</span></div><div class="bar"><i style="transform:scaleX(${f.toFixed(3)})"></i></div>
+  <p>${l?`Постоянный бонус: +${b}% урона и здоровья`+(b>=10?' (потолок)':''):'Растёт с каждым забегом этим героем'} · до уровня ${Math.min(MAST_MAX,l+1)}: ${l>=MAST_MAX?'максимум':Math.max(0,Math.ceil(hi-mx))+' оп.'}</p>
+  <p>${nx?`Следующая веха — уровень ${nx[0]}: <b>${nx[1]}</b>`:'Все вехи открыты'}</p>
+  <p>Книга чар: ${bk} из ${c.pool.size}${l>=4?' — эти чары чаще выпадают в забеге':' (откроется на 4 уровне мастерства)'} · забегов: ${sv?sv.runs|0:0} · побед ${sv?sv.kills|0:0}. Каждый заход начинается с 1-го уровня.</p></div>`;}
 function renderSelInfo(){const c=CLASS_BY[selId],sv=SAVE.chars[c.id],E1=ELEMENTS[EL[c.p]],E2=ELEMENTS[EL[c.s]];const R=REACT[rkey(EL[c.p],EL[c.s])];
   const stat=(n,v,mx)=>`<div class="si-stat" style="--c:${c.hex}">${n}<div class="bar"><i style="transform:scaleX(${clamp(v/mx,.08,1).toFixed(2)})"></i></div></div>`;
   const sig=[[c.p,c.pa[0]],[c.p,c.pa[2]],[c.s,c.sa[0]],[c.p,c.pp[0]]].map(([e,f])=>{const sk=SKILLS[sid(e,f,'mighty')];return `<div><span class="ico${sk.active?'':' p'}" style="--c:${sk.E.hex}">${svg(sk.F.id)}</span><span>${sk.base} — ${sk.F.role.toLowerCase()}</span></div>`;}).join('');
@@ -2734,18 +2800,18 @@ function renderSelInfo(){const c=CLASS_BY[selId],sv=SAVE.chars[c.id],E1=ELEMENTS
   <p class="si-rolebar">${ROLES[c.role]||''}</p><div class="si-nums"><span>Здоровье <b>${Math.round(120*c.hp)}</b></span><span>Мана <b>${Math.round(100*c.mp)}</b></span><span>Броня <b>${Math.round((1-(c.armor||1))*100)}%</b></span><span>Скорость <b>${Math.round(c.spd*100)}%</b></span></div>
   <div class="si-stats">${stat('Здоровье',c.hp,1.5)}${stat('Мана',c.mp,1.5)}${stat('Броня',(1-(c.armor||1))*100+8,28)}${stat('Скорость',c.spd,1.2)}</div>
   <div class="si-sig">${sig}</div>
-  <p class="si-prog">${sv?`Уровень ${sv.lvl|0} · побед ${sv.kills|0} · изучено ${(sv.learned||[]).filter(v=>c.pool.has(v)).length} из ${c.pool.size}`:`Новый герой · ${c.pairs.length} видов чар, ${c.pool.size} вариантов`}</p>
+  ${mastHtml(c,sv)}
   <div class="sel-btns">${MP.joinCode&&!MPon?`<button class="big" id="selJoin" type="button">Присоединиться к комнате ${MP.joinCode}</button>`:''}<button class="${MP.joinCode&&!MPon?'btn':'big'}" id="selPlay" type="button">Свободный мир</button><button class="btn" id="selGorge" type="button">Ущелья · пройдено ${(sv&&sv.gorge)|0} из 12</button><button class="btn coop" id="selCoop" type="button">${MP.role?'Вернуться в комнату':'Играть вместе'}</button><button class="ghost" id="selNick" type="button">Ник: ${esc(mpNick()||'—')} · сменить</button></div>
   <p class="si-hint">Слева — ходьба. Справа — атака и чары: тап колдует сам, потяни от кнопки — прицел. Красное на земле — уходи.</p>`;
   $('#selPlay').addEventListener('click',startGame);$('#selGorge').addEventListener('click',openGorges);$('#selCoop').addEventListener('click',mpOpenLobby);$('#selNick').addEventListener('click',()=>nickAsk(true));const jb=$('#selJoin');if(jb)jb.addEventListener('click',()=>mpJoin(MP.joinCode));}
 function selectClass(id){selId=id;setClass(id);renderClasses();renderSelInfo();selFx=.3;if(MP.peerId)mpHello();}
 $('#classes').addEventListener('click',e=>{const b=e.target.closest('.cls');if(b)selectClass(b.dataset.c);});
-function setClass(id){CLS=CLASS_BY[id];S=validChar(SAVE.chars[id],CLS);LEARNED=new Set(S.learned);computeStats();P.maxHp=0;P.maxMp=0;recalcStats();P.hp=P.maxHp;P.mp=P.maxMp;
+function setClass(id){CLS=CLASS_BY[id];S=validChar(SAVE.chars[id],CLS);LEARNED=new Set(S.learned);BOOK=new Set(S.book);computeStats();P.maxHp=0;P.maxMp=0;recalcStats();P.hp=P.maxHp;P.mp=P.maxMp;
   rebuildHero();syncAuto();onBuildChanged();}
-function startGame(){SAVE.chars[CLS.id]=S;SAVE.cur=CLS.id;save();mode='game';for(const id of ['#select','#gorges','#win','#dead'])$(id).hidden=true;$('#hud').hidden=false;clearWorld();exitGorge();P.face=0;hero.g.rotation.z=0;hero.g.position.y=0;P.hp=P.maxHp;P.mp=P.maxMp;hudCache.hk=null;
+function startGame(){SAVE.chars[CLS.id]=S;SAVE.cur=CLS.id;beginRun('world',0,1);save();mode='game';for(const id of ['#select','#gorges','#win','#dead'])$(id).hidden=true;$('#hud').hidden=false;clearWorld();exitGorge();P.face=0;hero.g.rotation.z=0;hero.g.position.y=0;P.hp=P.maxHp;P.mp=P.maxMp;hudCache.hk=null;
   if(MPon)mpStartPos();if(!MPG)for(let i=0;i<3;i++)spawnPack();zoneTag(0);syncPause();camT.set(P.pos.x,1.2,P.pos.z);
   fxPillar(0,0,1.2,7,CLS.color,1);colBurst(CLS.color,0,1,0,40,5,1,-1);toast(CLS.name+': '+CLS.pool.size+' чар класса, изучено '+LEARNED.size);}
-function toSelect(){if(MPon)mpLeaveGame();save();closeBook();mode='select';clearWorld();exitGorge();$('#hud').hidden=true;$('#select').hidden=false;for(const id of ['#gorges','#win','#dead'])$(id).hidden=true;hero.g.rotation.z=0;hero.g.position.y=0;selectClass(CLS.id);syncPause();if(NEWVER&&!MPon)location.reload();}
+function toSelect(){if(MPon)mpLeaveGame();runEnd();save();closeBook();mode='select';clearWorld();exitGorge();$('#hud').hidden=true;$('#select').hidden=false;for(const id of ['#gorges','#win','#dead'])$(id).hidden=true;hero.g.rotation.z=0;hero.g.position.y=0;selectClass(CLS.id);syncPause();if(NEWVER&&!MPon)location.reload();}
 let NEWVER=false;window.addEventListener('tc-newversion',()=>{NEWVER=true;if(mode==='select'&&!MPon)location.reload();else toast('Вышла новая версия — обновится, когда выйдешь в меню');});
 
 // =====================================================================
@@ -2759,7 +2825,7 @@ const knownBase=sk=>{for(const id of LEARNED)if(SKILLS[id].bk===sk.bk)return tru
 function cardStat(sk){return sk.active?`${fmt(skDmg(sk))} урона · ${skMana(sk)} маны · ${fmt(skCd(sk))} с`:`${fmt(skDmg(sk))} урона · пассивная`;}
 function openLevelUp(){const ch=rollChoices();if(!ch.length){luQueue=0;return;}luOpen=true;syncPause();
   $('#luTitle').textContent='Уровень '+S.lvl;$('#luSub').textContent='Выбери новые чары. Если есть свободный слот, они сразу встанут в билд.'+(tpFree()?' Очков талантов: '+tpFree()+'.':'');
-  $('#luCards').innerHTML=ch.map(sk=>`<button type="button" class="card" data-id="${sk.id}"><span class="ico${sk.active?'':' p'}" style="--c:${sk.E.hex}">${svg(sk.F.id)}${modBadge(sk)}</span><span class="ct"><span class="tag">${sk.F.role} · ${sk.E.name}${knownBase(sk)?'<i class="nv">вариант известной</i>':'<i class="nv">новая чара</i>'}</span><b>${sk.base}</b><span class="var">${sk.M.name}: ${sk.M.desc}</span><small>${cap(skLead(sk))}</small><small>${cardStat(sk)}</small></span></button>`).join('');
+  $('#luCards').innerHTML=ch.map(sk=>`<button type="button" class="card" data-id="${sk.id}"><span class="ico${sk.active?'':' p'}" style="--c:${sk.E.hex}">${svg(sk.F.id)}${modBadge(sk)}</span><span class="ct"><span class="tag">${sk.F.role} · ${sk.E.name}${knownBase(sk)?'<i class="nv">вариант известной</i>':'<i class="nv">новая чара</i>'}${bookOn()&&BOOK.has(sk.id)?'<i class="nv">из Книги чар</i>':''}</span><b>${sk.base}</b><span class="var">${sk.M.name}: ${sk.M.desc}</span><small>${cap(skLead(sk))}</small><small>${cardStat(sk)}</small></span></button>`).join('');
   $('#luSkip').textContent='Пропустить: +'+(20+S.lvl*5)+' эссенции';$('#lvlup').hidden=false;}
 function closeLevelUp(){luOpen=false;$('#lvlup').hidden=true;luQueue=Math.max(0,luQueue-1);luDelay=.35;syncPause();}
 $('#luCards').addEventListener('click',e=>{const b=e.target.closest('.card');if(!b)return;const sk=SKILLS[+b.dataset.id];learn(sk.id,true);toast('Изучено: '+skName(sk)+(EQUIPPED.has(sk.id)?' — в билде':' — в книге'));closeLevelUp();});
@@ -3109,7 +3175,7 @@ function mpPeerGone(why){
 function mpGuestLost(){
   // хост пропал: ждём его возвращения по той же ссылке
   $('#coop').hidden=false;MP.err='lost';mpRenderLobby();syncPause();}
-function mpHello(){mpSend({t:'hi',n:mpNick(),c:CLS.id,l:S.lvl,g:S.gorge|0,r:MP.role,v:1});}
+function mpHello(){mpSend({t:'hi',n:mpNick(),c:CLS.id,l:RUN.on?S.lvl:1,ml:mastLvl(),g:S.gorge|0,r:MP.role,v:1});}
 function mpTick(){
   const now=performance.now();
   if(!(mpTick.n=(mpTick.n||0)+1)%20&&!$('#coop').hidden)mpRefreshNet();
@@ -3167,7 +3233,7 @@ function mpOnHi(m){
   const cls=CLASS_BY[m.c]?m.c:'pyro';
   const first=!MP.peer;
   if(first)MP.peer={ib:new Interp(),on:false,pos:new THREE.Vector3(),vel:new THREE.Vector3(),tx:0,tz:0,tf:0,dead:false,hp:100,maxHp:100,walk:0,castT:0,hero:null,lbl:null,placed:false,mv:0,sh:0,rp:0};
-  const pr=MP.peer;pr.nick=nickClean(m.n)||'Напарник';pr.cls=cls;pr.lvl=m.l|0||1;pr.gorge=m.g|0;
+  const pr=MP.peer;pr.nick=nickClean(m.n)||'Напарник';pr.cls=cls;pr.lvl=m.l|0||1;pr.ml=m.ml|0;pr.gorge=m.g|0;
   MP.status=MP.active?'playing':'lobby';
   if(first&&MP.active&&MPH){/* гость вернулся, пока идёт игра: ждёт его «rdy» или сам войдёт */}
   if(first)mpHello();
@@ -3203,6 +3269,7 @@ function mpOnStart(m){
   MP.coop=true;MPon=true;MPG=true;MPH=false;MP.role='guest';MP.err='';MP.notice='';
   if(MP.peer)MP.peer.on=true;
   for(const id of ['#coop','#gorges','#win','#dead'])$(id).hidden=true;
+  if(m.j&&mode==='game'&&RUN.on)RUN.keep=true;
   mpApplyStart(m.p,m.g|0);}
 function mpApplyStart(play,g){
   mpSessionClear();
@@ -3575,9 +3642,9 @@ function mpUpdate(dt){
 
 // ---------- меню комнаты ----------
 function mpPlayersHtml(){
-  const me=`<div class="coop-pl"><b>${esc(mpNick())}</b><span>${esc(CLS.name)} · ур. ${S.lvl} (ты)</span></div>`;
+  const me=`<div class="coop-pl"><b>${esc(mpNick())}</b><span>${esc(CLS.name)} · мастерство ${mastLvl()} (ты)</span></div>`;
   const pr=MP.peer;
-  const o=pr?`<div class="coop-pl"><b>${esc(pr.nick)}</b><span>${esc(CLASS_BY[pr.cls].name)} · ур. ${pr.lvl}</span><i>на связи${MP.ping?' · '+Math.round(MP.ping)+' мс':''}</i></div>`:'';
+  const o=pr?`<div class="coop-pl"><b>${esc(pr.nick)}</b><span>${esc(CLASS_BY[pr.cls].name)} · мастерство ${pr.ml|0}</span><i>на связи${MP.ping?' · '+Math.round(MP.ping)+' мс':''}</i></div>`:'';
   return `<div class="coop-players">${me}${o}</div>`;}
 function mpNetBlock(){return `<div class="coop-net"><span id="mpNetSt">${esc(mpNetLine())}</span> <button class="ghost sm" data-a="diag" type="button">Подробнее</button></div><pre id="mpDiag" class="coop-diag" ${mpDiag.open?'':'hidden'}>${esc(mpDiag.open?mpNetDetail():'')}</pre>`;}
 function mpRenderLobby(){
@@ -3651,12 +3718,14 @@ function mpInit(){
     setTimeout(()=>{try{if(MP.peerId)mpHello();}catch(e){}},700);};
   document.addEventListener('visibilitychange',mpBack);window.addEventListener('pageshow',mpBack);window.addEventListener('online',mpBack);}
 
-const TCC=window.TCCF?window.TCCF({THREE,clamp,rand,randi,lerp,TAU,toLocal,toWorld,gcx,ghw,spawnMob,spawnEnemy,pickW,banner,hint,float,fxPillar,fxRing,colBurst,GOLD,RED,FXG,emit,SPARK,glowSprite,hurtPlayer,kill,dieFull,syncPause,toSelect,mpSend,MP,P,save,gainXp,learnRandom,xpNeed,scene,camera,gorgeGroup,WORLD_ANIM,ENEMIES,mpHostStart,mpOpenLobby,mpChestSpawn,mpRenderLobby,startGorge,
+const TCC=window.TCCF?window.TCCF({THREE,clamp,rand,randi,lerp,TAU,toLocal,toWorld,gcx,ghw,spawnMob,spawnEnemy,pickW,banner,hint,float,fxPillar,fxRing,colBurst,GOLD,RED,FXG,emit,SPARK,glowSprite,hurtPlayer,kill,dieFull,syncPause,toSelect,mpSend,MP,P,save,gainXp,learnRandom,xpNeed,scene,camera,gorgeGroup,WORLD_ANIM,ENEMIES,mpHostStart,mpOpenLobby,mpChestSpawn,mpRenderLobby,startGorge,runWon,
   get GZ(){return GZ;},get BOSS(){return BOSS;},setBOSS:v=>{BOSS=v;},shake:v=>{shake=Math.max(shake,v);},get S(){return S;},get SAVE(){return SAVE;},get MPon(){return MPon;},get MPH(){return MPH;},get MPG(){return MPG;},get mode(){return mode;},get paused(){return paused;},get time(){return time;}}):null;
 function start(hot){
   loadSave(hot||{});
   W=app.clientWidth;H=app.clientHeight;applyQuality(true);
   selectClass(SAVE.cur||'pyro');mpInit();
+  {const mg=Object.entries(SAVE.chars).filter(([,v])=>v.mig>0);if(mg.length){const t=mg.map(([id,v])=>CLASS_BY[id].name+' '+v.mig+' ур. → мастерство '+mastLvlOf(v.mx)).join('; ');mg.forEach(([,v])=>{v.mig=0;});if(S)S.mig=0;save();
+    setTimeout(()=>toast('Новая система: каждый заход начинается с 1-го уровня, а прежний уровень героя стал мастерством. '+t+'. Изученные чары — в Книге чар.',9000),600);}}
   P.pos.set(0,0,0);camT.set(0,1,0);
   const el=$('#classes .cls.on');if(el)el.scrollIntoView({block:'nearest',inline:'center'});
   requestAnimationFrame(loop);}
