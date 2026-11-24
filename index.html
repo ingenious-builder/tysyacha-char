@@ -2437,7 +2437,7 @@ function renderSelInfo(){const c=CLASS_BY[selId],sv=SAVE.chars[c.id],E1=ELEMENTS
   <div class="sel-btns">${MP.joinCode&&!MPon?`<button class="big" id="selJoin" type="button">Присоединиться к комнате ${MP.joinCode}</button>`:''}<button class="${MP.joinCode&&!MPon?'btn':'big'}" id="selPlay" type="button">Свободный мир</button><button class="btn" id="selGorge" type="button">Ущелья · пройдено ${(sv&&sv.gorge)|0} из 12</button><button class="btn coop" id="selCoop" type="button">${MP.role?'Вернуться в комнату':'Играть вместе'}</button><button class="ghost" id="selNick" type="button">Ник: ${esc(mpNick()||'—')} · сменить</button></div>
   <p class="si-hint">Слева — ходьба. Справа — атака и чары: тап колдует сам, потяни от кнопки — прицел. Красное на земле — уходи.</p>`;
   $('#selPlay').addEventListener('click',startGame);$('#selGorge').addEventListener('click',openGorges);$('#selCoop').addEventListener('click',mpOpenLobby);$('#selNick').addEventListener('click',()=>nickAsk(true));const jb=$('#selJoin');if(jb)jb.addEventListener('click',()=>mpJoin(MP.joinCode));}
-function selectClass(id){selId=id;setClass(id);renderClasses();renderSelInfo();selFx=.3;}
+function selectClass(id){selId=id;setClass(id);renderClasses();renderSelInfo();selFx=.3;if(MP.peerId)mpHello();}
 $('#classes').addEventListener('click',e=>{const b=e.target.closest('.cls');if(b)selectClass(b.dataset.c);});
 function setClass(id){CLS=CLASS_BY[id];S=validChar(SAVE.chars[id],CLS);LEARNED=new Set(S.learned);computeStats();P.maxHp=0;P.maxMp=0;recalcStats();P.hp=P.maxHp;P.mp=P.maxMp;
   rebuildHero();syncAuto();onBuildChanged();}
@@ -2721,7 +2721,7 @@ function mpTick(){
       if(MPH&&((++mpSeq)&1)===0)mpSendSnap();
     }else if(now-MP.kaAt>2000||!MP.kaAt){MP.kaAt=now;mpSend({t:'ka'});}
     if(now-MP.pingAt>2500){MP.pingAt=now;try{mpRoom.ping(MP.peerId).then(ms=>{MP.ping=ms;}).catch(()=>{});}catch(e){}}
-  }else if(MP.role==='guest'&&now-MP.t0>25000&&MP.code){MP.t0=now;mpOpen('guest',MP.code);}
+  }else if(MP.role&&MP.code&&mpRoom&&now-MP.t0>(MP.role==='guest'?25000:60000)){MP.t0=now;mpOpen(MP.role,MP.code);}
 }
 function mpSendPos(){
   mpSend({t:'p',x:r2(P.pos.x),z:r2(P.pos.z),f:r2(P.face),h:Math.round(P.hp),m:Math.round(P.maxHp),mv:P.moving?1:0,d:P.dead?1:0,c:P.castT>0?1:0,sw:P.swingT>0?1:0,sh:P.shield>0?1:0,rp:r2(MP.revT/3),l:S.lvl});}
@@ -2777,7 +2777,8 @@ function mpOnHi(m){
 // ---------- старт, выход, возвращение ----------
 function mpOpenLobby(){
   if(!mpNick()){nickAsk(false,mpOpenLobby);return;}
-  $('#coop').hidden=false;mpRenderLobby();}
+  $('#coop').hidden=false;mpRenderLobby();
+  if(MP.role==='guest'&&MP.peerId&&!MPon)mpSend({t:'rdy'});}
 function mpCreate(newCode){
   let code='';try{code=newCode?'':localStorage.getItem(ROOM_KEY)||'';}catch(e){}
   if(!code){code=mpCode();try{localStorage.setItem(ROOM_KEY,code);}catch(e){}}
@@ -3173,6 +3174,7 @@ function mpPlayersHtml(){
   const o=pr?`<div class="coop-pl"><b>${esc(pr.nick)}</b><span>${esc(CLASS_BY[pr.cls].name)} · ур. ${pr.lvl}</span><i>на связи${MP.ping?' · '+Math.round(MP.ping)+' мс':''}</i></div>`:'';
   return `<div class="coop-players">${me}${o}</div>`;}
 function mpRenderLobby(){
+  if(mode==='select'&&MP._selRole!==MP.role){MP._selRole=MP.role;renderSelInfo();}
   const ov=$('#coop');if(ov.hidden)return;const c=$('#coopCard');
   const pr=MP.peer;let h='';
   if(!MP.role){
@@ -3233,7 +3235,7 @@ function mpInit(){
   if(!MP.nick)nickAsk(false,()=>{if(MP.joinCode&&mode==='select')renderSelInfo();});
   else if(MP.joinCode&&mode==='select')renderSelInfo();
   window.__mp={MP,mpOpen,mpHostStart,mpJoin,mpCreate};
-  window.addEventListener('pagehide',()=>{try{if(MPH)mpSend({t:'stop'});else if(MPG)mpSend({t:'bye'});}catch(e){}});}
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&MP.role&&!MP.peerId&&MP.code)MP.t0=-1e9;});}
 
 function start(hot){
   loadSave(hot||{});
