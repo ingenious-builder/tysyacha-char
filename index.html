@@ -1958,7 +1958,7 @@ window.addEventListener('keydown',e=>{
   if(bookOpen||luOpen)return;
   input.keys[e.code]=true;
   if(e.code==='Space'){e.preventDefault();input.attack=true;}
-  const m=/^Digit([1-8])$/.exec(e.code);if(m)trySlot(+m[1]-1,true);});
+  const m=/^(?:Digit|Numpad)([1-8])$/.exec(e.code);if(m){if(e.code[0]==='N')e.preventDefault();trySlot(+m[1]-1,true);}});
 window.addEventListener('keyup',e=>{input.keys[e.code]=false;if(e.code==='Space')input.attack=false;});
 window.addEventListener('blur',()=>{input.keys={};input.attack=false;});
 $('#autoBtn').addEventListener('click',()=>{S.auto=!S.auto;syncAuto();toast(S.auto?'Авто: герой сам бьёт и колдует':'Авто выключено: колдуй кнопками');saveSoon();});
