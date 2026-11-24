@@ -349,6 +349,9 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 .coop-mode b{font:700 17px var(--f-display);color:var(--gold)}
 .coop-mode small{color:var(--muted);font-size:12px;line-height:1.35}
 .coop-wait{color:var(--muted);font-size:14px}
+.coop-net{color:var(--muted);font-size:13px;display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap}
+.ghost.sm{height:30px;padding:0 12px;font-size:12px}
+.coop-diag{margin:0;text-align:left;white-space:pre-wrap;word-break:break-word;font:12px/1.45 var(--f-ui);color:var(--muted);background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:10px;padding:8px 10px;max-width:100%}
 .spin{display:inline-block;width:14px;height:14px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--gold);animation:spin 1s linear infinite;vertical-align:-2px;margin-right:8px}
 @keyframes spin{to{transform:rotate(360deg)}}
 #mpHud{position:absolute;inset:0;pointer-events:none}
@@ -513,6 +516,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 </div>
 
 <script src="vendor/three.min.js"></script>
+<script src="net-relay.js"></script>
 <script>
 'use strict';
 (function(){
@@ -2821,11 +2825,15 @@ function mpSeeded(seed,fn){if(!MPon){fn();return;}const old=Math.random;Math.ran
 
 const MP_APP='ingenious-builder/tysyacha-char/v1';
 const MP_RELAYS=['nos.lol','nostr.mom','nostr.sathoarder.com','relay.fountain.fm','multiplexer.huszonegy.world'].map(u=>'wss://'+u);
-// STUN у Trystero уже есть (Google и др.); добавляем бесплатный публичный TURN для мобильного интернета
-const MP_TURN=[{urls:['turn:openrelay.metered.ca:80','turn:openrelay.metered.ca:443','turns:openrelay.metered.ca:443?transport=tcp'],username:'openrelayproject',credential:'openrelayproject'}];
+// TURN убран: openrelay.metered.ca закрыт (DNS не резолвится, relay-кандидатов нет). STUN у Trystero свой (Google и др.).
+// Запасной канал «через сервер»: Supabase Realtime (broadcast), net-relay.js. Ключ — только публичный publishable, секретного в браузере нет.
+const MP_SB={url:'wss://mugzpapozmuryzkfqldr.supabase.co/realtime/v1/websocket',key:'sb_publishable_2vCpEK1hJ3X-pmTtjbY8ZA_w9WUdvUu'};
 const NICK_KEY='tysyacha-nick',ROOM_KEY='tysyacha-room';
 Object.assign(MP,{active:false,play:'world',g:0,status:'idle',err:'',code:'',joinCode:null,lastRx:0,pingAt:0,byUid:new Map(),hitQ:[],pickGorge:false,down:false,revT:0,tBroken:false,pl:null,plCd:0,chest:null,wiped:false,hint:'',hintT:0});
 let mpLib=null,mpRoom=null,mpSendFn=null,mpTimer=0,mpSeq=0,mpHintUntil=0;
+// два канала одной комнаты: P2P (Trystero) и «через сервер» (Supabase). Id пира у обоих одинаковый (selfId задаём сами).
+let mpTry=null,mpTrySend=null,mpRel=null,mpRelSend=null,mpP2P=new Set(),mpSrv=new Set(),mpOpenGen=0;
+const mpDiag={nostr:null,nostrAt:0,open:false};
 
 // ---------- буфер интерполяции: чужие сущности рисуются чуть в прошлом, по времени отправителя ----------
 // отметка времени отправителя (ts, мс) -> свои часы через нижнюю огибающую задержки; между двумя образцами — линейно,
@@ -2864,20 +2872,79 @@ function mpCode(){const A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';const a=new Uint8Ar
 function mpUrl(code){const u=new URL(location.href);u.search='';u.hash='';u.pathname=u.pathname.replace(/index\.html$/,'');u.searchParams.set('room',code);return u.toString();}
 async function mpEnsureLib(){if(!mpLib)mpLib=await import('./vendor/trystero-nostr-0.21.5.js');return mpLib;}
 function mpSendTo(o,id){try{const r=mpSendFn&&mpSendFn(o,id);if(r&&r.catch)r.catch(()=>{});}catch(e){}}
+// P2P, если он поднят; иначе через сервер
+function mpRoute(o,id){
+  if(mpTrySend&&mpP2P.has(id))return mpTrySend(o,id);
+  if(mpRelSend&&mpSrv.has(id))return mpRelSend(o,id);
+  if(mpTrySend)return mpTrySend(o,id);}
+function mpVia(){const id=MP.peerId;return !id?'':mpP2P.has(id)?'p2p':mpSrv.has(id)?'relay':'';}
+function mpProbeNostr(){
+  mpDiag.nostr={ok:0,total:MP_RELAYS.length,done:0};const d=mpDiag.nostr;
+  for(const u of MP_RELAYS){let w=null,fin=false;const end=ok=>{if(fin)return;fin=true;if(ok)d.ok++;d.done++;try{w&&w.close();}catch(e){}};
+    try{w=new WebSocket(u);w.onopen=()=>end(true);w.onerror=()=>end(false);w.onclose=()=>end(false);setTimeout(()=>end(false),4000);}catch(e){end(false);}}}
+function mpIceInfo(){
+  try{const ps=mpTry&&mpTry.getPeers?mpTry.getPeers():null;if(!ps)return 'нет пиров';const a=[];
+    for(const id in ps){const c=ps[id];if(c&&c.connectionState)a.push(c.connectionState+', ice: '+c.iceConnectionState+', сбор: '+c.iceGatheringState);}
+    return a.length?a.join('; '):'пира нет';}catch(e){return '?';}}
+function mpNetLine(){
+  const v=mpVia();
+  if(v==='p2p')return 'Связь: P2P (напрямую)';
+  if(v==='relay')return 'Связь: через сервер'+(mpTry?' · P2P ищется…':'');
+  const rs=mpRel&&mpRel.status();
+  if(rs&&rs.joined)return 'Сервер связи подключён, ждём второго игрока…';
+  if(rs&&rs.lastErr)return 'Нет связи с сервером: '+rs.lastErr;
+  return 'Подключаемся к серверу связи…';}
+function mpNetDetail(){
+  const L=[],n=mpDiag.nostr,rs=mpRel?mpRel.status():null;
+  L.push('Канал: '+(mpVia()==='p2p'?'P2P':mpVia()==='relay'?'через сервер':'нет'));
+  L.push('Сервер связи (Supabase): '+(rs?(rs.joined?'подключён':'не подключён ('+rs.ws+(rs.lastErr?', '+rs.lastErr:'')+', попыток '+rs.tries+')')+(rs.rtt?', отклик '+Math.round(rs.rtt)+' мс':'')+', игроков в канале: '+rs.peers+', принято '+rs.rx+', отправлено '+rs.tx:'не запущен'));
+  L.push('Реле nostr (поиск P2P): '+(n?(n.done<n.total?'проверяем… ':'')+n.ok+' из '+n.total+' отвечают':'не проверялись'));
+  L.push('P2P / ICE: '+mpIceInfo());
+  L.push('Код комнаты: '+MP.code+', роль: '+(MP.role==='host'?'хозяин':'гость'));
+  return L.join('\n');}
+function mpRefreshNet(){
+  const a=document.getElementById('mpNetSt'),b=document.getElementById('mpDiag');
+  if(a)a.textContent=mpNetLine();if(b&&!b.hidden)b.textContent=mpNetDetail();}
 function mpSend(o){if(MP.peerId)mpSendTo(o,MP.peerId);}
 async function mpOpen(role,code){
-  mpCloseRoom();
+  mpCloseRoom();const gen=++mpOpenGen;
   MP.role=role;MP.code=code;MP.err='';MP.status=role==='host'?'waiting':'joining';MP.t0=performance.now();mpRenderLobby();
-  let lib;try{lib=await mpEnsureLib();}catch(e){MP.status='error';MP.err='Не удалось загрузить сетевой модуль. Проверь интернет и обнови страницу.';mpRenderLobby();return;}
-  if(MP.role!==role||MP.code!==code)return;
-  try{
-    const room=lib.joinRoom({appId:MP_APP,relayUrls:MP_RELAYS,turnConfig:MP_TURN},code);
-    mpRoom=room;const [send,get]=room.makeAction('m');mpSendFn=send;
-    get((d,id)=>mpOnMsg(d,id));room.onPeerJoin(id=>mpPeerJoin(id));room.onPeerLeave(id=>mpPeerLeave(id));
-  }catch(e){MP.status='error';MP.err='Не удалось открыть комнату: '+(e&&e.message||e);mpRenderLobby();return;}
+  // 1) канал «через сервер» поднимаем сразу, не дожидаясь P2P
+  let lib=null;
+  try{lib=await mpEnsureLib();}catch(e){lib=null;}
+  if(gen!==mpOpenGen)return;
+  const sid=lib&&lib.selfId?lib.selfId:Math.random().toString(36).slice(2,12)+Math.random().toString(36).slice(2,8);
+  try{if(window.relayJoin){
+    mpRel=relayJoin({appId:MP_APP,roomId:code,selfId:sid,url:MP_SB.url,key:MP_SB.key});
+    const [rsend,rget]=mpRel.makeAction('m');mpRelSend=rsend;
+    rget((d,id)=>mpOnMsg(d,id));mpRel.onPeerJoin(id=>mpChanJoin('srv',id));mpRel.onPeerLeave(id=>mpChanLeave('srv',id));}}catch(e){mpRel=null;mpRelSend=null;}
+  mpProbeNostr();
+  // 2) P2P (Trystero)
+  if(lib){
+    try{
+      const room=lib.joinRoom({appId:MP_APP,relayUrls:MP_RELAYS},code);
+      mpTry=room;mpRoom=room;const [send,get]=room.makeAction('m');mpTrySend=send;
+      get((d,id)=>mpOnMsg(d,id));room.onPeerJoin(id=>mpChanJoin('p2p',id));room.onPeerLeave(id=>mpChanLeave('p2p',id));
+    }catch(e){mpTry=null;mpTrySend=null;}}
+  if(!mpTry&&!mpRel){MP.status='error';MP.err=lib?'Не удалось открыть комнату.':'Не удалось загрузить сетевой модуль. Проверь интернет и обнови страницу.';mpRenderLobby();return;}
+  if(!mpTry)mpRoom=mpRel;
+  mpSendFn=mpRoute;
   clearInterval(mpTimer);mpTimer=setInterval(mpTick,50);mpRenderLobby();
 }
-function mpCloseRoom(){try{if(mpRoom)mpRoom.leave();}catch(e){}mpRoom=null;mpSendFn=null;MP.peerId=null;MP.peer&&mpPeerModelDrop();MP.peer=null;clearInterval(mpTimer);}
+function mpCloseRoom(){
+  mpOpenGen++;
+  try{if(mpRel)mpRel.leave();}catch(e){}try{if(mpTry)mpTry.leave();}catch(e){}
+  mpRel=null;mpRelSend=null;mpTry=null;mpTrySend=null;mpP2P.clear();mpSrv.clear();
+  mpRoom=null;mpSendFn=null;MP.peerId=null;MP.peer&&mpPeerModelDrop();MP.peer=null;clearInterval(mpTimer);}
+// вход/выход пира на одном из каналов; для игры пир один, канал выбирается на лету
+function mpChanJoin(ch,id){
+  (ch==='p2p'?mpP2P:mpSrv).add(id);
+  if(MP.peerId===id){MP.lastRx=performance.now();mpRenderLobby();return;}
+  mpPeerJoin(id);}
+function mpChanLeave(ch,id){
+  (ch==='p2p'?mpP2P:mpSrv).delete(id);
+  if(mpP2P.has(id)||mpSrv.has(id)){mpRenderLobby();return;}
+  mpPeerLeave(id);}
 function mpPeerJoin(id){
   if(MP.peerId&&MP.peerId!==id){if(performance.now()-MP.lastRx>4500){mpPeerGone('replace');}else{mpSendTo({t:'full'},id);return;}}
   MP.peerId=id;MP.lastRx=performance.now();MP.status='linked';mpHello();mpRenderLobby();}
@@ -2897,6 +2964,7 @@ function mpGuestLost(){
 function mpHello(){mpSend({t:'hi',n:mpNick(),c:CLS.id,l:S.lvl,g:S.gorge|0,r:MP.role,v:1});}
 function mpTick(){
   const now=performance.now();
+  if(!(mpTick.n=(mpTick.n||0)+1)%20&&!$('#coop').hidden)mpRefreshNet();
   if(MP.peerId){
     if(now-MP.lastRx>9000){mpPeerGone('timeout');return;}
     if(MP.active&&mode==='game'&&MP.peer&&MP.peer.on){
@@ -2904,7 +2972,7 @@ function mpTick(){
       if(MP.hitQ.length){mpSend({t:'H',a:MP.hitQ.splice(0,60)});}
       if(MPH)mpSendSnap();
     }else if(now-MP.kaAt>2000||!MP.kaAt){MP.kaAt=now;mpSend({t:'ka'});}
-    if(now-MP.pingAt>2500){MP.pingAt=now;try{mpRoom.ping(MP.peerId).then(ms=>{MP.ping=ms;}).catch(()=>{});}catch(e){}}
+    if(now-MP.pingAt>2500){MP.pingAt=now;try{const pr=mpP2P.has(MP.peerId)&&mpTry?mpTry:mpRel;if(pr)pr.ping(MP.peerId).then(ms=>{MP.ping=ms;}).catch(()=>{});}catch(e){}}
   }else if(MP.role&&MP.code&&mpRoom&&now-MP.t0>(MP.role==='guest'?25000:60000)){MP.t0=now;mpOpen(MP.role,MP.code);}
 }
 function mpSendPos(){
@@ -3336,7 +3404,7 @@ function mpHud(){
     card.classList.toggle('down',!!pr.dead);
     const lag=now-MP.lastRx,ok=lag<2500;
     mpTxt($('#mpInfo'),'i',pr.dead?'упал':Math.round(pr.hp)+' / '+pr.maxHp);
-    const lk=$('#mpLink');mpTxt(lk,'l',ok?'● '+(MP.ping?Math.round(MP.ping)+' мс':'на связи'):'● нет связи');lk.className=ok?'ok':'bad';}
+    const lk=$('#mpLink');mpTxt(lk,'l',ok?'● '+(mpVia()==='relay'?'сервер · ':'')+(MP.ping?Math.round(MP.ping)+' мс':'на связи'):'● нет связи');lk.className=ok?'ok':'bad';}
   const cb=$('#mpCombo');if(MP.combo>=2){cb.hidden=false;mpTxt(cb,'c','Связка ×'+MP.combo);}else cb.hidden=true;
   if(MP.down){const t=P.dead?'Ты упал — напарник может поднять тебя ('+Math.round(((pr&&pr.rp)||0)*100)+'%)':'';if(P.dead){const el=$('#mpHint');el.hidden=false;mpTxt(el,'h',t);}}
   else if(mpHintUntil&&now>mpHintUntil){mpHintUntil=0;$('#mpHint').hidden=true;MP.hint='';}
@@ -3360,6 +3428,7 @@ function mpPlayersHtml(){
   const pr=MP.peer;
   const o=pr?`<div class="coop-pl"><b>${esc(pr.nick)}</b><span>${esc(CLASS_BY[pr.cls].name)} · ур. ${pr.lvl}</span><i>на связи${MP.ping?' · '+Math.round(MP.ping)+' мс':''}</i></div>`:'';
   return `<div class="coop-players">${me}${o}</div>`;}
+function mpNetBlock(){return `<div class="coop-net"><span id="mpNetSt">${esc(mpNetLine())}</span> <button class="ghost sm" data-a="diag" type="button">Подробнее</button></div><pre id="mpDiag" class="coop-diag" ${mpDiag.open?'':'hidden'}>${esc(mpDiag.open?mpNetDetail():'')}</pre>`;}
 function mpRenderLobby(){
   if(mode==='select'&&MP._selRole!==MP.role){MP._selRole=MP.role;renderSelInfo();}
   const ov=$('#coop');if(ov.hidden)return;const c=$('#coopCard');
@@ -3372,17 +3441,17 @@ function mpRenderLobby(){
   else if(MP.status==='error'||MP.status==='full'){
     h=`<h1>Не получилось</h1><p>${esc(MP.err)}</p><button class="big" data-a="retry" type="button">Ещё раз</button><button class="ghost" data-a="leave" type="button">Выйти из комнаты</button>`;}
   else if(MP.err==='lost'&&MPG&&!MP.peerId){
-    h=`<h1>Связь потеряна</h1><p><span class="spin"></span>Ждём хозяина комнаты. Как только он вернётся, игра продолжится сама.</p><button class="ghost" data-a="leave" type="button">Выйти из комнаты</button>`;}
+    h=`<h1>Связь потеряна</h1><p><span class="spin"></span>Ждём хозяина комнаты. Как только он вернётся, игра продолжится сама.</p>${mpNetBlock()}<button class="ghost" data-a="leave" type="button">Выйти из комнаты</button>`;}
   else if(MP.role==='host'&&!pr){
     const link=mpUrl(MP.code);
     h=`<h1>Комната ${esc(MP.code)}</h1><p>Отправь ссылку другу. Он откроет её, введёт ник, выберет героя и сразу окажется у тебя. Одна и та же ссылка работает и для возвращения после разрыва.</p>
     <input class="coop-link" id="linkIn" type="text" readonly value="${esc(link)}" aria-label="Ссылка на комнату">
     <div class="coop-row"><button class="btn gold" data-a="share" type="button">Поделиться</button><button class="btn" data-a="copy" type="button">Скопировать</button></div>
-    <p class="coop-wait"><span class="spin"></span>Ждём друга…${MP.status==='linked'?' (соединяемся)':''}</p>
+    <p class="coop-wait"><span class="spin"></span>Ждём друга…${MP.status==='linked'?' (соединяемся)':''}</p>${mpNetBlock()}
     <div class="coop-row"><button class="ghost" data-a="newcode" type="button">Новая ссылка</button><button class="ghost" data-a="leave" type="button">Закрыть комнату</button></div>`;}
   else if(MP.role==='guest'&&!pr){
     const slow=performance.now()-MP.t0>14000;
-    h=`<h1>Комната ${esc(MP.code)}</h1><p><span class="spin"></span>Подключаемся к хозяину…${MP.status==='linked'?' (почти готово)':''}</p>${slow?'<p>Если долго: проверь, что хозяин открыл игру и создал комнату, и что у вас обоих есть интернет. Попытки повторяются сами.</p>':''}<button class="ghost" data-a="leave" type="button">Отмена</button>`;}
+    h=`<h1>Комната ${esc(MP.code)}</h1><p><span class="spin"></span>Подключаемся к хозяину…${MP.status==='linked'?' (почти готово)':''}</p>${slow?'<p>Если долго: проверь, что хозяин открыл игру и создал комнату, и что у вас обоих есть интернет. Попытки повторяются сами.</p>':''}${mpNetBlock()}<button class="ghost" data-a="leave" type="button">Отмена</button>`;}
   else{
     const playing=MP.active&&mode==='game';
     h=`<h1>Комната ${esc(MP.code)}</h1>${mpPlayersHtml()}`;
@@ -3396,7 +3465,8 @@ function mpRenderLobby(){
   c.innerHTML=h;}
 $('#coopCard').addEventListener('click',e=>{
   const b=e.target.closest('[data-a]');if(!b)return;const a=b.dataset.a;
-  if(a==='close'){$('#coop').hidden=true;}
+  if(a==='diag'){mpDiag.open=!mpDiag.open;mpRenderLobby();}
+  else if(a==='close'){$('#coop').hidden=true;}
   else if(a==='create')mpCreate(false);
   else if(a==='newcode')mpCreate(true);
   else if(a==='join'){const v=($('#codeIn').value||'').trim();if(v)mpJoin(v);}
@@ -3422,7 +3492,12 @@ function mpInit(){
   if(!MP.nick)nickAsk(false,()=>{if(MP.joinCode&&mode==='select')renderSelInfo();});
   else if(MP.joinCode&&mode==='select')renderSelInfo();
   window.__mp={MP,mpOpen,mpHostStart,mpJoin,mpCreate};
-  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&MP.role&&!MP.peerId&&MP.code)MP.t0=-1e9;});}
+  const mpBack=()=>{if(document.hidden||!MP.role||!MP.code)return;
+    if(!MP.peerId)MP.t0=-1e9;
+    // iOS усыпляет сокеты: пересоздаём канал сервера и объявляемся заново
+    try{if(mpRel)mpRel.kick();}catch(e){}
+    setTimeout(()=>{try{if(MP.peerId)mpHello();}catch(e){}},700);};
+  document.addEventListener('visibilitychange',mpBack);window.addEventListener('pageshow',mpBack);window.addEventListener('online',mpBack);}
 
 function start(hot){
   loadSave(hot||{});

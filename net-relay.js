@@ -1,0 +1,203 @@
+/* net-relay.js — запасной канал связи «через сервер» для кооператива «Тысячи чар».
+ *
+ * Зачем: P2P (Trystero) у части игроков не пробивается (мобильный интернет, NAT, режут реле nostr).
+ * Этот файл поднимает ту же «комнату» через Supabase Realtime (broadcast) на голом WebSocket
+ * по протоколу Phoenix — без сборки и без supabase-js. Классический скрипт, глобальная функция relayJoin.
+ *
+ * Интерфейс как у комнаты Trystero:
+ *   const room = relayJoin({ appId, roomId, selfId, url, key });
+ *   const [send, onReceive] = room.makeAction('m');   // send(data, peerId?) -> Promise; onReceive(cb(data, peerId))
+ *   room.onPeerJoin(cb(peerId)); room.onPeerLeave(cb(peerId));
+ *   room.getPeers() -> { peerId: {lastSeen} };  room.ping(peerId) -> Promise<ms>;
+ *   room.kick() — принудительное переподключение (вернулись в приложение на iOS);  room.leave();
+ *   room.status() -> { ws, joined, peers, tx, rx, lastErr, rtt, ... } для диагностики.
+ *
+ * Частота: сообщения копятся и уходят пачкой не чаще 1 раза в flushMs (по умолчанию 80 мс, то есть ≤ ~12 конвертов/с
+ * на игрока). «Последнее побеждает» для игровых сообщений p (позиция), s (снимок), ka — они не копятся в очереди.
+ * Лимиты Supabase Realtime (бесплатный план): ~100 событий/с на проект и до 200 одновременных соединений.
+ * Присутствие: свои hello раз в 2 с и bye при выходе; пир пропадает после 6 с молчания (любое сообщение его освежает).
+ */
+(function (g) {
+  'use strict';
+  var DEF_URL = 'wss://mugzpapozmuryzkfqldr.supabase.co/realtime/v1/websocket';
+
+  function relayJoin(o) {
+    o = o || {};
+    var selfId = o.selfId || Math.random().toString(36).slice(2, 12);
+    var url = o.url || DEF_URL, key = o.key || '';
+    var flushMs = o.flushMs || 80, helloMs = o.helloMs || 2000, silenceMs = o.silenceMs || 6000;
+    var coalesce = o.coalesce || ['p', 's', 'ka'];
+    var topic = 'realtime:' + String(o.appId || 'app').replace(/[^A-Za-z0-9_-]/g, '-').slice(-40) + '-' + String(o.roomId || 'room').replace(/[^A-Za-z0-9_-]/g, '').slice(0, 24);
+
+    var ws = null, joined = false, closed = false, ref = 1, joinRef = '', tries = 0, lastErr = '';
+    var hbTimer = 0, hbAt = 0, hbRef = '', helloTimer = 0, flushTimer = 0, reconTimer = 0, prTimer = 0, connAt = 0;
+    var peers = {}, actions = {}, joinCbs = [], leaveCbs = [], queue = [], pings = {};
+    var st = { tx: 0, rx: 0, txBytes: 0, rxBytes: 0, rtt: 0, maxBytes: 0, connects: 0 };
+
+    function nextRef() { return String(ref++); }
+    function raw(ev, payload, r) {
+      if (!ws || ws.readyState !== 1) return false;
+      try { ws.send(JSON.stringify({ topic: ev === 'heartbeat' ? 'phoenix' : topic, event: ev, payload: payload || {}, ref: r === undefined ? nextRef() : r })); return true; } catch (e) { return false; }
+    }
+    function emitEnv(env) {
+      if (!joined) return false;
+      env.i = selfId;
+      var s = JSON.stringify(env);
+      var ok = raw('broadcast', { type: 'broadcast', event: 'tc', payload: env }, null);
+      if (ok) { st.tx++; st.txBytes += s.length; if (s.length > st.maxBytes) st.maxBytes = s.length; }
+      return ok;
+    }
+
+    function connect() {
+      if (closed) return;
+      clearTimeout(reconTimer);
+      try { if (ws) { ws.onopen = ws.onmessage = ws.onclose = ws.onerror = null; ws.close(); } } catch (e) {}
+      joined = false; connAt = Date.now();
+      var w;
+      try { w = new WebSocket(url + '?apikey=' + encodeURIComponent(key) + '&vsn=1.0.0'); } catch (e) { lastErr = 'WebSocket: ' + (e && e.message || e); return schedule(); }
+      ws = w;
+      w.onopen = function () {
+        if (ws !== w) return;
+        joinRef = nextRef();
+        raw('phx_join', { config: { broadcast: { self: false, ack: false }, presence: { key: '' }, private: false } }, joinRef);
+        clearInterval(hbTimer); hbAt = 0;
+        hbTimer = setInterval(heartbeat, 25000);
+      };
+      w.onmessage = function (e) {
+        if (ws !== w) return;
+        var m; try { m = JSON.parse(e.data); } catch (x) { return; }
+        if (m.event === 'phx_reply') {
+          if (m.ref === joinRef) {
+            if (m.payload && m.payload.status === 'ok') { joined = true; tries = 0; lastErr = ''; st.connects++; sendHello(false); flush(); }
+            else { lastErr = 'join: ' + JSON.stringify(m.payload && m.payload.response || m.payload).slice(0, 120); try { w.close(); } catch (x) {} }
+          } else if (m.ref === hbRef) { hbAt = 0; }
+          else if (m.payload && m.payload.status === 'error' && m.topic === 'phoenix') { lastErr = 'heartbeat error'; }
+        } else if (m.event === 'broadcast') {
+          var env = m.payload && m.payload.payload;
+          if (env && m.payload.event === 'tc') onEnv(env, e.data.length);
+        } else if (m.event === 'phx_error' || m.event === 'phx_close') {
+          lastErr = m.event; try { w.close(); } catch (x) {}
+        } else if (m.event === 'system' && m.payload && m.payload.status === 'error') {
+          lastErr = 'system: ' + String(m.payload.message || '').slice(0, 120);
+        }
+      };
+      w.onerror = function () { if (ws === w) lastErr = lastErr || 'сбой соединения'; };
+      w.onclose = function () {
+        if (ws !== w) return;
+        joined = false; clearInterval(hbTimer); schedule();
+      };
+    }
+    function schedule() {
+      if (closed) return;
+      clearTimeout(reconTimer);
+      var d = Math.min(8000, 400 * Math.pow(2, tries++)) + Math.random() * 300;
+      reconTimer = setTimeout(connect, d);
+    }
+    function heartbeat() {
+      if (!ws || ws.readyState !== 1) return;
+      if (hbAt && Date.now() - hbAt > 12000) { lastErr = 'нет ответа сервера'; try { ws.close(); } catch (e) {} return; }
+      hbRef = nextRef(); hbAt = Date.now(); raw('heartbeat', {}, hbRef);
+    }
+
+    function sendHello(re) { emitEnv({ k: 'h', re: re ? 1 : 0 }); }
+    function seen(id, t) {
+      var p = peers[id];
+      if (!p) {
+        p = peers[id] = { lastSeen: t, since: t };
+        for (var i = 0; i < joinCbs.length; i++) try { joinCbs[i](id); } catch (e) {}
+        return true;
+      }
+      p.lastSeen = t; return false;
+    }
+    function drop(id) {
+      if (!peers[id]) return;
+      delete peers[id];
+      for (var i = 0; i < leaveCbs.length; i++) try { leaveCbs[i](id); } catch (e) {}
+    }
+    function onEnv(env, len) {
+      var id = env.i; if (!id || id === selfId) return;
+      if (env.to && env.to !== selfId) return;
+      st.rx++; st.rxBytes += len || 0;
+      var now = Date.now(), k = env.k;
+      if (k === 'b') { drop(id); return; }
+      var isNew = seen(id, now);
+      if (k === 'h') { if (isNew && !env.re) sendHello(true); return; }
+      if (k === 'pi') { emitEnv({ k: 'po', n: env.n, to: id }); return; }
+      if (k === 'po') { var pr = pings[env.n]; if (pr) { delete pings[env.n]; var ms = now - pr.t; st.rtt = ms; pr.res(ms); } return; }
+      if (k === 'd' && env.m) {
+        for (var j = 0; j < env.m.length; j++) {
+          var a = env.m[j], cbs = actions[a[0]]; if (!cbs) continue;
+          for (var q = 0; q < cbs.length; q++) try { cbs[q](a[1], id); } catch (e) { try { console.error(e); } catch (x) {} }
+        }
+      } else if (isNew && k !== 'h') { /* неизвестный пир прислал данные — считаем присутствием */ }
+    }
+
+    function flush() {
+      flushTimer = 0;
+      if (!joined || !queue.length) { if (!joined && queue.length > 300) queue.splice(0, queue.length - 300); return; }
+      var by = {}, order = [], i, it;
+      for (i = 0; i < queue.length; i++) { it = queue[i]; var t = it.to || ''; if (!by[t]) { by[t] = []; order.push(t); } by[t].push([it.a, it.d]); }
+      queue = [];
+      for (i = 0; i < order.length; i++) { var env = { k: 'd', m: by[order[i]] }; if (order[i]) env.to = order[i]; emitEnv(env); }
+    }
+    function enqueue(a, d, to) {
+      if (closed) return Promise.resolve();
+      if (d && typeof d === 'object' && coalesce.indexOf(d.t) >= 0) {
+        for (var i = 0; i < queue.length; i++) { var q = queue[i]; if (q.a === a && q.to === to && q.d && q.d.t === d.t) { q.d = d; return Promise.resolve(); } }
+      }
+      queue.push({ a: a, d: d, to: to || '' });
+      if (!flushTimer) flushTimer = setTimeout(flush, flushMs);
+      return Promise.resolve();
+    }
+
+    // присутствие: свои hello и сторож молчания
+    helloTimer = setInterval(function () { if (joined) sendHello(false); }, helloMs);
+    prTimer = setInterval(function () {
+      var now = Date.now();
+      for (var id in peers) if (now - peers[id].lastSeen > silenceMs) drop(id);
+    }, 1000);
+
+    connect();
+
+    return {
+      selfId: selfId,
+      topic: topic,
+      makeAction: function (name) {
+        var cbs = actions[name] = actions[name] || [];
+        return [function (data, peerId) { return enqueue(name, data, typeof peerId === 'string' ? peerId : ''); }, function (cb) { cbs.push(cb); }];
+      },
+      onPeerJoin: function (cb) { joinCbs.push(cb); },
+      onPeerLeave: function (cb) { leaveCbs.push(cb); },
+      getPeers: function () { var r = {}; for (var id in peers) r[id] = peers[id]; return r; },
+      ping: function (peerId) {
+        return new Promise(function (res, rej) {
+          if (!joined || !peers[peerId]) { rej(new Error('нет связи')); return; }
+          var n = String(ref++); pings[n] = { t: Date.now(), res: res };
+          setTimeout(function () { if (pings[n]) { delete pings[n]; rej(new Error('таймаут')); } }, 5000);
+          emitEnv({ k: 'pi', n: n, to: peerId });
+        });
+      },
+      isJoined: function () { return joined; },
+      kick: function () {
+        // вернулись из фона: сокет мог тихо умереть — пересоздаём сразу и объявляемся заново
+        if (closed) return; tries = 0;
+        for (var id in peers) peers[id].lastSeen = Date.now();
+        connect();
+      },
+      status: function () {
+        var n = 0; for (var id in peers) n++;
+        return { ws: !ws ? 'нет' : ['подключается', 'открыт', 'закрывается', 'закрыт'][ws.readyState], joined: joined, peers: n, tx: st.tx, rx: st.rx, txBytes: st.txBytes, rxBytes: st.rxBytes, maxBytes: st.maxBytes, rtt: st.rtt, connects: st.connects, lastErr: lastErr, tries: tries, age: Date.now() - connAt };
+      },
+      leave: function () {
+        if (closed) return;
+        flush();
+        if (joined) emitEnv({ k: 'b' });
+        closed = true;
+        clearInterval(helloTimer); clearInterval(prTimer); clearInterval(hbTimer); clearTimeout(reconTimer); clearTimeout(flushTimer);
+        var w = ws; setTimeout(function () { try { if (w) { w.onclose = null; w.close(); } } catch (e) {} }, 150);
+        peers = {};
+      }
+    };
+  }
+  g.relayJoin = relayJoin;
+})(typeof window !== 'undefined' ? window : this);
