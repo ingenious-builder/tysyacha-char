@@ -1618,11 +1618,11 @@ renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFShadowMap;
 const scene=new THREE.Scene();
 const FOGC=0x1c2946;
 scene.background=new THREE.Color(0x0e1630);
-scene.fog=new THREE.Fog(FOGC,42,118);
+scene.fog=new THREE.Fog(FOGC,49,129);
 const camera=new THREE.PerspectiveCamera(42,1,.1,190);
 const hemi=new THREE.HemisphereLight(0xa8bdf0,0x2a3320,.85);scene.add(hemi);
 const moon=new THREE.DirectionalLight(0xdbe4ff,.85);moon.position.set(-30,50,20);scene.add(moon);scene.add(moon.target);
-moon.castShadow=true;moon.shadow.mapSize.set(2048,2048);{const c=moon.shadow.camera;c.left=-30;c.right=30;c.top=30;c.bottom=-30;c.near=5;c.far=120;}
+moon.castShadow=true;moon.shadow.mapSize.set(2048,2048);{const c=moon.shadow.camera;c.left=-36;c.right=36;c.top=36;c.bottom=-36;c.near=5;c.far=130;}
 moon.shadow.bias=-.0006;moon.shadow.normalBias=.03;
 const rim=new THREE.DirectionalLight(0xb28cff,.35);rim.position.set(30,20,-40);scene.add(rim);
 const WHITE=new THREE.Color(0xffffff),GOLD=new THREE.Color(0xf2c46b),RED=new THREE.Color(0xff3b30),GREENH=new THREE.Color(0x7dff8a),ACID=new THREE.Color(0x9be84a),FIREC=new THREE.Color(0xff7a33),ARROWC=new THREE.Color(0xffb36b),ORBC=new THREE.Color(0x9dff5a);
@@ -3505,7 +3505,7 @@ AIX.b_heart=(en,dt,dx,dz,dist,sp)=>{
 let spawnT=1,ambT=0,mode='select';
 let MPon=false,MPH=false,MPG=false;const MP={role:null,peer:null,coop:false,combo:0,comboT:0,peerId:null,ping:0,nick:''};
 const input={gx:0,gy:0,jx:0,jy:0,attack:false,keys:{},moveTo:null,mouseAttack:false};
-const camYaw=Math.PI/4;let camPitch=1.06;
+const camYaw=Math.PI/4;let camPitch=1.06;const CAM_K=1.16;// камера выше на 16 % — больше мира на экране; туман отодвинут следом
 const camT=new THREE.Vector3();
 function updatePlayer(dt){
   P.invulnT-=dt;P.slowT-=dt;
@@ -3619,7 +3619,7 @@ function updateCamera(dt){
     v2.set(P.pos.x,ty,P.pos.z);camT.lerp(v2,1-Math.exp(-dt*6));const cp=Math.cos(pitch);
     camera.position.set(camT.x+Math.sin(camYaw)*d*cp,camT.y+Math.sin(pitch)*d+.9,camT.z+Math.cos(camYaw)*d*cp);camera.lookAt(camT);
     const ox=selVO?Math.round(-selVO.dx):0,oy=selVO?Math.round(-selVO.dy):0;if(ox!==selOX||oy!==selOY||selOW!==W||selOH!==H){selOX=ox;selOY=oy;selOW=W;selOH=H;camera.setViewOffset(W,H,ox,oy,W,H);}}
-  else{if(selOW){selOW=0;selOX=selOY=0;camera.clearViewOffset();}const dist=(portrait?29:22)+(BOSS?4:0);
+  else{if(selOW){selOW=0;selOX=selOY=0;camera.clearViewOffset();}const dist=(portrait?29:22)*CAM_K+(BOSS?4:0);
     camT.lerp(v1.set(P.pos.x,1.2,P.pos.z),1-Math.exp(-dt*9));const cp=Math.cos(camPitch);
     camera.position.set(camT.x+Math.sin(camYaw)*dist*cp,camT.y+Math.sin(camPitch)*dist,camT.z+Math.cos(camYaw)*dist*cp);
     if(shake>0){shake-=dt;camera.position.x+=rand(-1,1)*shake*.5;camera.position.y+=rand(-1,1)*shake*.5;}
@@ -3695,7 +3695,7 @@ function toLocal(x,z){const t=camYaw+Math.PI,c=Math.cos(t),s=Math.sin(t);return 
 function toWorld(x,z){const t=camYaw+Math.PI,c=Math.cos(t),s=Math.sin(t);return {x:x*c+z*s,z:-x*s+z*c};}
 function gcx(z){const b=GZ.bend;return Math.sin(z*b[2]+GZ.seed)*b[0]+Math.sin(z*b[3]+GZ.seed*2.3)*b[1];}
 function ghw(z){let w=GZ.bw;for(const a of GZ.arenas){const d=Math.abs(z-a.z);if(d<a.len)w=Math.max(w,GZ.bw+(a.w-GZ.bw)*Math.cos(d/a.len*Math.PI/2));}return w;}
-function setGorgeLight(th){const d=th||{hemi:[0xa8bdf0,0x2a3320,.85],moon:[0xdbe4ff,.85],fogd:[42,118]};hemi.color.set(d.hemi[0]);hemi.groundColor.set(d.hemi[1]);hemi.intensity=d.hemi[2];moon.color.set(d.moon[0]);moon.intensity=d.moon[1];scene.fog.near=d.fogd[0];scene.fog.far=d.fogd[1];}
+function setGorgeLight(th){const d=th||{hemi:[0xa8bdf0,0x2a3320,.85],moon:[0xdbe4ff,.85],fogd:[42,118]};hemi.color.set(d.hemi[0]);hemi.groundColor.set(d.hemi[1]);hemi.intensity=d.hemi[2];moon.color.set(d.moon[0]);moon.intensity=d.moon[1];scene.fog.near=d.fogd[0]+7;scene.fog.far=d.fogd[1]+11;}
 function clearGorge(){if(TCC)TCC.clear();while(gorgeGroup.children.length)gorgeGroup.remove(gorgeGroup.children[0]);GDISP.forEach(d=>d&&d.dispose&&d.dispose());GDISP.length=0;GZ=null;gorgeGroup.visible=false;setGorgeLight(null);}
 function gdeco(k){if(GGEO[k])return GGEO[k];const T=THREE,C=(g,c,f)=>geoC(g,c,f),Dd=(r,y,x,z,c)=>C(new T.DodecahedronGeometry(r,0).translate(x||0,y,z||0),c,1);let g;
  switch(k){
@@ -4648,7 +4648,7 @@ const r2=x=>Math.round(x*100)/100;
 function mpRng(seed){let a=seed>>>0;return()=>{a=(a+0x6D2B79F5)>>>0;let t=a;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296;};}
 function mpSeeded(seed,fn){if(!MPon){fn();return;}const old=Math.random;Math.random=mpRng(seed);try{fn();}finally{Math.random=old;}}
 
-const APP_BUILD='v13.10';window.APP_BUILD=APP_BUILD;// = VERSION в sw.js; при выпуске менять в обоих местах (кооператив сверяет сборки игроков)
+const APP_BUILD='v13.11';window.APP_BUILD=APP_BUILD;// = VERSION в sw.js; при выпуске менять в обоих местах (кооператив сверяет сборки игроков)
 const MP_APP='ingenious-builder/tysyacha-char/v1';
 const MP_RELAYS=['nos.lol','nostr.mom','nostr.sathoarder.com','relay.fountain.fm','multiplexer.huszonegy.world'].map(u=>'wss://'+u);
 // TURN убран: openrelay.metered.ca закрыт (DNS не резолвится, relay-кандидатов нет). STUN у Trystero свой (Google и др.).
@@ -5643,7 +5643,7 @@ if(H_&&H_.ready)H_.ready(start);else start((H_&&H_.data)||{});
 <script>
 // версия, проверка обновлений и диагностика экрана
 (function(){
-const CUR=window.APP_BUILD||'v13.10';let reg=null;
+const CUR=window.APP_BUILD||'v13.11';let reg=null;
 const $=id=>document.getElementById(id);
 function showUpd(v){if($('updBar'))return;const b=document.createElement('div');b.id='updBar';b.innerHTML='<span>Есть обновление '+v+'</span><button type="button">Обновить</button>';b.querySelector('button').onclick=async()=>{b.firstChild.textContent='Обновляю…';try{if(reg)await reg.update();}catch(e){}try{const ks=await caches.keys();await Promise.all(ks.filter(k=>k.startsWith('tysyacha-char-')).map(k=>caches.delete(k)));}catch(e){}try{if(reg&&reg.waiting)reg.waiting.postMessage('skip');}catch(e){}appUpdateNow();};($('app')||document.body).appendChild(b);}
 async function chk(){try{const r=await fetch('sw.js?'+Date.now(),{cache:'no-store'});const t=await r.text();const m=t.match(/VERSION\s*=\s*['"]([^'"]+)['"]/);if(m&&m[1]!==CUR)showUpd(m[1]);}catch(e){}}
