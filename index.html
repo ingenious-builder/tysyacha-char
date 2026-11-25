@@ -783,14 +783,31 @@ html[data-ui=tab] .sk::after{font-size:15px;padding:3px 6px;border-radius:7px;ri
 html[data-ui=tab] .lay-l{font-size:15px;padding:5px 10px}
 #layPan{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);pointer-events:auto;width:min(380px,calc(100% - 24px - var(--sal) - var(--sar)));display:grid;gap:8px;padding:12px 14px;border-radius:14px;background:rgba(10,13,26,.95);border:1px solid var(--gold);box-shadow:0 10px 30px rgba(0,0,0,.6);cursor:default;touch-action:manipulation}
 #layPan.drag{opacity:.12;pointer-events:none;transition:opacity .15s}
-#layPan .lay-h{margin:0;text-align:center;font:600 15px var(--f-ui);color:var(--gold)}
+#layPan .lay-hd{display:flex;align-items:center;gap:8px}
+#layPan .lay-h{margin:0;flex:1;min-width:0;text-align:left;font:600 15px var(--f-ui);color:var(--gold)}
+#layPan .lay-min{flex:none;height:32px;min-height:32px;padding:0 10px;font-size:12px;border-radius:9px}
 #layPan .lay-hint{margin:0;text-align:center;font:400 12px/1.3 var(--f-ui);color:var(--muted)}
+#layPan .lay-mp{margin:0;text-align:center;font:600 12px/1.3 var(--f-ui);color:#ffc49a;background:rgba(255,106,77,.13);border:1px solid rgba(255,106,77,.45);border-radius:9px;padding:5px 8px}
+/* свёрнутая панель — узкая полоска «Развернуть | Готово», чтобы не закрывала кнопки (телефон в альбоме) */
+#layTop #layPan.min{width:auto;max-width:calc(100% - 24px - var(--sal) - var(--sar));grid-template-columns:auto auto;align-items:center;justify-content:center}
+#layPan.min .lay-h,#layPan.min .lay-hint,#layPan.min label,#layPan.min #laySwap,#layPan.min #layReset{display:none}
+#layPan.min .lay-hd{justify-self:end}#layPan.min .lay-b{grid-template-columns:auto;justify-self:start}#layPan.min .lay-b .btn{padding:0 18px}
+#layPan.min .lay-min{height:44px;min-height:44px;font-size:13px;padding:0 14px}
+#layPan.min .lay-mp{order:3;grid-column:1/-1}
+/* редактор: неподвижный интерфейс (полоски героя, мини-карта, полоса босса) — кнопки рядом, но не поверх */
+.lay-o{position:absolute;border:1px dashed rgba(255,255,255,.32);border-radius:10px;background:repeating-linear-gradient(135deg,rgba(255,255,255,.07) 0 6px,transparent 6px 12px)}
+/* телефон в альбоме: панель шире и ниже (ползунки рядом), чтобы помещалась между кнопками */
+@media (orientation:landscape) and (max-height:540px){
+  html:not([data-ui=tab]) #layPan:not(.min){width:min(540px,calc(100% - 24px - var(--sal) - var(--sar)));grid-template-columns:1fr 1fr;gap:6px 14px;padding:10px 14px}
+  html:not([data-ui=tab]) #layPan:not(.min)>:not(label){grid-column:1/-1}
+  html:not([data-ui=tab]) #layPan label{grid-template-columns:auto 1fr 40px}
+}
 #layPan label{display:grid;grid-template-columns:118px 1fr 42px;align-items:center;gap:8px;font:500 13px var(--f-ui)}
 #layPan label b{font-weight:600;text-align:right;font-variant-numeric:tabular-nums}
 #layPan input[type=range]{width:100%;min-height:32px;accent-color:var(--gold);touch-action:pan-x}
 #layPan .lay-b{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
 #layPan .lay-b .btn{padding:0 6px;font-size:13px;line-height:1.1;white-space:normal}
-html[data-ui=tab] #layPan{width:min(460px,calc(100% - 40px));padding:16px 18px;gap:12px}html[data-ui=tab] #layPan .lay-h{font-size:18px}html[data-ui=tab] #layPan label{font-size:15px;grid-template-columns:140px 1fr 50px}html[data-ui=tab] #layPan .lay-b .btn{font-size:15px;height:50px}
+html[data-ui=tab] #layPan{width:min(460px,calc(100% - 40px));padding:16px 18px;gap:12px}html[data-ui=tab] #layPan .lay-h{font-size:18px}html[data-ui=tab] #layPan label{font-size:15px;grid-template-columns:140px 1fr 50px}html[data-ui=tab] #layPan .lay-b .btn{font-size:15px;height:50px}html[data-ui=tab] #layPan .lay-min{height:40px;font-size:14px}html[data-ui=tab] #layPan .lay-mp{font-size:14px}html[data-ui=tab] #layPan.min .lay-min{height:50px;font-size:15px}
 </style>
 
 <div id="app">
@@ -832,7 +849,8 @@ html[data-ui=tab] #layPan{width:min(460px,calc(100% - 40px));padding:16px 18px;g
   <div id="layTop" hidden>
     <div id="layFr"></div>
     <div id="layPan" role="dialog" aria-label="Расположение кнопок">
-      <p class="lay-h">Расположение кнопок</p>
+      <div class="lay-hd"><p class="lay-h">Расположение кнопок</p><button class="btn lay-min" id="layMin" type="button" aria-expanded="true" aria-label="Свернуть панель, чтобы не мешала">Свернуть</button></div>
+      <p class="lay-mp" id="layMp" hidden>Игра вдвоём не ставится на паузу — враги не ждут, а герой пока стоит без защиты</p>
       <p class="lay-hint" id="layHint">Перетащи джойстик, атаку и кнопки меню куда удобно</p>
       <label><span>Джойстик</span><input type="range" id="layJ" min="80" max="140" step="5" value="100"><b id="layJV">100%</b></label>
       <label><span>Атака и чары</span><input type="range" id="layP" min="80" max="140" step="5" value="100"><b id="layPV">100%</b></label>
@@ -3653,6 +3671,20 @@ function layBoxes(st,S){const f=layFlips(st,S),sp=laySplit(),u=UI_U,kp=u*st.p.s,
   const abs=(c,B)=>({l:c.x+B.l,r:c.x+B.r,t:c.y+B.t,b:c.y+B.b}),t=st.t;
   return {j:abs(st.j,J),p:abs(st.p,P),t:{l:t.x-t.w/2,r:t.x+t.w/2,t:t.y-t.h/2,b:t.y+t.h/2},f};}
 function layKeys(st){return st.t.w>0?['j','p','t']:['j','p'];}
+// неподвижный интерфейс, который кнопки в редакторе не закрывают: полоски героя, мини-карта (и в ущелье, где она спрятана), полоса угрозы/босса/ущелья (самая большая из них),
+// подпись места, карточка напарника в игре вдвоём. Меряется по-живому при открытии редактора и при повороте экрана.
+let LAY_OB=[],LAY_LB=[],LAY_MIN=false;
+function layObs(){const a=app.getBoundingClientRect(),out=[],rc=el=>{if(!el)return null;const r=el.getBoundingClientRect();return r.width>0&&r.height>0?{l:r.left-a.left,r:r.right-a.left,t:r.top-a.top,b:r.bottom-a.top}:null;},
+  un=(x,y)=>!x?y:!y?x:{l:Math.min(x.l,y.l),r:Math.max(x.r,y.r),t:Math.min(x.t,y.t),b:Math.max(x.b,y.b)},add=b=>{if(b)out.push(b);};
+  if($('#hud').hidden)return out;
+  add(rc($('#stats')));
+  const mh=mmEl.hidden;mmEl.hidden=false;add(rc(mmEl));mmEl.hidden=mh;
+  const bars=[bossbar,threatEl,gprogEl],hs=bars.map(b=>b.hidden);let bt=null,zt=null;
+  for(const b of bars){bars.forEach(x=>{x.hidden=x!==b;});bt=un(bt,rc(b));zt=un(zt,rc($('#zoneTag')));}
+  bars.forEach((x,i)=>{x.hidden=hs[i];});add(bt);add(zt);
+  if(!$('#mpHud').hidden)add(rc($('#mpCard')));
+  return out;}
+function layOnOb(st,S,k){const b=layBoxes(st,S)[k];return LAY_ED&&LAY_OB.some(o=>layHit(b,o));}
 function layHit(a,b){return !(a.r+LAY_GAP<=b.l||b.r+LAY_GAP<=a.l||a.b+LAY_GAP<=b.t||b.b+LAY_GAP<=a.t);}
 function layOverlaps(st,S){const B=layBoxes(st,S),ks=layKeys(st);for(let i=0;i<ks.length;i++)for(let j=i+1;j<ks.length;j++)if(layHit(B[ks[i]],B[ks[j]]))return true;return false;}
 // не за край экрана и не под «островок»/полоску «Домой»
@@ -3660,14 +3692,15 @@ function layClampEl(st,k,S){for(let n=0;n<3;n++){const B=layBoxes(st,S)[k],e=st[
   if(B.r-B.l>S.x1-S.x0)dx=(S.x0+S.x1-B.l-B.r)/2;else if(B.l<S.x0)dx=S.x0-B.l;else if(B.r>S.x1)dx=S.x1-B.r;
   if(B.b-B.t>S.y1-S.y0)dy=(S.y0+S.y1-B.t-B.b)/2;else if(B.t<S.y0)dy=S.y0-B.t;else if(B.b>S.y1)dy=S.y1-B.b;
   if(Math.abs(dx)<.01&&Math.abs(dy)<.01)return;e.x+=dx;e.y+=dy;}}
-// элемент k — в пределах экрана и не поверх соседей: мягко отодвигаем на самую короткую сторону; false — места нет
-function layPush(st,k,S){layClampEl(st,k,S);
-  for(let it=0;it<6;it++){const B=layBoxes(st,S),a=B[k];let o=null;for(const q of layKeys(st))if(q!==k&&layHit(a,B[q])){o=B[q];break;}
+// элемент k — в пределах экрана, не поверх соседей и (в редакторе) не поверх полосок/карты/полосы босса: мягко отодвигаем на самую короткую сторону; false — места нет
+function layPush(st,k,S){layClampEl(st,k,S);const ob=LAY_ED?LAY_OB:[];
+  for(let it=0;it<8;it++){const B=layBoxes(st,S),a=B[k];let o=null;for(const q of layKeys(st))if(q!==k&&layHit(a,B[q])){o=B[q];break;}
+    if(!o)o=ob.find(b=>layHit(a,b))||null;
     if(!o)return true;
     const e=st[k],x0=e.x,y0=e.y,mv=[[o.l-LAY_GAP-a.r-.5,0],[o.r+LAY_GAP-a.l+.5,0],[0,o.t-LAY_GAP-a.b-.5],[0,o.b+LAY_GAP-a.t+.5]].sort((m1,m2)=>Math.abs(m1[0]+m1[1])-Math.abs(m2[0]+m2[1]));
     let ok=false;for(const [dx,dy] of mv){e.x=x0+dx;e.y=y0+dy;layClampEl(st,k,S);if(!layHit(layBoxes(st,S)[k],o)){ok=true;break;}}
     if(!ok){e.x=x0;e.y=y0;return false;}}
-  return !layOverlaps(st,S);}
+  return !layOverlaps(st,S)&&!layOnOb(st,S,k);}
 function layFromStore(o,S,tw,th){const W=S.x1-S.x0,H=S.y1-S.y0,arr=(a,n,d)=>Array.isArray(a)&&a.length>=n&&a.every(v=>isFinite(+v))?a.map(Number):d;
   const j=arr(o.j,3,[.12,.88,1]),p=arr(o.p,3,[.88,.88,1]),t=arr(o.t,4,[1,0,0,0]),c=v=>Math.max(-.2,Math.min(1.2,v));
   const l=t[0]?S.x1-c(t[1])*W-tw:S.x0+c(t[1])*W,tp=t[2]?S.y1-c(t[3])*H-th:S.y0+c(t[3])*H;
@@ -3690,7 +3723,7 @@ function layCur(S){const o=LAY_ALL[layMode()],tp=$('#topr');
 let LAY_ST=null,LAY_DRAG=null,LAY_SEL='';
 // при каждом resize: своя раскладка для этого экрана (портрет/альбом, телефон/iPad) или всё по умолчанию
 function applyLayout(){const S=laySafe();
-  if(LAY_ED){if(LAY_DRAG)return;LAY_ST=layCur(S);if(LAY_ALL[layMode()])layWrite(LAY_ST,S);layoutSlots();layDraw(S);layPanPlace(S);layRenderSl();return;}
+  if(LAY_ED){if(LAY_DRAG)return;LAY_OB=layObs();LAY_ST=layCur(S);if(LAY_ALL[layMode()])layWrite(LAY_ST,S);layoutSlots();layDraw(S);layPanPlace(S);layRenderSl();return;}
   const o=LAY_ALL[layMode()];if(!o){layOff();return;}
   const tp=$('#topr'),tw=tp.offsetWidth,th=tp.offsetHeight,st=layFromStore(o,S,tw,th);
   for(const k of layKeys(st))layClampEl(st,k,S);
@@ -3698,26 +3731,42 @@ function applyLayout(){const S=laySafe();
 function layCommit(S){LAY_ALL[layMode()]=layToStore(LAY_ST,S);laySaveAll();layWrite(LAY_ST,S);layoutSlots();}
 function layHint(t){const h=$('#layHint');h.textContent=t;clearTimeout(layHint.t);layHint.t=setTimeout(()=>{h.textContent=LAY_HINT;},2600);}
 function layRenderSl(){if(!LAY_ST)return;const j=Math.round(LAY_ST.j.s*100),p=Math.round(LAY_ST.p.s*100);$('#layJ').value=j;$('#layP').value=p;$('#layJV').textContent=j+'%';$('#layPV').textContent=p+'%';}
-function layDraw(S){const fr=$('#layFr');if(!LAY_ED||!LAY_ST){fr.innerHTML='';return;}S=S||laySafe();const B=layBoxes(LAY_ST,S),ks=layKeys(LAY_ST),pd=4,box=[];let h='';
+function layDraw(S){const fr=$('#layFr');if(!LAY_ED||!LAY_ST){fr.innerHTML='';LAY_LB=[];return;}S=S||laySafe();const B=layBoxes(LAY_ST,S),ks=layKeys(LAY_ST),pd=4,box=[];let h='';
+  for(const o of LAY_OB)h+=`<div class="lay-o" style="left:${(o.l-3).toFixed(1)}px;top:${(o.t-3).toFixed(1)}px;width:${(o.r-o.l+6).toFixed(1)}px;height:${(o.b-o.t+6).toFixed(1)}px"></div>`;
   for(const k of ks){const b=B[k];h+=`<div class="lay-f${k===LAY_SEL?' on':''}" data-k="${k}" style="left:${(b.l-pd).toFixed(1)}px;top:${(b.t-pd).toFixed(1)}px;width:${(b.r-b.l+pd*2).toFixed(1)}px;height:${(b.b-b.t+pd*2).toFixed(1)}px"></div>`;}
   // подписи: над рамкой, под ней, сбоку — где пусто и не за краем; места нет — внутри рамки
   const lw=k=>LAY_NAMES[k].length*(UI_U>1?8.6:7)+(UI_U>1?20:16),lh=UI_U>1?25:20;
   for(const k of ks){const b=B[k],w=lw(k),cx=Math.max(S.x0,Math.min(S.x1-w,(b.l+b.r)/2-w/2)),cy=(b.t+b.b)/2-lh/2;let at=null;
-    for(const [x,y] of [[cx,b.t-pd-lh-3],[cx,b.b+pd+3],[b.l-pd-w-4,cy],[b.r+pd+4,cy],[cx,b.t+pd+2]]){const r={l:x,r:x+w,t:y,b:y+lh};if(y<S.y0-4||y+lh>S.y1+4||x<S.x0-4||x+w>S.x1+4)continue;if(ks.some(q=>q!==k&&layHit(r,B[q]))||box.some(q=>layHit(r,q)))continue;at=[x,y];box.push(r);break;}
-    if(!at)at=[cx,b.t+pd+2];h+=`<span class="lay-l" style="left:${at[0].toFixed(1)}px;top:${at[1].toFixed(1)}px">${LAY_NAMES[k]}</span>`;}
-  fr.innerHTML=h;}
-// панель — по высоте туда, где она меньше всего закрывает кнопки (при равенстве — ближе к середине); пока тянешь — почти прозрачная
-function layPanPlace(S){if(!LAY_ED||!LAY_ST)return;S=S||laySafe();const pn=$('#layPan'),B=layBoxes(LAY_ST,S),ks=layKeys(LAY_ST),w=pn.offsetWidth,h=pn.offsetHeight,x=(S.W-w)/2,mid=(S.y0+S.y1)/2-h/2;
-  const cover=r=>ks.reduce((a,k)=>{const b=B[k],ow=Math.min(r.r,b.r+LAY_GAP)-Math.max(r.l,b.l-LAY_GAP),oh=Math.min(r.b,b.b+LAY_GAP)-Math.max(r.t,b.t-LAY_GAP);return a+(ow>0&&oh>0?ow*oh:0);},0);
-  let y=mid,bv=Infinity;for(let yy=S.y0;yy<=Math.max(S.y0,S.y1-h)+.1;yy+=6){const v=cover({l:x,r:x+w,t:yy,b:yy+h})+Math.abs(yy-mid)*.5;if(v<bv){bv=v;y=yy;}}
-  pn.style.top=Math.max(S.y0,Math.min(y,S.y1-h)).toFixed(1)+'px';pn.style.transform='translateX(-50%)';}
+    // сначала место, где подпись не ложится и на полоски/карту; нет такого — хоть поверх них (это лучше, чем на саму кнопку)
+    for(const strict of [true,false]){if(at)break;for(const [x,y] of [[cx,b.t-pd-lh-3],[cx,b.b+pd+3],[b.l-pd-w-4,cy],[b.r+pd+4,cy]]){const r={l:x,r:x+w,t:y,b:y+lh};if(y<S.y0-4||y+lh>S.y1+4||x<S.x0-4||x+w>S.x1+4)continue;if(ks.some(q=>q!==k&&layHit(r,B[q]))||box.some(q=>layHit(r,q))||(strict&&LAY_OB.some(q=>layHit(r,q))))continue;at=[x,y];box.push(r);break;}}
+    if(!at){at=[cx,b.t+pd+2];box.push({l:at[0],r:at[0]+w,t:at[1],b:at[1]+lh});}h+=`<span class="lay-l" style="left:${at[0].toFixed(1)}px;top:${at[1].toFixed(1)}px">${LAY_NAMES[k]}</span>`;}
+  LAY_LB=box;fr.innerHTML=h;}
+// панель — по горизонтали и по высоте туда, где она меньше всего закрывает кнопки и их подписи (при равенстве — ближе к середине);
+// место, за которое хватают (центр стика и атаки, кнопки меню), закрывать почти нельзя. Не помещается — её можно свернуть в полоску. Пока тянешь — почти прозрачная.
+function layPanPlace(S){if(!LAY_ED||!LAY_ST)return;S=S||laySafe();const pn=$('#layPan');pn.style.left='0px';pn.style.transform='none';
+  const st=LAY_ST,B=layBoxes(st,S),ks=layKeys(st),u=UI_U,w=pn.offsetWidth,h=pn.offsetHeight,mx=(S.x0+S.x1)/2-w/2,my=(S.y0+S.y1)/2-h/2,
+    ov=(r,b,m)=>{const ow=Math.min(r.r,b.r+m)-Math.max(r.l,b.l-m),oh=Math.min(r.b,b.b+m)-Math.max(r.t,b.t-m);return ow>0&&oh>0?ow*oh:0;},
+    cr=(c,R)=>({l:c.x-R,r:c.x+R,t:c.y-R,b:c.y+R}),core=[cr(st.j,50*u*st.j.s+12),cr(st.p,42*u*st.p.s+12)];if(st.t.w)core.push(B.t);
+  const cost=r=>{let v=0;for(const k of ks)v+=ov(r,B[k],LAY_GAP);for(const c of core)v+=ov(r,c,4)*40;for(const l of LAY_LB)v+=ov(r,l,2);return v;},
+    rng=(a,b,m)=>{const o=[m];for(let v=a;v<b;v+=6)o.push(v);o.push(b);return o;},
+    xs=S.x1-w>S.x0?rng(S.x0,S.x1-w,Math.max(S.x0,Math.min(mx,S.x1-w))):[mx],ys=S.y1-h>S.y0?rng(S.y0,S.y1-h,Math.max(S.y0,Math.min(my,S.y1-h))):[S.y0];
+  let bx=xs[0],by=ys[0],bv=Infinity;
+  for(const y of ys)for(const x of xs){const v=cost({l:x,r:x+w,t:y,b:y+h})+(Math.abs(x-mx)+Math.abs(y-my))*.5;if(v<bv){bv=v;bx=x;by=y;}}
+  pn.style.left=bx.toFixed(1)+'px';pn.style.top=by.toFixed(1)+'px';
+  // места нет совсем (бывает в альбоме, когда кнопки посередине) — подсвечиваем «Свернуть» и подсказываем
+  const pr={l:bx,r:bx+w,t:by,b:by+h},hid=!LAY_MIN&&(ov(pr,cr(st.j,50*u*st.j.s),0)>0||ov(pr,cr(st.p,42*u*st.p.s),0)>0||(st.t.w>0&&ov(pr,B.t,0)>0));$('#layMin').classList.toggle('gold',hid);
+  if(hid&&$('#layHint').textContent===LAY_HINT)layHint('Панель закрывает кнопку — нажми «Свернуть»');}
+function layMinSet(){const b=$('#layMin');$('#layPan').classList.toggle('min',LAY_MIN);b.textContent=LAY_MIN?'Развернуть':'Свернуть';b.setAttribute('aria-expanded',String(!LAY_MIN));
+  b.setAttribute('aria-label',LAY_MIN?'Развернуть панель: размер кнопок, «Поменять местами», «Сбросить»':'Свернуть панель, чтобы не мешала');}
 function layOpen(){const bh=$('#layBtnHint');
   if(mode!=='game'){if(bh)bh.textContent='Открой во время забега: кнопки управления видны только в игре.';return;}
   LAY_ED=true;if(setOpen)closeSettings();if(bookOpen)closeBook();hideUpg();syncPause();
   input.attack=false;input.jx=input.jy=0;input.keys={};input.mouseAttack=false;input.moveTo=null;joyId=null;mouseId=null;
   joy.classList.remove('on');joy.style.left='';joy.style.top='';knob.style.transform='';aimSt=null;hideAim();atk.classList.remove('down');SKB.forEach(s=>s.b.classList.remove('down'));
+  // игра вдвоём на паузу не встаёт — говорим об этом прямо в редакторе, как и в «Настройках»
+  $('#layMp').hidden=!MPon;layMinSet();
   app.classList.add('lay-ed');$('#layEd').hidden=false;$('#layTop').hidden=false;LAY_SEL='';LAY_DRAG=null;$('#layHint').textContent=LAY_HINT;applyLayout();}
-function layClose(){if(!LAY_ED)return;LAY_ED=false;LAY_DRAG=null;LAY_ST=null;$('#layPan').classList.remove('drag');$('#layEd').hidden=true;$('#layTop').hidden=true;app.classList.remove('lay-ed');$('#layFr').innerHTML='';syncPause();applyLayout();layoutSlots();if(LAY_ALL[layMode()])toast('Раскладка сохранена. Поменять — шестерёнка → «Расположение кнопок»');}
+function layClose(){if(!LAY_ED)return;LAY_ED=false;LAY_DRAG=null;LAY_ST=null;LAY_OB=[];LAY_LB=[];$('#layPan').classList.remove('drag');$('#layEd').hidden=true;$('#layTop').hidden=true;app.classList.remove('lay-ed');$('#layFr').innerHTML='';syncPause();applyLayout();layoutSlots();if(LAY_ALL[layMode()])toast('Раскладка сохранена. Поменять — шестерёнка → «Расположение кнопок»');}
 {const ed=$('#layEd'),pt=e=>{const r=app.getBoundingClientRect();return {x:e.clientX-r.left,y:e.clientY-r.top};};
  const which=(p,S)=>{const st=LAY_ST,u=UI_U,B=layBoxes(st,S),inB=(b,m)=>p.x>=b.l-m&&p.x<=b.r+m&&p.y>=b.t-m&&p.y<=b.b+m;
    if(Math.hypot(p.x-st.j.x,p.y-st.j.y)<=50*u*st.j.s+12)return 'j';if(Math.hypot(p.x-st.p.x,p.y-st.p.y)<=42*u*st.p.s+12)return 'p';
@@ -3727,9 +3776,10 @@ function layClose(){if(!LAY_ED)return;LAY_ED=false;LAY_DRAG=null;LAY_ST=null;$('
    layDraw(S);});
  ed.addEventListener('pointermove',e=>{const d=LAY_DRAG;if(!d||d.pid!==e.pointerId)return;const p=pt(e),st=LAY_ST,el=st[d.k],bx=el.x,by=el.y;
    el.x=p.x+d.ox;el.y=p.y+d.oy;if(d.k==='t')delete st.t.a;
+   d.ob=layOnOb(st,d.S,d.k);   // тянут на полоски/карту/полосу босса — после отпускания подскажем, почему кнопка встала рядом
    if(!layPush(st,d.k,d.S)){el.x=bx;el.y=by;}   // упёрся в соседа — стоит, где был
    d.moved=true;layWrite(st,d.S);layoutSlots();layDraw(d.S);});
- const up=e=>{const d=LAY_DRAG;if(!d||d.pid!==e.pointerId)return;LAY_DRAG=null;$('#layPan').classList.remove('drag');if(d.moved)layCommit(d.S);layPanPlace(d.S);layDraw(d.S);};
+ const up=e=>{const d=LAY_DRAG;if(!d||d.pid!==e.pointerId)return;LAY_DRAG=null;$('#layPan').classList.remove('drag');if(d.moved)layCommit(d.S);layDraw(d.S);layPanPlace(d.S);if(d.ob)layHint('Полоски героя, карта и полоса босса не закрываются — кнопка встала рядом');};
  ed.addEventListener('pointerup',up);ed.addEventListener('pointercancel',up);
  const size=(k,v)=>{if(!LAY_ST)return;const S=laySafe(),st=LAY_ST,o={s:st[k].s,x:st[k].x,y:st[k].y};st[k].s=layS(v/100);if(st[k].s===o.s){layRenderSl();return;}
    let ok=layPush(st,k,S);
@@ -3741,6 +3791,7 @@ function layClose(){if(!LAY_ED)return;LAY_ED=false;LAY_DRAG=null;LAY_ST=null;$('
    for(const k of layKeys(st))layPush(st,k,S);layCommit(S);layDraw(S);layPanPlace(S);layHint(LAY.jx>S.W/2?'Джойстик справа, атака слева':'Джойстик слева, атака справа');});
  $('#layReset').addEventListener('click',()=>{if(!LAY_ED)return;delete LAY_ALL[layMode()];laySaveAll();LAY_SEL='';applyLayout();layoutSlots();layHint('Как было по умолчанию');});
  $('#layDone').addEventListener('click',layClose);
+ $('#layMin').addEventListener('click',()=>{if(!LAY_ED)return;LAY_MIN=!LAY_MIN;layMinSet();layPanPlace(laySafe());});
  $('#layBtn').addEventListener('click',layOpen);$('#setLay').addEventListener('click',layOpen);
  window.addEventListener('keydown',e=>{if(!LAY_ED)return;const inPan=e.target&&e.target.closest&&e.target.closest('#layPan');
    if(e.code==='Escape'||(e.code==='Enter'&&!inPan)){e.preventDefault();layClose();}e.stopImmediatePropagation();},true);}
