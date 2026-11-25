@@ -1753,8 +1753,9 @@ const CP_MORE={
  lock:['doom','aura','surge','rebirth','harvest','trail'],     // адский взрыв трупов, ореол пламени, перегрев, возрождение из пепла, похищение жизни, адский след
  inq:['execute','rebirth','deflect','link','volley','focus'],   // казнь-приговор, благословение, эгид-отбойник, цепь света, святые болты, прицел стоя
  alch:['volley','surge','twin','focus','slip','orbit'],        // колбы за спиной, брожение, двойник, шар яда, дымовое ускользание, колбы-стражи
- // Тимур (слияние int/v1331): 10 разных форм, с Пиромантом совпадает 6, с Криомантом/Повелителем бури/Геомантом — 5; защитных 2 (потолок мага 3)
- timur:['link','battery','doom','brand','rebirth','brink']};   // угощение по цепочке, самовар-батарея, взрыв павших, метка гостя, второе дыхание, миг на краю
+ // Тимур (слияние int/v1331): 10 разных форм, с Пиромантом и Криомантом совпадает 6, с Геомантом 6, с Повелителем бури 5; защитных 2 (потолок
+ // мага 3). «Метку» (brand) не даём: в бою 60-го ур. с ней Тимур бил в 1,45 раза сильнее Пироманта и Криоманта (без неё — 0,94)
+ timur:['link','battery','doom','orbit','rebirth','brink']};   // угощение по цепочке, самовар-батарея, взрыв павших, эчпочмаки вокруг, второе дыхание, миг на краю
 for(const id in CP_MORE)if(CLASS_KIT[id])for(const f of CP_MORE[id])if(!CLASS_KIT[id].cp.includes(f))CLASS_KIT[id].cp.push(f);   // c.cp героя — тот же массив
 // Проверка 25.11 со смертным героем (_check/rev_pas/surv.js): «Лучший билд» брал две «Вторые жизни» (и два «Кокона») у 14 героев из 20 —
 // у каждой свой откат, то есть два спасения от смерти за бой. Теперь PAS_ONE — в билде по одной (автоустановка, автозамена, «Лучший
@@ -4062,10 +4063,12 @@ function wvBurst(C,k){const two=WV.w>=5&&WV.burst%2===0,a=WV.dir+(two?Math.PI*.7
     WV.q.shift();const x=bx+rand(-3,3),z=bz+rand(-3,3);
     const zk=wvZK(WV.z);for(const e of spawnMob(sp.tid,x,z,WV.lv,{rw,hunt:true,aggro:true,noPack:true,elite:!!sp.el,affixList:sp.el?wvAffix(WV.lv):undefined,hpMul:WV_HP*zk.hp*(sp.el?.5:1),dmgMul:WV_DM*zk.dm*(wvCoop()?1.1:1),xpMul:WV_XP})){e.noDespawn=true;e.aggro=true;wvMark(e,WV.id);}}
   puffs(bx,1,bz,new THREE.Color(0x553344),10,2.5,1.2);}
-// босс волны на 1 ур. выше волны (владыка — на 2): прежний босс мира (+2 ур.) у героя 8–10-го уровня сносил хрупкого мага одним ударом
+// босс волны на 1 ур. выше волны (владыка — на 2): прежний босс мира (+2 ур.) у героя 8–10-го уровня сносил хрупкого мага одним ударом.
+// int/v1331 (16 пассивок, у мага не больше 3 защитных): удар колосса 3-й волны снимал Пироманту 8-го ур. 73% здоровья (176 из 242), бот
+// падал на 3-й и 6-й волне до 7 раз подряд — урон боссов 3-й и 6-й волн ×0,65 и ×0,75 (было ×0,75 и ×0,85), владыка края — как был
 function wvBoss(sp,x,z,rw){const main=sp.boss===2,lv=WV.lv+(main?2:1);
   // вдвоём босс крепче (к ×1,6 кооператива ещё ×1,3) и бьёт на 10 % больнее: двое с танком проходили 3-ю волну, не опускаясь ниже 89 % здоровья
-  const zk=wvZK(WV.z),first=WV.w<=3,cp=wvCoop();BOSS=spawnEnemy(sp.tid,x,z,lv,{rw,hpMul:(main?WV_BMAIN:WV_BHP[first?0:1])*zk.hp*(cp?1.3:1),dmgMul:(main?.95:first?.75:.85)*zk.dm*(cp?1.1:1),bsub:(main?'Владыка края':'Босс '+WV.w+'-й волны')+' «'+ZONES[WV.z].name+'»'});
+  const zk=wvZK(WV.z),first=WV.w<=3,cp=wvCoop();BOSS=spawnEnemy(sp.tid,x,z,lv,{rw,hpMul:(main?WV_BMAIN:WV_BHP[first?0:1])*zk.hp*(cp?1.3:1),dmgMul:(main?.95:first?.65:.75)*zk.dm*(cp?1.1:1),bsub:(main?'Владыка края':'Босс '+WV.w+'-й волны')+' «'+ZONES[WV.z].name+'»'});
   BOSS.skillCd=2.5;wvMark(BOSS,WV.id);bossIntro(BOSS);puffs(x,1,z,new THREE.Color(0x553344),20,2.5,1.4);}
 // награда за волну: до цели края T(w) = мин + (макс − мин)·(0,25 + 0,75·w/10), не больше 3 уровней за раз; перерос цель — тает
 function wvReward(z,w){const L=S.lvl,n=xpNeed(L);if(z>=ZABYSS)return Math.round(.25*n);
