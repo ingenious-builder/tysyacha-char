@@ -8213,6 +8213,9 @@ function mpInit(){
   H(()=>{shootAt=W(shootAt,(en,kind)=>A.eshot(en.pos.x,en.pos.z,kind));});
   H(()=>{shootDir=W(shootDir,en=>A.eshot(en.pos.x,en.pos.z,'orb'));});
   H(()=>{mpGuestEProj=W(mpGuestEProj,m=>{if(m&&MPG&&mode==='game')A.eshot(m.x,m.z,m.k==='arrow'?'arrow':'orb');});});
+  // кооп: чары и удары напарника (форма, стихия, его редкость m.r; без чары — взмах/выстрел по его классу)
+  H(()=>{mpPeerCast=W(mpPeerCast,m=>{const pr=MP.peer;if(!m||!pr||!pr.on||!pr.hero||mode!=='game')return;const sk=m.s>=0?SKILLS[m.s]:null,C=CLASS_BY[pr.cls]||{};
+    A.peerCast(pr.pos.x,pr.pos.z,sk?sk.F.id:'',sk?sk.E.id:'',m.r|0,C.role,!!C.melee,C.id);});});
   H(()=>{const f0=tele;tele=function(shape,o,dur,cb){let big=false,sz=3;try{big=!!(o.src&&o.src.boss);sz=o.r||o.len||3;A.tele(o.x,o.z,sz,big||sz>=5);}catch(e){}
     return f0.call(this,shape,o,dur,cb?function(t){try{A.teleHit(t.x,t.z,sz,big||sz>=5);}catch(e){}return cb.apply(this,arguments);}:cb);};});
   H(()=>{dash=W(dash,en=>{if(en&&en.pos&&(en.boss||en.elite))A.charge(en.pos.x,en.pos.z);});});

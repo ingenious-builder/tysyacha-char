@@ -108,7 +108,9 @@ function brass(sr,d,f,o){o=o||{};const x=N(sr,d),vib=t=>1+(t>.3?.006*Math.sin(TA
   osc(x,sr,'sin',f/2,.25);svf(x,sr,'lp',crv([[0,280],[.09,o.br||2200],[.4,(o.br||2200)*.6],[d,(o.br||2200)*.45]]),1.1);E(x,sr,ar(o.a||.07,d-(o.a||.07)-(o.r||.35),o.r||.35));return x;}
 function notesBrass(sr,seq,o){let d=0;for(const s of seq)d=Math.max(d,s[0]+s[2]);const x=N(sr,d+.05);for(const s of seq)add(x,nz(brass(sr,s[2],mtf(s[1]),o)),s[3]==null?1:s[3],s[0],sr);return x;}
 function taiko(sr,r,f){const x=N(sr,.9);osc(x,sr,'sin',crv([[0,f*1.7],[.14,f]]),1);E(x,sr,ad(.002,.32));const b=N(sr,.3);osc(b,sr,'sin',crv([[0,f*2.9],[.1,f*1.8]]),.45);E(b,sr,ad(.001,.08));add(x,b);
-  add(x,noiseHit(sr,r,.08,'lp',1100,.7,.0005,.022),.45);return drv(nz(x),1.4);}
+  add(x,noiseHit(sr,r,.08,'lp',1100,.7,.0005,.022),.45);
+  // кожа и палка: мембрана 300–600 Гц и щелчок — барабан слышен и на динамике телефона
+  add(x,body(sr,.5,f*1.7,f,.32,[[3,1,.5],[4,.75,.4],[5,.5,.3]]),.8);add(x,noiseHit(sr,r,.16,'bp',460,1.1,.0006,.06),.6);add(x,smack(sr,r,1500,.012),.25);return drv(nz(x),1.4);}
 function roar(sr,r,d,f0c,o){o=o||{};const x=N(sr,d),j=smooth(r,d,9);osc(x,sr,'saw',t=>f0c(t)*(1+.05*(j(t)-.5)),.7);add(x,W(sr,d,r),o.nz||.55);
   E(x,sr,t=>.62+.38*Math.sin(TAU*(o.am||29)*t+3*Math.sin(t*7.3)));const y=fmt(x,sr,o.F||[[640,5,1],[1080,6,.65],[2450,8,.32]]);lp1(y,sr,3600);drv(nz(y),o.drv||2.4);
   osc(y,sr,'sin',t=>f0c(t)/2,.35);E(y,sr,o.env||ar(.14,d-.75,.6));return y;}
@@ -120,6 +122,12 @@ function zap(sr,r,d,f){const x=N(sr,d),n=W(sr,d,r);bq(n,sr,'bp',2800,1.2);let p=
 function bubbles(x,sr,r,n,t0,t1,f0,f1,a){for(let k=0;k<n;k++){const t=t0+(t1-t0)*r(),f=f0*(.8+.5*r());blip(x,sr,f,t,.03+r()*.03,(a||1)*(.5+.5*r()),f*(f1||2.6));}return x;}
 function shatter(sr,r,d,n){const x=N(sr,d);for(let k=0;k<n;k++){const f=1800+r()*7000,t=Math.pow(r(),2)*d*.35;parts(x,sr,f,[[1,.5+.5*r(),.03+r()*.1],[1.7,.3,.04]],t,.6);}
   add(x,noiseHit(sr,r,.25,'hp',3500,.7,.0005,.05),.6);return x;}
+// слой для динамика телефона: суб ниже ~150 Гц iPhone почти не играет — гармоники того же тона (2–4 и выше, 150–600 Гц) слышны и на нём.
+// H — [[кратность, громкость, доля спада]]; тон идёт той же кривой, что у thud (f0 → f1)
+function body(sr,d,f0,f1,dk,H){const x=N(sr,d),fc=crv([[0,f0],[Math.min(.12,d*.6),f1]]);
+  for(const h of H||[[2,1,.7],[3,.6,.5],[4,.35,.35]]){const y=N(sr,d);osc(y,sr,'sin',t=>fc(t)*h[0],1);E(y,sr,ad(.002,(dk||.09)*h[2]));add(x,y,h[1]);}return nz(x);}
+// хлёсткая атака 1–3 кГц: удар «щёлкает» и на маленьком динамике
+const smack=(sr,r,f,dk)=>noiseHit(sr,r,.07,'bp',f||1800,.8,.0004,dk||.012);
 
 // =====================================================================
 // РЕЦЕПТЫ: имя → {f:(sr,rnd,вариант)→Float32Array|{x,base}, v: вариантов, d: о звуке}
@@ -137,10 +145,14 @@ def('ui_slot','торжественный аккорд — открыт слот
 def('ui_rar2','фиолетовые искры — эпическая чара',(sr,r)=>{const x=bells(sr,1.1,[81,84,88,93],BELL,.045,1,.9);add(x,whoosh(sr,r,.4,2500,7000,1.2,.15,.12),.12);return verb(x,sr,1.1,.22);});
 def('ui_rar3','золотые фанфары и колокола — легендарная',(sr,r)=>{const x=base(sr,2,nz(notesBrass(sr,[[0,62,.5,.8],[0,66,.5,.6],[0,69,.5,.6],[.18,74,1.1,1]],{br:2600})));add(x,nz(bells(sr,1.8,[86,90,93,98],CHIME,.06,1,1.2)),.55,.15,sr);
   add(x,nz(thud(sr,.6,110,55,.25)),.4);add(x,whoosh(sr,r,.8,3000,8000,1,.4,.2),.1,.1,sr);return verb(x,sr,1.8,.3);});
-def('ui_rar4','чёрное пламя: суб-удар, тритон, рёв огня — «Невозможная»',(sr,r)=>{const d=2.4,x=N(sr,d);osc(x,sr,'sin',crv([[0,70],[.5,30]]),1);E(x,sr,ad(.003,.55));
-  const b=N(sr,d);parts(b,sr,mtf(36),[[1,1,1.4],[2.01,.5,.8],[2.97,.3,.5]],.05);parts(b,sr,mtf(42),[[1,.8,1.3],[2.02,.4,.7]],.05);parts(b,sr,mtf(49),[[1,.4,1]],.05);add(x,nz(b),.6);
-  const f=W(sr,d,r);lp1(f,sr,380);lp1(f,sr,600);const fl=smooth(r,d,18);E(f,sr,t=>sw(0,1,0,.5)(t)*Math.exp(-Math.max(0,t-.5)/.7)*(.4+.6*fl(t)));add(x,nz(f),.7);
-  const sws=W(sr,.5,r);bq(sws,sr,'hp',2500,.7);E(sws,sr,t=>Math.pow(t/.5,3));add(x,nz(sws),.12);return drv(verb(x,sr,2,.3),1.3);});
+def('ui_rar4','чёрное пламя: суб-удар, тритон, рёв огня — «Невозможная»',(sr,r)=>{const d=2.4,x=N(sr,d);osc(x,sr,'sin',crv([[0,70],[.5,30]]),.32);E(x,sr,ad(.003,.55));
+  const b=N(sr,d);parts(b,sr,mtf(36),[[1,1,1.4],[2.01,.5,.8],[2.97,.3,.5]],.05);parts(b,sr,mtf(42),[[1,.8,1.3],[2.02,.4,.7]],.05);parts(b,sr,mtf(49),[[1,.4,1]],.05);add(x,nz(b),.42);
+  const f=W(sr,d,r);lp1(f,sr,380);lp1(f,sr,600);hp1(f,sr,170);const fl=smooth(r,d,18);E(f,sr,t=>sw(0,1,0,.5)(t)*Math.exp(-Math.max(0,t-.5)/.7)*(.4+.6*fl(t)));add(x,nz(f),.7);
+  const sws=W(sr,.5,r);bq(sws,sr,'hp',2500,.7);E(sws,sr,t=>Math.pow(t/.5,3));add(x,nz(sws),.12);
+  // тёмная медь тритоном (ре и соль-диез большой октавы) и рёв пламени 250–800 Гц — тяжело и громче легендарной на любом динамике
+  add(x,nz(notesBrass(sr,[[0,38,1.9,1],[0,44,1.9,.85],[0,50,1.9,.5]],{br:1100,a:.05,r:.9})),1.6,.02,sr);
+  add(x,nz(roar(sr,r,1.6,crv([[0,58],[.35,76],[1.6,44]]),{F:[[290,4,1],[480,5,.75],[850,6,.4]],am:21,nz:.8,drv:2.2,env:ad(.06,.6)})),1.5,.03,sr);
+  const fr=W(sr,2,r);svf(fr,sr,'bp',t=>850+450*fl(t),.8);E(fr,sr,t=>ad(.08,.6)(t)*(.3+.7*fl(t)));add(x,nz(fr),1.4,.03,sr);const k=N(sr,d);crk(k,sr,r,30,.05,1.4,3);bq(k,sr,'bp',1100,.9);add(x,nz(k),.25);return drv(verb(x,sr,2,.3),1.3);},1,1);
 def('ui_impw','зловещий подъём и удар — Невозможное пробудилось',(sr,r)=>{const d=3,x=N(sr,d);const s=W(sr,1.4,r);bq(s,sr,'bp',crv([[0,600],[1.4,4000]]),1);E(s,sr,t=>Math.pow(t/1.4,2.5));add(x,nz(s),.4);
   const b=N(sr,1.6);osc(b,sr,'sin',crv([[0,62],[.6,28]]),1);E(b,sr,ad(.003,.5));add(x,nz(b),1,1.4,sr);const c=N(sr,1.6);parts(c,sr,mtf(38),[[1,1,1.2],[2.01,.4,.7]]);parts(c,sr,mtf(44),[[1,.8,1.1]]);add(x,nz(c),.5,1.4,sr);return verb(x,sr,2.2,.3);});
 def('chest','скрип крышки, щелчок замка и россыпь сокровищ',(sr,r)=>{const d=1.6,x=N(sr,d);const c=N(sr,.45);let t=0;while(t<.4){const i=Math.round(t*sr);if(i<c.length)c[i]+=1;t+=1/(35+t*80);}bq(c,sr,'bp',850,6);lp1(c,sr,2500);E(c,sr,ar(.05,.25,.1));add(x,nz(c),.5);
@@ -153,13 +165,16 @@ def('portal','магический вихрь — выход открыт',(sr,r
   const p=N(sr,d);[69,73,76,81].forEach((m,i)=>osc(p,sr,'sin',mtf(m),.25,i*.12));E(p,sr,ar(.5,.7,.6));add(x,nz(p),.6);return verb(x,sr,1.6,.3);});
 def('peer_in','дружелюбные два звона вверх — напарник подключился',(sr,r)=>{const x=bells(sr,.9,[72,77],[[1,1,.45],[4,.25,.1],[10,.06,.03]],.11);return x;});
 def('peer_out','два звона вниз — напарник ушёл',(sr,r)=>bells(sr,.8,[77,72],[[1,1,.35],[4,.2,.08]],.13));
-def('peer_down','тревога: три пары тонов — напарник упал',(sr,r)=>{const x=N(sr,.9);for(let k=0;k<3;k++){osc(x,sr,'tri',988,.5,k*.27,.12);osc(x,sr,'tri',740,.5,k*.27+.13,.12);}lp1(x,sr,3200);
-  for(let i=0;i<x.length;i++){const t=(i/sr)%.13;x[i]*=Math.min(1,t/.006,(.12-t)/.01>0?(.12-t)/.01:0);}return x;});
+// у каждой ноты своя огибающая от её начала (атака 6 мс, спад 12 мс), треугольник с фазы 0,25 — нота стартует с нуля: щелчков нет
+def('peer_down','тревога: три пары тонов — напарник упал',(sr,r)=>{const x=N(sr,.9);for(let k=0;k<3;k++)for(const [f,t0] of [[988,k*.27],[740,k*.27+.13]]){const y=N(sr,.12);osc(y,sr,'tri',f,.5,0,0,.25);E(y,sr,t=>Math.min(1,t/.006,Math.max(0,(.12-t)/.012)));add(x,y,1,t0,sr);}
+  lp1(x,sr,3200);return x;});
 def('revive','восходящий светлый аккорд — поднялся',(sr,r)=>{const x=bells(sr,1.4,[69,73,76,81,85],BELL,.07,1,1.2);add(x,whoosh(sr,r,.7,500,4500,1.2,.4,.2),.2);return verb(x,sr,1.3,.25);});
 def('heal','мягкий восходящий звон — лечение',(sr,r)=>{const x=N(sr,.8);osc(x,sr,'sin',crv([[0,660],[.25,990]]),.6);osc(x,sr,'sin',crv([[0,1320],[.25,1980]]),.2);E(x,sr,ad(.06,.25));add(x,nz(bells(sr,.6,[93,96],GLASS,.05,1,2)),.15,.12,sr);return x;});
-def('heart','глухое двойное сердцебиение — мало здоровья',(sr,r)=>{const x=N(sr,.45);add(x,nz(thud(sr,.2,70,45,.05)));add(x,nz(thud(sr,.2,62,42,.05)),.7,.17,sr);lp1(x,sr,400);return x;});
-def('hurt','глухой удар по герою',(sr,r)=>{const x=thud(sr,.25,95,45,.09);nz(x);add(x,noiseHit(sr,r,.08,'lp',1800,.7,.0008,.035),.5);const g=N(sr,.16);osc(g,sr,'saw',crv([[0,145],[.15,105]]),1);
-  const gf=fmt(g,sr,[[520,4,1],[950,5,.5]]);E(gf,sr,ad(.012,.05));add(x,nz(gf),.22,.01,sr);return drv(x,1.6);},2);
+def('heart','глухое двойное сердцебиение — мало здоровья',(sr,r)=>{const x=N(sr,.45),b=(f0,f1)=>{const y=nz(thud(sr,.2,f0,f1,.05));add(y,body(sr,.2,f0,f1*1.35,.05,[[3,.8,1],[4,1,.9],[5,.6,.7],[6,.35,.5]]),1.2);return y;};
+  add(x,b(70,45));add(x,b(62,42),.7,.17,sr);lp1(x,sr,900);return x;});
+def('hurt','глухой удар по герою',(sr,r)=>{const x=thud(sr,.25,95,45,.09);nz(x,.8);add(x,body(sr,.25,95,70,.09,[[2,.8,.9],[3,1,.75],[4,.7,.6],[5,.4,.45]]),1);add(x,smack(sr,r,1400,.02),.4);
+  add(x,noiseHit(sr,r,.08,'lp',1800,.7,.0008,.035),.5);const g=N(sr,.16);osc(g,sr,'saw',crv([[0,145],[.15,105]]),1);
+  const gf=fmt(g,sr,[[520,4,1],[950,5,.5]]);E(gf,sr,ad(.012,.05));add(x,nz(gf),.4,.01,sr);return drv(x,1.6);},2);
 def('die','падение героя: удар и уходящий вниз тон',(sr,r)=>{const d=1.8,x=base(sr,1.9,nz(thud(sr,.5,90,35,.25)));const t=N(sr,d);osc(t,sr,'sin',crv([[0,330],[1.4,70]]),.6);osc(t,sr,'tri',crv([[0,165],[1.4,35]]),.3);E(t,sr,ad(.02,.6));add(x,nz(t),.5,.05,sr);
   const rb=BR(sr,1.2,r);lp1(rb,sr,250);E(rb,sr,ad(.02,.35));add(x,nz(rb),.35);return verb(x,sr,1.8,.3);});
 def('shield_hit','звон щита, поглотившего удар',(sr,r)=>{const x=N(sr,.3);parts(x,sr,1800*(1+r()*.05),[[1,1,.08],[1.44,.6,.06],[2.28,.4,.04]]);add(x,noiseHit(sr,r,.03,'hp',3000,.7,.0005,.006),.25);return x;},2);
@@ -171,7 +186,7 @@ def('sw_heavy','тяжёлый взмах танка',(sr,r)=>{const x=whoosh(sr
 def('bow','тетива и свист стрелы',(sr,r)=>{const p=pluck(sr,150+r()*30,.25,r,.985,.45).x;E(p,sr,ad(.001,.07));const x=nz(p);add(x,noiseHit(sr,r,.02,'hp',2200,.7,.0003,.004),.4);add(x,whoosh(sr,r,.14,2600,1300,1.6,.02,.05),.45,.03,sr);return x;},2);
 def('wand','волшебный выстрел: свист вниз с искрой',(sr,r)=>{const x=N(sr,.2);let p=0;const f=crv([[0,1700+r()*300],[.09,650]]);for(let i=0;i<x.length;i++){const t=i/sr,fc=f(t);p+=fc/sr;x[i]=Math.sin(TAU*p+2.2*Math.exp(-t/.05)*Math.sin(TAU*p*3));}
   E(x,sr,ad(.003,.045));add(x,noiseHit(sr,r,.02,'bp',2600,1,.0005,.008),.3);return x;},2);
-def('hit_f','мясистый удар в ближнем бою',(sr,r)=>{const x=thud(sr,.2,140+r()*20,55,.06);nz(x);add(x,noiseHit(sr,r,.07,'lp',2200,.7,.0005,.025),.55);add(x,noiseHit(sr,r,.004,'hp',2000,.7,.0002,.0008),.25);return drv(x,1.8);},2);
+def('hit_f','мясистый удар в ближнем бою',(sr,r)=>{const f0=140+r()*20,x=thud(sr,.2,f0,55,.06);nz(x,.65);add(x,body(sr,.2,f0,90,.06,[[2,.8,1.1],[3,1,.9],[4,.7,.7],[5,.4,.5]]),1.3);add(x,smack(sr,r,1700,.035),1.3);add(x,noiseHit(sr,r,.07,'lp',2200,.7,.0005,.025),.55);add(x,noiseHit(sr,r,.004,'hp',2000,.7,.0002,.0008),.25);return drv(x,1.8);},2);
 def('hit_p','лёгкое попадание снаряда',(sr,r)=>{const x=thud(sr,.13,300,120,.03);nz(x);add(x,noiseHit(sr,r,.05,'bp',2000,.9,.0005,.02),.6);return x;},2);
 def('crit','крит: резкий щелчок и звон',(sr,r)=>{const x=base(sr,.22,noiseHit(sr,r,.03,'hp',3000,.7,.0002,.008));add(x,nz(thud(sr,.15,180,60,.05)),.7);parts(x,sr,2400,[[1,.5,.09],[1.54,.4,.07]],.002);return drv(x,1.5);});
 // ---------- попадания стихий (у каждой свой тембр) ----------
@@ -187,7 +202,7 @@ def('h_blood','кровь: влажный удар',(sr,r)=>{const x=W(sr,.3,r);
 def('h_arcane','аркана: звонкий FM-колокол со взлётом',(sr,r)=>{const d=.5,x=N(sr,d);let p=0,q=0;const f=crv([[0,860],[.12,960]]);for(let i=0;i<x.length;i++){const t=i/sr,fc=f(t);p+=fc/sr;q+=fc*2.01/sr;x[i]=Math.sin(TAU*p+(3*Math.exp(-t/.08)+.4)*Math.sin(TAU*q));}
   E(x,sr,ad(.002,.15));parts(x,sr,3520,[[1,.2,.1]],.01);return x;},2);
 // ---------- взрыв площади (низ) ----------
-def('boom','взрыв: низкий удар, гул и треск',(sr,r)=>{const x=thud(sr,.7,80,32,.28);nz(x);const n=W(sr,.6,r);bq(n,sr,'lp',crv([[0,2600],[.5,240]]),.7);E(n,sr,ad(.003,.16));add(x,nz(n),.75);const c=N(sr,.6);crk(c,sr,r,14,.02,.45,2);hp1(c,sr,900);add(x,nz(c),.18);return drv(x,1.6);},2,1);
+def('boom','взрыв: низкий удар, гул и треск',(sr,r)=>{const x=thud(sr,.7,80,32,.28);nz(x);add(x,body(sr,.7,80,32,.28,[[3,1,.4],[4,.7,.3],[5,.4,.25]]),.5);const n=W(sr,.6,r);bq(n,sr,'lp',crv([[0,2600],[.5,240]]),.7);E(n,sr,ad(.003,.16));add(x,nz(n),.75);const c=N(sr,.6);crk(c,sr,r,14,.02,.45,2);hp1(c,sr,900);add(x,nz(c),.18);return drv(x,1.6);},2,1);
 def('boom_big','большой взрыв с хвостом',(sr,r)=>{const x=thud(sr,1,70,26,.45);nz(x);const n=W(sr,.9,r);bq(n,sr,'lp',crv([[0,3000],[.8,180]]),.7);E(n,sr,ad(.003,.25));add(x,nz(n),.8);const c=N(sr,.9);crk(c,sr,r,30,.02,.7,2.5);hp1(c,sr,800);add(x,nz(c),.2);return verb(drv(x,1.7),sr,1.3,.22);},1,1);
 // ---------- касты: жест формы чар ----------
 def('c_bolt','запуск снаряда: «фшух»',(sr,r)=>{const x=whoosh(sr,r,.26,800,2600,1.4,.012,.08);const s=N(sr,.15);osc(s,sr,'sin',crv([[0,480],[.1,900]]),1);E(s,sr,ad(.004,.05));add(x,nz(s),.22);return x;},2);
@@ -210,28 +225,35 @@ def('c_aura','пульс ауры',(sr,r)=>{const x=N(sr,.4);osc(x,sr,'sin',crv(
 // ---------- редкость каста ----------
 def('r_epic','эпическая: россыпь высоких искр',(sr,r)=>{const x=N(sr,.6);for(let k=0;k<6;k++)parts(x,sr,mtf([93,96,100,105][k%4])*(1+r()*.01),GLASS,k*.03,.6,1.6);return x;});
 def('r_leg','легендарная: золотой аккорд и «фвумм»',(sr,r)=>{const x=bells(sr,1.1,[86,90,93,98],CHIME,.025,1,.8);add(x,nz(thud(sr,.5,110,70,.2)),.45);add(x,whoosh(sr,r,.6,2500,8000,1,.15,.15),.15);return x;});
-def('r_imp','Невозможная: чёрное пламя, суб и тритон',(sr,r)=>{const d=1.25,x=N(sr,d);osc(x,sr,'sin',crv([[0,72],[.6,30]]),1);E(x,sr,ad(.004,.4));nz(x);const f=W(sr,d,r);lp1(f,sr,420);lp1(f,sr,700);const fl=smooth(r,d,18);
-  E(f,sr,t=>ad(.08,.35)(t)*(.35+.65*fl(t)));add(x,nz(f),.8);const c=N(sr,d);parts(c,sr,98,[[1,1,.7],[2,.4,.4]]);parts(c,sr,138.6,[[1,.8,.6]]);add(x,nz(c),.45);return drv(x,1.4);});
+// «Невозможная»: под субом — рычащее пламя 200–800 Гц и тритон октавой выше: тяжёлый тёмный звук слышен и на телефоне, громче легендарной
+def('r_imp','Невозможная: чёрное пламя, суб и тритон',(sr,r)=>{const d=1.25,x=N(sr,d);osc(x,sr,'sin',crv([[0,72],[.6,30]]),1);E(x,sr,ad(.004,.4));nz(x,.45);add(x,body(sr,d,72,30,.4,[[3,1,.8],[4,.7,.6],[5,.4,.45]]),.7);
+  const f=W(sr,d,r);lp1(f,sr,420);lp1(f,sr,700);hp1(f,sr,170);const fl=smooth(r,d,18);
+  E(f,sr,t=>ad(.08,.35)(t)*(.35+.65*fl(t)));add(x,nz(f),.7);const c=N(sr,d);parts(c,sr,98,[[1,.5,.7],[2,.4,.4]]);parts(c,sr,138.6,[[1,.45,.6]]);parts(c,sr,196,[[1,.9,.6],[2,.35,.35],[3,.2,.25]]);parts(c,sr,277.2,[[1,.75,.55],[2,.3,.3]]);add(x,nz(c),.8);
+  add(x,nz(roar(sr,r,1.15,crv([[0,62],[.3,74],[1.15,46]]),{F:[[280,4,1],[470,5,.75],[820,6,.4]],am:23,nz:.8,drv:2.2,env:ad(.05,.5)})),1.8,.02,sr);
+  const k=N(sr,d);crk(k,sr,r,22,.02,.8,3);bq(k,sr,'bp',1100,.9);add(x,nz(k),.45);
+  const fr=W(sr,d,r);svf(fr,sr,'bp',t=>900+500*fl(t),.8);E(fr,sr,t=>ad(.05,.4)(t)*(.3+.7*fl(t)));add(x,nz(fr),1.4);return drv(x,1.5);},1,1);
 def('imp_hit','удар чёрным пламенем: тёмный треск и суб',(sr,r)=>{const x=thud(sr,.3,60,40,.1);nz(x);const f=W(sr,.3,r);lp1(f,sr,600);const fl=smooth(r,.3,40);E(f,sr,t=>ad(.004,.08)(t)*(.3+.7*fl(t)));add(x,nz(f),.7);return x;},2);
 // ---------- враги ----------
-def('d_flesh','смерть: глухой удар и хрип',(sr,r)=>{const x=thud(sr,.45,120,45,.14);nz(x);const g=N(sr,.32);osc(g,sr,'saw',crv([[0,130+r()*25],[.3,82]]),1);const gf=fmt(g,sr,[[500,4,1],[1000,5,.55]]);E(gf,sr,ad(.012,.11));add(x,nz(gf),.4,.01,sr);return drv(x,1.4);},2);
+def('d_flesh','смерть: глухой удар и хрип',(sr,r)=>{const x=thud(sr,.45,120,45,.14);nz(x,.75);add(x,body(sr,.45,120,70,.14,[[2,1,1],[3,.8,.8],[4,.5,.6]]),1.1);add(x,smack(sr,r,1400,.03),.55);
+  const g=N(sr,.32);osc(g,sr,'saw',crv([[0,130+r()*25],[.3,82]]),1);const gf=fmt(g,sr,[[500,4,1],[1000,5,.55]]);lp1(gf,sr,2200);E(gf,sr,ad(.012,.15));add(x,nz(gf),1.2,.01,sr);return drv(x,1.4);},2);
 def('d_slime','смерть слизня: хлюп и пузыри',(sr,r)=>{const x=W(sr,.42,r);svf(x,sr,'lp',crv([[0,1500],[.35,200]]),8);E(x,sr,ad(.004,.1));nz(x);bubbles(x,sr,r,3,.05,.25,200,2.5,.5);return x;},2);
 def('d_bat','смерть мелкой летучей твари: писк',(sr,r)=>{const x=N(sr,.26);for(let k=0;k<2;k++){const f0=2700+r()*500;osc(x,sr,'sin',t=>f0*(1-.25*t/.08)*(1+.05*Math.sin(TAU*40*t)),1,k*.09,.08);}E(x,sr,t=>{const u=t%.09;return Math.min(1,u/.006)*Math.exp(-u/.03);});return x;},2);
 def('d_ghost','смерть призрака: затихающий вой',(sr,r)=>{const d=.95,x=N(sr,d);osc(x,sr,'sin',t=>crv([[0,560],[.8,190]])(t)*(1+.03*Math.sin(TAU*6*t)),.6);osc(x,sr,'saw',t=>crv([[0,560],[.8,190]])(t),.15);const y=fmt(x,sr,[[330,3,1],[870,4,.5]]);add(y,x,.4);E(y,sr,ad(.05,.3));return verb(nz(y),sr,1.4,.35);});
 def('d_stone','смерть каменного: осыпь камней',(sr,r)=>{const x=thud(sr,.6,70,38,.15);nz(x);const c=N(sr,.6);for(let k=0;k<16;k++){const t=Math.pow(r(),1.6)*.45,i=Math.round(t*sr),L=Math.round((.01+r()*.03)*sr),f=800+r()*2200,a=.4+.6*r();const b=N(sr,.05);for(let j=0;j<L;j++)b[j]=(r()*2-1)*Math.exp(-4*j/L);bq(b,sr,'bp',f,3);add(c,b,a,t,sr);}add(x,nz(c),.6);return x;},2,1);
 def('d_bone','смерть костяного: стук костей',(sr,r)=>{const x=N(sr,.5);for(let k=0;k<10;k++){const b=noiseHit(sr,r,.03,'bp',1800+r()*1700,10,.0002,.006);add(x,b,.5+.5*r(),Math.pow(r(),1.3)*.35,sr);}add(x,nz(thud(sr,.2,110,60,.05)),.35);return x;},2,1);
 def('d_beast','смерть зверя: взвизг и рык',(sr,r)=>{const x=N(sr,.5);osc(x,sr,'saw',crv([[0,640+r()*80],[.35,370]]),1);const y=fmt(x,sr,[[1200,4,1],[2600,6,.4]]);E(y,sr,ad(.02,.12));nz(y);const g=N(sr,.4);osc(g,sr,'saw',88,1);lp1(g,sr,500);E(g,sr,t=>ad(.02,.12)(t)*(.6+.4*Math.sin(TAU*30*t)));add(y,nz(g),.35);add(y,nz(thud(sr,.3,110,50,.08)),.4,.05,sr);return y;},2);
-def('d_big','крупный враг рухнул: тяжёлый удар и гул',(sr,r)=>{const x=thud(sr,.9,80,30,.3);nz(x);const b=BR(sr,.8,r);lp1(b,sr,300);E(b,sr,ad(.02,.25));add(x,nz(b),.5);const c=N(sr,.8);crk(c,sr,r,12,.05,.6,4);bq(c,sr,'bp',1500,1);add(x,nz(c),.2);return drv(x,1.5);},1,1);
+def('d_big','крупный враг рухнул: тяжёлый удар и гул',(sr,r)=>{const x=thud(sr,.9,80,30,.3);nz(x);add(x,body(sr,.9,80,30,.3,[[3,1,.5],[4,.8,.4],[5,.5,.3],[6,.3,.25]]),.7);add(x,noiseHit(sr,r,.25,'bp',420,1,.001,.07),.45);
+  const b=BR(sr,.8,r);lp1(b,sr,300);E(b,sr,ad(.02,.25));add(x,nz(b),.5);const c=N(sr,.8);crk(c,sr,r,12,.05,.6,4);bq(c,sr,'bp',1500,1);add(x,nz(c),.35);return drv(x,1.5);},1,1);
 def('e_arrow','выстрел лучника: тетива и свист',(sr,r)=>{const p=pluck(sr,230+r()*30,.2,r,.98,.45).x;E(p,sr,ad(.001,.05));const x=nz(p);add(x,whoosh(sr,r,.16,3000,1500,1.6,.02,.05),.5,.02,sr);return x;},2);
 def('e_orb','колдун: дрожащий магический сгусток',(sr,r)=>{const d=.42,x=N(sr,d);osc(x,sr,'sin',t=>crv([[0,300],[.3,520]])(t)*(1+.06*Math.sin(TAU*12*t)),.7);const n=W(sr,d,r);bq(n,sr,'bp',800,3);add(x,nz(n),.35);E(x,sr,ad(.03,.15));return x;},2);
 def('tw','замах врага: нарастающий рык-свист (уходи!)',(sr,r)=>{const d=.62,x=N(sr,d);osc(x,sr,'saw',crv([[0,72],[d,112]]),1);lp1(x,sr,700);E(x,sr,t=>.6+.4*Math.sin(TAU*28*t));nz(x);const n=W(sr,d,r);svf(n,sr,'bp',crv([[0,400],[d,1300]]),1.6);add(x,nz(n),.6);E(x,sr,t=>Math.pow(Math.min(1,t/d),1.4)*(t>d-.03?(d-t)/.03:1));return x;},2);
 def('twb','замах босса: глубокий рёв с тревожным тоном',(sr,r)=>{const d=1,x=roar(sr,r,d,crv([[0,52],[.8,70]]),{env:t=>Math.pow(Math.min(1,t/.85),1.3)*(t>.95?(1-t)/.05:1)});const s=N(sr,d);osc(s,sr,'sin',crv([[0,200],[d,420]]),1);E(s,sr,t=>Math.pow(t/d,2));add(nz(x),nz(s),.25);return x;});
-def('th','удар врага по площади: тяжёлый шлепок',(sr,r)=>{const x=thud(sr,.5,72,34,.17);nz(x);const n=W(sr,.4,r);lp1(n,sr,1200);E(n,sr,ad(.002,.09));add(x,nz(n),.6);return drv(x,1.6);},2);
+def('th','удар врага по площади: тяжёлый шлепок',(sr,r)=>{const x=thud(sr,.5,72,34,.17);nz(x);add(x,body(sr,.5,72,34,.17,[[3,1,.45],[4,.7,.35],[5,.4,.3]]),.55);const n=W(sr,.4,r);lp1(n,sr,1200);E(n,sr,ad(.002,.09));add(x,nz(n),.6);return drv(x,1.6);},2);
 def('charge','рывок крупного врага: гулкий свист',(sr,r)=>{const x=whoosh(sr,r,.5,300,1500,1,.08,.18);const b=BR(sr,.5,r);lp1(b,sr,200);E(b,sr,ad(.05,.15));add(x,nz(b),.5);return x;});
 def('champ','чемпион края: низкий рог и барабан',(sr,r)=>{const x=nz(brass(sr,1.3,mtf(40),{br:1200,r:.45}));add(x,taiko(sr,r,70),.7);return verb(x,sr,1.6,.25);});
 // ---------- боссы ----------
 def('b_roar','рёв босса',(sr,r)=>verb(roar(sr,r,2,crv([[0,55],[.35,88],[1.1,72],[2,45]])),sr,1.8,.32));
-def('b_boom','низкий удар появления босса',(sr,r)=>{const x=thud(sr,1.3,62,24,.55);nz(x);const n=W(sr,1,r);lp1(n,sr,450);lp1(n,sr,600);E(n,sr,ad(.003,.3));add(x,nz(n),.6);const b=BR(sr,1.3,r);lp1(b,sr,150);E(b,sr,ad(.05,.5));add(x,nz(b),.4);return verb(drv(x,1.5),sr,1.6,.25);});
+def('b_boom','низкий удар появления босса',(sr,r)=>{const x=thud(sr,1.3,62,24,.55);nz(x);add(x,body(sr,1.3,62,24,.55,[[3,1,.4],[4,.8,.32],[5,.5,.26],[6,.3,.2]]),.55);const n=W(sr,1,r);lp1(n,sr,450);lp1(n,sr,600);E(n,sr,ad(.003,.3));add(x,nz(n),.6);const b=BR(sr,1.3,r);lp1(b,sr,150);E(b,sr,ad(.05,.5));add(x,nz(b),.4);return verb(drv(x,1.5),sr,1.6,.25);});
 def('b_phase','новая фаза босса: нарастание, удар, рёв',(sr,r)=>{const d=1.9,x=N(sr,d);const s=W(sr,.8,r);bq(s,sr,'hp',crv([[0,500],[.8,6000]]),.8);E(s,sr,t=>Math.pow(t/.8,2.2));add(x,nz(s),.35);
   add(x,nz(thud(sr,.8,70,28,.3)),.9,.8,sr);add(x,nz(roar(sr,r,1.05,crv([[0,70],[.3,110],[1,80]]))),.75,.82,sr);return verb(x,sr,1.6,.28);});
 def('b_death','смерть босса: затихающий рёв и обвал',(sr,r)=>{const d=3,x=N(sr,d);add(x,nz(roar(sr,r,1.6,crv([[0,85],[1.5,34]]),{env:ad(.1,.6)})),.8);const b=BR(sr,2.6,r);lp1(b,sr,260);E(b,sr,t=>ad(.3,.9)(t));add(x,nz(b),.55,.3,sr);
@@ -240,7 +262,7 @@ def('b_fall','последний обвал туши босса',(sr,r)=>{const 
 def('win','победные фанфары с тарелкой',(sr,r)=>{const x=base(sr,2.3,nz(notesBrass(sr,[[0,55,.22,.8],[.22,60,.22,.85],[.44,64,.22,.9],[.66,67,1.3,1],[.66,60,1.3,.6],[.66,64,1.3,.6]],{br:2600})));
   const cy=W(sr,1.6,r);bq(cy,sr,'hp',5000,.7);E(cy,sr,t=>t<.66?Math.pow(t/.66,2)*.4:Math.exp(-(t-.66)/.4));add(x,nz(cy),.12);add(x,nz(bells(sr,1.6,[84,88,91,96],CHIME,.05,1,1)),.35,.66,sr);return verb(x,sr,1.8,.25);});
 // ---------- волны ----------
-def('w_horn','боевой рог: волна близко',(sr,r)=>{const x=nz(brass(sr,1.9,mtf(45),{br:1600,fall:.4}));add(x,nz(taiko(sr,r,62)),.45);return verb(x,sr,2,.3);});
+def('w_horn','боевой рог: волна близко',(sr,r)=>{const x=nz(brass(sr,1.9,mtf(45),{br:2000,fall:.4}));add(x,nz(taiko(sr,r,62)),.45);return verb(x,sr,2,.3);});
 def('w_drum','барабаны: волна началась',(sr,r)=>{const x=N(sr,1.4);add(x,taiko(sr,r,64),1);add(x,taiko(sr,r,58),.7,.24,sr);add(x,taiko(sr,r,66),.85,.48,sr);return verb(x,sr,1.3,.2);});
 def('w_tick','деревянный щелчок отсчёта',(sr,r)=>{const x=N(sr,.12);osc(x,sr,'sin',1150,1);E(x,sr,ad(.0006,.022));add(x,noiseHit(sr,r,.04,'bp',1150,10,.0003,.02),.4);return x;});
 def('w_clear','волна отбита: короткие фанфары',(sr,r)=>{const x=base(sr,1.35,nz(notesBrass(sr,[[0,60,.16,.8],[.15,64,.16,.85],[.3,67,.7,1]],{br:2400})));add(x,nz(bells(sr,1,[84,91],CHIME,.05,1,.8)),.3,.3,sr);return verb(x,sr,1.4,.22);});
@@ -313,7 +335,9 @@ const AB={
  ice:(sr,r,Ls)=>{const x=PK(sr,Ls,r);const d=smooth(r,Ls,.15);const w=x.slice();svf(w,sr,'bp',t=>500+900*d(t),5);lp1(x,sr,700);const y=nz(x,.6);add(y,nz(w),.55);const g=smooth(r,Ls,.22);E(y,sr,t=>.3+.7*g(t));
    const s=W(sr,Ls,r);bq(s,sr,'bp',5000,1);add(y,nz(s),.025);return nz(y,.9);},
  volcano:(sr,r,Ls)=>{const x=BR(sr,Ls,r);lp1(x,sr,130);lp1(x,sr,180);const g=smooth(r,Ls,.3);E(x,sr,t=>.55+.45*g(t));const y=nz(x,.9);const bb=N(sr,Ls);for(let k=0;k<Ls*1.2;k++)blip(bb,sr,60+r()*40,r()*(Ls-.2),.12,.5+.5*r(),170);add(y,nz(bb),.3);
-   const c=N(sr,Ls);crk(c,sr,r,Math.round(Ls*4),0,Ls-.05,1.5);hp1(c,sr,1500);lp1(c,sr,6000);add(y,nz(c),.07);return y;},
+   const c=N(sr,Ls);crk(c,sr,r,Math.round(Ls*4),0,Ls-.05,1.5);hp1(c,sr,1500);lp1(c,sr,6000);add(y,nz(c),.1);
+   // средний слой (динамик телефона): гул лавы 200–500 Гц, медленно дышит
+   const m=PK(sr,Ls,r),m2=m.slice(),gm=smooth(r,Ls,.22);svf(m,sr,'bp',t=>250+70*gm(t),2.2);svf(m2,sr,'bp',t=>430+90*gm(t),3);add(m,nz(m2),.6);E(m,sr,t=>.45+.55*gm(t));add(y,nz(m),.75);return y;},
  sky:(sr,r,Ls)=>{const x=W(sr,Ls,r);bq(x,sr,'bp',2300,.8);lp1(x,sr,5000);const g=smooth(r,Ls,.2);E(x,sr,t=>.3+.7*g(t));const y=nz(x,.5);const p=N(sr,Ls);osc(p,sr,'sin',523.25,.5);osc(p,sr,'sin',526,.4);osc(p,sr,'sin',784,.25);osc(p,sr,'sin',786.5,.2);
    const g2=smooth(r,Ls,.12);E(p,sr,t=>.4+.6*g2(t));add(y,nz(p),.16);const lo=PK(sr,Ls,r);lp1(lo,sr,400);add(y,nz(lo),.3);return y;},
  crystal:(sr,r,Ls)=>{const p=N(sr,Ls);[220,330.4,440.7,659.5,880.9].forEach((f,i)=>{const q=N(sr,Ls);osc(q,sr,'sin',f,1);const g=smooth(r,Ls,.1+i*.03);E(q,sr,t=>.2+.8*g(t));add(p,q,[1,.7,.5,.35,.2][i]);});const y=nz(p,.6);
@@ -321,8 +345,13 @@ const AB={
  deadcity:(sr,r,Ls)=>{const x=PK(sr,Ls,r),y=N(sr,Ls);const d1=smooth(r,Ls,.1);const a=x.slice(),b=x.slice();svf(a,sr,'bp',t=>520*(.85+.3*d1(t)),8);svf(b,sr,'bp',t=>830*(.9+.2*d1(t)),8);add(y,nz(a),.8);add(y,nz(b),.5);
    const lo=BR(sr,Ls,r);lp1(lo,sr,160);add(y,nz(lo),.45);const g=smooth(r,Ls,.2);E(y,sr,t=>.35+.65*g(t));return nz(y,.9);},
  abyss:(sr,r,Ls)=>{const y=N(sr,Ls);[[41.2,1],[43.1,.7],[55,.6],[61.7,.45],[82.4,.25]].forEach(([f,a])=>osc(y,sr,'sin',f,a,0,0,r()));nz(y,.7);const n=PK(sr,Ls,r);const g=smooth(r,Ls,.15);svf(n,sr,'lp',t=>200+450*g(t),1.5);E(n,sr,t=>.2+.8*g(t));add(y,nz(n),.45);
+   // средний слой: обертоны гула (×4, ×6) медленно бьются и тёмный выдох 300–500 Гц — бездна слышна и на телефоне
+   const h=N(sr,Ls);[[164.8,1],[165.6,.8],[247.2,.6],[220,.45]].forEach(([f,a])=>osc(h,sr,'sin',f,a,0,0,r()));const gh=smooth(r,Ls,.1);E(h,sr,t=>.3+.7*gh(t));add(y,nz(h),.8);
+   const m=PK(sr,Ls,r);svf(m,sr,'bp',t=>330+120*g(t),2.5);E(m,sr,t=>.3+.7*g(t));add(y,nz(m),1.1);
    return nz(y,.9);},
- cave:(sr,r,Ls)=>{const x=BR(sr,Ls,r);lp1(x,sr,110);const y=nz(x,.6);const a=PK(sr,Ls,r);svf(a,sr,'bp',190,6);add(y,nz(a),.25);return y;},
+ cave:(sr,r,Ls)=>{const x=BR(sr,Ls,r);lp1(x,sr,110);const y=nz(x,.6);const a=PK(sr,Ls,r);svf(a,sr,'bp',190,6);add(y,nz(a),.25);
+   // средний слой: гулкий воздух пещеры 300–600 Гц (резонансы свода), медленно плывёт
+   const b=PK(sr,Ls,r),b2=b.slice(),gb=smooth(r,Ls,.15);svf(b,sr,'bp',t=>310+40*gb(t),4);svf(b2,sr,'bp',t=>540+60*gb(t),5);add(b,nz(b2),.5);E(b,sr,t=>.4+.6*gb(t));add(y,nz(b),.55);return y;},
  windy:(sr,r,Ls)=>{const x=PK(sr,Ls,r);const g=smooth(r,Ls,.35);const w=x.slice();svf(w,sr,'bp',t=>600+1100*g(t),3);lp1(x,sr,900);const y=nz(x,.7);add(y,nz(w),.6);E(y,sr,t=>.15+.85*Math.pow(g(t),1.5));return nz(y,.9);},
  camp:(sr,r,Ls)=>{const x=PK(sr,Ls,r);lp1(x,sr,500);lp1(x,sr,900);const g=smooth(r,Ls,.15);E(x,sr,t=>.4+.6*g(t));const y=nz(x,.6);const c=N(sr,Ls);crk(c,sr,r,Math.round(Ls*2.5),0,Ls-.05,1.8);hp1(c,sr,1000);lp1(c,sr,5000);add(y,nz(c),.1);return y;},
 };
@@ -365,7 +394,8 @@ if(typeof window==='undefined'&&typeof importScripts==='function'){self.onmessag
 // ДВИЖОК (браузер)
 // =====================================================================
 const Q=location.search,TESTM=/[?&]test=1/.test(Q),FORCE=/[?&]snd=1/.test(Q),NOSND=/[?&]snd=0/.test(Q),DBG=/[?&](debug|snddbg)\b/.test(Q);
-const OPT={on:1,mus:45,sfx:80,amb:50,sil:1};
+// sil (играть и в беззвучном режиме iPhone) — по умолчанию выкл.: audioSession 'playback' останавливает музыку других приложений (Spotify и т. п.)
+const OPT={on:1,mus:45,sfx:80,amb:50,sil:0};
 try{const s=JSON.parse(localStorage.getItem('tcSnd')||'null');if(s&&typeof s==='object')for(const k in OPT)if(typeof s[k]==='number'&&isFinite(s[k]))OPT[k]=clamp(s[k],0,100);}catch(e){}
 const optSave=()=>{try{localStorage.setItem('tcSnd',JSON.stringify(OPT));}catch(e){}};
 const allowed=()=>!!OPT.on&&(!TESTM||FORCE)&&!NOSND;
@@ -374,7 +404,8 @@ const BUF={},GENQ=[],VO=[],LAST={},CNT={},BY={},STAT={played:0,dropped:0,gen:0,g
 let LX=0,LZ=0,RX=Math.cos(Math.PI/4),RZ=-Math.sin(Math.PI/4);
 const now=()=>ctx?ctx.currentTime:0,rr=(a,b)=>a+Math.random()*(b-a);
 const vol=v=>Math.pow(clamp(v,0,100)/100,2);
-function setSession(){try{const s=navigator.audioSession;if(s)s.type=allowed()?(OPT.sil?'playback':'ambient'):'ambient';}catch(e){}}
+// без галочки — тип сессии по умолчанию ('auto'): звук слушается кнопки беззвучного режима, чужая музыка не прерывается
+function setSession(){try{const s=navigator.audioSession;if(s)s.type=allowed()&&OPT.sil?'playback':'auto';}catch(e){}}
 function build(){master=ctx.createGain();master.gain.value=0;
   comp=ctx.createDynamicsCompressor();comp.threshold.value=-12;comp.knee.value=8;comp.ratio.value=4;comp.attack.value=.004;comp.release.value=.2;
   lim=ctx.createDynamicsCompressor();lim.threshold.value=-3;lim.knee.value=0;lim.ratio.value=20;lim.attack.value=.001;lim.release.value=.12;
@@ -394,20 +425,23 @@ function unlock(){if(!allowed())return;try{
 for(const ev of ['touchend','pointerup','mousedown','keydown','click'])addEventListener(ev,unlock,{capture:true,passive:true});
 document.addEventListener('visibilitychange',()=>{if(!ctx)return;try{if(document.hidden)ctx.suspend();else if(allowed())ctx.resume().catch(()=>{});}catch(e){}});
 // ---------- буферы: синтез в рабочем потоке (Worker); без него — по очереди в простое (≤ 6 мс за раз); нужный сейчас и ещё не готовый — сразу ----------
-let WK=null,wkId=0;const WKCB={},PEND={};
+let WK=null,wkId=0;const WKCB={},PEND={},WFAIL={};
 function wkInit(){if(WK||NOWK)return;try{WK=new Worker('audio.js');WK.onmessage=e=>{const m=e.data,cb=WKCB[m.id];delete WKCB[m.id];if(cb)cb(m);};WK.onerror=()=>{WK=null;for(const n in PEND)delete PEND[n];};}catch(e){WK=null;}}
 const NOWK=/[?&]sndwk=0/.test(Q);
 function wkPost(msg,cb){const id=++wkId;msg.id=id;WKCB[id]=cb;WK.postMessage(msg);}
 const mkAB=(x,sr)=>{const b=ctx.createBuffer(1,x.length,sr);if(b.copyToChannel)b.copyToChannel(x,0);else b.getChannelData(0).set(x);return b;};
 function reqBuf(name){if(BUF[name]||PEND[name]||!L[name]||!ctx)return;if(!WK){enq(name);return;}const R=L[name],P=PEND[name]={n:R.v,arr:[]};
-  for(let v=0;v<R.v;v++)wkPost({n:name,v,sr:SR1},m=>{if(PEND[name]!==P)return;if(m.err){STAT.errs++;delete PEND[name];return;}P.arr[v]=mkAB(m.x,SR1);P.arr.base=m.base;P.arr.loop=!!m.loop;STAT.gen++;STAT.wkMs=(STAT.wkMs||0)+m.ms;
+  for(let v=0;v<R.v;v++)wkPost({n:name,v,sr:SR1},m=>{if(PEND[name]!==P)return;if(m.err){STAT.errs++;WFAIL[name]=1;delete PEND[name];return;}P.arr[v]=mkAB(m.x,SR1);P.arr.base=m.base;P.arr.loop=!!m.loop;STAT.gen++;STAT.wkMs=(STAT.wkMs||0)+m.ms;
     if(--P.n===0){delete PEND[name];if(!BUF[name])BUF[name]=P.arr;}});}
 const genStat=t0=>{const ms=performance.now()-t0;STAT.gen++;STAT.genMs+=ms;STAT.maxGenMs=Math.max(STAT.maxGenMs,ms);};
 function mkBuf(name){const R=L[name];if(!R)return null;if(BUF[name])return BUF[name];const t0=performance.now(),arr=[];
   for(let v=0;v<R.v;v++){const o=render(name,v,SR1);arr.push(mkAB(o.x,SR1));arr.base=o.base;arr.loop=!!o.loop;}
   genStat(t0);return BUF[name]=arr;}
 const BIG=new Set(['b_death','ui_rar4','ui_impw','w_done','b_roar','b_phase','a_bell','win','b_fall','b_boom','cl_thunder','die']);
-function getBuf(name){if(BUF[name])return BUF[name];if(!ctx)return null;if(BIG.has(name)&&(WK||GENQ.length)){if(WK)reqBuf(name);else if(!GENQ.includes(name))GENQ.unshift(name);return null;}
+// рабочий поток есть — главный поток звук не синтезирует (иначе рывок кадра до ~20 мс): ещё не готов — в этот раз без звука.
+// Синтез в главном потоке — только без рабочего потока (или если поток не смог именно этот звук)
+function getBuf(name){if(BUF[name])return BUF[name];if(!ctx)return null;if(WK&&!WFAIL[name]){reqBuf(name);return null;}
+  if(BIG.has(name)&&GENQ.length){if(!GENQ.includes(name))GENQ.unshift(name);return null;}
   try{const b=mkBuf(name);delete PEND[name];return b;}catch(e){STAT.errs++;return null;}}
 let genT=0;
 function genStep(){genT=0;if(!ctx)return;const t0=performance.now();
@@ -419,7 +453,9 @@ function warm(){const first=['ui_click','sw_light','sw_blade','sw_heavy','bow','
    'e_arrow','e_orb','tw','th','ess','m_pad','m_pluck','m_bell','m_bass','r_epic','r_leg','r_imp','imp_hit','shield_hit','heal','ui_book','ui_bookc','ui_lu','ui_pick','ui_lvl','m_taiko','m_tom','m_stick','m_shk','m_obass','m_stab','m_brass'];
   wkInit();for(const n of first)reqBuf(n);for(const n in L)if(!first.includes(n)&&!/^a_/.test(n))reqBuf(n);}
 // ---------- голос ----------
-function rm(v){const i=VO.indexOf(v);if(i>=0){VO.splice(i,1);CNT[v.key]=Math.max(0,(CNT[v.key]|0)-1);}try{v.out.disconnect();}catch(e){}}
+// drop — голос уходит из счёта (VO, CNT) сразу; rm — ещё и отключает узлы, только когда звук доиграл (onended): вытесненный голос успевает погаснуть без щелчка
+function drop(v){const i=VO.indexOf(v);if(i>=0){VO.splice(i,1);CNT[v.key]=Math.max(0,(CNT[v.key]|0)-1);}}
+function rm(v){drop(v);for(const n of v.out===v.gn?[v.s,v.gn]:[v.s,v.gn,v.out])try{n.disconnect();}catch(e){}}
 function play(name,o){o=o||{};if(!ctx||ctx.state!=='running'||!allowed())return null;
   const t=now(),key=o.key||name;if(o.gap&&LAST[key]!=null&&t-LAST[key]<o.gap/1000){STAT.dropped++;return null;}
   if(o.max&&(CNT[key]|0)>=o.max){STAT.dropped++;return null;}
@@ -429,7 +465,7 @@ function play(name,o){o=o||{};if(!ctx||ctx.state!=='running'||!allowed())return 
   const B=getBuf(name);if(!B||!B.length)return null;
   const pri=o.pri||1;
   if(VO.length>=MAXV){let wi=-1;for(let i=0;i<VO.length;i++){const v=VO[i];if(v.pri<pri&&(wi<0||v.pri<VO[wi].pri||(v.pri===VO[wi].pri&&v.t0<VO[wi].t0)))wi=i;}
-    if(wi<0){STAT.dropped++;return null;}const v=VO[wi];try{v.gn.gain.setTargetAtTime(0,t,.01);v.s.stop(t+.06);}catch(e){}rm(v);}
+    if(wi<0){STAT.dropped++;return null;}const v=VO[wi];try{v.gn.gain.setTargetAtTime(0,t,.01);v.s.stop(t+.06);}catch(e){}drop(v);}
   try{const s=ctx.createBufferSource();s.buffer=B[(Math.random()*B.length)|0];const rate=(o.rate||1)*(o.jit===0?1:1+(Math.random()*2-1)*(o.jit||.04));s.playbackRate.value=clamp(rate,.25,4);
     const gn=ctx.createGain();gn.gain.value=Math.min(2,g);s.connect(gn);let out=gn;
     if(pan&&ctx.createStereoPanner){const p=ctx.createStereoPanner();p.pan.value=pan;gn.connect(p);out=p;}
@@ -442,7 +478,7 @@ const MOOD={b:{prog:[[50,0],[45,0],[47,1],[43,0]],mel:[62,64,66,69,71,74,76,78,8
             d:{prog:[[50,1],[46,0],[43,1],[45,0]],mel:[62,65,67,69,72,74,77,79],bpm:58}};
 const MUS={off:{},cur:'',mood:'n',calm:null,tense:null,boss:null,bossBuf:null,bossLoading:false,bossErr:false,inten:1};
 function note(inst,m,t,g,dest,o){const B=getBuf(inst);if(!B||!B.length)return null;o=o||{};try{const s=ctx.createBufferSource();s.buffer=B[(Math.random()*B.length)|0];s.playbackRate.value=m==null?1:mtf(m)/B.base;
-  const gn=ctx.createGain();s.connect(gn);gn.connect(dest);if(o.loop){s.loop=true;gn.gain.setValueAtTime(0,t);gn.gain.linearRampToValueAtTime(g,t+(o.a||2.5));}else gn.gain.value=g;s.start(t);return {s,gn};}catch(e){STAT.errs++;return null;}}
+  const gn=ctx.createGain();s.connect(gn);gn.connect(dest);s.onended=()=>{try{s.disconnect();gn.disconnect();}catch(e){}};if(o.loop){s.loop=true;gn.gain.setValueAtTime(0,t);gn.gain.linearRampToValueAtTime(g,t+(o.a||2.5));}else gn.gain.value=g;s.start(t);return {s,gn};}catch(e){STAT.errs++;return null;}}
 function padOff(v,t){if(!v)return;try{v.gn.gain.cancelScheduledValues(t);v.gn.gain.setValueAtTime(v.gn.gain.value,t);v.gn.gain.setTargetAtTime(0,t,1.1);v.s.stop(t+5.5);}catch(e){}}
 function calmRun(t1){const C=MUS.calm,M=MOOD[MUS.mood]||MOOD.n,beat=60/M.bpm;
   while(C.next<t1){const t=C.next,b=C.beat;
@@ -461,13 +497,21 @@ function tenseRun(t1){const T=MUS.tense,step=60/104/4,root=MUS.mood==='d'?38:33,
     if(s32===0||(k>=2&&s32===16)){for(const iv of [0,3,7])note('m_stab',root+ch+iv+12,t,.11,mTense);}
     if(s%128===0)note('m_brass',root+ch+12,t,.16,mTense);
     T.step++;T.next+=step;}}
-function bossRun(){const B=MUS.boss;if(!MUS.bossBuf)return;const t=now();if(B.next>t+.6)return;const st=Math.max(B.next,t+.05),len=MUS.bossBuf.duration,xf=2;
-  try{const s=ctx.createBufferSource();s.buffer=MUS.bossBuf;const g=ctx.createGain();s.connect(g);g.connect(mBoss);
-    g.gain.setValueAtTime(0,st);g.gain.linearRampToValueAtTime(.62,st+(B.first?.8:xf));g.gain.setValueAtTime(.62,st+len-xf);g.gain.linearRampToValueAtTime(0,st+len);s.start(st);s.stop(st+len+.05);B.first=false;B.srcs.push({s,g,end:st+len});
-    B.next=st+len-xf;}catch(e){STAT.errs++;}}
-function bossStop(){const B=MUS.boss;if(!B)return;const t=now();for(const v of B.srcs){try{v.g.gain.cancelScheduledValues(t);v.g.gain.setValueAtTime(v.g.gain.value,t);v.g.gain.linearRampToValueAtTime(0,t+2.5);v.s.stop(t+2.6);}catch(e){}}MUS.boss=null;}
+// boss.mp3 — такты 8–31 «Volatile Reaction» (155 уд/мин): ровно 24 такта = 37,161 с и 0,5 с хвоста. Копии встают каждые BOSS_P с —
+// стык на сильной доле, равномощный перекрёст 0,4 с (синус/косинус); первая копия входит за 0,8 с. Разбор стыка — _check/audio/boss/sim.py
+const BOSS_P=37.1607,BOSS_X=.4,BOSS_G=.62,XIN=new Float32Array(64),XOUT=new Float32Array(64);
+for(let i=0;i<64;i++){const k=i/63;XIN[i]=BOSS_G*Math.sin(k*Math.PI/2);XOUT[i]=BOSS_G*Math.cos(k*Math.PI/2);}
+function bossRun(){const B=MUS.boss;if(!MUS.bossBuf)return;const t=now();if(B.next>t+.6)return;const st=Math.max(B.next,t+.05),P=Math.min(BOSS_P,MUS.bossBuf.duration-BOSS_X);
+  try{const s=ctx.createBufferSource();s.buffer=MUS.bossBuf;const g=ctx.createGain(),p=g.gain;s.connect(g);g.connect(mBoss);s.onended=()=>{try{s.disconnect();g.disconnect();}catch(e){}};p.value=0;
+    try{if(B.first){p.setValueAtTime(0,st);p.linearRampToValueAtTime(BOSS_G,st+.8);}else p.setValueCurveAtTime(XIN,st,BOSS_X);p.setValueCurveAtTime(XOUT,st+P,BOSS_X);}
+    catch(e){try{p.cancelScheduledValues(0);}catch(x){}p.setValueAtTime(0,st);p.linearRampToValueAtTime(BOSS_G,st+(B.first?.8:BOSS_X));p.setValueAtTime(BOSS_G,st+P);p.linearRampToValueAtTime(0,st+P+BOSS_X);}
+    s.start(st);s.stop(st+P+BOSS_X+.05);B.first=false;B.srcs.push({s,g,end:st+P+BOSS_X});B.next=st+P;}catch(e){STAT.errs++;}}
+// стоп: громкость каждой копии держится и плавно гаснет, остановка источника — отдельно (сбой автоматизации её не отменит)
+function bossStop(){const B=MUS.boss;if(!B)return;const t=now();for(const v of B.srcs){const p=v.g.gain;
+    try{if(p.cancelAndHoldAtTime)p.cancelAndHoldAtTime(t);else{const c=p.value;p.cancelScheduledValues(t);p.setValueAtTime(c,t);}}catch(e){}
+    try{p.setTargetAtTime(0,t,.6);}catch(e){}try{v.s.stop(t+3);}catch(e){}}MUS.boss=null;}
 function bossLoad(){if(MUS.bossBuf||MUS.bossLoading||MUS.bossErr||!ctx)return;MUS.bossLoading=true;
-  fetch('assets/audio/boss.mp3?av=1').then(r=>{if(!r.ok)throw new Error('http '+r.status);return r.arrayBuffer();}).then(ab=>new Promise((ok,no)=>{const p=ctx.decodeAudioData(ab,ok,no);if(p&&p.catch)p.catch(no);}))
+  fetch('assets/audio/boss.mp3?av=2').then(r=>{if(!r.ok)throw new Error('http '+r.status);return r.arrayBuffer();}).then(ab=>new Promise((ok,no)=>{const p=ctx.decodeAudioData(ab,ok,no);if(p&&p.catch)p.catch(no);}))
    .then(b=>{MUS.bossBuf=b;MUS.bossLoading=false;}).catch(()=>{MUS.bossErr=true;MUS.bossLoading=false;});}
 function musSet(w){const t=now(),G={calm:mCalm,tense:mTense,boss:mBoss};if(w==='boss'&&!MUS.bossBuf)w='tense!';const real=w==='tense!'?'tense':w;MUS.inten=w==='tense!'?3:MUS.inten;
   if(real===MUS.cur)return;if(MUS.cur)MUS.off[MUS.cur]=t+4.5;MUS.cur=real;
@@ -489,10 +533,10 @@ function bedGen(k){for(let i=0;i<2;i++){const key=k+'#'+i;if(AMB.beds[key]||PEND
   enq(()=>{if(AMB.beds[key])return;const t0=performance.now();AMB.beds[key]=mkAB(bedArr(k,i,SRA),SRA);genStat(t0);bedKeep();},true);}}
 function ambTick(kind){const t=now();if(kind!==AMB.want){AMB.want=kind;if(kind)bedGen(kind);}
   if(AMB.want!==AMB.kind&&(!AMB.want||(bedBuf(AMB.want,0)&&bedBuf(AMB.want,1)))){
-    if(AMB.lay){const o=AMB.lay;o.g.gain.setTargetAtTime(0,t,1);for(const s of o.s)try{s.stop(t+5);}catch(e){}o.s[0].onended=()=>{try{o.g.disconnect();}catch(e){}};}AMB.lay=null;AMB.kind=AMB.want;AMB.evN={};
-    if(AMB.kind){const K=AMBK[AMB.kind]||AMBK.forest,g=ctx.createGain();g.gain.value=0;g.gain.setTargetAtTime(K.g,t,1);g.connect(busA);const ss=[];
-      for(let i=0;i<2;i++){const s=ctx.createBufferSource();s.buffer=bedBuf(AMB.kind,i);s.loop=true;let out=s;if(ctx.createStereoPanner){const p=ctx.createStereoPanner();p.pan.value=i?.55:-.55;s.connect(p);out=p;}out.connect(g);s.start(t+.02,Math.random()*3);ss.push(s);}
-      AMB.lay={g,s:ss};}}
+    if(AMB.lay){const o=AMB.lay;o.g.gain.setTargetAtTime(0,t,1);for(const s of o.s)try{s.stop(t+5);}catch(e){}o.s[0].onended=()=>{for(const n of o.s.concat(o.p,[o.g]))try{n.disconnect();}catch(e){}};}AMB.lay=null;AMB.kind=AMB.want;AMB.evN={};
+    if(AMB.kind){const K=AMBK[AMB.kind]||AMBK.forest,g=ctx.createGain();g.gain.value=0;g.gain.setTargetAtTime(K.g,t,1);g.connect(busA);const ss=[],pp=[];
+      for(let i=0;i<2;i++){const s=ctx.createBufferSource();s.buffer=bedBuf(AMB.kind,i);s.loop=true;let out=s;if(ctx.createStereoPanner){const p=ctx.createStereoPanner();p.pan.value=i?.55:-.55;s.connect(p);out=p;pp.push(p);}out.connect(g);s.start(t+.02,Math.random()*3);ss.push(s);}
+      AMB.lay={g,s:ss,p:pp};}}
   if(AMB.kind&&AMB.lay){const K=AMBK[AMB.kind]||{ev:[]};for(const e of K.ev){const n=AMB.evN[e[0]];if(n==null){AMB.evN[e[0]]=t+rr(e[1]*.3,e[2]*.6);continue;}
       if(t>=n){AMB.evN[e[0]]=t+rr(e[1],e[2]);if(!BUF[e[0]]){reqBuf(e[0]);continue;}play(e[0],{g:e[3]*rr(.7,1.1),pan:rr(-.8,.8),bus:busA,key:'amb',max:3,pri:0,jit:.08});}}}}
 // ---------- тик: состояние игры, слушатель, фоны, музыка, отсчёт ----------
@@ -514,11 +558,11 @@ function tick(){if(!ctx||!A||!A.st)return;let s;try{s=A.st();}catch(e){return;}S
     if(s.wv===1&&s.cd>0&&s.cd<=3){const c=Math.ceil(s.cd);if(c<cdLast){cdLast=c;play('w_tick',{g:c===1?.55:.4,rate:c===1?1.25:1,jit:0,pri:3,key:'tick'});}}else if(s.wv!==1||s.cd>3.5)cdLast=9;
     // кооп: напарник пришёл/ушёл, упал/поднялся
     if(prev.mode===s.mode&&stT>3){if(s.peer&&!prev.peer)ui('peer_in');else if(!s.peer&&prev.peer)ui('peer_out');
-      if(s.peer&&s.pdead&&!prev.pdead)play('peer_down',{g:.7,pri:4,key:'pd'});else if(s.peer&&!s.pdead&&prev.pdead)ui('revive');
+      if(s.peer&&s.pdead&&!prev.pdead)play('peer_down',{g:.33,pri:4,key:'pd'});else if(s.peer&&!s.pdead&&prev.pdead)ui('revive');
       if(s.mode==='game'&&s.ess>prev.ess&&s.play===prev.play)play('ess',{g:.14,gap:110,pri:0,rate:1+Math.min(.3,(s.ess-prev.ess)/400)});}
     if(prev.mode!==s.mode||prev.play!==s.play)stT=0;else stT+=.1;
     // сердце на малом здоровье
-    if(s.mode==='game'&&!s.dead&&!s.paused&&s.hp<.3&&t-lastHeart>(s.hp<.15?.7:.9)){lastHeart=t;play('heart',{g:.3,jit:0,pri:2,key:'heart'});}
+    if(s.mode==='game'&&!s.dead&&!s.paused&&s.hp<.3&&t-lastHeart>(s.hp<.15?.7:.9)){lastHeart=t;play('heart',{g:.34,jit:0,pri:2,key:'heart'});}
     prev={mode:s.mode,play:s.play,peer:s.peer,pdead:s.pdead,ess:s.ess};
   }catch(e){STAT.errs++;}}
 // ---------- события игры (их зовут обёртки в index.html) ----------
@@ -546,23 +590,29 @@ const API={
  basic:safe((role,melee,cid)=>{const n=melee?(role==='Танк'?'sw_heavy':role==='Ловкач'||cid==='monk'?'sw_light':'sw_blade'):(role==='Стрелок'?'bow':'wand');play(n,{g:n==='bow'?.38:.33,key:'sw',gap:80,pri:2});}),
  cast:safe((form,el,rar,clone)=>{const n=FORM[form]||'c_bolt',k=clone?.55:1,rg=1+(rar>=4?.45:rar>=3?.3:rar>=2?.1:0);
    play(n,{g:.42*k*rg,key:'c'+form,gap:70,pri:3});if(EXH[el])play(EXH[el],{g:.22*k*rg,rate:1.12,key:'ce'+el,gap:70,pri:2,t:.015});
-   if(!clone){if(rar>=4)play('r_imp',{g:.55,gap:200,pri:4});else if(rar===3)play('r_leg',{g:.42,gap:200,pri:4});else if(rar===2)play('r_epic',{g:.22,gap:200,pri:3});}}),
+   if(!clone){if(rar>=4)play('r_imp',{g:.6,gap:200,pri:4});else if(rar===3)play('r_leg',{g:.42,gap:200,pri:4});else if(rar===2)play('r_epic',{g:.22,gap:200,pri:3});}}),
  boom:safe((x,z,r,el,form,depth)=>{if(NOBOOM.has(form)&&!depth)return;const rate=clamp(1.25-r*.07,.72,1.2),g=clamp(r/4,.5,1.15)*(depth?.7:1);
    play('boom',{x,z,g:.38*g,rate,key:'bm',gap:90,max:3,pri:2});if(EXH[el])play(EXH[el],{x,z,g:.26*g,rate:.85,key:'bme'+el,gap:90,max:2,pri:1});}),
  eshot:safe((x,z,kind)=>play(kind==='arrow'?'e_arrow':'e_orb',{x,z,g:.32,key:'es',gap:110,max:3,pri:1})),
  tele:safe((x,z,size,boss)=>{if(boss)play('twb',{x,z,g:.62,gap:350,max:1,pri:4,dd:400,far:70});else play('tw',{x,z,g:.42,gap:220,max:2,pri:3,rate:clamp(1.15-size*.03,.85,1.15)});}),
  teleHit:safe((x,z,size,boss)=>play(boss?'b_boom':'th',{x,z,g:boss?.5:.45,gap:150,max:2,pri:3,rate:boss?1.15:clamp(1.1-size*.03,.8,1.1),dd:boss?400:170,far:boss?70:46})),
  charge:safe((x,z)=>play('charge',{x,z,g:.45,gap:300,pri:3})),
+ // кооп: чара или удар напарника (mpPeerCast) — в его точке, тише своих (×0,7) и с затуханием по расстоянию; редкость слышна так же
+ peerCast:safe((x,z,form,el,rar,role,melee,cid)=>{const P=(g,o)=>Object.assign({x,z,g,dd:300,far:60},o);rar=rar|0;
+   if(!form){const n=melee?(role==='Танк'?'sw_heavy':role==='Ловкач'||cid==='monk'?'sw_light':'sw_blade'):(role==='Стрелок'?'bow':'wand');play(n,P((n==='bow'?.38:.33)*.7,{key:'psw',gap:90,pri:1}));return;}
+   const n=FORM[form]||'c_bolt',rg=.7*(1+(rar>=4?.45:rar>=3?.3:rar>=2?.1:0));play(n,P(.42*rg,{key:'pc'+form,gap:80,pri:2}));
+   if(EXH[el])play(EXH[el],P(.22*rg,{rate:1.12,key:'pce'+el,gap:80,pri:1,t:.015}));
+   if(rar>=4)play('r_imp',P(.6*.7,{key:'pri',gap:250,pri:3}));else if(rar===3)play('r_leg',P(.42*.7,{key:'pri',gap:250,pri:3}));else if(rar===2)play('r_epic',P(.22*.7,{key:'pri',gap:250,pri:2}));}),
  bossIntro:safe(()=>{play('b_roar',{g:.8,pri:6,jit:0,t:.42});play('b_boom',{g:.75,pri:6,jit:0});bossLoad();}),
  bossPhase:safe(p=>play('b_phase',{g:.75,pri:6,jit:0,rate:p===2?1.08:1})),
  bossDeath:safe(()=>{play('b_death',{g:.8,pri:6,jit:0});play('win',{g:.42,pri:5,jit:0,t:1.2});}),
  bossFall:safe(()=>play('b_fall',{g:.7,pri:6,jit:0})),
- wv:safe(ev=>{const m={pre:['w_horn',.6],go:['w_drum',.7],clr:['w_clear',.55],done:['w_done',.65],fail:['w_fail',.5],cs:['champ',.6],chd:['w_clear',.55],ph:['w_gather',.55]}[ev];if(m)play(m[0],{g:m[1],pri:5,jit:0,key:'wv',gap:400});}),
+ wv:safe(ev=>{const m={pre:['w_horn',.6],go:['w_drum',.8],clr:['w_clear',.55],done:['w_done',.65],fail:['w_fail',.5],cs:['champ',.6],chd:['w_clear',.55],ph:['w_gather',.55]}[ev];if(m)play(m[0],{g:m[1],pri:5,jit:0,key:'wv',gap:400});}),
  lvl:safe(()=>ui('ui_lvl',.55)),
  lu:safe(()=>ui('ui_lu',.4)),
  pick:safe(()=>ui('ui_pick',.45)),
  book:safe(open=>ui(open?'ui_book':'ui_bookc',.42)),
- rar:safe(r=>{if(r>=4)ui('ui_rar4',.7);else if(r===3)ui('ui_rar3',.6);else if(r===2)ui('ui_rar2',.45);}),
+ rar:safe(r=>{if(r>=4)ui('ui_rar4',.6);else if(r===3)ui('ui_rar3',.6);else if(r===2)ui('ui_rar2',.45);}),
  heal:safe(()=>play('heal',{g:.32,gap:1800,pri:2})),
  shieldBreak:safe(()=>play('shield_break',{g:.5,gap:300,pri:3})),
  ess:safe(()=>ui('ess_big',.4)),
@@ -572,7 +622,7 @@ const API={
  banner:safe((b,k,red)=>{b=String(b||'');if(k==='boss')return;if(k==='imp'){ui('ui_impw',.7);return;}
    if(/открыт[ыа]? слот/i.test(b)){setTimeout(()=>ui('ui_slot',.5),350);return;}
    if(/^Сундук открыт/.test(b)){ui('chest',.6);return;}if(/^Выход открыт/.test(b)){ui('portal',.5);return;}
-   if(/^Засада/.test(b)){play('w_gather',{g:.55,pri:5,jit:0});return;}if(/^Ущелье \d/.test(b)){play('w_drum',{g:.6,pri:5,jit:0,key:'wv',gap:400});return;}
+   if(/^Засада/.test(b)){play('w_gather',{g:.55,pri:5,jit:0});return;}if(/^Ущелье \d/.test(b)){play('w_drum',{g:.7,pri:5,jit:0,key:'wv',gap:400});return;}
    if(/^(Мастерство|Особенность)/.test(b)){ui('ui_slot',.45);return;}
    if(k==='win'&&!/повержен|пройден/.test(b)){ui('w_clear',.5);return;}
    if(red&&!k)play('champ',{g:.4,pri:4,gap:1500});}),
@@ -580,7 +630,7 @@ const API={
  opt:()=>Object.assign({},OPT),
  state:()=>({ctx:ctx?ctx.state:null,sr:ctx?ctx.sampleRate:0,unlocked,worker:!!WK,pend:Object.keys(PEND).length,allowed:allowed(),voices:VO.length,buffers:Object.keys(BUF).length,beds:Object.keys(AMB.beds).length,queue:GENQ.length,amb:AMB.kind,mus:MUS.cur,mood:MUS.mood,boss:!!MUS.bossBuf,stat:Object.assign({},STAT),session:navigator.audioSession?navigator.audioSession.type:'нет'}),
  dbg:{L,play:(n,o)=>play(n,o||{}),force:w=>{MUS.forced=w||'';if(w==='boss')bossLoad();},meter:()=>{if(!meter)return null;const a=new Float32Array(meter.fftSize);meter.getFloatTimeDomainData(a);let p=0,e=0;for(const v of a){p=Math.max(p,Math.abs(v));e+=v*v;}return {peak:p,rms:Math.sqrt(e/a.length)};},
-   genAll:()=>{for(const n in L)if(!BUF[n])reqBuf(n);},q:()=>GENQ.length+Object.keys(PEND).length,by:()=>Object.assign({},BY),set:o=>{Object.assign(OPT,o);applyVol();},mus:()=>({cur:MUS.cur,inten:MUS.inten,mood:MUS.mood})},
+   genAll:()=>{for(const n in L)if(!BUF[n])reqBuf(n);},boss:()=>MUS.boss&&{next:+(MUS.boss.next-now()).toFixed(3),srcs:MUS.boss.srcs.length,P:BOSS_P,dur:MUS.bossBuf?MUS.bossBuf.duration:0},q:()=>GENQ.length+Object.keys(PEND).length,by:()=>Object.assign({},BY),set:o=>{Object.assign(OPT,o);applyVol();},mus:()=>({cur:MUS.cur,inten:MUS.inten,mood:MUS.mood})},
 };
 G.TCSND=API;
 
