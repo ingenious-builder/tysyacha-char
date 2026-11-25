@@ -1625,6 +1625,35 @@ const CLASS_KIT={
   desc:'Каждая третья атака по врагу клеймит его еретиком: по нему больше урона, а его смерть взрывается святым огнём и клеймит соседа. Арбалет, печати и Инквизиция, бьющая по еретикам.'},
  alch:{arch:'alch arc',ca:['bolt','trap','totem','meteor','stasis','fan'],cp:['trail','doom','sprite','battery'],sig:['s_mutagen','s_fumes','s_philstone'],
   desc:'Каждое попадание ставит врагу метку ещё одной стихии — реакции идут одна за другой, а каждая пятая чара нестабильна и бьёт сильнее. Колбы, мины и Философский камень, который бросает всё втрое.'}};
+// ===== пассивок до 16 слотов (Артём 25.11: «пассивок мало стало… сделай хотя бы до 16»): к четырём общим пассивкам героя — ещё 6
+// (Страннику ветров — 5: «Шар силы» стоя спорит с его «сильнее на бегу»; Паладину — 5: оберег, отбойник и таран глушили его гнев от принятых ударов).
+// Замер в бою (_check/pas/formdmg2.js): «Таран» отбрасывает врагов от бойца — Берсерк терял ярость и «Бойню» (урон ×0,2 на 100-м), Паладин с
+// оберегом и отбойником не получал ударов и не копил гнев; «Клеймо» у самых частых ударов (Убийца, Арканист) раскидывало знаки цепью (урон по
+// толстым врагам ×10–47) — им «Клеймо» заменено. Только по образу (DESIGN-obraz 4.0: «можно» по архетипу, «нельзя»
+// по основному архетипу и именам), поводы у героя разные; «Лучший билд» берёт не больше двух одной формы, так что 16 слотов заполняются
+// десятью разными пассивками (+ фирменная) в трёх стихиях. Список ca не трогаем. =====
+const CP_MORE={
+ pyro:['aura','orbit','doom','trail','shell','battery'],        // огненный ореол и стражи, взрыв трупов, огненный след, кокон, батарея
+ cryo:['aura','trail','focus','rebirth','surge','sprite'],      // ледяной ореол и след, шар льда, ледяной сон, пик холода, дитя льда
+ storm:['orbit','twin','sprite','trail','rebirth','focus'],     // шаровые молнии, грозовой двойник, дитя грозы, след, второй разряд, шар грозы
+ plague:['harvest','link','surge','rebirth','brink','rift'],    // лекарь: искры жизни, заразная сцепка, брожение, живучесть чумы, вязкий миг, провал
+ necro:['focus','execute','link','surge','volley','rift'],      // шар тьмы, казнь-жатва, сцепка душ, прилив тьмы, костяные клинки, провал
+ paladin:['aura','revenge','brand','harvest','trophy'],          // святой ореол, шипы-возмездие, клеймо, искры жизни, трофей с чемпиона
+ geo:['orbit','rebirth','ward','surge','trail','sprite'],       // камни-стражи, каменное сердце, оберег, нарастание, каменный след, дитя камня
+ windr:['deflect','brand','trophy','brink','execute'],          // отбойник, метка бури, трофей, миг ветра, казнь
+ hemo:['aura','rebirth','execute','doom','trail','rift'],       // кровавый ореол, неистощимая кровь, казнь, кровавый взрыв, след, провал
+ arcan:['ward','surge','focus','volley','brink','slip'],        // руна-оберег, переполнение, шар чар, рунные клинки, остановленный миг, ускользание
+ bers:['deflect','harvest','aura','stagger','brink','trail'],   // отбойник, искры жизни, кровавый ореол, отсрочка, миг на краю, кровавый след
+ dk:['harvest','stagger','rebirth','shell','doom','execute'],   // похищение жизни, отсрочка, филактерия, ледяной кокон, взрыв трупов, казнь
+ druid:['aura','rebirth','shell','link','surge','focus'],       // ореол шипов, каменное сердце, кокон-кора, сцепка корнями, нарастание, шар камня
+ hunter:['volley','brand','battery','brink','trail','execute'], // ледяные клинки-болты, метка добычи, батарея, застывший миг, ледяной след, добивание
+ assassin:['twin','trail','doom','rift','trophy','deflect'],    // теневой двойник, ядовитый след, ядовитый взрыв жертвы, провал от крита, трофей, парирование
+ shaman:['orbit','battery','aura','harvest','shell','focus'],   // духи-стражи, грозовая батарея, ореол, искры жизни, каменный кокон, шар грозы
+ monk:['aura','harvest','revenge','brink','rebirth','execute'], // ореол ветра, искры жизни, ответный удар, миг ветра, второе дыхание, казнь
+ lock:['doom','aura','surge','orbit','rebirth','focus'],        // адский взрыв трупов, ореол пламени, перегрев, огненные стражи, возрождение из пепла, шар тьмы
+ inq:['execute','rebirth','deflect','link','volley','focus'],   // казнь-приговор, благословение, эгид-отбойник, цепь света, святые болты, прицел стоя
+ alch:['volley','surge','twin','focus','slip','orbit']};        // колбы за спиной, брожение, двойник, шар яда, дымовое ускользание, колбы-стражи
+for(const id in CP_MORE)for(const f of CP_MORE[id])if(!CLASS_KIT[id].cp.includes(f))CLASS_KIT[id].cp.push(f);
 for(const c of CLASSES){const k=CLASS_KIT[c.id];c.oldDesc=c.desc;Object.assign(c,k);
   // совместимость с экраном выбора (renderSelInfo берёт pa[0], pa[2], sa[0], pp[0]): фирменная, ульта, вторая общая, пассивка
   c.pa=[k.sig[0],k.ca[0],k.sig[2]];c.sa=[k.ca[1]];c.pp=[k.cp[0]];c.sp=[];}
@@ -1632,7 +1661,7 @@ for(const c of CLASSES){const k=CLASS_KIT[c.id];c.oldDesc=c.desc;Object.assign(c
 const ROLES={'Маг':'Дальний бой, много маны, хрупкий','Призыватель':'Помощники в бою, средняя прочность','Стрелок':'Дальний бой и скорость','Ловкач':'Скорость и ближний бой, мало здоровья','Боец':'Ближний бой, крепкий','Танк':'Ближний бой, много здоровья и броня'};
 const CLASS_BY={};CLASSES.forEach(c=>{CLASS_BY[c.id]=c;c.icon='w_'+c.look.weapon;c.ban=new Set(c.ban||[]);
   c.t=THIRD[c.id];const els=[c.p,c.s,c.t];
-  // пул героя: 6 общих активных и 4 пассивные во всех трёх стихиях + 3 фирменные в своей стихии (264 чары)
+  // пул героя: 6 общих активных и 10 пассивных (Странник ветров и Паладин — 9) во всех трёх стихиях + 3 фирменные в своей стихии (408 чар, у них 384)
   c.pool=new Set();c.pairs=[];
   for(const f of [...c.ca,...c.cp])for(const e of els){c.pairs.push([e,f]);for(const m of MODS)c.pool.add(sid(e,f,m.id));}
   for(const f of c.sig){const e=FORMS[FORM[f]].els[0];c.pairs.push([e,f]);for(const m of MODS)c.pool.add(sid(e,f,m.id));}
@@ -1967,7 +1996,7 @@ let SAVE={cur:null,q:'auto',chars:{}};
 function loadSave(hot){let d=hot&&hot.SAVE?hot.SAVE:null;if(!d){try{const raw=localStorage.getItem(SAVE_KEY);if(raw)d=JSON.parse(raw);}catch(e){}}
   if(d&&d.chars&&typeof d.chars==='object'){SAVE.cur=CLASS_BY[d.cur]?d.cur:null;SAVE.q=['auto','high','mid','low'].includes(d.q)?d.q:'auto';SAVE.chars={};for(const id in d.chars){if(CLASS_BY[id])SAVE.chars[id]=validChar(d.chars[id],CLASS_BY[id]);}SAVE.camp=window.TCCF?(d.camp&&typeof d.camp==='object'?d.camp:null):null;}}
 let CLS=null,S=null,LEARNED=new Set(),EQUIPPED=new Set(),BOOK=new Set();
-function newChar(c){const s={abMig:1,lvl:1,xp:0,kills:0,ess:0,learned:[],ranks:{},talents:{},active:Array(8).fill(null),passive:Array(42).fill(null),sandbox:false,auto:false,autoBest:true,autoLu:false,bosses:0,gorge:0,mx:0,book:[],runs:0,mig:0,legacy:[],mig2:1,scrL:0,talV:TAL_VER};
+function newChar(c){const s={abMig:1,lvl:1,xp:0,kills:0,ess:0,learned:[],ranks:{},talents:{},active:Array(8).fill(null),passive:Array(42).fill(null),sandbox:false,auto:false,autoBest:true,autoLu:false,bosses:0,gorge:0,mx:0,book:[],runs:0,mig:0,legacy:[],mig2:1,pas16:1,scrL:0,talV:TAL_VER};
   // старт: первая общая активная (Спешка), фирменная № 1 (Мощь), первая общая пассивная (Размах)
   s.active[0]=sid(c.p,c.ca[0],'swift');s.active[1]=sid(c.p,c.sig[0],'mighty');
   s.passive[0]=sid(c.p,c.cp[0],'huge');
@@ -1990,6 +2019,13 @@ function validChar(d,c){if(!d||!Array.isArray(d.active)||!Array.isArray(d.passiv
     for(const id of f.learned)if(!s.book.includes(id))s.book.push(id);
   }else{s.book=Array.isArray(d.book)?[...new Set(d.book.filter(v=>c.poolAll.has(v)))]:[...s.learned];for(const id of s.learned)if(!s.book.includes(id))s.book.push(id);}
   if(d.drop&&Array.isArray(d.drop.b)&&Array.isArray(d.drop.i))s.drop={b:d.drop.b.filter(Number.isInteger).slice(0,18),i:d.drop.i.filter(v=>c.poolAll.has(v)).slice(0,18)}; // память выпадения чар
+  // 16 пассивок (25.11): у героев новые пассивные формы — прежние чары этих форм снова его (в книге и в изученных забега, а не в «Прежних»);
+  // открывшиеся по новой лесенке слоты заполнит nfTick (fillNew) лучшими изученными — то, что урезание до 8 убрало в книгу, вернётся в билд.
+  // Слоты сверх 16 не показываются и не работают — чары оттуда остаются изученными.
+  if(d.fillNew)s.fillNew=1;if(d.needBest)s.needBest=1;   // флаги переживают повторную проверку (setClass зовёт validChar ещё раз)
+  if(!d.pas16){s.pas16=1;s.fillNew=1;const lg=Array.isArray(d.legacy)?d.legacy:[];
+    for(const v of lg)if(c.pool.has(v)&&SKILLS[v]){if(!s.book.includes(v))s.book.push(v);if(!s.learned.includes(v))s.learned.push(v);}}
+  for(let i=PAS_AT.length;i<s.passive.length;i++)s.passive[i]=null;
   if(!d.mig2){s.mig2=1;s.needBest=1;const st=sid(c.p,c.sig[0],'mighty');if(!s.learned.includes(st))s.learned.push(st);if(!s.book.includes(st))s.book.push(st);
     const nl=new Set([...s.legacy,...s.book.filter(v=>c.legacy.has(v))]).size;(NFS.mig||(NFS.mig=[])).push([c.name,nl]);}
   return s;}
@@ -1998,8 +2034,9 @@ function save(){if(CLS&&S){SAVE.chars[CLS.id]=S;SAVE.cur=CLS.id;}try{localStorag
 function saveSoon(){clearTimeout(saveTimer);saveTimer=setTimeout(save,400);}
 
 const isLearned=id=>S.sandbox?CLS.pool.has(id):LEARNED.has(id);
-// слоты открываются плавно до 100-го уровня: бодрое начало (3 + 3), последний активный — на 90-м, последний пассивный — на 100-м
-const ACT_AT=[1,1,1,4,10,22,45,90],PAS_AT=[1,1,1,8,20,40,70,100];
+// слоты открываются ровной лесенкой (Артём 25.11: «сделай хотя бы до 16 пассивок… 8 вообще мало слотов»): бодрое начало (3 + 3),
+// активных 8 к 38-му, пассивных 16 к 58-му (было 8 + 8: последний активный на 90-м, последний пассивный на 100-м)
+const ACT_AT=[1,1,1,4,8,14,24,38],PAS_AT=[1,1,1,3,5,8,11,14,18,22,27,32,38,44,51,58];
 const activeSlots=()=>S.sandbox?8:ACT_AT.filter(x=>x<=S.lvl).length;
 const passiveSlots=()=>S.sandbox?PAS_AT.length:PAS_AT.filter(x=>x<=S.lvl).length;
 const activeLvl=j=>ACT_AT[j]||999;
@@ -2041,9 +2078,13 @@ function computeStats(){
   ST.hpMul=(1+.1*T('vit'))*(1+.01*mastB());ST.armor=(1-.05*T('armor'))*(CLS.armor||1);ST.regen=2*T('regen');ST.leech=.02*T('leech');ST.wrath=1+.2*T('wrath');
   ST.mana=1+.1*T('mana');ST.summDmg=1+.2*T('summ');ST.summMax=3+T('summ');ST.luck=.03*T('luck');ST.cascade=1+.15*T('cascade');ST.orbitN=T('orbit');ST.orbitDmg=1;cfStats();ctTalStats();}   // «Свита» (25.11): только сферы — было ещё +15% урона за очко (×2,9 Стражам)
 const WRATH=new Set(['strike','blink','revenge','whirl']),CASC=new Set(['doom','aura','trail','trap']);
-// PASS_K: пассивок в билде 8, а не 42 — каждая сильнее (ориентир DESIGN-obraz 1,9). slotBoost: пока слотов мало, чары сильнее; после 100-го — ×1,26 (слотов 8+8 вместо 8+42)
-const PASS_K=1.9,SLOT_BOOST=[[1,1],[5,1.89],[10,2.09],[15,2.21],[20,1.93],[25,1.8],[30,1.8],[40,1.61],[50,1.52],[60,1.52],[70,1.41],[80,1.41],[90,1.35],[100,1.26],[999,1.26]];
-// SLOT_BOOST подобран под «Лучший билд» v13.27 (build_bp.js: сила A / v13.27 ≈ 0,97 на 5–100 уровне; механики классов B — сверху)
+// PASS_K: пассивок в билде до 16 (было 8, в v13.27 — до 42) — каждая сильнее обычной, но слабее прежней «как будто их 8» (было 1,9):
+// пассивная чара ×0,68 к прежней, зато их вдвое больше. slotBoost: пока слотов мало, чары сильнее; с 58-го (открыты все 8 + 16) — ровно ×1,35.
+// Подобрано по реальному бою (_check/pas/bal2.js — как _sc_check/balance.js, 20 героев × 2 зерна, обычная выдача), к v13.29 на 10/20/50/100-м:
+// урон по волнам ×1,03/1,07/1,09/1,15, по толстым врагам ×0,91/1,16/1,22/1,00 (ср. геом.), убийства ×1,03/1,09/1,16/1,40; разброс героев уже —
+// слабейший на 100-м 0,58 медианы (было 0,29: Охотник), сильнейший 1,25 (было 1,35). Сила в меру: врагов в волнах меньше, но они живучие
+const PASS_K=1.3,SLOT_BOOST=[[1,1.15],[3,1.45],[5,1.89],[10,2.09],[15,2.15],[20,1.93],[25,1.8],[30,1.75],[40,1.61],[50,1.5],[58,1.35],[999,1.35]];
+const SB_TAIL=SLOT_BOOST[SLOT_BOOST.length-1][1];   // надбавка, когда открыты все слоты (подсказка «пока слотов мало» считает сверх неё)
 let SB_OFF=false;   // стенд замера силы выключает надбавку
 const slotBoost=()=>{if(!S||S.sandbox||SB_OFF)return 1;const L=S.lvl;for(let i=1;i<SLOT_BOOST.length;i++){const a=SLOT_BOOST[i-1],b=SLOT_BOOST[i];if(L<=b[0])return a[1]+(b[1]-a[1])*(L-a[0])/(b[0]-a[0]);}return SLOT_BOOST[SLOT_BOOST.length-1][1];};
 function skDmg(sk){const f=sk.F.id;let m=1;if(WRATH.has(f))m=ST.wrath;else if(CASC.has(f))m=ST.cascade;else if(f==='summon')m=ST.summDmg;else if(f==='orbit')m=ST.orbitDmg;
@@ -2314,7 +2355,7 @@ function rarInfo(){const k=CLS.id;if(RAR_CACHE[k])return RAR_CACHE[k];
   for(const act of [true,false]){const arr=ids.filter(id=>SKILLS[id].active===act).map(id=>{const q=skParts(SKILLS[id],true),fq=FP[SKILLS[id].F.id]||{};return {id,p:Math.max(1e-3,q.pw),u:q.dps<=0&&!fq.pv&&!fq.x};});if(!arr.length)continue;
     const fm={};for(const x of arr){const f=SKILLS[x.id].F.id;(fm[f]=fm[f]||[]).push(x);}
     for(const f in fm){const g=fm[f],m=gm(g.map(x=>x.p));g.sort((a,b)=>a.p-b.p||a.id-b.id);g.forEach((x,i)=>{x.w=(i+.5)/g.length;x.q=x.p/m;});}
-    arr.sort((a,b)=>a.w-b.w||a.q-b.q||a.id-b.id);const n=arr.length,cut=RAR_Q.map(q=>Math.floor(n*q)),b0=RAR_B0[act?0:1]*MG[act?0:1]*(act?1:PASS_K);I.b0[act?0:1]=b0;   // PASS_K (A): пассивок в билде 8 — база пассивных выше
+    arr.sort((a,b)=>a.w-b.w||a.q-b.q||a.id-b.id);const n=arr.length,cut=RAR_Q.map(q=>Math.floor(n*q)),b0=RAR_B0[act?0:1]*MG[act?0:1]*(act?1:PASS_K);I.b0[act?0:1]=b0;   // PASS_K: база пассивных выше (пассивок в билде до 16)
     for(let i=0;i<n;i++){const x=arr[i];let r=0;while(r<cut.length&&i>=cut[r])r++;
       const lo=r?cut[r-1]:0,hi=(r<cut.length?cut[r]:n)-1,pos=hi>lo?(i-lo)/(hi-lo):0,B=b0*RAR_POW[r]*(1+RAR_W*pos);
       // чара без урона (тотем лечения): лечение не раздуваем больше ×1,5 — она остаётся слабой обычной, база = её настоящая сила
@@ -3635,7 +3676,7 @@ function checkUpgrade(id){if(mode!=='game'||S.sandbox)return;const sk=SKILLS[id]
 function applyUpgrade(sk,u){putInSlot(sk.id,sk.active?'active':'passive',u.idx);}
 // после ранга/талантов: изученная чара вне билда могла стать сильнее стоящей — ставим (автозамена) или подсказываем
 function sweepUpgrades(quiet){if(!S||S.sandbox||mode!=='game')return 0;let n=0,last=null;
-  for(let g=0;g<8;g++){let best=null,bu=null;for(const id of LEARNED){const sk=SKILLS[id];if(EQUIPPED.has(id))continue;const u=upgradeFor(sk);if(u&&u.gain>.02&&(!bu||u.gain>bu.gain)){best=sk;bu=u;}}
+  for(let g=0;g<24;g++){let best=null,bu=null;for(const id of LEARNED){const sk=SKILLS[id];if(EQUIPPED.has(id))continue;const u=upgradeFor(sk);if(u&&u.gain>.02&&(!bu||u.gain>bu.gain)){best=sk;bu=u;}}
     if(!best)break;if(!S.autoBest){if(!quiet)toast('«'+skName(best)+'» теперь сильнее «'+skName(SKILLS[bu.tgt])+'» на '+pct(bu.gain)+'% — поставь в билд или включи автозамену');break;}
     last=[best,SKILLS[bu.tgt],bu.gain];applyUpgrade(best,bu);n++;}
   if(n&&!quiet)toast(n===1?'Автозамена: «'+skName(last[0])+'» вместо «'+skName(last[1])+'» (+'+pct(last[2])+'%)':'Автозамена: '+n+' чар заменены на более сильные');
@@ -5720,7 +5761,8 @@ function cardPow(sk){const r=rarOf(sk),u=upgradeFor(sk,true),arr=sk.active?S.act
   return `<small class="pw" data-r="${r}">${RARITY[r].n} · сила ${Math.round(pwr(sk))}${free?' · встанет в свободный слот':u?' · ↑ сильнее «'+skName(SKILLS[u.tgt])+'» на '+pct(u.gain)+'%':''}</small>`;}
 function luScore(sk){if(sk.rankUp)return 1.15e6+pwr(sk);const u=upgradeFor(sk,true),arr=sk.active?S.active:S.passive,n=sk.active?activeSlots():passiveSlots();
   const free=baseSlot(sk)==null&&arr.findIndex((v,i)=>i<n&&v==null)>=0&&formSlot(sk)==null;
-  return (free?2e6:0)+(u?1e6*(1+u.gain):0)+pwr(sk);}
+  // свободный активный слот — пустая кнопка в бою: заполнить его важнее, чем ещё один пассивный (пассивок теперь до 16, их сила выше)
+  return (free?(sk.active?2.5e6:2e6):0)+(u?1e6*(1+u.gain):0)+pwr(sk);}
 function luAutoRun(n){const names=[];let best=null,nr=0;while(n-->0&&luQueue>0){const ch=rollChoices();if(!ch.length){luNone();break;}
   let b=ch[0],bs=-1;for(const sk of ch){const v=luScore(sk);if(v>bs){bs=v;b=sk;}}
   luPick(b);luQueue--;if(b.rankUp)nr++;names.push(b.rankUp?'ранг «'+skName(b)+'» → '+rk(b.id):skName(b));if(!b.rankUp&&(!best||rarOf(b)>rarOf(best)))best=b;}
@@ -5756,8 +5798,10 @@ function renderFilters(){
   const els=[EL[CLS.p],EL[CLS.s],EL[CLS.t]];
   $('#fRar').innerHTML=chip('Любая редкость',F_.rar<0,'data-rar="-1"')+RARITY.map((R,i)=>chip(rarGem(i)+R.n,F_.rar===i,'data-rar="'+i+'"',R.c)).join('');
   $('#fEl').innerHTML=chip('Все стихии',F_.el<0,'data-el="-1"')+els.map(i=>chip(`<span class="dot"></span>${ELEMENTS[i].name}`,F_.el===i,`data-el="${i}"`,ELEMENTS[i].hex)).join('');
+// пассивок у героя теперь 10 видов: в фильтре — имя вида (у нескольких один повод: «По таймеру» — оберег, отбойник, клинки)
+const PAS_NM={aura:'Ореол',orbit:'Стражи',link:'Сцепка',volley:'Клинки',ward:'Оберег',deflect:'Отбойник',surge:'Перегрев',twin:'Двойник',brand:'Клеймо',combo:'Таран',battery:'Батарея',rift:'Провал',doom:'Детонация',thrall:'Свита',harvest:'Искры жизни',trophy:'Трофей',revenge:'Шипы',slip:'Ускользание',stagger:'Отсрочка',brink:'На краю',rebirth:'Вторая жизнь',trail:'След',focus:'Шар силы',shell:'Кокон',sprite:'Дитя стихий',execute:'Казнь'};
   const forms=[...new Set(CLASS_BY[CLS.id].pairs.map(p=>p[1]))];
-  $('#fForm').innerHTML=chip('Все виды',F_.form<0,'data-form="-1"')+forms.map(f=>{const i=FORM[f];return chip(svg(f,'currentColor')+FORMS[i].role+(['nova','meteor','rain'].includes(f)?' · '+({nova:'нова',meteor:'удар сверху',rain:'дождь'})[f]:['bolt','chain','beam'].includes(f)?' · '+({bolt:'снаряд',chain:'цепь',beam:'луч'})[f]:['strike','whirl'].includes(f)?' · '+({strike:'удар',whirl:'вихрь'})[f]:''),F_.form===i,`data-form="${i}"`);}).join('');}
+  $('#fForm').innerHTML=chip('Все виды',F_.form<0,'data-form="-1"')+forms.map(f=>{const i=FORM[f];return chip(svg(f,'currentColor')+(FORMS[i].kind==='passive'?PAS_NM[f]||FORMS[i].names[EL[CLS.p]]||FORMS[i].role:FORMS[i].role)+(['nova','meteor','rain'].includes(f)?' · '+({nova:'нова',meteor:'удар сверху',rain:'дождь'})[f]:['bolt','chain','beam'].includes(f)?' · '+({bolt:'снаряд',chain:'цепь',beam:'луч'})[f]:['strike','whirl'].includes(f)?' · '+({strike:'удар',whirl:'вихрь'})[f]:''),F_.form===i,`data-form="${i}"`);}).join('');}
 $('#fType').addEventListener('click',e=>{const b=e.target.closest('[data-type]');if(!b)return;F_.type=b.dataset.type;renderFilters();renderList();});
 $('#fEl').addEventListener('click',e=>{const b=e.target.closest('[data-el]');if(!b)return;F_.el=+b.dataset.el;renderFilters();renderList();});
 $('#fRar').addEventListener('click',e=>{const b=e.target.closest('[data-rar]');if(!b)return;F_.rar=+b.dataset.rar;renderFilters();renderList();});
@@ -5855,7 +5899,7 @@ function renderBuild(){
   $('#slotsP').innerHTML=S.passive.slice(0,PAS_AT.length).map((id,i)=>slotHtml(id,i,'p',i<np,passiveLvl(i))).join('');
   const ca=S.active.slice(0,na).filter(v=>v!=null).length,cp=S.passive.slice(0,np).filter(v=>v!=null).length;
   $('#actN').textContent=ca+' / '+na+(na<8?' (всего 8)':'');$('#pasN').textContent=cp+' / '+np+(np<PAS_AT.length?' (всего '+PAS_AT.length+')':'');
-  $('#resoHint').textContent='Каждые чары стихии в билде дают ей +'+Math.round(ST.resoPer*100)+'% урона.'+(!S.sandbox&&S.lvl<100&&slotBoost()>1.02?' Пока слотов мало, каждая чара сильнее: +'+Math.round((slotBoost()-1)*100)+'%.':'');
+  $('#resoHint').textContent='Каждые чары стихии в билде дают ей +'+Math.round(ST.resoPer*100)+'% урона.'+(!S.sandbox&&S.lvl<PAS_AT[PAS_AT.length-1]&&slotBoost()>SB_TAIL*1.02?' Пока слотов мало, каждая чара сильнее: +'+Math.round((slotBoost()/SB_TAIL-1)*100)+'%.':'');
   const rs=ELEMENTS.map((e,i)=>({e,i,n:RESO_N[i]})).filter(x=>x.n>0).sort((a,b)=>b.n-a.n);
   $('#reso').innerHTML=rs.length?rs.map(x=>`<span class="rchip" style="--c:${x.e.hex}"><span class="dot"></span>${x.e.name} ×${x.n} <b>+${Math.round(x.n*ST.resoPer*100)}%</b></span>`).join(''):'<p class="hint">Пока пусто.</p>';
   const R=REACT[rkey(EL[CLS.p],EL[CLS.s])];const has=RESO_N[R.a]>0&&RESO_N[R.b]>0;
@@ -7718,8 +7762,9 @@ function nfAI(en,dt,dx,dz,dist){if(NFS.ents)for(const e of NFS.ents){if(e.ai&&e.
 function nfTick(dt){if(!S||!CLS)return;
   if(NFS.lv!==S.lvl){if(NFS.lv!=null&&S.lvl>NFS.lv)S.scrL=0;NFS.lv=S.lvl;}
   const sa=activeSlots(),sp=passiveSlots();if(NFS.sa!=null&&(sa>NFS.sa||sp>NFS.sp)&&!S.sandbox){const t=sa>NFS.sa?'Активный слот '+sa:'Пассивный слот '+sp;
-    banner('Открыт слот',t+' — можно поставить ещё одну чару');fxPillar(P.pos.x,P.pos.z,1.3,8,GOLD,1);fxRing(P.pos.x,P.pos.z,.6,5,GOLD,.8);colBurst(GOLD,P.pos.x,1.4,P.pos.z,24,4,.8,-1);nfFillSlots();}
-  NFS.sa=sa;NFS.sp=sp;if(S.needBest){delete S.needBest;applyBestBuild();}
+    // слотов теперь 8 + 16 — одно окно на уровень: баннер уровня сменяется «открыт слот», без отдельного тоста о вставшей чаре (Артём 25.11: «окна вылазят постоянно»)
+    const ch=nfFillSlots(true);banner('Уровень '+S.lvl+' · открыт слот',t+(ch?' — в него встала лучшая из изученных':' — можно поставить ещё одну чару'));fxPillar(P.pos.x,P.pos.z,1.3,8,GOLD,1);fxRing(P.pos.x,P.pos.z,.6,5,GOLD,.8);colBurst(GOLD,P.pos.x,1.4,P.pos.z,24,4,.8,-1);}
+  NFS.sa=sa;NFS.sp=sp;if(S.needBest){delete S.needBest;delete S.fillNew;applyBestBuild();}else if(S.fillNew){delete S.fillNew;if(!S.sandbox)nfFillSlots();}
   if(NFS.ents&&NFS.ents.length){const E=NFS.ents;for(let i=E.length-1;i>=0;i--){const e=E[i];let k;try{k=e.up?e.up(dt):true;}catch(err){k=false;console.error(err);}if(k===false){const j=E.indexOf(e);if(j>=0)E.splice(j,1);try{if(e.end)e.end();}catch(_){}}}}
   NFS.brinkOn=0;for(const a of NFS.pa||[]){const p=NFP[a.sk.F.id];if(p.tick)p.tick(a,dt);}
   for(const en of ENEMIES){const w=en.tkW;en.tk=w!=null&&w<1?w:1;en.tkW=1;}
@@ -7745,13 +7790,13 @@ function nfImpMig(){NFS.impMsg=null;if(!S||!CLS||!CLS.legacy||!Array.isArray(S.i
   if(msg.length){impDirty();NFS.impMsg=msg;}}
 var nfCW0=clearWorld;clearWorld=function(){nfClr();NFS.heroY=0;return nfCW0.apply(this,arguments);};
 // новый слот открылся — ставим туда лучшую изученную чару
-function nfFillSlots(){let ch=0;for(const act of [true,false]){const arr=act?S.active:S.passive,n=act?activeSlots():passiveSlots();
+function nfFillSlots(quiet){let ch=0;for(const act of [true,false]){const arr=act?S.active:S.passive,n=act?activeSlots():passiveSlots();
     for(let i=0;i<n;i++){if(arr[i]!=null)continue;let b=null,bp=-1;const mf=act&&movFull(arr);for(const id of LEARNED){if(EQUIPPED.has(id)||arr.includes(id))continue;const sk=SKILLS[id];if(!sk||sk.active!==act||!CLS.pool.has(id))continue;
         if(baseSlot(sk)!=null||formSlot(sk)!=null)continue;const p=pwr(sk)*(mf&&FP[sk.F.id].cat==='mov'?.01:1);if(p>bp){bp=p;b=id;}}if(b!=null){arr[i]=b;ch++;EQUIPPED.add(b);}}}
-  if(ch){onBuildChanged();toast('В открытый слот встала '+(ch>1?ch+' чары':'чара')+' из изученных');}}
+  if(ch){onBuildChanged();if(!quiet)toast('В открытый слот встала '+(ch>1?ch+' чары':'чара')+' из изученных');}return ch;}
 // ---------- полоса пассивок у HUD, кнопка «Батареи», дымка «На краю» ----------
 function nfHudInit(){if(NFS.hud&&document.body.contains(NFS.hud))return;const host=document.querySelector('#hud .bars');if(!host)return;
-  if(!document.getElementById('nfpbCss')){const st=document.createElement('style');st.id='nfpbCss';st.textContent='#nfpb{display:flex;gap:4px;flex-wrap:wrap;pointer-events:none;min-height:0}#nfpb:empty{display:none}#nfpb .b{position:relative;width:28px;height:28px;border-radius:8px;background:rgba(10,12,22,.6);border:1px solid var(--c);display:grid;place-items:center;color:var(--c);overflow:visible}#nfpb svg{width:18px;height:18px;position:relative;z-index:1}#nfpb .n{position:absolute;right:-4px;bottom:-5px;z-index:2;font:700 10px/1 system-ui,sans-serif;color:#fff;text-shadow:0 1px 2px #000;background:rgba(0,0,0,.6);border-radius:6px;padding:1px 3px}#nfpb .tm{position:absolute;inset:0;border-radius:7px;background:conic-gradient(rgba(0,0,0,.65) var(--p),transparent 0)}#nfpb .b.on{pointer-events:auto;cursor:pointer;animation:nfpu .5s infinite alternate;box-shadow:0 0 12px var(--c)}#nfpb .b.on::after{content:"";position:absolute;inset:-9px;border-radius:12px}@keyframes nfpu{to{transform:scale(1.15)}}#nfbrink{position:fixed;inset:0;pointer-events:none;opacity:0;transition:opacity .35s;background:radial-gradient(ellipse at center,transparent 42%,rgba(80,110,170,.5));z-index:4}';document.head.appendChild(st);}
+  if(!document.getElementById('nfpbCss')){const st=document.createElement('style');st.id='nfpbCss';st.textContent='#nfpb{display:flex;gap:4px;flex-wrap:wrap;pointer-events:none;min-height:0;isolation:isolate}#nfpb:empty{display:none}#nfpb .b{position:relative;width:28px;height:28px;border-radius:8px;background:rgba(10,12,22,.6);border:1px solid var(--c);display:grid;place-items:center;color:var(--c);overflow:visible}#nfpb svg{width:18px;height:18px;position:relative;z-index:1}#nfpb .n{position:absolute;right:-4px;bottom:-5px;z-index:2;font:700 10px/1 system-ui,sans-serif;color:#fff;text-shadow:0 1px 2px #000;background:rgba(0,0,0,.6);border-radius:6px;padding:1px 3px}#nfpb .tm{position:absolute;inset:0;border-radius:7px;background:conic-gradient(rgba(0,0,0,.65) var(--p),transparent 0)}#nfpb .b.on{pointer-events:auto;cursor:pointer;animation:nfpu .5s infinite alternate;box-shadow:0 0 12px var(--c)}#nfpb .b.on::after{content:"";position:absolute;inset:-9px;border-radius:12px}#nfpb.sm{gap:3px}#nfpb.sm .b{width:22px;height:22px;border-radius:6px}#nfpb.sm svg{width:14px;height:14px}#nfpb.sm .n{font-size:9px;right:-3px;bottom:-4px}#nfpb.sm .tm{border-radius:5px}#nfpb.sm .b.bat{width:28px;height:28px;border-radius:8px}#nfpb.sm .b.bat svg{width:18px;height:18px}@keyframes nfpu{to{transform:scale(1.15)}}#nfbrink{position:fixed;inset:0;pointer-events:none;opacity:0;transition:opacity .35s;background:radial-gradient(ellipse at center,transparent 42%,rgba(80,110,170,.5));z-index:4}';document.head.appendChild(st);}
   const d=document.createElement('div');d.id='nfpb';host.appendChild(d);NFS.hud=d;
   d.addEventListener('pointerdown',e=>{const b=e.target.closest('.b.on');if(!b)return;e.preventDefault();e.stopPropagation();nfBattery((NFS.pa||[]).find(a=>a.sk.F.id==='battery'&&a.c>=a.cap));});
   if(!NFS.brEl){const o=document.createElement('div');o.id='nfbrink';document.body.appendChild(o);NFS.brEl=o;}
@@ -7760,10 +7805,13 @@ function nfHudInit(){if(NFS.hud&&document.body.contains(NFS.hud))return;const ho
 function nfHx(){const st=document.getElementById('stats');if(!st)return;const de=document.documentElement,h=st.offsetHeight,
     x=h&&matchMedia('(orientation:portrait)').matches?Math.max(0,Math.round(h+8-(de.dataset.ui==='tab'?104:90))):0,v=x+'px';
   if(NFS.hxV!==v){NFS.hxV=v;de.style.setProperty('--hx',v);}}
+// значков до 16 (Артём 25.11: пассивок до 16; было до 7): больше 8 — мельче (22 px), встают в 1–2 ряда; «Батарея» (кнопка) — всегда первой и крупной
+const NF_HUD_MAX=16;
 function nfHud(){const d=NFS.hud;if(!d)return;if(!NFS.hxRO)nfHx();let h='';let n=0;
-  for(const a of NFS.pa||[]){const p=NFP[a.sk.F.id];if(!p.hud||n>=7)continue;const r=p.hud(a);if(!r)continue;n++;
+  for(let pass=0;pass<2;pass++)for(const a of NFS.pa||[]){const bat=a.sk.F.id==='battery';if(bat!==(pass===0))continue;const p=NFP[a.sk.F.id];if(!p.hud||n>=NF_HUD_MAX)continue;const r=p.hud(a);if(!r)continue;n++;
     const txt=r.v!=null?String(r.v)+(r.mx?'/'+r.mx:''):'';const tm=r.t!=null&&!r.btn?`<i class="tm" style="--p:${Math.round((1-Math.max(0,Math.min(1,r.t)))*100)}%"></i>`:'';
-    h+=`<span class="b${r.btn?' on':''}" style="--c:${a.sk.E.hex}" title="${a.sk.base}">${tm}${svg(a.sk.F.id,'currentColor')}${txt?'<i class="n">'+txt+'</i>':''}</span>`;}
+    h+=`<span class="b${bat?' bat':''}${r.btn?' on':''}" style="--c:${a.sk.E.hex}" title="${a.sk.base}">${tm}${svg(a.sk.F.id,'currentColor')}${txt?'<i class="n">'+txt+'</i>':''}</span>`;}
+  const sm=n>8;if(d.classList.contains("sm")!==sm)d.classList.toggle("sm",sm);
   if(h!==NFS.hudK){NFS.hudK=h;d.innerHTML=h;}}
 document.addEventListener('keydown',e=>{if(e.code!=='KeyR'||mode!=='game'||e.repeat)return;const t=e.target;if(t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'))return;nfBattery((NFS.pa||[]).find(a=>a.sk.F.id==='battery'&&a.c>=a.cap));});
 function nfGamepad(){if(!(NFS.pa||[]).some(a=>a.sk.F.id==='battery'))return;let pr=false;try{const gp=navigator.getGamepads?navigator.getGamepads():[];for(const g of gp)if(g&&g.buttons[10]&&g.buttons[10].pressed)pr=true;}catch(e){}
