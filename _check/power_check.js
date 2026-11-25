@@ -136,7 +136,7 @@ function realRows(file) { const R = JSON.parse(fs.readFileSync(file, 'utf8')); c
 function checkK(G, out) {
   if (!fs.existsSync(REAL)) return 0; const R = JSON.parse(fs.readFileSync(REAL, 'utf8')), SKILLS = G.get('SKILLS'), m = {};
   for (const x of R.rows) { if (!x.tag) continue; const k = x.id + '|' + x.cls, o = m[k] || (m[k] = { id: x.id, cls: x.cls, k0: [0, 0], k1: [0, 0] }); const w = x.scen === 'one' ? W_ONE : SKILLS[x.id].active ? 1 - W_ONE : 1; o[x.tag][0] += w * x.dps; o[x.tag][1] += w; }
-  let n = 0, bad = 0, worst = []; for (const o of Object.values(m)) { const a = o.k0[0] / o.k0[1], b = o.k1[0] / o.k1[1]; if (!(a > .5)) continue; useClass(G, o.cls, { lvl: KLV }); const K = G.get('rarK')(SKILLS[o.id]), r = b / a / K; n++; if (Math.abs(r - 1) > .06) { bad++; worst.push([r, o.cls + ' ' + SKILLS[o.id].F.id + '/' + SKILLS[o.id].E.id + '/' + SKILLS[o.id].M.id]); } }
+  let n = 0, bad = 0, worst = []; for (const o of Object.values(m)) { const a = o.k0[0] / o.k0[1], b = o.k1[0] / o.k1[1]; if (!(Math.min(a, b) >= 20)) continue; /* урон меньше 20 ед./с — округление до целых (2 → 2 при rarK 0,62) и шум, не множитель */ useClass(G, o.cls, { lvl: KLV }); const K = G.get('rarK')(SKILLS[o.id]), r = b / a / K; n++; if (Math.abs(r - 1) > .06) { bad++; worst.push([r, o.cls + ' ' + SKILLS[o.id].F.id + '/' + SKILLS[o.id].E.id + '/' + SKILLS[o.id].M.id]); } }
   out.push('', '## Множитель редкости в бою', '', `Чар проверено: ${n}; урон с множителем / без множителя = rarK с точностью 6%: ${n - bad} из ${n}.` + (bad ? ' Не сошлись: ' + worst.slice(0, 4).map(w => w[1] + ' ×' + w[0].toFixed(2)).join(', ') : ''));
   return bad > n * .1 ? 1 : 0; }
 function compare(G, out) {
