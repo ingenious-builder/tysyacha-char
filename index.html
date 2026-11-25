@@ -771,13 +771,93 @@ html[data-ui=tab] .stats{grid-template-columns:repeat(auto-fit,minmax(110px,1fr)
 html[data-ui=tab] .tagc{font-size:13px;padding:3px 10px}
 html[data-ui=tab] .sh-act .btn{min-width:150px}
 /* сила, редкость, рекомендации */
-[data-r="0"]{--rc:#9aa3b8}[data-r="1"]{--rc:#4aa3ff}[data-r="2"]{--rc:#b66bff}[data-r="3"]{--rc:#ffb02e}
-.sk[data-r]{box-shadow:0 0 0 3px var(--rc)}
-.sk[data-r="2"],.sk[data-r="3"]{box-shadow:0 0 0 3px var(--rc),0 0 12px 2px color-mix(in srgb,var(--rc) 55%,transparent)}
-.ico[data-r],.slot[data-r]{box-shadow:0 0 0 2px var(--rc)}
-.ico[data-r="3"],.slot[data-r="3"]{box-shadow:0 0 0 2px var(--rc),0 0 9px color-mix(in srgb,var(--rc) 60%,transparent)}
+/* Редкость чар (Артём 25.11: «непонятно, где легендарные, где обычные, где редкие»). Одна система везде (окно выбора, книга, билд, кнопки в бою, плашки):
+   рамка и фон значка + камни сверху + лента на карточке. Различается не только цветом: обычная — тонкое серое кольцо без камней;
+   редкая — толстое синее кольцо, 1 камень; эпическая — двойное кольцо, свечение, 2 камня; легендарная — узорное золотое кольцо, лучи,
+   сияние, бегущий блик и корона из 3 камней со звездой. Анимации — только transform/opacity, prefers-reduced-motion выключает. */
+[data-r="0"]{--rc:#9aa3b8;--gi:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 12'%3E%3Ccircle cx='5' cy='6' r='3.4' fill='none' stroke='%239aa3b8' stroke-width='1.8'/%3E%3C/svg%3E");--ga:.84}[data-r="1"]{--rc:#4aa3ff;--gi:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 12'%3E%3Cpath d='M5 0.8 9.2 6 5 11.2 0.8 6z' fill='%234aa3ff' stroke='%2306122a' stroke-width='1.3' stroke-linejoin='round'/%3E%3Cpath d='M5 2.4 2.4 6H5z' fill='%23fff' fill-opacity='.6'/%3E%3C/svg%3E");--ga:.84}[data-r="2"]{--rc:#b66bff;--gi:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 12'%3E%3Cpath d='M5 0.8 9.2 6 5 11.2 0.8 6z' fill='%23c48aff' stroke='%231a0830' stroke-width='1.3' stroke-linejoin='round'/%3E%3Cpath d='M5 2.4 2.4 6H5z' fill='%23fff' fill-opacity='.6'/%3E%3Cpath d='M15 0.8 19.2 6 15 11.2 10.8 6z' fill='%23c48aff' stroke='%231a0830' stroke-width='1.3' stroke-linejoin='round'/%3E%3Cpath d='M15 2.4 12.4 6H15z' fill='%23fff' fill-opacity='.6'/%3E%3C/svg%3E");--ga:1.67}[data-r="3"]{--rc:#ffb02e;--gi:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 34 14'%3E%3Cpath d='M5 2.8 9.2 8 5 13.2 0.8 8z' fill='%23ffbf3a' stroke='%232e1700' stroke-width='1.3' stroke-linejoin='round'/%3E%3Cpath d='M5 4.4 2.4 8H5z' fill='%23fff' fill-opacity='.6'/%3E%3Cpath d='M29 2.8 33.2 8 29 13.2 24.8 8z' fill='%23ffbf3a' stroke='%232e1700' stroke-width='1.3' stroke-linejoin='round'/%3E%3Cpath d='M29 4.4 26.4 8H29z' fill='%23fff' fill-opacity='.6'/%3E%3Cpath d='M17.00 0.60 18.82 5.09 23.66 5.44 19.95 8.56 21.11 13.26 17.00 10.70 12.89 13.26 14.05 8.56 10.34 5.44 15.18 5.09z' fill='%23ffe27a' stroke='%232e1700' stroke-width='1.3' stroke-linejoin='round'/%3E%3Ccircle cx='15.6' cy='6.3999999999999995' r='1.3' fill='%23fff' fill-opacity='.75'/%3E%3C/svg%3E");--ga:2.43}
+:is(.ico,.slot,.sk)[data-r]::before{content:'';position:absolute;inset:0;border-radius:inherit;z-index:-1;pointer-events:none}
+:is(.ico,.slot,.sk)[data-r="0"]{border-color:#7a8297;box-shadow:0 0 0 1px rgba(0,0,0,.55)}
+:is(.ico,.slot,.sk)[data-r="0"]::before{background:radial-gradient(circle,transparent 40%,rgba(8,10,20,.55))}
+:is(.ico,.slot,.sk)[data-r="1"]{border-color:#4aa3ff;box-shadow:0 0 0 2px #4aa3ff,0 0 0 3px rgba(0,0,0,.6)}
+:is(.ico,.slot,.sk)[data-r="1"]::before{background:radial-gradient(circle,transparent 48%,rgba(74,163,255,.45))}
+:is(.ico,.slot,.sk)[data-r="2"]{border-color:#dcb4ff;box-shadow:0 0 0 1.5px #1a0830,0 0 0 3.5px #b66bff,0 0 0 4.5px rgba(0,0,0,.55),0 0 12px 3px rgba(182,107,255,.6)}
+:is(.ico,.slot,.sk)[data-r="2"]::before{background:radial-gradient(circle,rgba(220,180,255,.2) 25%,transparent 50%,rgba(182,107,255,.55))}
+:is(.ico,.slot,.sk)[data-r="3"]{border-color:#ffe39a;box-shadow:0 0 0 1px #2a1600,0 0 16px 5px rgba(255,176,46,.6)}
+:is(.ico,.slot,.sk)[data-r="3"]::before{background:radial-gradient(circle,rgba(255,236,170,.42),transparent 58%),repeating-conic-gradient(rgba(255,225,140,.32) 0 8deg,transparent 8deg 22.5deg)}
+/* кнопки в бою: всё в пределах 4 px снаружи, чтобы не наезжать на соседние кнопки дуги */
+.sk[data-r="1"]{box-shadow:0 0 0 2px #4aa3ff,0 0 0 3px rgba(0,0,0,.6)}
+.sk[data-r="2"]{box-shadow:0 0 0 1.5px #1a0830,0 0 0 3.5px #b66bff,0 0 10px 2px rgba(182,107,255,.65)}
+.sk[data-r="3"]{box-shadow:0 0 0 1.5px #2a1600,0 0 0 4px #ffb02e,0 0 14px 4px rgba(255,176,46,.55)}
+/* узорное кольцо легендарной (зубцы) и бегущий по нему блик */
+.rf{position:absolute;inset:-8px;border-radius:50%;padding:5px;z-index:-1;pointer-events:none;overflow:hidden;
+  background:repeating-conic-gradient(#fff1bf 0 4deg,#ffb02e 4deg 12deg,#8a4b00 12deg 16deg,#ffb02e 16deg 26deg,#fff1bf 26deg 30deg);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+.ico.p>.rf,.slots.pas .slot>.rf{border-radius:17px}
+.sk>.rf{inset:0;padding:3px}.slot>.rf{inset:-6px;padding:4px}
+.rf::before{content:'';position:absolute;inset:-30%;background:linear-gradient(100deg,transparent 40%,rgba(255,255,255,.95) 50%,transparent 60%);transform:translateX(-100%);animation:rarGlint 4.2s ease-in-out infinite}
+@keyframes rarGlint{0%{transform:translateX(-100%)}55%,100%{transform:translateX(100%)}}
+/* камни редкости: на значке — сверху по центру, в тексте — строкой */
+/* над значком «короной» — выше значка стихии (он слева сверху), у легендарной — над узорным кольцом; на кнопке в бою — внутри, мельче, между значком стихии и подсказкой клавиши */
+.rg{position:absolute;left:50%;top:-3px;z-index:5;height:var(--gh,10px);width:calc(var(--gh,10px) * var(--ga));transform:translate(-50%,-100%);background:var(--gi) center/100% 100% no-repeat;pointer-events:none;filter:drop-shadow(0 0 1px rgba(0,0,0,.95)) drop-shadow(0 1px 1px rgba(0,0,0,.8))}
+[data-r="3"]>.rg{top:-6px}
+.sk>.rg,.sk[data-r="3"]>.rg{top:2px;transform:translateX(-50%);--gh:calc(7px * var(--u,1))}
+.card .ico>.rg,.sh-top .ico>.rg,#rarPop .ico>.rg{--gh:13px}
+.card[data-r] .ico{margin-top:12px}.sh-top{padding-top:14px}#upg .ico{margin-top:12px}
+.slots{padding-top:12px;row-gap:16px}html[data-ui=tab] .slots{padding-top:14px;row-gap:20px}
+[data-r="3"]>.rg{animation:rarTw 2.6s ease-in-out infinite}
+@keyframes rarTw{0%,100%{scale:1}50%{scale:1.15}}
+.gm{display:inline-block;flex:none;height:var(--gh,10px);width:calc(var(--gh,10px) * var(--ga,1));background:var(--gi) center/100% 100% no-repeat;vertical-align:middle;filter:drop-shadow(0 1px 1px rgba(0,0,0,.7))}
+.chip .gm{--gh:12px}
+/* карточки в окне выбора: лента с названием редкости, фон в тон; легендарная — золото, искры и блик */
+.card[data-r]{position:relative;overflow:hidden;isolation:isolate;padding-top:0;border-color:color-mix(in srgb,var(--rc) 40%,transparent)}
+.card[data-r="1"]{border-color:color-mix(in srgb,var(--rc) 65%,transparent);background:linear-gradient(165deg,color-mix(in srgb,var(--rc) 16%,var(--panel-solid)),var(--panel-solid) 60%)}
+.card[data-r="2"]{border:2px solid #b66bff;background:linear-gradient(165deg,color-mix(in srgb,var(--rc) 26%,var(--panel-solid)),var(--panel-solid) 65%);box-shadow:0 0 18px rgba(182,107,255,.3)}
+.card[data-r="3"]{border:2px solid #ffb02e;background:radial-gradient(130% 75% at 50% 0%,rgba(255,176,46,.34),transparent 72%),linear-gradient(165deg,#2e2410,var(--panel-solid) 72%);box-shadow:0 0 26px rgba(255,176,46,.42),inset 0 0 0 1px rgba(255,226,140,.3)}
+.rbn{grid-column:1/-1;justify-self:stretch;margin:0 -10px;display:flex;align-items:center;justify-content:center;gap:9px;padding:7px 10px 6px;font:800 14px/1 var(--f-ui);letter-spacing:.16em;text-transform:uppercase;color:#c3c9d8;background:rgba(255,255,255,.05);border-bottom:1px solid var(--line)}
+.rbn .gm{--gh:12px}
+.card[data-r="1"] .rbn{color:#fff;background:linear-gradient(90deg,#1b5aa8,#3d97f5 50%,#1b5aa8);border-color:#4aa3ff;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+.card[data-r="2"] .rbn{color:#fff;background:linear-gradient(90deg,#55208f,#a95cf5 50%,#55208f);border-color:#c99bff;text-shadow:0 1px 2px rgba(0,0,0,.6);font-size:15px}
+.card[data-r="3"] .rbn{color:#2a1600;background:linear-gradient(90deg,#b86a05,#ffcf55 28%,#fff0b3 50%,#ffcf55 72%,#b86a05);border-color:#ffe39a;font-size:16px;padding:8px 10px 7px;text-shadow:0 1px 0 rgba(255,255,255,.55)}
+.card[data-r="3"]::before{content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background:radial-gradient(circle at 7% 72%,#ffe9a8 0 1.5px,transparent 2.5px),radial-gradient(circle at 21% 94%,#fff 0 1px,transparent 2px),radial-gradient(circle at 37% 84%,#ffd35e 0 1.6px,transparent 2.6px),radial-gradient(circle at 58% 97%,#fff4c8 0 1.1px,transparent 2.1px),radial-gradient(circle at 76% 78%,#ffe9a8 0 1.5px,transparent 2.5px),radial-gradient(circle at 93% 91%,#fff 0 1px,transparent 2px);
+  animation:rarSpark 3.8s linear infinite}
+.card[data-r="3"]::after{content:'';position:absolute;inset:0;z-index:2;pointer-events:none;background:linear-gradient(105deg,transparent 38%,rgba(255,236,170,.14) 46%,rgba(255,255,255,.26) 50%,rgba(255,236,170,.14) 54%,transparent 62%);transform:translateX(-100%);animation:rarGlint 3.6s ease-in-out infinite}
+@keyframes rarSpark{0%{transform:translateY(10px);opacity:0}20%{opacity:1}100%{transform:translateY(-70px);opacity:0}}
+html[data-ui=tab] .card .rbn{margin:0 -14px;font-size:16px;padding:9px 12px 8px}html[data-ui=tab] .card[data-r="3"] .rbn{font-size:18px}
+html[data-ui=tab] .card .ico>.rg{--gh:16px}
+/* книга: полоса слева и подложка в тон редкости, название редкости с камнями */
+.row[data-r]{background-image:linear-gradient(90deg,color-mix(in srgb,var(--rc) 11%,transparent),transparent 45%);box-shadow:inset 3px 0 0 color-mix(in srgb,var(--rc) 70%,transparent)}
+.row[data-r="0"]{background-image:none;box-shadow:none}
+.row[data-r="2"]{background-image:linear-gradient(90deg,color-mix(in srgb,var(--rc) 20%,transparent),transparent 55%);box-shadow:inset 4px 0 0 var(--rc)}
+.row[data-r="3"]{background-image:linear-gradient(90deg,rgba(255,176,46,.26),rgba(255,176,46,.05) 60%,transparent);box-shadow:inset 4px 0 0 #ffb02e,inset 0 0 0 1px rgba(255,176,46,.32)}
+.row .ico{margin-top:9px}.list{padding-top:4px}
+.rn{font-weight:700;color:var(--rc)}.rn .gm{--gh:10px;margin-right:3px;vertical-align:-1px}
+.row[data-r="0"] .rn{font-weight:500}
+html[data-ui=tab] .rn .gm{--gh:12px}html[data-ui=tab] .row .ico>.rg,html[data-ui=tab] .slot>.rg{--gh:12px}
 .badge.rec{color:#7dff8a;border-color:rgba(125,255,138,.55);background:rgba(125,255,138,.08)}
-.tagc.rar{border-color:var(--rc);color:var(--rc)}
+.tagc.rar{display:inline-flex;align-items:center;gap:5px;font-weight:700;border-color:var(--rc);color:var(--rc);background:color-mix(in srgb,var(--rc) 14%,transparent)}
+.tagc.rar .gm{--gh:11px}
+.tagc.rar[data-r="3"]{color:#2a1600;border-color:#ffe39a;background:linear-gradient(90deg,#ffc13a,#ffeaa0 50%,#ffc13a)}
+.tagc.rar[data-r="2"]{color:#fff;border-color:#c99bff;background:linear-gradient(90deg,#6a2cb0,#9b52e8)}
+/* всплывашка при изучении эпической и легендарной */
+#rarPop{position:absolute;left:50%;top:calc(var(--m) + var(--sat) + 116px);z-index:8;transform:translateX(-50%);display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 14px;align-items:center;
+  width:max-content;min-width:min(290px,calc(100% - 32px));max-width:calc(100% - var(--sal) - var(--sar) - 32px);padding:12px 18px 12px 16px;border-radius:16px;pointer-events:none;opacity:0;overflow:hidden;isolation:isolate;text-align:left}
+#rarPop[data-r="2"]{background:linear-gradient(135deg,#311552,#160b26 70%);border:2px solid #b66bff;box-shadow:0 0 0 1px #000,0 0 26px rgba(182,107,255,.55)}
+#rarPop[data-r="3"]{background:radial-gradient(120% 90% at 20% 0%,rgba(255,176,46,.45),transparent 70%),linear-gradient(135deg,#3b2807,#1a1206 70%);border:2px solid #ffb02e;box-shadow:0 0 0 1px #000,0 0 32px rgba(255,176,46,.6)}
+#rarPop .ico{width:52px;height:52px;grid-row:1/span 3;margin:16px 4px 2px}#rarPop .ico svg{width:28px;height:28px}
+#rarPop .rph{display:flex;align-items:center;gap:7px;font:800 13px/1.1 var(--f-ui);letter-spacing:.14em;text-transform:uppercase;color:#d6b0ff}
+#rarPop[data-r="3"] .rph{color:#ffcf55}#rarPop .rph .gm{--gh:13px}
+#rarPop b{font:700 18px/1.2 var(--f-display);color:#fff;text-wrap:balance}
+#rarPop small{font:500 13px/1.3 var(--f-ui);color:var(--muted)}
+#rarPop::after{content:'';position:absolute;inset:0;z-index:-1;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.16) 50%,transparent 65%);transform:translateX(-100%);animation:rarGlint 2.2s ease-in-out .3s infinite}
+#rarPop.on{animation:rarPopIn 3s ease forwards}
+@keyframes rarPopIn{0%{opacity:0;transform:translateX(-50%) scale(.72)}9%{opacity:1;transform:translateX(-50%) scale(1.07)}15%{transform:translateX(-50%) scale(1)}84%{opacity:1;transform:translateX(-50%) scale(1)}100%{opacity:0;transform:translateX(-50%) scale(1)}}
+@keyframes rarPopFade{0%{opacity:0}8%,84%{opacity:1}100%{opacity:0}}
+@media (orientation:portrait){#rarPop{top:calc(var(--sat) + var(--m) + 180px)}}
+html[data-ui=tab] #rarPop{top:calc(var(--m) + var(--sat) + 146px);padding:16px 24px 16px 20px}html[data-ui=tab] #rarPop b{font-size:22px}html[data-ui=tab] #rarPop .rph{font-size:15px}html[data-ui=tab] #rarPop small{font-size:15px}html[data-ui=tab] #rarPop .ico{width:64px;height:64px}
+@media (orientation:portrait){html[data-ui=tab] #rarPop{top:calc(var(--sat) + 262px)}}
+@media (prefers-reduced-motion:reduce){.rf::before,[data-r="3"]>.rg,.card[data-r="3"]::before,.card[data-r="3"]::after,#rarPop::after{animation:none}#rarPop.on{animation-name:rarPopFade}}
 .pw{color:var(--rc,var(--muted))}
 .note.up{color:#7dff8a}
 #fSort{align-items:center}
@@ -976,6 +1056,7 @@ html[data-ui=tab] #layPan{width:min(460px,calc(100% - 40px));padding:16px 18px;g
         <div class="chips" id="fType"></div>
         <div class="chips" id="fEl"></div>
         <div class="chips" id="fForm"></div>
+        <div class="chips" id="fRar"></div>
         <div class="chips" id="fSort"></div>
         <div class="found" id="found"></div>
       </div>
@@ -1398,6 +1479,9 @@ let RESO=new Array(10).fill(1),RESO_N=new Array(10).fill(0);
 // СИЛА ЧАРЫ · РЕДКОСТЬ · РЕКОМЕНДАЦИИ · ЛУЧШИЙ БИЛД
 // =====================================================================
 const RARITY=[{n:'Обычная',c:'#9aa3b8'},{n:'Редкая',c:'#4aa3ff'},{n:'Эпическая',c:'#b66bff'},{n:'Легендарная',c:'#ffb02e'}];
+// значки редкости внутри иконки чары (вид — CSS по data-r хозяина): узорное кольцо легендарной и камни сверху (1 — редкая, 2 — эпическая, корона — легендарная)
+const rarDeco=r=>(r>=3?'<i class="rf"></i>':'')+(r>=1?'<i class="rg"></i>':'');
+const rarGem=r=>'<i class="gm" data-r="'+r+'"></i>';
 const CATN={atk:'атака',area:'площадь',ctl:'контроль',def:'защита',mov:'движение',sum:'призыв',pas:'пассивная'};
 // ph — сколько «ударов по целям» даёт одно срабатывание; u — польза сверх урона; cat — категория для разнообразия билда
 const FP={bolt:{ph:1.15,cat:'atk'},chain:{ph:3.2,cat:'atk'},beam:{ph:2.4,cat:'atk'},strike:{ph:1.9,cat:'atk'},
@@ -2292,7 +2376,7 @@ function checkUpgrade(id){if(mode!=='game'||S.sandbox)return;const sk=SKILLS[id]
   showUpg(sk,u);}
 function applyUpgrade(sk,u){putInSlot(sk.id,sk.active?'active':'passive',u.idx);}
 function showUpg(sk,u){if(luOpen||bookOpen){hideUpg();return;}UPG=sk.id;const T_=SKILLS[u.tgt],r=rarOf(sk),el=$('#upg');el.dataset.r=r;
-  $('#upgIco').innerHTML=svg(sk.F.id)+modBadge(sk);$('#upgIco').style.setProperty('--c',sk.E.hex);$('#upgIco').dataset.r=r;$('#upgIco').className='ico'+(sk.active?'':' p');
+  $('#upgIco').innerHTML=svg(sk.F.id)+modBadge(sk)+rarDeco(r);$('#upgIco').style.setProperty('--c',sk.E.hex);$('#upgIco').dataset.r=r;$('#upgIco').className='ico'+(sk.active?'':' p');
   $('#upgT').textContent='Новая чара сильнее «'+skName(T_)+'» в '+slotNm(u.act,u.idx);
   $('#upgS').textContent=skName(sk)+' · '+RARITY[r].n+' · сила '+Math.round(u.cp)+' (+'+pct(u.gain)+'%)';
   el.hidden=false;clearTimeout(upgTm);upgTm=setTimeout(hideUpg,14000);}
@@ -2305,7 +2389,7 @@ function wpick(c){let t=0;const bk=bookOn(),w=c.map(s=>(CLS.core.has(s.bk)?3:1)*
 function learnRandom(){const pool=rollPool();
   if(!pool.length||S.sandbox){S.ess+=60;toast('Свиток рассыпался в 60 эссенции');return;}
   const sk=wpick(pool);learn(sk.id,true);fxPillar(P.pos.x,P.pos.z,.8,5,GOLD,.7);colBurst(GOLD,P.pos.x,1.2,P.pos.z,20,4,.7,-2);
-  toast('Свиток: «'+skName(sk)+'»'+(EQUIPPED.has(sk.id)?' — сразу в билде':' — в книге'));}
+  toastSk(sk,'Свиток: «'+skName(sk)+'»'+(EQUIPPED.has(sk.id)?' — сразу в билде':' — в книге'),'Из свитка'+(EQUIPPED.has(sk.id)?' — сразу в билде':' — в книге'));}
 
 // =====================================================================
 // COMBAT CORE
@@ -3854,7 +3938,7 @@ for(let i=0;i<8;i++){const b=document.createElement('button');b.type='button';b.
 function updateHudSlots(){const n=activeSlots();
   SKB.forEach((s,i)=>{const id=i<n?S.active[i]:null;s.b.hidden=i>=n;if(i>=n)return;
     if(id==null){s.b.className='sk empty';delete s.b.dataset.r;s.b.textContent='+';s.b.dataset.tip='Пустой слот|'+(i+1);s.b.style.removeProperty('--c');s.id=-1;s.b.setAttribute('aria-label','Пустой слот '+(i+1));return;}
-    const sk=SKILLS[id];s.b.className='sk';s.b.dataset.r=rarOf(sk);s.b.style.setProperty('--c',sk.E.hex);s.b.innerHTML=svg(sk.F.id)+modBadge(sk)+rankBadge(id)+'<span class="cd"></span><span class="t"></span>';
+    const sk=SKILLS[id];s.b.className='sk';s.b.dataset.r=rarOf(sk);s.b.style.setProperty('--c',sk.E.hex);s.b.innerHTML=svg(sk.F.id)+modBadge(sk)+rankBadge(id)+rarDeco(rarOf(sk))+'<span class="cd"></span><span class="t"></span>';
     s.b.setAttribute('aria-label',skName(sk)+', ранг '+rk(id)+' из 5');s.b.dataset.tip=skName(sk)+'|'+(i+1);s.id=id;s.p=-1;s.t='';s.low=null;s.cdEl=s.b.querySelector('.cd');s.tEl=s.b.querySelector('.t');});
   const tot=EQUIPPED.size,cap_=activeSlots()+passiveSlots();
   $('#bookCount').textContent=tot+'/'+cap_;$('#tabBuildN').textContent=tot+'/'+cap_;
@@ -3879,6 +3963,12 @@ function updateHud(){
   hurtFlash=Math.max(0,hurtFlash-FDT*1.8);const lowHp=P.hp/P.maxHp<.3?.35+.15*Math.sin(time*6):0;
   const ho=Math.max(hurtFlash,lowHp).toFixed(2);if(hudCache.ho!==ho){hudCache.ho=ho;hurtEl.style.opacity=ho;}}
 let toastT=0;
+// изучена эпическая/легендарная — своя всплывашка (фиолетовая/золотая) вместо обычной строки
+let rarPopT=0;
+function rarPop(sk,sub){const r=rarOf(sk);let el=$('#rarPop');if(!el){el=document.createElement('div');el.id='rarPop';el.setAttribute('role','status');$('#toast').after(el);}
+  el.dataset.r=r;el.innerHTML='<span class="ico'+(sk.active?'':' p')+'" data-r="'+r+'" style="--c:'+sk.E.hex+'">'+svg(sk.F.id)+modBadge(sk)+rarDeco(r)+'</span><span class="rph">'+rarGem(r)+(r>=3?'Легендарная чара!':'Эпическая чара!')+'</span><b>'+skName(sk)+'</b><small>'+sub+'</small>';
+  $('#toast').classList.remove('on');el.classList.remove('on');void el.offsetWidth;el.classList.add('on');clearTimeout(rarPopT);rarPopT=setTimeout(()=>el.classList.remove('on'),3100);}
+function toastSk(sk,t,sub){if(rarOf(sk)>=2)rarPop(sk,sub);else toast(t);}
 function toast(t,ms){const el=$('#toast');el.textContent=t;el.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('on'),ms||1900);}
 let banT=0;
 function banner(b,s,red){$('#bannerB').textContent=b;$('#bannerS').textContent=s;const el=$('#banner');el.classList.toggle('red',!!red);el.classList.add('on');clearTimeout(banT);banT=setTimeout(()=>el.classList.remove('on'),2600);}
@@ -4048,19 +4138,20 @@ function cardPow(sk){const r=rarOf(sk),u=upgradeFor(sk,true),arr=sk.active?S.act
 function luScore(sk){const u=upgradeFor(sk,true),arr=sk.active?S.active:S.passive,n=sk.active?activeSlots():passiveSlots();
   const free=baseSlot(sk)==null&&arr.findIndex((v,i)=>i<n&&v==null)>=0&&formSlot(sk)==null;
   return (free?2e6:0)+(u?1e6*(1+u.gain):0)+pwr(sk);}
-function luAutoRun(n){const names=[];while(n-->0&&luQueue>0){const ch=rollChoices();if(!ch.length){luQueue=0;break;}
+function luAutoRun(n){const names=[];let best=null;while(n-->0&&luQueue>0){const ch=rollChoices();if(!ch.length){luQueue=0;break;}
   let b=ch[0],bs=-1;for(const sk of ch){const v=luScore(sk);if(v>bs){bs=v;b=sk;}}
-  learn(b.id,true);luQueue--;names.push(skName(b));}
-  if(names.length)toast(names.length===1?'Изучено: '+names[0]:'Изучено '+names.length+': '+names.slice(0,3).join(', ')+(names.length>3?'…':''));
+  learn(b.id,true);luQueue--;names.push(skName(b));if(!best||rarOf(b)>rarOf(best))best=b;}
+  const tt=names.length===1?'Изучено: '+names[0]:'Изучено '+names.length+': '+names.slice(0,3).join(', ')+(names.length>3?'…':'');
+  if(best&&rarOf(best)>=2)rarPop(best,names.length>1?tt:'Изучена'+(EQUIPPED.has(best.id)?' — сразу в билде':' — в книге'));else if(names.length)toast(tt);
   luDelay=.5;}
 function luSync(){const a=$('#luAuto');if(a)a.textContent='Авто-выбор: '+(S.autoLu?'вкл':'выкл');const l=$('#luAll');if(l){l.hidden=luQueue<2;l.textContent='Авто для всех '+luQueue;}}
 function setAutoLu(v){S.autoLu=!!v;if(S.autoLu)S.autoBest=true;saveSoon();const c=$('#autoLu');if(c)c.checked=S.autoLu;const b=$('#autoBest');if(b)b.checked=!!S.autoBest;}
 function openLevelUp(){if(S.autoLu){luAutoRun(luQueue);return;}const ch=rollChoices();if(!ch.length){luQueue=0;return;}luOpen=true;hideUpg();syncPause();
   $('#luTitle').textContent='Уровень '+S.lvl+(luQueue>1?' · ещё '+(luQueue-1):'');$('#luSub').textContent='Выбери новые чары. Если есть свободный слот, они сразу встанут в билд.'+(talFreeUse()?' Очков талантов: '+tpFree()+'.':'');luSync();
-  $('#luCards').innerHTML=ch.map(sk=>`<button type="button" class="card" data-id="${sk.id}"><span class="ico${sk.active?'':' p'}" data-r="${rarOf(sk)}" style="--c:${sk.E.hex}">${svg(sk.F.id)}${modBadge(sk)}</span><span class="ct"><span class="tag">${sk.F.role} · ${sk.E.name}${knownBase(sk)?'<i class="nv">вариант известной</i>':'<i class="nv">новая чара</i>'}${bookOn()&&BOOK.has(sk.id)?'<i class="nv">из Книги чар</i>':''}</span><b>${sk.base}</b><span class="var">${sk.M.name}: ${sk.M.desc}</span><small>${cap(skLead(sk))}</small><small>${cardStat(sk)}</small>${cardPow(sk)}</span></button>`).join('');
+  $('#luCards').innerHTML=ch.map(sk=>{const r=rarOf(sk);return `<button type="button" class="card" data-id="${sk.id}" data-r="${r}"><span class="rbn">${rarGem(r)}<span>${RARITY[r].n}</span>${rarGem(r)}</span><span class="ico${sk.active?'':' p'}" data-r="${r}" style="--c:${sk.E.hex}">${svg(sk.F.id)}${modBadge(sk)}${rarDeco(r)}</span><span class="ct"><span class="tag">${sk.F.role} · ${sk.E.name}${knownBase(sk)?'<i class="nv">вариант известной</i>':'<i class="nv">новая чара</i>'}${bookOn()&&BOOK.has(sk.id)?'<i class="nv">из Книги чар</i>':''}</span><b>${sk.base}</b><span class="var">${sk.M.name}: ${sk.M.desc}</span><small>${cap(skLead(sk))}</small><small>${cardStat(sk)}</small>${cardPow(sk)}</span></button>`;}).join('');
   $('#luSkip').textContent='Пропустить: +'+(20+S.lvl*5)+' эссенции';$('#lvlup').hidden=false;}
 function closeLevelUp(){luOpen=false;$('#lvlup').hidden=true;luQueue=Math.max(0,luQueue-1);luDelay=1.2;syncPause();}
-$('#luCards').addEventListener('click',e=>{const b=e.target.closest('.card');if(!b)return;const sk=SKILLS[+b.dataset.id];learn(sk.id,true);toast('Изучено: '+skName(sk)+(EQUIPPED.has(sk.id)?' — в билде':' — в книге'));closeLevelUp();});
+$('#luCards').addEventListener('click',e=>{const b=e.target.closest('.card');if(!b)return;const sk=SKILLS[+b.dataset.id];learn(sk.id,true);toastSk(sk,'Изучено: '+skName(sk)+(EQUIPPED.has(sk.id)?' — в билде':' — в книге'),'Изучена'+(EQUIPPED.has(sk.id)?' — сразу в билде':' — в книге'));closeLevelUp();});
 $('#luAuto').addEventListener('click',()=>{setAutoLu(!S.autoLu);if(S.autoLu){luOpen=false;$('#lvlup').hidden=true;luAutoRun(luQueue);syncPause();toast('Авто-выбор чар включён (и автозамена в билде)');}else luSync();});
 $('#luAll').addEventListener('click',()=>{luOpen=false;$('#lvlup').hidden=true;luAutoRun(luQueue);syncPause();});
 $('#autoLu').addEventListener('change',e=>{setAutoLu(e.target.checked);toast(S.autoLu?'Чары после уровня выбираются сами (и автозамена в билде)':'Чары после уровня — через окно выбора');});
@@ -4070,7 +4161,7 @@ $('#luSkip').addEventListener('click',()=>{S.ess+=20+S.lvl*5;closeLevelUp();});
 // BOOK
 // =====================================================================
 let bookOpen=false,bookTab='lib',pending=null,setOpen=false,exitArmAt=0;
-const F_={type:'learned',el:-1,form:-1,q:''};
+const F_={type:'learned',el:-1,form:-1,rar:-1,q:''};
 let LIST=[],shown=0;
 const listEl=$('#list');
 function chip(label,on,attrs,c){return `<button type="button" class="chip${on?' on':''}" ${attrs}${c?` style="--c:${c}"`:''}>${label}</button>`;}
@@ -4078,11 +4169,13 @@ function renderFilters(){
   const T_=[['learned','Изученные'],['all','Все чары класса'],['active','Активные'],['passive','Пассивные'],['eq','В билде']];
   $('#fType').innerHTML=T_.map(([k,l])=>chip(l,F_.type===k,`data-type="${k}"`)).join('');
   const els=[EL[CLS.p],EL[CLS.s],EL[CLS.t]];
+  $('#fRar').innerHTML=chip('Любая редкость',F_.rar<0,'data-rar="-1"')+RARITY.map((R,i)=>chip(rarGem(i)+R.n,F_.rar===i,'data-rar="'+i+'"',R.c)).join('');
   $('#fEl').innerHTML=chip('Все стихии',F_.el<0,'data-el="-1"')+els.map(i=>chip(`<span class="dot"></span>${ELEMENTS[i].name}`,F_.el===i,`data-el="${i}"`,ELEMENTS[i].hex)).join('');
   const forms=[...new Set(CLASS_BY[CLS.id].pairs.map(p=>p[1]))];
   $('#fForm').innerHTML=chip('Все виды',F_.form<0,'data-form="-1"')+forms.map(f=>{const i=FORM[f];return chip(svg(f,'currentColor')+FORMS[i].role+(['nova','meteor','rain'].includes(f)?' · '+({nova:'нова',meteor:'удар сверху',rain:'дождь'})[f]:['bolt','chain','beam'].includes(f)?' · '+({bolt:'снаряд',chain:'цепь',beam:'луч'})[f]:['strike','whirl'].includes(f)?' · '+({strike:'удар',whirl:'вихрь'})[f]:''),F_.form===i,`data-form="${i}"`);}).join('');}
 $('#fType').addEventListener('click',e=>{const b=e.target.closest('[data-type]');if(!b)return;F_.type=b.dataset.type;renderFilters();renderList();});
 $('#fEl').addEventListener('click',e=>{const b=e.target.closest('[data-el]');if(!b)return;F_.el=+b.dataset.el;renderFilters();renderList();});
+$('#fRar').addEventListener('click',e=>{const b=e.target.closest('[data-rar]');if(!b)return;F_.rar=+b.dataset.rar;renderFilters();renderList();});
 $('#fForm').addEventListener('click',e=>{const b=e.target.closest('[data-form]');if(!b)return;F_.form=+b.dataset.form;renderFilters();renderList();});
 $('#q').addEventListener('input',e=>{F_.q=e.target.value.trim().toLowerCase();renderList();});
 const ROM=['','I','II','III','IV','V'];
@@ -4102,22 +4195,23 @@ function rankLine(sk,lv){const r=rk(sk.id),mx=r>=5,can=!mx&&S.ess>=rankCost(r);
   return `<span class="rkl${mx?' mx':''}"><b>${mx?'Ранг 5 из 5 · МАКС':'Ранг '+r+' из 5'}</b>${pips(r)}${can?'<em>↑ можно повысить</em>':''}</span><span class="meta2">${lv>1?'вариантов '+lv+'/'+NM+' · ':''}${cardStat(sk)}</span>`;}
 function rowHtml(sk,nv){const eq=EQUIPPED.has(sk.id),ln=isLearned(sk.id),lv=learnedVars(sk.bk),r=rarOf(sk),u=ln&&!eq?upgradeFor(sk):null;
   const other=!eq&&ln?[...EQUIPPED].find(id=>SKILLS[id].bk===sk.bk):null;
-  return `<button type="button" class="row${eq?' eq':''}${ln?'':' locked'}" data-id="${sk.id}"><span class="ico${sk.active?'':' p'}" data-r="${r}" style="--c:${sk.E.hex}">${svg(sk.F.id)}${modBadge(sk)}</span>
-  <span class="rt"><span class="nm">${sk.base} <i>· ${sk.M.name}</i></span><span class="meta"><b class="pw" data-r="${r}">сила ${Math.round(pwr(sk))}</b> · ${sk.F.role} · ${RARITY[r].n} ${sk.active?'актив.':'пассив.'}${ln?'':' · не изучено'}</span>${ln?rankLine(sk,lv):''}</span>${eq?'<span class="badge">в билде · р.'+rk(sk.id)+'</span>':u?`<span class="badge rec">↑ +${pct(u.gain)}%</span>`:other!=null?'<span class="badge">есть вариант в билде</span>':''}</button>`;}
+  return `<button type="button" class="row${eq?' eq':''}${ln?'':' locked'}" data-id="${sk.id}" data-r="${r}"><span class="ico${sk.active?'':' p'}" data-r="${r}" style="--c:${sk.E.hex}">${svg(sk.F.id)}${modBadge(sk)}${rarDeco(r)}</span>
+  <span class="rt"><span class="nm">${sk.base} <i>· ${sk.M.name}</i></span><span class="meta"><b class="pw" data-r="${r}">сила ${Math.round(pwr(sk))}</b> · ${sk.F.role} · <b class="rn">${rarGem(r)}${RARITY[r].n}</b> ${sk.active?'актив.':'пассив.'}${ln?'':' · не изучено'}</span>${ln?rankLine(sk,lv):''}</span>${eq?'<span class="badge">в билде · р.'+rk(sk.id)+'</span>':u?`<span class="badge rec">↑ +${pct(u.gain)}%</span>`:other!=null?'<span class="badge">есть вариант в билде</span>':''}</button>`;}
 function classSkills(){const a=[];CLS.pool.forEach(id=>a.push(SKILLS[id]));const er=e=>e===CLS.p?0:e===CLS.s?1:2;a.sort((x,y)=>er(x.E.id)-er(y.E.id)||x.f-y.f||x.m-y.m);return a;}
 const F2_={sort:'power',weak:false};let WEAKN=0,WEAKE=0;
-function renderSort(){$('#fSort').innerHTML=chip('По силе',F2_.sort==='power','data-sort="power"')+chip('По стихии',F2_.sort==='el','data-sort="el"')+
+function renderSort(){$('#fSort').innerHTML=chip('По силе',F2_.sort==='power','data-sort="power"')+chip('По редкости',F2_.sort==='rar','data-sort="rar"')+chip('По стихии',F2_.sort==='el','data-sort="el"')+
   (F_.type==='learned'&&WEAKN?chip((F2_.weak?'Слабые показаны':'Слабые свёрнуты')+' ('+WEAKN+')',F2_.weak,'data-weak="1"')+chip('Распылить слабые · +'+WEAKE+' эсс.',false,'data-dust="1"'):'');}
 function renderList(keep){
   const q=F_.q,lockType=pending&&pending.type?pending.type:null,st=keep?listEl.scrollTop:0;
   let L=classSkills().filter(sk=>{
     if(lockType==='active'&&!sk.active)return false;if(lockType==='passive'&&sk.active)return false;
     if(F_.type==='learned'&&!isLearned(sk.id))return false;if(F_.type==='active'&&!sk.active)return false;if(F_.type==='passive'&&sk.active)return false;if(F_.type==='eq'&&!EQUIPPED.has(sk.id))return false;
-    if(F_.el>=0&&sk.e!==F_.el)return false;if(F_.form>=0&&sk.f!==F_.form)return false;
+    if(F_.el>=0&&sk.e!==F_.el)return false;if(F_.rar>=0&&rarOf(sk)!==F_.rar)return false;if(F_.form>=0&&sk.f!==F_.form)return false;
     if(q)return q.split(/\s+/).every(w=>sk.key.includes(w));return true;});
   {const gr=new Map(),sc=x=>(isLearned(x.id)?1e6:0)+pwr(x);for(const sk of L){const o=gr.get(sk.bk);if(!o||sc(sk)>sc(o))gr.set(sk.bk,sk);}L=[...gr.values()];}
   const ln=x=>isLearned(x.id)?1:0;
   if(F2_.sort==='power')L.sort((x,y)=>ln(y)-ln(x)||(+y.active)-(+x.active)||pwr(y)-pwr(x));
+  else if(F2_.sort==='rar')L.sort((x,y)=>ln(y)-ln(x)||rarOf(y)-rarOf(x)||(+y.active)-(+x.active)||pwr(y)-pwr(x));
   else if(pending&&pending.type)L.sort((a,b)=>ln(b)-ln(a));
   WEAKN=0;WEAKE=0;{const wk=F_.type==='learned'&&!q&&!S.sandbox?L.filter(isWeak):[];WEAKN=wk.length;wk.forEach(x=>WEAKE+=dustValue(x));
     if(!F2_.weak&&WEAKN){const ws=new Set(wk);L=L.filter(x=>!ws.has(x));}}
@@ -4140,7 +4234,7 @@ listEl.addEventListener('click',e=>{const r=e.target.closest('.row');if(r)openSh
 function slotHtml(id,i,kind,unlocked,lvlNeed){
   if(!unlocked)return `<button type="button" class="slot lock${id!=null?' has':''}" data-k="${kind}" data-i="${i}" aria-label="Закрыт до уровня ${lvlNeed}">ур ${lvlNeed}</button>`;
   if(id==null)return `<button type="button" class="slot empty" data-k="${kind}" data-i="${i}" aria-label="Пустой слот">+</button>`;
-  const sk=SKILLS[id];return `<button type="button" class="slot" style="--c:${sk.E.hex}" data-k="${kind}" data-i="${i}" aria-label="${skName(sk)}, ранг ${rk(id)} из 5">${svg(sk.F.id)}${modBadge(sk)}${slotRank(id)}</button>`;}
+  const sk=SKILLS[id],r=rarOf(sk);return `<button type="button" class="slot" style="--c:${sk.E.hex}" data-r="${r}" data-k="${kind}" data-i="${i}" aria-label="${skName(sk)}, ${RARITY[r].n.toLowerCase()}, ранг ${rk(id)} из 5">${svg(sk.F.id)}${modBadge(sk)}${slotRank(id)}${rarDeco(r)}</button>`;}
 function renderBuild(){
   const na=activeSlots(),np=passiveSlots();
   $('#slotsA').innerHTML=S.active.map((id,i)=>slotHtml(id,i,'a',i<na,activeLvl(i))).join('');
@@ -4298,7 +4392,7 @@ function sheetHtml(sk){const eq=EQUIPPED.has(sk.id),ln=isLearned(sk.id),r=rk(sk.
     (r<5?`<button type="button" class="btn ess" data-act="rank" ${S.ess<cost?'disabled':''}>Ранг ${r+1} · ${cost} эсс.</button>`:'')+(dv?`<button type="button" class="btn" data-act="dust">Распылить · +${dv} эсс.</button>`:'')+`<button type="button" class="btn" data-act="close">Закрыть</button></div>`+
     (r<5&&S.ess<cost?`<p class="note">Нужно ${cost} эссенции, есть ${S.ess}. Эссенция падает со всех врагов.</p>`:'');}
   const vars=`<div class="vars" role="group" aria-label="Варианты чары">${MODS.map((M,mi)=>{const v=SKILLS[sk.bk*NM+mi];return `<button type="button" class="vchip${v.id===sk.id?' on':''}${isLearned(v.id)?'':' lk'}" data-v="${v.id}">${MODG[mi]} ${M.name}${EQUIPPED.has(v.id)?' ●':''}</button>`;}).join('')}</div>`;
-  return `<div class="sh-body"><div class="sh-top"><span class="ico${sk.active?'':' p'}" data-r="${rr}" style="--c:${sk.E.hex}">${svg(sk.F.id)}${modBadge(sk)}</span><div><h2>${sk.F.id==='summon'&&CLS?summInfo(sk).name:sk.base}</h2><p><span class="tagc rar" data-r="${rr}">${RARITY[rr].n}</span><span class="tagc v">${sk.M.name}</span><span class="tagc">${sk.F.role}</span><span class="tagc" style="border-color:${sk.E.hex}">${sk.E.name}</span></p></div></div>
+  return `<div class="sh-body"><div class="sh-top"><span class="ico${sk.active?'':' p'}" data-r="${rr}" style="--c:${sk.E.hex}">${svg(sk.F.id)}${modBadge(sk)}${rarDeco(rr)}</span><div><h2>${sk.F.id==='summon'&&CLS?summInfo(sk).name:sk.base}</h2><p><span class="tagc rar" data-r="${rr}">${rarGem(rr)}${RARITY[rr].n}</span><span class="tagc v">${sk.M.name}</span><span class="tagc">${sk.F.role}</span><span class="tagc" style="border-color:${sk.E.hex}">${sk.E.name}</span></p></div></div>
   ${vars}<p class="lead">${cap(skLead(sk))}</p><p class="note"><b style="color:var(--ess);font-weight:500">${sk.M.name}:</b> ${sk.M.desc}.</p>
   ${sk.F.id==='summon'?`<p class="note"><b style="color:var(--ess);font-weight:500">Призыв:</b> одновременно до ${ST.summMax} призывов (талант «Повелитель духов» добавляет места). У существа своя полоска здоровья; с уровнем оно крупнее и крепче. Напарник по коопу видит твоих существ, а их удары засчитываются.</p>`:''}
   ${rankRow}<div class="stats">${st.map(([k,v])=>`<div>${k}<b>${v}</b></div>`).join('')}</div></div>${acts}`;}
@@ -4333,7 +4427,7 @@ function showTab(t){bookTab=t;$('#tabLib').classList.toggle('on',t==='lib');$('#
   if(t==='lib')renderList();else if(t==='build')renderBuild();else renderTalents();}
 $('#tabLib').addEventListener('click',()=>showTab('lib'));$('#tabBuild').addEventListener('click',()=>showTab('build'));$('#tabTal').addEventListener('click',()=>showTab('tal'));
 function openBook(tab,p){if(setOpen)closeSettings();bookOpen=true;hideUpg();input.attack=false;input.jx=input.jy=0;joyId=null;mouseId=null;input.mouseAttack=false;input.moveTo=null;joy.classList.remove('on');aimSt=null;hideAim();
-  $('#book').hidden=false;$('#bkTitle').textContent=CLS.name;syncPause();if(p&&p.type)F_.type='learned';F_.el=-1;F_.form=-1;setPending(p||null);renderFilters();showTab(tab||'lib');}
+  $('#book').hidden=false;$('#bkTitle').textContent=CLS.name;syncPause();if(p&&p.type)F_.type='learned';F_.el=-1;F_.form=-1;F_.rar=-1;setPending(p||null);renderFilters();showTab(tab||'lib');}
 function closeBook(){bookOpen=false;closeSheet();setPending(null);$('#book').hidden=true;syncPause();save();}
 $('#bkClose').addEventListener('click',closeBook);
 $('#heroBtn').addEventListener('click',()=>{if(mode==='game'){closeBook();openSettings(true);}else toSelect();});
