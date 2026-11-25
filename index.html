@@ -1333,6 +1333,7 @@ html[data-ui=tab] #layPan{width:min(460px,calc(100% - 40px));padding:16px 18px;g
 <script src="net-relay.js"></script>
 <script src="campaign.js"></script>
 <script src="net-p2p.js"></script>
+<script src="audio.js"></script>
 <script>
 'use strict';
 (function(){
@@ -8180,6 +8181,72 @@ function mpInit(){
     setTimeout(()=>{try{if(MP.peerId)mpHello();}catch(e){}},700);};
   document.addEventListener('visibilitychange',mpBack);window.addEventListener('pageshow',mpBack);window.addEventListener('online',mpBack);}
 
+// =====================================================================
+// ЗВУК (audio.js → window.TCSND): тонкие обёртки событий. Функции игры не меняются — каждая обёрнута здесь один раз,
+// до TCC (кампания получает уже обёрнутые banner, kill, hurtPlayer, bossIntro, learnRandom). Нет модуля или обёртки
+// не нашлось — тишина, игра как раньше (каждая строка в своём try). Звуки, громкость, лимиты голосов — в audio.js.
+// =====================================================================
+{const A=window.TCSND;if(A&&A.bind){
+  const W=(f,pre,post)=>function(){let s;if(pre)try{s=pre.apply(null,arguments);}catch(e){}const r=f.apply(this,arguments);if(post)try{post(s,r,arguments);}catch(e){}return r;};
+  const H=fn=>{try{fn();}catch(e){if(TEST)console.warn('звук: обёртка не встала',e&&e.message);}};
+  const elId=i=>i>=0&&ELEMENTS[i]?ELEMENTS[i].id:'',SST={};
+  A.bind({rar:sk=>rarOf(sk),mel:()=>!!(CLS&&CLS.melee),st:()=>{const s=SST;s.mode=mode;s.paused=paused;s.set=setOpen;s.dead=!!P.dead;s.x=P.pos.x;s.z=P.pos.z;s.yaw=camYaw;s.play=PLAY;
+    s.zone=PLAY==='world'?zoneOf(P.pos.x,P.pos.z):-1;s.gorge=PLAY==='gorge'&&GZ&&GZ.th?GT.indexOf(GZ.th):-1;
+    let v=null;if(mode==='game'&&PLAY==='world'&&S)try{v=wvView();}catch(e){}s.wv=v?v.s|0:0;s.cd=v?+v.cd||0:0;s.wn=v?v.w|0:0;
+    s.boss=!!(BOSS&&!BOSS.dead);let n=0;if(mode==='game')for(const e of ENEMIES)if(!e.dead&&e.aggro&&Math.abs(e.pos.x-P.pos.x)<16&&Math.abs(e.pos.z-P.pos.z)<16)n++;s.ag=n;
+    s.peer=!!(MP.peer&&MP.peer.on);s.pdead=!!(s.peer&&MP.peer.dead);s.ess=S?S.ess|0:0;s.hp=P.maxHp>0?P.hp/P.maxHp:1;return s;}});
+  // бой: попадания (и у гостя — cfOnHit зовут оба), смерти, удар по герою, щит, падение и подъём
+  H(()=>{cfOnHit=W(cfOnHit,(en,d,el,o,crit)=>{if(!o.dot)A.hit(en.pos.x,en.pos.z,elId(el),o,crit,o.sk);});});
+  H(()=>{kill=W(kill,en=>{if(!en.dead)A.kill(en.pos.x,en.pos.z,en.tid,en.r,!!(en.elite||en.champ),!!en.boss);});});
+  H(()=>{hurtPlayer=W(hurtPlayer,()=>[P.hp,P.shield],(b,r,a)=>{const o=a[2]||{};if(o.dot||!b)return;if(P.hp<b[0])A.hurt((b[0]-P.hp)/Math.max(1,P.maxHp),false);else if(P.shield<b[1])A.hurt(0,true);});});
+  H(()=>{die=W(die,()=>P.dead,was=>{if(!was&&P.dead)A.die();});});
+  H(()=>{revive=W(revive,()=>P.dead,was=>{if(was&&!P.dead)A.revive();});});
+  H(()=>{mpRevived=W(mpRevived,()=>P.dead,was=>{if(was&&!P.dead)A.revive();});});
+  H(()=>{heal=W(heal,n=>{if(!P.dead&&n>=P.maxHp*.15&&P.hp<P.maxHp)A.heal();});});
+  H(()=>{shieldBurst=W(shieldBurst,()=>{if(P.shieldSk)A.shieldBreak();});});
+  // герой: удар по роли класса, каст (форма, стихия, редкость), взрывы площади
+  H(()=>{basicAttack=W(basicAttack,()=>A.basic(CLS.role,!!CLS.melee,CLS.id));});
+  H(()=>{cast=W(cast,(sk,Ad,cl)=>A.cast(sk.F.id,sk.E.id,rarOf(sk),!!cl));});
+  H(()=>{aoe=W(aoe,(pos,r,dmg,el,o)=>{o=o||{};if(!o.splash&&!o.ctx)A.boom(pos.x,pos.z,r,elId(el),o.sk&&o.sk.F?o.sk.F.id:'',o.depth|0);});});
+  H(()=>{fireBlast=W(fireBlast,(x,z,r)=>A.boom(x,z,r,'fire','',1));});
+  // враги: выстрелы (и у гостя), замах-предупреждение и удар в конце, рывок
+  H(()=>{shootAt=W(shootAt,(en,kind)=>A.eshot(en.pos.x,en.pos.z,kind));});
+  H(()=>{shootDir=W(shootDir,en=>A.eshot(en.pos.x,en.pos.z,'orb'));});
+  H(()=>{mpGuestEProj=W(mpGuestEProj,m=>{if(m&&MPG&&mode==='game')A.eshot(m.x,m.z,m.k==='arrow'?'arrow':'orb');});});
+  H(()=>{const f0=tele;tele=function(shape,o,dur,cb){let big=false,sz=3;try{big=!!(o.src&&o.src.boss);sz=o.r||o.len||3;A.tele(o.x,o.z,sz,big||sz>=5);}catch(e){}
+    return f0.call(this,shape,o,dur,cb?function(t){try{A.teleHit(t.x,t.z,sz,big||sz>=5);}catch(e){}return cb.apply(this,arguments);}:cb);};});
+  H(()=>{dash=W(dash,en=>{if(en&&en.pos&&(en.boss||en.elite))A.charge(en.pos.x,en.pos.z);});});
+  // боссы: выход, фазы, смерть и последний обвал
+  H(()=>{bossIntro=W(bossIntro,(en,quiet)=>{if(en&&!quiet)A.bossIntro();});});
+  H(()=>{bossPhaseFx=W(bossPhaseFx,(en,p)=>A.bossPhase(p));});
+  H(()=>{bossDeathShow=W(bossDeathShow,()=>A.bossDeath());});
+  H(()=>{bossDying=W(bossDying,en=>en.dEnd,(was,r,a)=>{if(!was&&a[0].dEnd)A.bossFall();});});
+  // волны (хост/соло — wvSync, гость — wvOnMsg): рог, барабаны, отбита, край пройден, сорвана, чемпион
+  H(()=>{wvSync=W(wvSync,ev=>{if(ev)A.wv(ev);});});
+  H(()=>{wvOnMsg=W(wvOnMsg,m=>{if(m&&m.e)A.wv(m.e);});});
+  // уровень, окно выбора, карта, книга, редкость выпавшей чары, баннеры (слот, сундук, выход, засада, ущелье, Невозможное)
+  H(()=>{gainXp=W(gainXp,()=>S.lvl,l0=>{if(S.lvl>l0)A.lvl();});});
+  H(()=>{openLevelUp=W(openLevelUp,()=>luOpen,was=>{if(!was&&luOpen)A.lu();});});
+  H(()=>{luPick=W(luPick,()=>A.pick());});
+  H(()=>{openBook=W(openBook,()=>bookOpen,was=>{if(!was)A.book(true);});});
+  H(()=>{closeBook=W(closeBook,()=>bookOpen,was=>{if(was)A.book(false);});});
+  H(()=>{rarPop=W(rarPop,sk=>A.rar(rarOf(sk)));});
+  H(()=>{banner=W(banner,(b,s,red,k)=>A.banner(b,k,red));});
+  H(()=>{dustSkill=W(dustSkill,null,(s,v)=>{if(v>0)A.ess();});});
+  H(()=>{learnRandom=W(learnRandom,()=>{if(mode==='game')A.scroll();});});
+  H(()=>{gorgeWin=W(gorgeWin,()=>A.win());});
+  // особенности классов: Вспышка, Раскол, Громовой раскат, Чумной взрыв, Священный гнев, Буревестник, Бешенство, импульс, ладонь, смесь
+  H(()=>{ctFlash=W(ctFlash,en=>A.cls('flash',en.pos.x,en.pos.z));});
+  H(()=>{ctShatter=W(ctShatter,en=>A.cls('shatter',en.pos.x,en.pos.z));});
+  H(()=>{ctThunder=W(ctThunder,()=>A.cls('thunder',P.pos.x,P.pos.z));});
+  H(()=>{ctPlBurst=W(ctPlBurst,en=>{if(!en.ctPlB)A.cls('plburst',en.pos.x,en.pos.z);});});
+  H(()=>{ctWrathOut=W(ctWrathOut,()=>CT.wrath,w0=>{if(w0>0&&CT.wrath===0)A.cls('wrath',P.pos.x,P.pos.z);});});
+  H(()=>{ctGale=W(ctGale,()=>A.cls('gale',P.pos.x,P.pos.z));});
+  H(()=>{ctRage=W(ctRage,()=>time<CT.frenzyT,was=>{if(!was&&time<CT.frenzyT)A.cls('rage',P.pos.x,P.pos.z);});});
+  H(()=>{ctPulse=W(ctPulse,()=>A.cls('pulse',P.pos.x,P.pos.z));});
+  H(()=>{ctPalm=W(ctPalm,()=>A.cls('palm',P.pos.x,P.pos.z));});
+  H(()=>{ctUnstable=W(ctUnstable,()=>A.cls('unstable',P.pos.x,P.pos.z));});
+}}
 const TCC=window.TCCF?window.TCCF({THREE,clamp,rand,randi,lerp,TAU,toLocal,toWorld,gcx,ghw,spawnMob,spawnEnemy,pickW,banner,hint,float,fxPillar,fxRing,colBurst,GOLD,RED,FXG,emit,SPARK,glowSprite,hurtPlayer,kill,dieFull,syncPause,toSelect,mpSend,MP,P,save,gainXp,learnRandom,xpNeed,scene,camera,gorgeGroup,WORLD_ANIM,ENEMIES,mpHostStart,mpOpenLobby,mpChestSpawn,mpRenderLobby,startGorge,runWon,
   get GZ(){return GZ;},get BOSS(){return BOSS;},setBOSS:v=>{BOSS=v;},bossIntro,get bossShow(){return time<bossShowT;},shake:v=>{shake=Math.max(shake,v);},get S(){return S;},get SAVE(){return SAVE;},get MPon(){return MPon;},get MPH(){return MPH;},get MPG(){return MPG;},get mode(){return mode;},get paused(){return paused;},get time(){return time;},get FRK(){return FRK;}}):null;
 function start(hot){
