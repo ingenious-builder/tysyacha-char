@@ -1091,7 +1091,8 @@ html[data-ui=tab] #layPan{width:min(460px,calc(100% - 40px));padding:16px 18px;g
         <section class="set-sec"><h3>Камера</h3><div class="set-stp"><button type="button" class="chip" id="camM" aria-label="Камера ближе">−</button><span id="camV">116 %</span><button type="button" class="chip" id="camP" aria-label="Камера дальше">+</button></div><p class="hint">Дальше — видно больше мира, герой мельче. Ближе — крупнее, но обзор меньше.</p></section>
         <section class="set-sec"><h3>Отступ снизу</h3><div class="set-stp"><button type="button" class="chip" id="botM" aria-label="Меньше отступ снизу">−</button><span id="botV">0 px</span><button type="button" class="chip" id="botP" aria-label="Больше отступ снизу">+</button></div><p class="hint">Если снизу тёмная полоса и кнопки обрезаны — добавь отступ (шаг 8).</p></section>
         <section class="set-sec"><h3>Управление</h3><button class="btn" id="setLay" type="button">Расположение кнопок</button><p class="hint" id="layBtnHint">Перетащи джойстик, атаку и кнопки меню куда удобно, поменяй размер или стороны (для левшей). Отдельно для вертикального и горизонтального экрана.</p></section>
-        <section class="set-sec"><h3>Благодарности</h3><p class="hint">Модели героев — KayKit Adventurers, автор Kay Lousberg (kaylousberg.com), лицензия CC0.</p></section>
+        <section class="set-sec"><h3>Благодарности</h3><p class="hint">Модели героев — KayKit Adventurers, автор Kay Lousberg (kaylousberg.com), лицензия CC0.</p>
+          <p class="hint">Деревья, камни, надгробия, руины и дома в локациях — KayKit Halloween Bits, Medieval Hexagon Pack и Dungeon Remastered, автор Kay Lousberg (kaylousberg.com), лицензия CC0.</p></section>
       </div>
       <div class="set-foot">
         <div class="set-exit">
@@ -2016,14 +2017,16 @@ function genChunk(cx,cz){
   const ch={cx,cz,b:B,col};for(const c of col){const k=cgk(Math.floor(c.x/8),Math.floor(c.z/8));if(!CG.has(k))CG.set(k,[]);CG.get(k).push(c);}
   const bb=B.map(b=>({m:new Float32Array(b.m),c:new Float32Array(b.c),n:b.n}));ch.b=bb;return ch;}
 function unloadChunk(ch){for(const c of ch.col){const k=cgk(Math.floor(c.x/8),Math.floor(c.z/8)),l=CG.get(k);if(l){const i=l.indexOf(c);if(i>=0)l.splice(i,1);}}}
-function rebuildChunks(){for(const k of PK){let n=0;const im=k.im;for(const ch of CH.values()){const b=ch.b[k.i];if(!b.n)continue;if(n+b.n>k.cap)break;im.instanceMatrix.array.set(b.m,n*16);im.instanceColor.array.set(b.c,n*3);n+=b.n;}
-  im.count=n;im.visible=n>0;/* пустые виды (чужих регионов) не рисуем — меньше вызовов отрисовки */im.instanceMatrix.needsUpdate=true;im.instanceColor.needsUpdate=true;}}
+// рисуются только части 3×3 вокруг героя: ближняя граница дальних частей — не ближе 64 м, а камера видит ~40 м (дальше туман)
+function rebuildChunks(){for(const k of PK){let n=0;const im=k.im;for(const ch of CH.values()){const b=ch.b[k.i];if(!b.n||Math.abs(ch.cx-SC.cx)>1||Math.abs(ch.cz-SC.cz)>1)continue;if(n+b.n>k.cap)break;im.instanceMatrix.array.set(b.m,n*16);im.instanceColor.array.set(b.c,n*3);n+=b.n;}
+  im.count=n;im.visible=n>0;/* пустые виды (чужих регионов) не рисуем — меньше вызовов отрисовки */im.instanceMatrix.needsUpdate=true;im.instanceColor.needsUpdate=true;if(k.split)k.split(k);}}
 const SC={cx:-9999,cz:-9999,q:[]};
 function streamWorld(){
   if(PLAY!=='world'||!GROUND)return;
   GROUND.position.set(P.pos.x,0,P.pos.z);
   const cx=Math.floor(P.pos.x/CS),cz=Math.floor(P.pos.z/CS);let dirty=false;
-  if(cx!==SC.cx||cz!==SC.cz){const far=Math.max(Math.abs(cx-SC.cx),Math.abs(cz-SC.cz))>1;SC.cx=cx;SC.cz=cz;
+  if(cx!==SC.cx||cz!==SC.cz){const far=Math.max(Math.abs(cx-SC.cx),Math.abs(cz-SC.cz))>1;SC.cx=cx;SC.cz=cz;dirty=true;/* рисуемые 3×3 сдвинулись */
+    {const r=Math.hypot(P.pos.x,P.pos.z);if(r>95)emNeed('b');if(r>440)emNeed('c');}
     for(const [k,ch] of CH)if(Math.abs(ch.cx-cx)>CR+1||Math.abs(ch.cz-cz)>CR+1){unloadChunk(ch);CH.delete(k);dirty=true;}
     SC.q=[];for(let i=-CR;i<=CR;i++)for(let j=-CR;j<=CR;j++)if(!CH.has(ckey(cx+i,cz+j)))SC.q.push([cx+i,cz+j,i*i+j*j]);SC.q.sort((a,b)=>a[2]-b[2]);
     if(far){while(SC.q.length){const [a,b]=SC.q.shift();CH.set(ckey(a,b),genChunk(a,b));dirty=true;}}}
@@ -2205,7 +2208,7 @@ const GMOTE=[null,[.1,0,1,0xcfd8e8],[-.6,1.2,1,0xe8f4ff],[.15,0,1.1,0xc090ff],[0
 const WMOTE=[[.12,0,1],[.1,0,1],[.08,0,1],[.8,.2,1.1],[-.5,1.6,1.2],[.55,.3,1.1],[.06,.5,1],[.22,.15,1.25],[.04,.45,1.15],[.18,.1,1.3]];
 let sigB=6,gfxExt=true;
 function updateGfx(dt){
-  const ext=Q.pp&&SAVE.q!=='low';if(ext!==gfxExt){gfxExt=ext;worldExtra.visible=ext;if(GZ&&GZ.fxex)GZ.fxex.forEach(m=>m.visible=ext);motes.visible=ext;}
+  const ext=Q.pp&&SAVE.q!=='low';if(ext!==gfxExt){gfxExt=ext;worldExtra.visible=ext;if(GZ&&GZ.fxex)GZ.fxex.forEach(m=>m.visible=ext);motes.visible=ext;if(EMW)EMW.setLite(!ext);}
   sigB=6;updateTrails(dt);updateDebris(dt);
   if(gfxExt){const g=PLAY==='gorge'&&GZ?GMOTE[GZ.g]:null;moteU.uC.value.set(P.pos.x,0,P.pos.z);
     if(g){moteU.uVy.value=g[0];moteU.uWind.value=g[1];moteU.uSize.value=g[2]*pr;moteU.uCol.value.setHex(g[3]);}
@@ -2434,6 +2437,24 @@ function hmBoot(){if(HM_OFF||hmBoot.p||HMW)return;clearTimeout(hmBoot.tm);
       for(const h of HM_PEND)if(!h.g.parent)HM_PEND.delete(h);
       if(hmBoot.n<6)hmBoot.tm=setTimeout(hmBoot,Math.min(60000,4000*2**(hmBoot.n-1)));else HM_PEND.clear();});}
 addEventListener('online',()=>{if(!HM_OFF&&!HMW&&!hmBoot.p){hmBoot.n=0;hmBoot();}});
+// ---------- декор мира из моделей KayKit (Kay Lousberg, CC0), env-models.js: грузится по регионам; пока нет или ошибка — прежний процедурный ----------
+// a — центр мира и ущелья (сразу), b — лёд, вулкан, небесные руины, Бездна (с 95 м от центра), c — Мёртвый город (с 440 м). ?noenv=1 — без моделей.
+// EM_V должен совпадать с ENV_V в sw.js (кэш tc-models).
+const EM_V='1',EM_OFF=/[?&](nomdl|noenv)=1/.test(location.search),EM_SET={a:0,b:0,c:0};let EMW=null;
+const EM_BUSY=()=>Object.values(EM_SET).some(v=>v===1);
+function emKinds(){const m=new Map([[GEO.pine,'pine'],[GEO.round,'round'],[GEO.swamp,'swamp'],[GEO.dead,'dead'],[GEO.tomb,'tomb'],[GEO.pillar,'pillar'],[GEO.rock,'rock']]);
+  for(const k of ['stump','skull','bone','cairn','menhir','column'])if(GGEO[k])m.set(GGEO[k],k);return m;}
+function emApply(){if(!EMW)return;EMW.setLite(!gfxExt);PK.forEach(e=>e.im.emSkip=1);/* части мира — отдельно, не как неподвижный декор */
+  for(const [k,kind] of [[K.pine,'snowpine'],[K.dead,'dead'],[K.rock,'rock'],[K.pillar,'pillar'],[K.tomb,'tomb'],[K.spire,'spire'],[K.island,'island'],[K.arch,'arch'],[K.house,'house'],[K.tower,'tower'],[K.lamp,'lamp']])EMW.pk(PK[k],kind,worldGroup);
+  const km=emKinds();EMW.eye=camera.position;EMW.fog=scene.fog;EMW.swap(worldGroup,km,64,2);EMW.swap(worldExtra,km,64,2);
+  if(EMW.has('lamp')&&!PK[K.lglow].emK){PK[K.lglow].emK='glow';PK[K.lglow].im.geometry=EMW.lampGlow();}
+  rebuildChunks();emGorge();}
+function emGorge(){if(EMW&&EM_SET.a===2&&PLAY==='gorge'&&GZ)EMW.swap(gorgeGroup,emKinds(),48,2);}
+function emNeed(set){if(EM_OFF||EM_SET[set])return;EM_SET[set]=1;
+  (THREE.GLTFLoader?Promise.resolve():hmScript('vendor/GLTFLoader.js?v='+HM_V)).then(()=>window.EM?0:hmScript('env-models.js?ev='+EM_V))
+    .then(()=>{window.EM.V=EM_V;return window.EM.load(set,'');}).then(()=>{EMW=window.EM;EM_SET[set]=2;emApply();})
+    .catch(e=>{console.warn('Декор из моделей не загрузился — остаётся простой',e);EM_SET[set]=0;const n=emNeed[set]=(emNeed[set]||0)+1;if(n<6)setTimeout(()=>emNeed(set),Math.min(60000,4000*2**(n-1)));});}
+addEventListener('online',()=>{for(const k in EM_SET)if(!EM_SET[k]&&emNeed[k]){emNeed[k]=0;emNeed(k);}});
 function hmAttach(h){
   if(h.mdl||!HMW||!HMW.has(h.cid))return;let m;
   try{m=HMW.make(h.cid,h.sil?{mat:LOB_SILMAT,matSk:LOB_SILSK}:{});}catch(e){console.warn('модель героя',h.cid,e);return;}
@@ -4197,7 +4218,7 @@ function buildGorge(g,camp){clearGorge();const th=GT[g-1],tier=Math.min(2,Math.f
   const sm=lam(0x6a6a78);for(const s of [-1,1]){const st=new THREE.Mesh(G.box,sm);st.scale.set(.55,4.4,.55);st.position.set(s*2.1,2.2,0);st.castShadow=true;pg.add(st);}
   D.push(ring.geometry,ringM,inner.geometry,inM,sm);
   GZ.portal={pg,ring,ringM,inM,w:toWorld(gcx(pz),pz)};
-  gorgeGroup.rotation.y=camYaw+Math.PI;gorgeGroup.visible=true;}
+  gorgeGroup.rotation.y=camYaw+Math.PI;gorgeGroup.visible=true;emGorge();}
 function startGorge(g,camp){SAVE.chars[CLS.id]=S;SAVE.cur=CLS.id;beginRun(camp?'camp':'gorge',camp?camp.k:g,camp?camp.lv:Math.max(1,g*2-1));save();mode='game';PLAY='gorge';
   for(const id of ['#select','#gorges','#win','#dead'])$(id).hidden=true;$('#hud').hidden=false;
   clearWorld();mpSeeded(g*7919+13,()=>buildGorge(g,camp));worldGroup.visible=false;const th=GZ.th;if(MPH&&MP.coop)GZ.lv=Math.max(GZ.lv,mpLvl());scene.fog.color.set(th.fog);scene.background.set(th.bg);setGorgeLight(th);
@@ -6161,7 +6182,7 @@ function mpInit(){
 const TCC=window.TCCF?window.TCCF({THREE,clamp,rand,randi,lerp,TAU,toLocal,toWorld,gcx,ghw,spawnMob,spawnEnemy,pickW,banner,hint,float,fxPillar,fxRing,colBurst,GOLD,RED,FXG,emit,SPARK,glowSprite,hurtPlayer,kill,dieFull,syncPause,toSelect,mpSend,MP,P,save,gainXp,learnRandom,xpNeed,scene,camera,gorgeGroup,WORLD_ANIM,ENEMIES,mpHostStart,mpOpenLobby,mpChestSpawn,mpRenderLobby,startGorge,runWon,
   get GZ(){return GZ;},get BOSS(){return BOSS;},setBOSS:v=>{BOSS=v;},bossIntro,get bossShow(){return time<bossShowT;},shake:v=>{shake=Math.max(shake,v);},get S(){return S;},get SAVE(){return SAVE;},get MPon(){return MPon;},get MPH(){return MPH;},get MPG(){return MPG;},get mode(){return mode;},get paused(){return paused;},get time(){return time;},get FRK(){return FRK;}}):null;
 function start(hot){
-  hmBoot();loadSave(hot||{});
+  hmBoot();emNeed('a');loadSave(hot||{});
   W=app.clientWidth;H=app.clientHeight;applyQuality(true);
   selectClass(SAVE.cur||'pyro');mpInit();
   {const mg=Object.entries(SAVE.chars).filter(([,v])=>v.mig>0);if(mg.length){const t=mg.map(([id,v])=>CLASS_BY[id].name+' '+v.mig+' ур. → мастерство '+mastLvlOf(v.mx)).join('; ');mg.forEach(([,v])=>{v.mig=0;});if(S)S.mig=0;save();
