@@ -2194,12 +2194,14 @@ const WORLD_ANIM=[];
 const Q={pp:true,shadow:true};
 const quadCam=new THREE.OrthographicCamera(-1,1,1,-1,0,1),quadScene=new THREE.Scene(),quad=new THREE.Mesh(new THREE.PlaneGeometry(2,2));quad.frustumCulled=false;quadScene.add(quad);
 const VS='varying vec2 vUv;void main(){vUv=uv;gl_Position=vec4(position.xy,0.,1.);}';
-const brightMat=new THREE.ShaderMaterial({uniforms:{tDiffuse:{value:null},uTh:{value:.78}},vertexShader:VS,depthTest:false,depthWrite:false,
-  fragmentShader:'uniform sampler2D tDiffuse;uniform float uTh;varying vec2 vUv;void main(){vec3 c=texture2D(tDiffuse,vUv).rgb;float l=max(c.r,max(c.g,c.b));gl_FragColor=vec4(c*smoothstep(uTh,uTh+.22,l),1.);}'});
+// свечение (C2): в размытие идёт только избыток над порогом с мягким коленом — большие светлые пятна эффектов не удваиваются в белое, яркие ядра светятся как раньше
+const brightMat=new THREE.ShaderMaterial({uniforms:{tDiffuse:{value:null},uTh:{value:.9},uK:{value:.2},uG:{value:1.5}},vertexShader:VS,depthTest:false,depthWrite:false,
+  fragmentShader:'uniform sampler2D tDiffuse;uniform float uTh,uK,uG;varying vec2 vUv;void main(){vec3 c=texture2D(tDiffuse,vUv).rgb;float l=max(c.r,max(c.g,c.b));float s=clamp(l-uTh+uK,0.,2.*uK);s=s*s/(4.*uK+1e-4);gl_FragColor=vec4(c*(max(s,l-uTh)/max(l,1e-4)*uG),1.);}'});
 const blurMat=new THREE.ShaderMaterial({uniforms:{tDiffuse:{value:null},uDir:{value:new THREE.Vector2()}},vertexShader:VS,depthTest:false,depthWrite:false,
   fragmentShader:'uniform sampler2D tDiffuse;uniform vec2 uDir;varying vec2 vUv;void main(){vec3 c=texture2D(tDiffuse,vUv).rgb*.227;c+=texture2D(tDiffuse,vUv+uDir*1.385).rgb*.316;c+=texture2D(tDiffuse,vUv-uDir*1.385).rgb*.316;c+=texture2D(tDiffuse,vUv+uDir*3.231).rgb*.07;c+=texture2D(tDiffuse,vUv-uDir*3.231).rgb*.07;gl_FragColor=vec4(c,1.);}'});
-const compMat=new THREE.ShaderMaterial({uniforms:{tScene:{value:null},tBloom:{value:null},uBloom:{value:1.05}},vertexShader:VS,depthTest:false,depthWrite:false,
-  fragmentShader:'uniform sampler2D tScene,tBloom;uniform float uBloom;varying vec2 vUv;void main(){vec3 c=texture2D(tScene,vUv).rgb+texture2D(tBloom,vUv).rgb*uBloom;c=vec3(1.)-exp(-c*1.7);float l=dot(c,vec3(.299,.587,.114));c=mix(vec3(l),c,1.15);vec2 d=vUv-.5;c*=1.-dot(d,d)*.55;gl_FragColor=vec4(c,1.);}'});
+// тон-кривая: на очень ярком (эффекты внахлёст) часть света сводится по яркому каналу — огонь остаётся оранжевым, лёд голубым, а не белым
+const compMat=new THREE.ShaderMaterial({uniforms:{tScene:{value:null},tBloom:{value:null},uBloom:{value:1.05},uHue:{value:.85}},vertexShader:VS,depthTest:false,depthWrite:false,
+  fragmentShader:'uniform sampler2D tScene,tBloom;uniform float uBloom,uHue;varying vec2 vUv;void main(){vec3 c=texture2D(tScene,vUv).rgb+texture2D(tBloom,vUv).rgb*uBloom;float m=max(c.r,max(c.g,c.b));vec3 t=vec3(1.)-exp(-c*1.7);c=mix(t,c*((1.-exp(-m*1.7))/max(m,1e-4)),uHue*smoothstep(.8,1.8,m));float l=dot(c,vec3(.299,.587,.114));c=mix(vec3(l),c,1.15);vec2 d=vUv-.5;c*=1.-dot(d,d)*.55;gl_FragColor=vec4(c,1.);}'});
 let rtMain=null,rtA=null,rtB=null;
 function makeRT(){const w=Math.max(1,Math.floor(W*pr)),h=Math.max(1,Math.floor(H*pr));
   if(rtMain)rtMain.dispose();rtMain=isGL2?new THREE.WebGLMultisampleRenderTarget(w,h):new THREE.WebGLRenderTarget(w,h);
@@ -2639,12 +2641,12 @@ function spikeAt(x,z,col,w,h){fx('spike',col,.75,m=>{m.position.set(x,0,z);m.rot
 function zigzag(a,b,col){const p1=a.clone().lerp(b,.33).add(v3.set(rand(-.5,.5),rand(-.3,.3),rand(-.5,.5)));const p2=a.clone().lerp(b,.66).add(v3.set(rand(-.5,.5),rand(-.3,.3),rand(-.5,.5)));
   fxBeam(a,p1,col,.25,.1);fxBeam(p1,p2,col,.25,.1);fxBeam(p2,b,col,.25,.1);if(HQ())fxBeam(a,b,WHITE,.16,.04);fxBurst(b.x,b.y,b.z,.6,col,.22);colBurst(col,b.x,b.y,b.z,5,4,.25,0);}
 function skyBolt(x,z,col){let prev=new THREE.Vector3(x+rand(-1,1),14,z+rand(-1,1));for(let i=1;i<=5;i++){const t=i/5;const p=new THREE.Vector3(lerp(prev.x,x,.5)+rand(-.6,.6)*(1-t),14*(1-t),lerp(prev.z,z,.5)+rand(-.6,.6)*(1-t));if(i===5)p.set(x,.1,z);fxBeam(prev,p,col,.3,.16);fxBeam(prev,p,WHITE,.18,.06);prev=p;}fxGlow(x,z,3,deepC(col),.4,.9);xq(()=>fxShock(x,z,1.8,col,.3));fxMark(x,z,1.3,MK_C.storm[0],1.4,MK_C.storm[1]);colBurst(col,x,.3,z,14,6,.35,4);}
-function novaFx(sk,x,z,r){const id=sk.E.id,col=sk.E.color,dc=ELD[sk.e];fxShock(x,z,r,col);elSig(sk.e,x,.6,z,r>3?24:12);if(r>=4)shk(.12,x,z);
-  fxRing(x,z,.6,r,col,.45);fxDisc(x,z,r,dc,.3,.3);fxGlow(x,z,r*1.3,dc,.45,.7);ringBurst(sk.e,x,z,r,26);
-  if(r>=4)xq(()=>fxRing(x,z,r*1.15,.5,WHITE,.14,.6));elMark(sk.e,x,z,r*.85,1.2);
+function novaFx(sk,x,z,r){const id=sk.E.id,col=sk.E.color,dc=ELD[sk.e],vc=vivC(col);fxShock(x,z,r,vc);elSig(sk.e,x,.6,z,r>3?24:12);if(r>=4)shk(.12,x,z);
+  fxRing(x,z,.6,r,vc,.45);fxDisc(x,z,r,dc,.3,.16);fxGlow(x,z,r*1.15,dc,.45,.42);ringBurst(sk.e,x,z,r,26);
+  if(r>=4)xq(()=>{fxRing(x,z,r*1.15,.5,col,.14,.5);const ph=rand(0,TAU);fx('dash',col,.42,m=>{m.position.set(x,.13,z);m.scale.set(r*.3,1,r*.3);m.rotation.y=ph;},(m,k)=>{const s=r*(.3+.78*eo(k));m.scale.set(s,1,s);m.rotation.y=ph+k*2.6;m.material.opacity=.8*(1-k);});});elMark(sk.e,x,z,r*.85,1.2);
   if(id==='ice'||id==='earth'){const n=11;for(let i=0;i<n;i++){const a=i/n*TAU+rand(-.15,.15),d=r*rand(.5,.9);spikeAt(x+Math.cos(a)*d,z+Math.sin(a)*d,id==='ice'?ICEC:EARTHC,rand(.22,.36),rand(.8,1.5));}}
   else if(id==='storm'){for(let i=0;i<6;i++){const a=i/6*TAU+rand(-.3,.3);zigzag(new THREE.Vector3(x,1,z),new THREE.Vector3(x+Math.cos(a)*r,.4,z+Math.sin(a)*r),col);}}
-  else if(id==='light')fxPillar(x,z,.6,7,col,.55,.45);
+  else if(id==='light')fxPillar(x,z,.3,6,vc,.5,.3);
   else if(id==='shadow'||id==='wind'){for(let i=0;i<24;i++){const a=rand(0,TAU),d=r*rand(.7,1);emit(PUFF,x+Math.cos(a)*d,rand(.3,1.4),z+Math.sin(a)*d,-Math.cos(a)*d*2.2,rand(0,1),-Math.sin(a)*d*2.2,col,.5,0,1);}}
   else if(id==='poison')puffs(x,.4,z,col.clone().multiplyScalar(.6),10,2.5,1.1);
   else if(id==='blood')colBurst(col,x,1,z,20,5,.6,12);
@@ -2698,7 +2700,7 @@ FXG.rune=new THREE.PlaneGeometry(2,2).rotateX(-Math.PI/2);FXG.ring2=new THREE.Ri
 const C_EMB=new THREE.Color(0xffc060),C_SMK=new THREE.Color(0x442211),C_FLK=new THREE.Color(0xeaffff),C_DRP=new THREE.Color(0xc01830),C_DUST=new THREE.Color(0x6a5a40);
 function fxRune(x,z,r,col,life,op){if(!HQ())return;life=life||.7;op=op==null?.8:op;const ph=rand(0,TAU);fx('rune',col,life,m=>{m.position.set(x,.1,z);m.scale.set(r*.4,1,r*.4);m.rotation.y=ph;},(m,k)=>{const s=r*(.4+.6*eo(Math.min(1,k*2.5)));m.scale.set(s,1,s);m.rotation.y=ph+k*2.2;m.material.opacity=op*(k<.15?k/.15:1-(k-.15)/.85);});}
 function fxShock(x,z,r,col,life){life=life||.5;fx('ring2',col,life,m=>{m.position.set(x,.1,z);m.scale.set(r*.3,1,r*.3);},(m,k)=>{const s=r*(.3+.7*eo(k));m.scale.set(s,1,s);m.material.opacity=.75*(1-k)*(1-k);});
-  if(HQ()&&r>3)fx('ring',WHITE,life*.55,m=>{m.position.set(x,.11,z);m.scale.set(r*.2,1,r*.2);},(m,k)=>{const s=r*1.05*(.2+.8*eo(k));m.scale.set(s,1,s);m.material.opacity=.7*(1-k);});}
+  if(HQ()&&r>3)fx('ring',WHITE,life*.55,m=>{m.position.set(x,.11,z);m.scale.set(r*.2,1,r*.2);},(m,k)=>{const s=r*1.05*(.2+.8*eo(k));m.scale.set(s,1,s);m.material.opacity=.42*(1-k);});}
 function fxTongue(x,z,h,col,life){life=life||.5;const ph=rand(0,TAU),w=rand(.18,.32);fx('cone',col,life,m=>{m.position.set(x,0,z);m.scale.set(w,.01,w);},(m,k)=>{const s=k<.25?k/.25:1-(k-.25)/.75;m.scale.set(w*(1-k*.6),h*Math.max(.01,s)*(1+.15*Math.sin(k*30+ph)),w*(1-k*.6));m.material.opacity=.8*(1-k);});}
 function fxBubble(x,y,z,col){const r=rand(.1,.22);fx('sphere',col,rand(.5,.8),m=>{m.position.set(x,y,z);m.scale.setScalar(r);},(m,k)=>{m.position.y=y+k*1.4;m.scale.setScalar(r*(1+k*.5));m.material.opacity=.55*(k<.8?1:(1-k)/.2);});}
 // --- осколки (один InstancedMesh на всё): лёд, камни, капли крови, кристаллы ---
@@ -2773,7 +2775,7 @@ function elSig(el,x,y,z,n){if(el<0||sigB<=0||!Q.pp||FX.length>80)return;sigB--;c
     case 'storm':for(let i=0;i<(big?3:1);i++){const a=rand(0,TAU),d=rand(1.2,big?3.5:2.2);fxBeam(new THREE.Vector3(x,y,z),new THREE.Vector3(x+Math.cos(a)*d,.3,z+Math.sin(a)*d),c,.18,.06);}break;
     case 'poison':for(let i=0;i<(big?6:3);i++){if(hq&&big&&i<3)fxBubble(x+rand(-.6,.6),.2,z+rand(-.6,.6),c);else emit(SPARK,x+rand(-.5,.5),.3,z+rand(-.5,.5),0,rand(.5,1.2),0,c,.8,-1,.5);}break;
     case 'shadow':for(let i=0;i<(big?8:3);i++){const a=rand(0,TAU),r=rand(.4,1.4);emit(PUFF,x+Math.cos(a)*r,.3+rand(0,1),z+Math.sin(a)*r,-Math.sin(a)*2,rand(.3,1),Math.cos(a)*2,c,.7,-.2,1);}break;
-    case 'light':{const m=big?5:3;for(let i=0;i<m;i++){const a=i/m*TAU+rand(-.2,.2),d=rand(1.6,big?3.6:2.4);fxBeam(new THREE.Vector3(x,y+.2,z),new THREE.Vector3(x+Math.cos(a)*d,y+rand(.1,.7),z+Math.sin(a)*d),c,.22,.05);}if(hq&&big)fxPillar(x,z,.3,6,c,.4);break;}
+    case 'light':{const m=big?5:3;for(let i=0;i<m;i++){const a=i/m*TAU+rand(-.2,.2),d=rand(1.6,big?3.6:2.4);fxBeam(new THREE.Vector3(x,y+.2,z),new THREE.Vector3(x+Math.cos(a)*d,y+rand(.1,.7),z+Math.sin(a)*d),c,.22,.05);}if(hq&&big)fxPillar(x,z,.2,5,c,.4,.35);break;}
     case 'earth':shards(el,x,y,z,big?12:5,big?7:4.5,big?1.4:1);puffs(x,.3,z,C_DUST,big?5:2,1.6,.8);break;
     case 'wind':{const m=big?14:6;for(let i=0;i<m;i++){const a=i/m*TAU*2,r=.3+i*.1;emit(SPARK,x+Math.cos(a)*r*.3,.3+i*.05,z+Math.sin(a)*r*.3,-Math.sin(a)*5,2,Math.cos(a)*5,c,.5,0,1.2);}if(hq&&big)fxRing(x,z,.3,3,c,.4,.6);break;}
     case 'blood':shards(el,x,y,z,big?10:5,big?6:4);for(let i=0;i<(big?8:3);i++)emit(SPARK,x,y,z,rand(-3,3),rand(1,4),rand(-3,3),C_DRP,.8,18,.3);break;
@@ -2799,8 +2801,14 @@ function projFx(p,g){if(p.el<0||!Q.pp||!fk())return;const id=ELEMENTS[p.el].id,x
 let XN=0,fxX=0;
 function xq(fn){if(!HQ()||XN>=2+.1*(FX.length-XN))return false;fxX=1;try{fn();}finally{fxX=0;}return true;}
 // «глубокий» цвет стихии: та же гамма, насыщеннее и темнее — большие свечения не выгорают в белое
-const deepC=(()=>{const M=new Map(),h={};return c=>{const k=c.getHex();let d=M.get(k);if(!d){c.getHSL(h);d=new THREE.Color().setHSL(h.h,Math.min(1,h.s*1.1+.1),Math.min(.42,h.l*.62));M.set(k,d);}return d;};})();
+// memoC(f): цвет-производная с кэшем по hex (одна THREE.Color на исходный цвет, без новых объектов на каст)
+const memoC=f=>{const M=new Map();return c=>{const k=c.getHex();let d=M.get(k);if(!d)M.set(k,d=f(c));return d;};},HSL_={};
+const deepC=memoC(c=>{c.getHSL(HSL_);return new THREE.Color().setHSL(HSL_.h,Math.min(1,HSL_.s*1.1+.1),Math.min(.42,HSL_.l*.62));});
 const ELD=ELEMENTS.map(e=>deepC(e.color));
+// «сочный» цвет стихии: насыщеннее и чуть темнее бледных (свет, лёд, ветер), чтобы широкие кольца не уходили в белое; белый и серый не трогает
+const vivC=memoC(c=>{c.getHSL(HSL_);return HSL_.s<.12?c.clone():new THREE.Color().setHSL(HSL_.h,Math.min(1,HSL_.s*1.1+.08),Math.min(HSL_.l,Math.max(.62,HSL_.l-.12)));});
+// светлый оттенок стихии вместо чисто белого (вторая дуга удара, полоса телепорта)
+const lightC=memoC(c=>c.clone().lerp(WHITE,.35));
 // тряска экрана: переключатель в настройках (localStorage tcShake), сила падает с расстоянием до героя
 let SHK=1;try{SHK=localStorage.getItem('tcShake')==='0'?0:1;}catch(e){}
 function shk(v,x,z){const d=Math.hypot(x-P.pos.x,z-P.pos.z);if(d<18)shake=Math.max(shake,v*(1-d/24));}
@@ -2821,18 +2829,19 @@ function fxGhost(x,z,face,col,life){if(!HQ()||GHL.length>=3)return;let g=GHP.pop
 function dashRing(n,r0,r1,fill){const p=[];for(let i=0;i<n;i++){const a0=i/n*TAU,a1=a0+TAU/n*fill,s=4;for(let k=0;k<s;k++){const b0=a0+(a1-a0)*k/s,b1=a0+(a1-a0)*(k+1)/s,c0=Math.cos(b0),s0=Math.sin(b0),c1=Math.cos(b1),s1=Math.sin(b1);
   p.push(c0*r0,s0*r0,0,c0*r1,s0*r1,0,c1*r1,s1*r1,0,c0*r0,s0*r0,0,c1*r1,s1*r1,0,c1*r0,s1*r0,0);}}
   const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(p,3));return g.rotateX(-Math.PI/2);}
-const DASHG=dashRing(12,.9,1,.55);
+const DASHG=dashRing(12,.9,1,.55);FXG.dash=DASHG;
 // подсветка героя при касте: контур ярче на 0.3 с, вспышка в руке и искры вверх
-let vfxCT=0,vfxRim=0,vfxRimOn=false,vfxRimHero=null,vfxRimBase=null,vfxShM=null,vfxShLast=0,vfxShHit=0;
+let vfxCT=0,vfxRim=0,vfxRimOn=false,vfxRimHero=null,vfxRimBase=null,vfxShM=null,vfxShLast=0,vfxShHit=0,vfxShA=1,vfxSg=0;
+const C_TMP=new THREE.Color(),C_DOOM=new THREE.Color(0x0e0716);
 function castFx(el){vfxRim=1;if(!HQ())return;const c=elCol(el),f=P.face,hx=P.pos.x+Math.sin(f)*.5,hz=P.pos.z+Math.cos(f)*.5;
-  xq(()=>fxBurst(hx,1.45,hz,.6,c,.16,.95));
+  xq(()=>fxBurst(hx,1.45,hz,.32,c,.14,.75));
   for(let i=0;i<8;i++){const a=i/8*TAU+rand(-.2,.2);emit(SPARK,P.pos.x+Math.cos(a)*.6,.2,P.pos.z+Math.sin(a)*.6,-Math.sin(a)*1.8,rand(2.4,3.6),Math.cos(a)*1.8,c,.45,-1,1.5);}}
 function rimSet(k){if(!hero||!hero.rims||!hero.rims.length)return;
   if(vfxRimHero!==hero||!vfxRimBase||vfxRimBase.length!==hero.rims.length){vfxRimHero=hero;vfxRimBase=hero.rims.map(u=>u.value.clone());}
   for(let i=0;i<hero.rims.length;i++)hero.rims[i].value.copy(vfxRimBase[i]).multiplyScalar(k);}
 // «След»: у каждой стихии свой вид полосы (огонь горит, лёд — иней, яд — лужица, молния — искры, ветер — пыль…)
 function trailFx(dt){let zb=2;for(let i=0;i<ZN.length;i++){const z=ZN[i];if(!z.sk||z.sk.F.id!=='trail')continue;const id=ELEMENTS[z.el].id,c=ELEMENTS[z.el].color;
-  if(!z.vx){z.vx=1;z.vt=rand(0,.3);elMark(z.el,z.pos.x,z.pos.z,z.r*1.1,z.dur);if(id==='wind'||id==='earth')puffs(z.pos.x,.2,z.pos.z,C_DUST,3,1.4,.8);}
+  if(!z.vx){z.vx=1;z.vt=rand(0,.3);elMark(z.el,z.pos.x,z.pos.z,z.r*1.1,z.dur);xq(()=>fxRing(z.pos.x,z.pos.z,.2,z.r*1.1,c,.4,.55));if(id==='wind'||id==='earth')puffs(z.pos.x,.2,z.pos.z,C_DUST,3,1.4,.8);}
   z.vt-=dt;if(z.vt>0||zb<=0)continue;zb--;z.vt=.35;const a=rand(0,TAU),d=Math.sqrt(Math.random())*z.r*.7,x=z.pos.x+Math.cos(a)*d,q=z.pos.z+Math.sin(a)*d;
   switch(id){
     case 'fire':if(!xq(()=>fxTongue(x,q,rand(.6,1.2),Math.random()<.5?FIREC:C_EMB,.45)))emit(SPARK,x,.2,q,0,rand(1.5,3),0,C_EMB,.7,-2,.5);break;
@@ -2846,24 +2855,49 @@ function trailFx(dt){let zb=2;for(let i=0;i<ZN.length;i++){const z=ZN[i];if(!z.s
     case 'blood':for(let k=0;k<2;k++)emit(SPARK,x,.6,q,rand(-1,1),rand(1,2),rand(-1,1),C_DRP,.7,14,.3);break;
     case 'arcane':if(!(Math.random()<.4&&xq(()=>fxRune(x,q,.9,c,.6))))emit(SPARK,x,.2,q,0,rand(1,2),0,c,.7,-1,.5);break;}}}
 // «Шипы» (вместо прежней новы): волна отброса и кольцо из 6 шипов стихии, наклонённых наружу; у огня ещё огненное кольцо
-function spikesFx(s,x,z,R){const id=s.E.id,c=id==='ice'?ICEC:id==='earth'?EARTHC:s.E.color,ph=rand(0,TAU),d=1.4*Math.sqrt(R),r=4*R;
-  fxShock(x,z,r,s.E.color,.4);fxGlow(x,z,r*.9,ELD[s.e],.35,.6);ringBurst(s.e,x,z,r,18);elSig(s.e,x,.6,z,12);
+function spikesFx(s,x,z,R,src){const id=s.E.id,c=id==='ice'?ICEC:id==='earth'?EARTHC:s.E.color,ph=rand(0,TAU),d=1.4*Math.sqrt(R),r=4*R;
+  if(src&&src.pos){const a=Math.atan2(src.pos.z-z,src.pos.x-x);xq(()=>fxFan(x,z,a,3.4*R,s.E.color,.22));for(let i=0;i<8;i++){const b=a+rand(-.45,.45);emit(SPARK,x+Math.cos(b)*.8,1,z+Math.sin(b)*.8,Math.cos(b)*rand(7,11),rand(.5,1.5),Math.sin(b)*rand(7,11),s.E.color,.3,2,2);}}
+  fxShock(x,z,r,vivC(s.E.color),.4);fxGlow(x,z,r*.9,ELD[s.e],.35,.5);ringBurst(s.e,x,z,r,18);elSig(s.e,x,.6,z,12);
   if(FX.length<150)for(let i=0;i<6;i++){const a=ph+i/6*TAU,ca=Math.cos(a),sa=Math.sin(a),px=x+ca*d,pz=z+sa*d,w=rand(.26,.34),h=rand(1.4,1.8);
     fx('spike',c,.6,m=>{m.position.set(px,0,pz);m.rotation.set(sa*.5,0,-ca*.5);m.scale.set(w,.01,w);},(m,k)=>{const s_=k<.15?k/.15:k>.65?1-(k-.65)/.35:1;m.scale.y=h*Math.max(.01,s_);m.position.x=px+ca*k*.5;m.position.z=pz+sa*k*.5;});}
   if(id==='fire'){fxRing(x,z,.8,r,FIREC,.5,.9);xq(()=>{for(let i=0;i<4;i++){const a=ph+(i+.5)/4*TAU;fxTongue(x+Math.cos(a)*d*1.5,z+Math.sin(a)*d*1.5,rand(1,1.6),i%2?C_EMB:FIREC,.5);}});}}
+// «Аура»: второе (прерывистое) кольцо крутится навстречу — дочерний меш на том же материале, убирается вместе с кольцом;
+// на тике — пульс кольца и искры, стягивающиеся к герою
+function auraRing(r,dt){if(!r.m2&&HQ()){r.m2=new THREE.Mesh(DASHG,r.m.material);r.m2.scale.set(.8,1,.8);r.m2.position.y=.004;r.m.add(r.m2);}
+  if(r.m2){r.m2.visible=HQ();r.m2.rotation.y=-2.6*r.m.rotation.y;}r.p=Math.max(0,(r.p||0)-dt*2.6);const ps=r.r*(1+.07*r.p);r.m.scale.set(ps,1,ps);
+  r.m.material.opacity=.22+.1*Math.sin(time*3+r.i)+.45*r.p;}
+function auraPulse(e,R){for(const r of AURA_RINGS)if(r.e===e)r.p=1;if(!HQ())return;const c=ELEMENTS[e].color;
+  for(let i=0;i<8;i++){const a=i/8*TAU+rand(-.2,.2);emit(SPARK,P.pos.x+Math.cos(a)*R*.95,.25,P.pos.z+Math.sin(a)*R*.95,-Math.cos(a)*R*1.3,rand(.6,1.4),-Math.sin(a)*R*1.3,c,.38,0,1.5);}}
+// «Клеймо»: знак бьёт в цель сверху; каждое 3-е клеймо выжигает руну на земле
+let BRN=0;
+function brandFx(b,p,R,i){if(!HQ())return;const c=b.E.color;xq(()=>fxBeam(v1.set(p.x,4.4,p.z),v2.set(p.x,.25,p.z),c,.16,.14*Math.sqrt(R)));
+  if(!i&&++BRN%3===0){fxRune(p.x,p.z,2.4*R,c,.8,.85);elMark(b.e,p.x,p.z,1.5*R,1.4);}}
+// «Гибель»: тьма схлопывается в точку, вверх уходит огонёк души, на земле остаётся тёмный след
+function doomFx(s,q,R){if(!HQ())return;const c=s.E.color,dc=ELD[s.e],x=q.x,z=q.z;
+  xq(()=>fx('ring',dc,.24,m=>{m.position.set(x,.1,z);m.scale.set(3*R,1,3*R);},(m,k)=>{const sc=3*R*(1-eo(k)*.85);m.scale.set(sc,1,sc);m.material.opacity=.9*(1-k*.4);}));
+  xq(()=>{const ph=rand(0,TAU);fx('sphere',c,.75,m=>{m.position.set(x,1,z);m.scale.setScalar(.17);},(m,k)=>{m.position.set(x+Math.sin(k*9+ph)*.25,1+k*3.4,z+Math.cos(k*9+ph)*.25);m.scale.setScalar(.17*(1-k*.45));m.material.opacity=.95*(1-k*k);
+    if(Math.random()<.45*FRK)emit(SPARK,m.position.x,m.position.y,m.position.z,rand(-.3,.3),-.4,rand(-.3,.3),c,.4,0,1);});});
+  fxMark(x,z,1.7*R,C_DOOM,1.6,.5);}
+// «Нарастание»: перед залпом (следующий каст даст волну) герой светится, вокруг кружат искры; на залпе — волна с белым ядром
+function surgeFx(dt,casted){const s=PASS.surge[0];if(!s){vfxSg=0;return 0;}const n=s.M.cd?3:4,ph=P.casts%n,c=s.E.color;
+  if(casted&&ph===0&&HQ()){const r=4.2*skR(s);xq(()=>{fxBurst(P.pos.x,1,P.pos.z,.42,WHITE,.12,.6);fxShock(P.pos.x,P.pos.z,r*1.15,ELD[s.e],.5);});
+    for(let i=0;i<12;i++){const a=i/12*TAU;emit(SPARK,P.pos.x,1,P.pos.z,Math.cos(a)*8,rand(.5,1.5),Math.sin(a)*8,c,.35,0,1.5);}vfxSg=0;}
+  const want=ph===n-1?1:0;vfxSg+=(want-vfxSg)*Math.min(1,dt*6);
+  if(want&&HQ()&&Math.random()<.6*FRK){const a=time*7;for(let k=0;k<2;k++){const b=a+k*Math.PI;emit(SPARK,P.pos.x+Math.cos(b)*.85,.4+((time*1.3+k*.5)%1)*1.5,P.pos.z+Math.sin(b)*.85,-Math.sin(b)*2,.6,Math.cos(b)*2,c,.35,0,2);}}
+  return vfxSg*(.75+.25*Math.sin(time*9));}
 function updateVfx(dt){
   for(let i=MKL.length-1;i>=0;i--){const o=MKL[i];o.t+=dt;const f=o.t/o.life;if(f>=1){scene.remove(o.m);MKP.push(o.m);MKL.splice(i,1);continue;}o.m.material.opacity=o.op*Math.min(1,f/.06,(1-f)/o.fo);}
   for(let i=GHL.length-1;i>=0;i--){const o=GHL[i];o.t+=dt;const f=o.t/o.life;if(f>=1){scene.remove(o.g);GHP.push(o.g);GHL.splice(i,1);continue;}o.g.userData.mat.opacity=.6*(1-f)*(1-f);o.g.scale.set(1+f*.35,1+f*.12,1+f*.35);}
   if(mode!=='game'||!hero||P.dead){vfxCT=P.castT;vfxRim=0;if(vfxRimOn){rimSet(1);vfxRimOn=false;vfxRimBase=null;}if(vfxShM){dropMesh(vfxShM);vfxShM=null;}return;}
   // каст: castT подскочил — значит, только что сотворили чару
-  if(P.castT>vfxCT+.01){vfxRimBase=null;castFx(P.lastEl);}vfxCT=P.castT;
-  vfxRim=Math.max(0,vfxRim-dt/.3);
-  if(vfxRim>0){rimSet(1+2*vfxRim);vfxRimOn=true;}else if(vfxRimOn){rimSet(1);vfxRimOn=false;vfxRimBase=null;}
+  const casted=P.castT>vfxCT+.01;if(casted){vfxRimBase=null;castFx(P.lastEl);}vfxCT=P.castT;
+  vfxRim=Math.max(0,vfxRim-dt/.3);const rk=1+1.2*vfxRim+.9*surgeFx(dt,casted);
+  if(rk>1.002){rimSet(rk);vfxRimOn=true;}else if(vfxRimOn){rimSet(1);vfxRimOn=false;vfxRimBase=null;}
   // щит: руна под ногами, сфера вращается и дышит, прозрачность по остатку; по удару — рябь со стороны ближнего врага
   if(P.shield>0&&P.shieldSk&&HQ()){const c=P.shieldSk.E.color,left=Math.min(1,P.shield/Math.max(1,P.shieldMax));
-    if(!vfxShM){vfxShM=takeMesh('rune');vfxShLast=P.shield;}
+    if(!vfxShM){vfxShM=takeMesh('rune');vfxShLast=P.shield;vfxShA=0;}vfxShA=Math.min(1,vfxShA+dt/.3);
     vfxShM.material.color.copy(c);vfxShM.position.set(P.pos.x,.1,P.pos.z);vfxShM.rotation.y+=dt*1.1;const s=1.5+.06*Math.sin(time*5);vfxShM.scale.set(s,1,s);vfxShM.material.opacity=(.25+.25*left)*(.8+.2*Math.sin(time*5));
-    const sm=hero.shieldM;if(sm&&sm.visible){sm.rotation.y+=dt*.9;const mm=sm.material;if(mm.userData.op0==null)mm.userData.op0=mm.opacity;mm.opacity=mm.userData.op0*(.45+.55*left)*(.85+.25*Math.sin(time*5))+vfxShHit*.25;}
+    const sm=hero.shieldM;if(sm&&sm.visible){sm.rotation.y+=dt*.9;const mm=sm.material;mm.color.copy(vivC(c));if(mm.userData.op0==null)mm.userData.op0=mm.opacity;mm.opacity=mm.userData.op0*(.45+.55*left)*(.85+.25*Math.sin(time*5))*(.3+.7*vfxShA)+vfxShHit*.25;}
     vfxShHit=Math.max(0,vfxShHit-dt*4);
     if(P.shield<vfxShLast-.5){vfxShHit=1;const tg=nearest(P.pos,6),a=tg?Math.atan2(tg.pos.z-P.pos.z,tg.pos.x-P.pos.x):rand(0,TAU),rx=P.pos.x+Math.cos(a)*1.05,rz=P.pos.z+Math.sin(a)*1.05;
       xq(()=>fxRing(rx,rz,.15,.9,c,.3,.9));for(let i=0;i<6;i++)emit(SPARK,rx,1.1,rz,Math.cos(a)*rand(1,3)+rand(-1,1),rand(.5,2),Math.sin(a)*rand(1,3)+rand(-1,1),c,.35,4,1.5);}
@@ -2872,7 +2906,7 @@ function updateVfx(dt){
   if(ZN.length)trailFx(dt);}
 // цепь: перескок рисуется звено за звеном, узел-вспышка на целях, искры вдоль
 function chainFx(a,b,col,el,j){zigzag(a,b,col);if(j<4)xq(()=>fxRing(b.x,b.z,.2,1,col,.28,.8));for(let k=1;k<=4;k++){const t=k/5;emit(SPARK,lerp(a.x,b.x,t),lerp(a.y,b.y,t),lerp(a.z,b.z,t),rand(-1.5,1.5),rand(0,1.5),rand(-1.5,1.5),col,.3,2,1.5);}
-  if(!j)xq(()=>fxBurst(b.x,b.y,b.z,.8,WHITE,.12,.7));}
+  if(!j)xq(()=>fxBurst(b.x,b.y,b.z,.5,col,.12,.6));}
 // луч: «дышит» шириной и дрожит
 function fxBeamPulse(a,b,col,life,w,op){const A=a.clone(),B=b.clone(),ph=rand(0,TAU);fx('beam',col,life,m=>{m.position.copy(A).add(B).multiplyScalar(.5);m.lookAt(B);m.scale.set(w,w,A.distanceTo(B));},
   (m,k)=>{const ww=w*(1-k*.55)*(1+.22*Math.sin(k*34+ph)+.08*Math.sin(k*91));m.scale.x=ww;m.scale.y=ww;m.material.opacity=op*(1-k*k);});}
@@ -3420,7 +3454,7 @@ function aoe(pos,r,dmg,el,o,exclude){let n=0;if(o&&o.sk&&isImp(o.sk.id))impBurst
 function multi(sk,fn,stagger){const c=sk.M.count||1;for(let i=0;i<c;i++){if(i)later(i*(stagger||.14),()=>fn(i));else fn(0);}if(sk.M.echo)later(.6,()=>fn(0));}
 function procBrand(b,pos,depth){const R=skR(b),col=b.E.color;mpPE('b',b.id,pos.x,pos.z,2.2*R);
   multi(b,i=>{const p=i?pos.clone().add(v3.set(rand(-1,1),0,rand(-1,1))):pos;aoe(p,2.1*R,skDmg(b),b.e,{sk:b,depth});
-    fxBurst(p.x,1,p.z,1.4*R,col,.3);fxRing(p.x,p.z,.3,2.2*R,col,.35,.7);elBurst(b.e,p.x,1,p.z,8);});}
+    fxBurst(p.x,1,p.z,1.2*R,col,.3,.65);fxRing(p.x,p.z,.3,2.2*R,col,.35,.7);elBurst(b.e,p.x,1,p.z,8);brandFx(b,p,R,i);});}
 function kill(en,depth,el,o){o=o||{};if(en.dead)return;
   if(MPH)mpOnKill(en,o);
   cfOnKill(en,el,o);nfOnKill(en,el,o);
@@ -3432,7 +3466,7 @@ function kill(en,depth,el,o){o=o||{};if(en.dead)return;
   if(en.boss)bossDown(en);
   if(depth<=2&&!o.noReward&&!o.fromG){for(const s of PASS.doom){if(procBudget<=0)break;procBudget--;const p=en.pos.clone(),R=skR(s),col=s.E.color;mpPE('d',s.id,p.x,p.z,3.4*R);
     multi(s,i=>{const q=i?p.clone().add(v3.set(rand(-1.4,1.4),0,rand(-1.4,1.4))):p;aoe(q,3.2*R,skDmg(s),s.e,{sk:s,depth:depth+1});
-      fxBurst(q.x,1,q.z,2.2*R,col,.4,.6);fxRing(q.x,q.z,.4,3.4*R,col,.45);fxGlow(q.x,q.z,3*R,col,.45,.6);elBurst(s.e,q.x,.8,q.z,14);});}}
+      fxBurst(q.x,1,q.z,2.2*R,col,.4,.5);fxRing(q.x,q.z,.4,3.4*R,col,.45);fxGlow(q.x,q.z,3*R,ELD[s.e],.45,.6);elBurst(s.e,q.x,.8,q.z,14);doomFx(s,q,R);});}}
 }
 function fireBlast(x,z,r){fxBurst(x,.8,z,r,FIREC,.4,.7);fxRing(x,z,.5,r+.5,FIREC,.45);fxGlow(x,z,r*1.4,FIREC,.5,.9);elBurst(EL.fire,x,.6,z,24,1.3);puffs(x,.6,z,new THREE.Color(0x553322),6,1.5,1);shake=Math.max(shake,.3);}
 function hurtPlayer(d,src,o){o=o||{};if(P.dead||P.invulnT>0)return;let dmg=d*ST.armor;if(src&&src.blindT>0)dmg*=.7;dmg=Math.max(1,Math.round(dmg));
@@ -3442,7 +3476,7 @@ function hurtPlayer(d,src,o){o=o||{};if(P.dead||P.invulnT>0)return;let dmg=d*ST.
   cfOnHurt(dmg,src,o);
   if(o.slow)P.slowT=Math.max(P.slowT,o.slow);if(src&&src.affix&&src.affix.has('frost')){P.slowT=2;elBurst(EL.ice,P.pos.x,1,P.pos.z,8);}
   if(!o.dot){for(const s of PASS.revenge){const cd=revCd.get(s.id)||0;if(cd>0)continue;revCd.set(s.id,s.F.icd*(s.M.cd||1));const R=skR(s);mpPE('r',s.id,P.pos.x,P.pos.z,4*R);
-    multi(s,()=>{aoe(P.pos,4*R,skDmg(s),s.e,{sk:s,depth:1,knockFrom:P.pos.clone()});spikesFx(s,P.pos.x,P.pos.z,R);});}}
+    multi(s,()=>{aoe(P.pos,4*R,skDmg(s),s.e,{sk:s,depth:1,knockFrom:P.pos.clone()});spikesFx(s,P.pos.x,P.pos.z,R,src);});}}
   if(P.hp<=0)die();}
 function shieldBurst(){const sk=P.shieldSk;P.shield=0;hero.shieldM.visible=false;if(!sk)return;P.shieldSk=null;const R=skR(sk);aoe(P.pos,3.6*R,P.shieldDmg*1.3,sk.e,{sk,depth:0,knockFrom:P.pos.clone()});novaFx(sk,P.pos.x,P.pos.z,3.6*R);
   xq(()=>fxShock(P.pos.x,P.pos.z,4.8*R,sk.E.color,.6));shards(sk.e,P.pos.x,1.2,P.pos.z,10,7);shk(.16,P.pos.x,P.pos.z);}
@@ -3542,10 +3576,10 @@ function updateMeteors(dt){for(let i=METEORS.length-1;i>=0;i--){const m=METEORS[
   if(m.kind==='rift'&&Math.random()<.6*FRK){const a=rand(0,TAU),r=3*m.R;emit(PUFF,m.p.x+Math.cos(a)*r,.3,m.p.z+Math.sin(a)*r,-Math.cos(a)*r*1.6,.5,-Math.sin(a)*r*1.6,c,.6,0,0);}
   if(k>=1){if(m.o)dropProjVis(m.o);METEORS.splice(i,1);const sk=m.sk,r=3*m.R,id=sk.E.id;
     aoe(m.p,r,m.dmg,sk.e,{sk,depth:0,pull:id==='wind',stunX:(id==='earth'||id==='ice')?.8:0});
-    const dc=ELD[sk.e];fxBurst(m.p.x,.6,m.p.z,r,dc,.4,.7);fxRing(m.p.x,m.p.z,.5,r+.6,c,.5);fxGlow(m.p.x,m.p.z,r*1.7,dc,.6,.8);elMark(sk.e,m.p.x,m.p.z,r*.95,2);colBurst(c,m.p.x,.6,m.p.z,8,6,.8,14);
+    const dc=ELD[sk.e];fxBurst(m.p.x,.6,m.p.z,r*.72,dc,.4,.5);fxRing(m.p.x,m.p.z,.5,r+.6,c,.5);fxGlow(m.p.x,m.p.z,r*1.5,dc,.6,.6);elMark(sk.e,m.p.x,m.p.z,r*.95,2);colBurst(c,m.p.x,.6,m.p.z,8,6,.8,14);
     if(m.from)xq(()=>fxBeam(m.from,v1.set(m.p.x,.3,m.p.z),c,.2,.3*Math.sqrt(m.R)));elBurst(sk.e,m.p.x,.5,m.p.z,32,1.4);puffs(m.p.x,.4,m.p.z,c.clone().multiplyScalar(.35),5,2,1);
     if(m.kind==='bolt')skyBolt(m.p.x,m.p.z,c);
-    if(m.kind==='pillar')fxPillar(m.p.x,m.p.z,r*.5,12,c,.5);
+    if(m.kind==='pillar')fxPillar(m.p.x,m.p.z,r*.26,10,c,.5,.42);
     if(m.kind==='rift')fxPillar(m.p.x,m.p.z,r*.4,6,c,.5);
     if(id==='earth'||id==='ice'){for(let j=0;j<7;j++){const a=rand(0,TAU),d=rand(.3,1)*r;spikeAt(m.p.x+Math.cos(a)*d,m.p.z+Math.sin(a)*d,id==='ice'?ICEC:EARTHC,rand(.2,.34),rand(.6,1.3));}}
     if(id==='fire')addZone(m.p.x,m.p.z,2.5*m.R,4,sk.e,m.dmg*.18,sk);
@@ -3949,12 +3983,12 @@ function updateWhirls(dt){for(let i=WHIRLS.length-1;i>=0;i--){const w=WHIRLS[i];
 const RAINS=[];
 function spawnRain(p,sk,dmg,R){const r=3.2*R,disc=takeMesh('disc'),ring=takeMesh('ring');disc.material.color.copy(sk.E.color);disc.material.opacity=0;disc.position.set(p.x,.06,p.z);disc.scale.set(r,1,r);
   ring.material.color.copy(sk.E.color);ring.material.opacity=.6;ring.position.set(p.x,.07,p.z);ring.scale.set(r,1,r);RAINS.push({p,r,sk,dmg,t:3,tick:.15,disc,ring,b:0,st:0});
-  fxMark(p.x,p.z,r*1.25,ELD[sk.e].clone().multiplyScalar(.22),3.1,.42,7.6,.2);}
+  fxMark(p.x,p.z,r*1.9,C_TMP.copy(ELD[sk.e]).multiplyScalar(.3),3.1,.6,4.6,.2);}
 function updateRains(dt){for(let i=RAINS.length-1;i>=0;i--){const w=RAINS[i],c=w.sk.E.color,id=w.sk.E.id;w.t-=dt;w.disc.material.opacity=.16*Math.min(1,w.t*2,(3-w.t)*4);
-  for(let k=0;k<4;k++)if(fk()){const a=rand(0,TAU),d=Math.sqrt(Math.random())*w.r;emit(SPARK,w.p.x+Math.cos(a)*d,rand(6,9),w.p.z+Math.sin(a)*d,0,-22,0,c,.42,0,0);}
-  if(Math.random()<.6*FRK){const a=rand(0,TAU),d=Math.sqrt(Math.random())*w.r;emit(PUFF,w.p.x+Math.cos(a)*d,rand(7.2,8.2),w.p.z+Math.sin(a)*d,rand(-.5,.5),0,rand(-.5,.5),ELD[w.sk.e],1.1,0,.5);}
-  w.st-=dt;if(w.st<=0){w.st=.07;xq(()=>{const a=rand(0,TAU),d=Math.sqrt(Math.random())*w.r,x=w.p.x+Math.cos(a)*d,z=w.p.z+Math.sin(a)*d,h=rand(5.5,7.5);
-    fx('beam',c,.22,m=>{m.position.set(x,h,z);m.scale.set(.05,1.6,.05);},(m,k)=>{m.position.y=h-k*(h-.8);m.material.opacity=.85*(1-k*.4);});});}
+  for(let k=0;k<4;k++)if(fk()){const a=rand(0,TAU),d=Math.sqrt(Math.random())*w.r;emit(SPARK,w.p.x+Math.cos(a)*d,rand(4.2,5),w.p.z+Math.sin(a)*d,0,-22,0,c,.26,0,0);}
+  if(Math.random()<FRK){const a=rand(0,TAU),d=Math.sqrt(Math.random())*w.r*1.1;emit(PUFF,w.p.x+Math.cos(a)*d,rand(4.2,5),w.p.z+Math.sin(a)*d,rand(-.5,.5),0,rand(-.5,.5),ELD[w.sk.e],1.2,0,.5);}
+  w.st-=dt;if(w.st<=0){w.st=.07;xq(()=>{const a=rand(0,TAU),d=Math.sqrt(Math.random())*w.r,x=w.p.x+Math.cos(a)*d,z=w.p.z+Math.sin(a)*d,h=rand(3.6,4.4);
+    fx('beam',c,.17,m=>{m.position.set(x,h,z);m.scale.set(.05,1.6,.05);},(m,k)=>{m.position.y=h-k*(h-.8);m.material.opacity=.85*(1-k*.4);});});}
   w.b-=dt;if(w.b<=0){w.b=id==='storm'?.45:.18;const a=rand(0,TAU),d=Math.sqrt(Math.random())*w.r,x=w.p.x+Math.cos(a)*d,z=w.p.z+Math.sin(a)*d;if(id==='storm')skyBolt(x,z,c);else{fxGlow(x,z,1.2,ELD[w.sk.e],.3,.75);elBurst(w.sk.e,x,.2,z,9);
     xq(()=>{fxRing(x,z,.15,1.1,c,.28,.8);if(id==='ice'||id==='earth')spikeAt(x,z,id==='ice'?ICEC:EARTHC,rand(.12,.2),rand(.4,.7));else if(id==='poison')fxBubble(x,.1,z,c);});}}
   w.tick-=dt;if(w.tick<=0){w.tick=.4;aoe(w.p,w.r,w.dmg,w.sk.e,{sk:w.sk,depth:0,noKnock:true});}
@@ -4029,10 +4063,10 @@ function cast(sk,A,cl){
     strike:()=>{const t2=pick(sk.F.range+2);let delay=0;
       if(A&&!t2){P.dashV.copy(A.dir).multiplyScalar(3/.14);P.dashT=.14;delay=.14;fxGhost(P.pos.x,P.pos.z,P.face,col,.25);}
       if(t2){faceTo(t2.pos);const dist=t2.pos.distanceTo(P.pos);if(dist>2.4){const go=Math.min(dist-1.7,4.5),f0=fwd();P.dashV.copy(f0).multiplyScalar(go/.14);P.dashT=.14;delay=.14;fxGhost(P.pos.x,P.pos.z,P.face,col,.25);xq(()=>fxBeam(v1.set(P.pos.x,1,P.pos.z),v2.set(P.pos.x+f0.x*go,1,P.pos.z+f0.z*go),col,.22,.26));}}
-      const hit=()=>{const f=fwd(),r=3.4*R,ang=Math.atan2(f.z,f.x);fxFan(P.pos.x,P.pos.z,ang,r,ELD[sk.e],.25);fxSlash(P.pos.x,P.pos.z,ang,r*.8,col);later(.05,()=>xq(()=>fxSlash(P.pos.x,P.pos.z,ang+.3,r*.95,WHITE)));P.swingT=.25;let nh=0;
+      const hit=()=>{const f=fwd(),r=3.4*R,ang=Math.atan2(f.z,f.x);fxFan(P.pos.x,P.pos.z,ang,r,ELD[sk.e],.25);fxSlash(P.pos.x,P.pos.z,ang,r*.8,col);later(.05,()=>xq(()=>fxSlash(P.pos.x,P.pos.z,ang+.3,r*.95,lightC(col))));P.swingT=.25;let nh=0;
         for(let k=0;k<14;k++){const a=ang+rand(-.9,.9);emit(SPARK,P.pos.x+Math.cos(a)*r*.5,1,P.pos.z+Math.sin(a)*r*.5,Math.cos(a)*5,rand(0,2),Math.sin(a)*5,col,.3,2,2);}
         for(const en of ENEMIES){if(en.dead)continue;const dx=en.pos.x-P.pos.x,dz=en.pos.z-P.pos.z,dd=Math.hypot(dx,dz);if(dd>r+en.r)continue;
-          if(dd<en.r+.9||(dx*f.x+dz*f.z)/dd>.55){dealDamage(en,dmg,sk.e,{sk,depth:0,knockFrom:P.pos.clone()});if(nh++<2){elSig(sk.e,en.pos.x,1,en.pos.z,10);xq(()=>fxBurst(en.pos.x,1,en.pos.z,.7,WHITE,.12,.8));}}}
+          if(dd<en.r+.9||(dx*f.x+dz*f.z)/dd>.55){dealDamage(en,dmg,sk.e,{sk,depth:0,knockFrom:P.pos.clone()});if(nh++<2){elSig(sk.e,en.pos.x,1,en.pos.z,10);xq(()=>fxBurst(en.pos.x,1,en.pos.z,.5,col,.12,.6));}}}
         if(nh)shk(.08,P.pos.x,P.pos.z);};
       delay?later(delay,hit):hit();},
     beam:()=>{const t2=pick(sk.F.range+2);const d=A?A.dir.clone():t2?v1.set(t2.pos.x-P.pos.x,0,t2.pos.z-P.pos.z).normalize().clone():fwd();P.face=Math.atan2(d.x,d.z);fireBeam(sk,d,dmg,R);},
@@ -4041,7 +4075,7 @@ function cast(sk,A,cl){
       const dir=A?A.dir.clone():(moveDir()||fwd());const dist=sk.M.radius?9:7,start=P.pos.clone();
       aoe(start,2.6*R,dmg,sk.e,{sk,depth:0});novaFx(sk,start.x,start.z,2.6*R);
       const end=start.clone().addScaledVector(dir,dist);collide(end,.4);
-      fxGhost(start.x,start.z,Math.atan2(dir.x,dir.z),col,.35);xq(()=>{fxBeam(v1.set(start.x,1,start.z),v2.set(end.x,1,end.z),col,.3,.5);fxBeam(v1.set(start.x,1,start.z),v2.set(end.x,1,end.z),WHITE,.2,.14);fxRune(start.x,start.z,2.2,col,.6);fxRune(end.x,end.z,2.2,col,.6);});
+      fxGhost(start.x,start.z,Math.atan2(dir.x,dir.z),col,.35);xq(()=>{fxBeam(v1.set(start.x,1,start.z),v2.set(end.x,1,end.z),col,.3,.5);fxBeam(v1.set(start.x,1,start.z),v2.set(end.x,1,end.z),lightC(col),.2,.09);fxRune(start.x,start.z,2.2,col,.6);fxRune(end.x,end.z,2.2,col,.6);});
       for(let k=0;k<16;k++){const t=k/16;emit(PUFF,lerp(start.x,end.x,t),rand(.5,1.6),lerp(start.z,end.z,t),0,rand(0,.5),0,col,.5,0,1);}
       P.pos.copy(end);P.prev.copy(end);hero.g.position.copy(end);P.invulnT=.35;P.face=Math.atan2(dir.x,dir.z);
       later(.05,()=>{const q=P.pos.clone();aoe(q,2.6*R,dmg,sk.e,{sk,depth:0,knockFrom:q});novaFx(sk,q.x,q.z,2.6*R);});},
@@ -4050,7 +4084,7 @@ function cast(sk,A,cl){
     trap:(i)=>{let p;if(A)p=P.pos.clone().addScaledVector(A.dir,Math.max(1.5,A.dist*sk.F.range));else{const t2=getTarget(sk.F.range);p=t2?P.pos.clone().lerp(t2.pos,.7):P.pos.clone().addScaledVector(fwd(),3);}
       for(let k=0;k<3;k++){const a=k/3*TAU+i*.7;placeTrap(p.x+Math.cos(a)*1.3,p.z+Math.sin(a)*1.3,sk,dmg,R);}},
     // «Тройка» и «Эхо» того же щита в ту же секунду складываются (раньше каждый повтор затирал прошлый — от тройки оставалось 45%)
-    barrier:()=>{const amt=P.maxHp*.15*skK(sk)+dmg*1.6,stk=P.shieldSk===sk&&P.shield>0&&P.shieldT>5;P.shield=stk?P.shield+amt:Math.max(P.shield,amt);P.shieldMax=Math.max(P.shield,1);P.shieldT=6;P.shieldDmg=stk?P.shieldDmg+dmg:dmg;P.shieldSk=sk;hero.shieldM.visible=true;hero.shieldM.material.color.copy(col);fxPillar(P.pos.x,P.pos.z,1,3,ELD[sk.e],.5,.6);ringBurst(sk.e,P.pos.x,P.pos.z,2,20);fxRune(P.pos.x,P.pos.z,2.6,col,.9);fxShock(P.pos.x,P.pos.z,3,col,.5);},
+    barrier:()=>{const amt=P.maxHp*.15*skK(sk)+dmg*1.6,stk=P.shieldSk===sk&&P.shield>0&&P.shieldT>5;P.shield=stk?P.shield+amt:Math.max(P.shield,amt);P.shieldMax=Math.max(P.shield,1);P.shieldT=6;P.shieldDmg=stk?P.shieldDmg+dmg:dmg;P.shieldSk=sk;hero.shieldM.visible=true;hero.shieldM.material.color.copy(col);fxPillar(P.pos.x,P.pos.z,.85,3,ELD[sk.e],.5,.35);ringBurst(sk.e,P.pos.x,P.pos.z,2,20);fxRune(P.pos.x,P.pos.z,2.6,col,.9);fxShock(P.pos.x,P.pos.z,3,col,.5);},
   }[F]||(NFRUN[F]&&(i=>NFRUN[F](sk,A,i|0,dmg,R,col,cl)));
   if(cl){run(0);return;}
   if(F==='summon')run();
@@ -4082,11 +4116,11 @@ function updatePassives(dt){
   for(const s of PASS.aura){let t=auraT.has(s.id)?auraT.get(s.id):rand(0,1);t-=dt;
     if(t<=0){t+=1*(s.M.cd||1);const R=4*skR(s),d=skDmg(s)*(s.M.count||1);aoe(P.pos,R,d,s.e,{sk:s,depth:1,noKnock:true});
       if(s.M.echo)later(.5,()=>aoe(P.pos,R,d,s.e,{sk:s,depth:1,noKnock:true}));
-      if(FX.length<90)fxRing(P.pos.x,P.pos.z,R*.4,R,s.E.color,.5,.14);}
+      if(FX.length<90)fxRing(P.pos.x,P.pos.z,R*.4,R,s.E.color,.5,.14);auraPulse(s.e,R);}
     auraT.set(s.id,t);}
   if(P.moving){for(const s of PASS.trail){let t=(trailT.get(s.id)||0)-dt;if(t<=0){t=.42*(s.M.cd||1);addZone(P.pos.x,P.pos.z,1.3*skR(s),2.4,s.e,skDmg(s)*(s.M.count?1.35:1),s);}trailT.set(s.id,t);}}
   revCd.forEach((v,k)=>revCd.set(k,v-dt));
-  for(const r of AURA_RINGS){r.m.position.set(P.pos.x,.09+r.i*.01,P.pos.z);r.m.rotation.y=time*(r.i%2?.6:-.6);r.m.material.opacity=.22+.1*Math.sin(time*3+r.i);
+  for(const r of AURA_RINGS){r.m.position.set(P.pos.x,.09+r.i*.01,P.pos.z);r.m.rotation.y=time*(r.i%2?.6:-.6);auraRing(r,dt);
     if(Math.random()<.35*FRK){const a=rand(0,TAU),p=EP[ELEMENTS[r.e].id];emit(SPARK,P.pos.x+Math.cos(a)*r.r*rand(.3,1),.2,P.pos.z+Math.sin(a)*r.r*rand(.3,1),0,rand(.5,1.5),0,ELEMENTS[r.e].color,.6,p[0]*.25,1);}}
   updateOrbs();}
 
