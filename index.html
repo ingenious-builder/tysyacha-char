@@ -301,7 +301,7 @@ html[data-ui=tab] #mm{top:calc(var(--m) + var(--sat) + 70px);width:calc(92px * v
 .mb{position:absolute;right:-3px;bottom:-3px;min-width:15px;padding:1px 3px;border-radius:7px;background:rgba(8,10,22,.88);border:1px solid rgba(255,233,168,.55);color:#ffe9a8;font:700 12px/1.2 var(--f-ui);font-style:normal;text-align:center;z-index:4;pointer-events:none}
 .rkb{position:absolute;left:4px;bottom:2px;z-index:4;pointer-events:none;font:700 11px/1.15 var(--f-ui);font-style:normal;letter-spacing:.02em;color:#cfd6ff;background:rgba(8,10,22,.78);border-radius:6px;padding:0 3px;text-shadow:0 1px 1px #000}
 .rkb.mx{color:#2a1c00;background:linear-gradient(#ffe9a8,#e0a93a);text-shadow:none;box-shadow:0 0 5px rgba(255,214,110,.8)}
-.slot .rkb{left:50%;bottom:3px;transform:translateX(-50%);font-size:10px}
+.slot .rkb{left:50%;bottom:3px;transform:translateX(-50%);font-size:9px;white-space:nowrap}
 .ico .rkb{left:50%;bottom:-3px;transform:translateX(-50%);font-size:9px}
 .sk .mb{right:4px;bottom:2px;border:0;background:rgba(8,10,22,.75);font-size:12px;min-width:0;padding:0 2px;line-height:1.1}
 .vars{display:flex;flex-wrap:wrap;gap:6px}
@@ -314,6 +314,11 @@ html[data-ui=tab] #mm{top:calc(var(--m) + var(--sat) + 70px);width:calc(92px * v
 .nm i{font-style:normal;color:var(--ess);font-size:13px}
 .meta{font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-variant-numeric:tabular-nums}
 .badge{flex:none;font-size:12px;color:var(--gold);border:1px solid rgba(242,196,107,.5);border-radius:8px;padding:2px 6px}
+.rkl{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text);flex-wrap:wrap;white-space:normal}
+.rkl b{font-weight:600;color:#cfd6ff}.rkl.mx b,.rkw.mx{color:var(--gold)}.rkl em{font-style:normal;color:var(--gold);font-size:11px}
+.meta2{font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rkw{color:var(--text);font-weight:600}
+
 .pips{display:inline-flex;gap:3px;vertical-align:middle}
 .pips i{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.18)}
 .pips i.on{background:var(--gold)}
@@ -4055,6 +4060,7 @@ $('#fForm').addEventListener('click',e=>{const b=e.target.closest('[data-form]')
 $('#q').addEventListener('input',e=>{F_.q=e.target.value.trim().toLowerCase();renderList();});
 const ROM=['','I','II','III','IV','V'];
 const rankBadge=id=>{const r=rk(id);return r>=5?'<i class="rkb mx" title="Ранг 5 — максимум">MAX</i>':'<i class="rkb" title="Ранг '+r+' из 5">'+ROM[r]+'</i>';};
+const slotRank=id=>{const r=rk(id);return r>=5?'<i class="rkb mx" title="Ранг 5 — максимум">МАКС</i>':'<i class="rkb" title="Ранг '+r+' из 5">Ранг '+r+'</i>';};
 function buildRankIds(){return [...EQUIPPED].filter(id=>rk(id)<5);}
 function upgradeBuildRanks(){let n=0,spent=0;
   for(;;){let best=null,bc=0,br=9;for(const id of EQUIPPED){const r=rk(id);if(r>=5)continue;const c=rankCost(r);if(c>S.ess)continue;if(r<br||(r===br&&id<best)){best=id;br=r;bc=c;}}
@@ -4065,10 +4071,12 @@ function autoRankTick(){if(!S||!S.autoRank||!EQUIPPED.size)return;const t=perfor
   const r=upgradeBuildRanks();if(r.n){rankToastN+=r.n;if(t-rankToastAt>4000){rankToastAt=t;toast('Автопрокачка: +'+rankToastN+' '+(rankToastN===1?'ранг':'рангов'));rankToastN=0;}}}
 const pips=r=>`<span class="pips">${[1,2,3,4,5].map(i=>`<i class="${i<=r?'on':''}"></i>`).join('')}</span>`;
 const learnedVars=bk=>{let n=0;for(let m=0;m<NM;m++)if(isLearned(bk*NM+m))n++;return n;};
+function rankLine(sk,lv){const r=rk(sk.id),mx=r>=5,can=!mx&&S.ess>=rankCost(r);
+  return `<span class="rkl${mx?' mx':''}"><b>${mx?'Ранг 5 из 5 · МАКС':'Ранг '+r+' из 5'}</b>${pips(r)}${can?'<em>↑ можно повысить</em>':''}</span><span class="meta2">${lv>1?'вариантов '+lv+'/'+NM+' · ':''}${cardStat(sk)}</span>`;}
 function rowHtml(sk,nv){const eq=EQUIPPED.has(sk.id),ln=isLearned(sk.id),lv=learnedVars(sk.bk),r=rarOf(sk),u=ln&&!eq?upgradeFor(sk):null;
   const other=!eq&&ln?[...EQUIPPED].find(id=>SKILLS[id].bk===sk.bk):null;
   return `<button type="button" class="row${eq?' eq':''}${ln?'':' locked'}" data-id="${sk.id}"><span class="ico${sk.active?'':' p'}" data-r="${r}" style="--c:${sk.E.hex}">${svg(sk.F.id)}${modBadge(sk)}</span>
-  <span class="rt"><span class="nm">${sk.base} <i>· ${sk.M.name}</i></span><span class="meta">${sk.F.role} · ${RARITY[r].n} ${sk.active?'актив.':'пассив.'} · <b class="pw" data-r="${r}">сила ${Math.round(pwr(sk))}</b> · ${ln?'р.'+rk(sk.id)+'/5 · '+(lv>1?'вариантов '+lv+'/'+NM:cardStat(sk)):'не изучено'}</span></span>${eq?'<span class="badge">в билде</span>':u?`<span class="badge rec">↑ +${pct(u.gain)}%</span>`:other!=null?'<span class="badge">есть вариант в билде</span>':''}</button>`;}
+  <span class="rt"><span class="nm">${sk.base} <i>· ${sk.M.name}</i></span><span class="meta"><b class="pw" data-r="${r}">сила ${Math.round(pwr(sk))}</b> · ${sk.F.role} · ${RARITY[r].n} ${sk.active?'актив.':'пассив.'}${ln?'':' · не изучено'}</span>${ln?rankLine(sk,lv):''}</span>${eq?'<span class="badge">в билде · р.'+rk(sk.id)+'</span>':u?`<span class="badge rec">↑ +${pct(u.gain)}%</span>`:other!=null?'<span class="badge">есть вариант в билде</span>':''}</button>`;}
 function classSkills(){const a=[];CLS.pool.forEach(id=>a.push(SKILLS[id]));const er=e=>e===CLS.p?0:e===CLS.s?1:2;a.sort((x,y)=>er(x.E.id)-er(y.E.id)||x.f-y.f||x.m-y.m);return a;}
 const F2_={sort:'power',weak:false};let WEAKN=0,WEAKE=0;
 function renderSort(){$('#fSort').innerHTML=chip('По силе',F2_.sort==='power','data-sort="power"')+chip('По стихии',F2_.sort==='el','data-sort="el"')+
@@ -4105,7 +4113,7 @@ listEl.addEventListener('click',e=>{const r=e.target.closest('.row');if(r)openSh
 function slotHtml(id,i,kind,unlocked,lvlNeed){
   if(!unlocked)return `<button type="button" class="slot lock${id!=null?' has':''}" data-k="${kind}" data-i="${i}" aria-label="Закрыт до уровня ${lvlNeed}">ур ${lvlNeed}</button>`;
   if(id==null)return `<button type="button" class="slot empty" data-k="${kind}" data-i="${i}" aria-label="Пустой слот">+</button>`;
-  const sk=SKILLS[id];return `<button type="button" class="slot" style="--c:${sk.E.hex}" data-k="${kind}" data-i="${i}" aria-label="${skName(sk)}, ранг ${rk(id)} из 5">${svg(sk.F.id)}${modBadge(sk)}${rankBadge(id)}</button>`;}
+  const sk=SKILLS[id];return `<button type="button" class="slot" style="--c:${sk.E.hex}" data-k="${kind}" data-i="${i}" aria-label="${skName(sk)}, ранг ${rk(id)} из 5">${svg(sk.F.id)}${modBadge(sk)}${slotRank(id)}</button>`;}
 function renderBuild(){
   const na=activeSlots(),np=passiveSlots();
   $('#slotsA').innerHTML=S.active.map((id,i)=>slotHtml(id,i,'a',i<na,activeLvl(i))).join('');
@@ -4240,7 +4248,7 @@ function sheetHtml(sk){const eq=EQUIPPED.has(sk.id),ln=isLearned(sk.id),r=rk(sk.
   const rr=rarOf(sk),up=ln&&!eq?upgradeFor(sk):null,dv=ln&&!eq&&!S.sandbox?dustValue(sk):0;
   if(sk.M.count)st.push(['Повторов','×'+sk.M.count]);
   const cost=rankCost(r);
-  const rankRow=ln?`<div class="rank">Уровень чары ${r} из 5 ${pips(r)} <span>${r<5?'каждый ранг: +20% урона, −4% перезарядки':'максимум'}</span></div>`:'';
+  const rankRow=ln?`<div class="rank"><b class="rkw${r>=5?' mx':''}">${r>=5?'Ранг 5 из 5 · МАКС':'Ранг '+r+' из 5'}</b> ${pips(r)} <span>${r<5?'каждый ранг: +20% урона, −4% перезарядки':'максимум'}</span></div>`:'';
   let acts='';
   if(!ln)acts=`<p class="note">Ещё не изучено. Выпадает в свитках с монстров и предлагается при повышении уровня.</p><div class="sh-act"><button type="button" class="btn" data-act="close">Закрыть</button></div>`;
   else{acts=(up?`<p class="note up">↑ Сильнее «${skName(SKILLS[up.tgt])}» в ${slotNm(up.act,up.idx)} на ${pct(up.gain)}% (сила ${Math.round(up.cp)} против ${Math.round(up.tp)}).</p><div class="sh-act"><button type="button" class="btn gold" data-act="swap">Заменить «${skName(SKILLS[up.tgt])}»</button></div>`:'')+`<div class="sh-act">${eq?`<button type="button" class="btn warn" data-act="off">Снять</button>`:`<button type="button" class="btn gold" data-act="on">${pending&&pending.index!=null?'Поставить в слот '+(pending.index+1):'Взять в билд'}</button>`}`+
