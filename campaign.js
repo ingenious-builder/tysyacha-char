@@ -22,7 +22,7 @@ const LV=[
  {k:4,key:'plates',name:'Две плиты',th:3,L:190,lv:8,n:4,par:330,goal:'Откройте ворота и сойдитесь'},
  {k:5,key:'guard',name:'Страж',th:9,L:170,lv:10,n:4,par:360,goal:'Победите стража'},
  {k:6,key:'escape',name:'Побег',th:11,L:260,lv:12,n:4,par:150,goal:'Бегите к порталу от стены тьмы'},
- {k:7,key:'hunt',name:'Охота',th:8,L:150,lv:14,n:4,par:270,goal:'Убей 6 элитных врагов за 4 минуты'},
+ {k:7,key:'hunt',name:'Охота',th:8,L:150,lv:14,n:4,par:330,goal:'Убей 6 элитных врагов за 5 минут'},
  {k:8,key:'final',name:'Финал',th:12,L:190,lv:17,n:5,par:480,goal:'Победите хранителя сердца'},
 ];
 // 25.11 (Артём: «слишком много месива… нужно, чтобы врагов было немного, но они были живучими; танк танкует, маг за спиной»):
@@ -34,7 +34,8 @@ const ROLE={
  brute:  {pool:'heavy', hp:7,  dmg:1.7, xp:1.7,spd:.85},
  shooter:{pool:'ranged',hp:4.2,dmg:1.45,xp:1.3},
  hound:  {pool:'swarm', hp:4,  dmg:1.4, xp:1.2,spd:1.3,hound:true},
- champ:  {pool:'heavy', hp:3.2,dmg:1.5, xp:1.2,elite:true,champ:true},   // элита ×3,5 и чемпион ×2 — уже в spawnEnemy
+ champ:  {pool:'heavy', hp:3.2,dmg:1.3, xp:1.2,elite:true,champ:true},   // элита ×3,5 и чемпион ×2 — уже в spawnEnemy;
+          // урон 1,3 (было 1,5): пара «маг + танк» ботами погибала вдвоём у чемпиона (уровни 1 и 3) — крепкий, но не убивает с двух ударов
 };
 // запас здоровья по уровням кампании: первый — без особых правил, там враги толще; остальные держит сама цель уровня
 const LVHP=[0,1.4,1,1,1.3,1.6,1,1.4,1.3];
@@ -79,8 +80,9 @@ function heroes(){const a=[];if(!X.P.dead)a.push({id:0,p:X.P.pos});const pr=MPm.
 // на прошлом уровне (у портала, z≈170–230). По этой старой точке сразу появлялся босс и срабатывали засады, а ворота
 // перед ними так и оставались закрытыми. Теперь напарник учитывается, только когда его свежая позиция пришла к старту
 // (через 1,5 с и ближе 40 м от начала), и никогда — за закрытыми воротами (туда не пройти, значит позиция старая)
+// Свежей позиция считается и рядом с хостом (ближе 15 м): гость вернулся посреди уровня и стоит возле хозяина комнаты дальше 40 м
 function peerOk(pr){if(!H||!CS)return true;const Z=Zf();if(!Z)return false;const l=X.toLocal(pr.pos.x,pr.pos.z);
-  if(!H.peerOk){if(X.time-H.t0>1.5&&l.z<40)H.peerOk=true;else return false;}
+  if(!H.peerOk){if(X.time-H.t0>1.5&&(l.z<40||Math.hypot(pr.pos.x-X.P.pos.x,pr.pos.z-X.P.pos.z)<15))H.peerOk=true;else return false;}
   return l.z<=(Z.z1||1e9)+4;}
 function resetPeer(){const pr=MPm.peer;if(!pr||!pr.pos)return;const p=X.P.pos;pr.pos.set(p.x+(X.MPG?-2.6:2.6),0,p.z);pr.tx=pr.pos.x;pr.tz=pr.pos.z;
   if(pr.ib&&pr.ib.b){pr.ib.b.length=0;pr.ib.off=null;}}
@@ -119,7 +121,9 @@ function encTick(dt){const Z=Zf();if(!Z.ce)return;const lead=leadZ();
   for(const e of Z.ce){
     if(e.wi<0){if(lead>e.z-(e.trig||22)){e.done=true;encWave(e);}continue;}
     if(e.wi<e.waves.length-1&&!alive(e.units)){e.wt+=dt;if(e.wt>=1.8){e.wt=0;encWave(e);}}
-    stragglers(e.all,e,dt);if(e.bi!=null||e.gate)cornered(e.units,e.cs||(e.cs={}),dt);}}
+    // отставших и загнанных подтягиваем только у отрядов, которые держат ворота: обойдённый отряд без ворот (побег, первые
+    // отряды алтаря и плит) остаётся позади — иначе он через 25 с выпрыгивал перед героями и копился у сундука и портала
+    if(e.bi!=null||e.gate){stragglers(e.all,e,dt);cornered(e.units,e.cs||(e.cs={}),dt);}}}
 function encCleared(e){return e.wi>=e.waves.length-1&&e.all.length>0&&!alive(e.all);}
 function encLeft(){const Z=Zf();let n=0;if(Z&&Z.ce)for(const e of Z.ce)if(e.done&&!encCleared(e)){n+=aliveN(e.all);for(let j=e.wi+1;j<e.waves.length;j++)n+=parseW(e.waves[j].replace('@back','')).length;}return n;}
 // отставшие: если живые враги нужной группы 25 с далеко от обоих героев (застряли за камнем, ушли назад) — выходят вперёд к героям
@@ -127,10 +131,15 @@ function stragglers(list,st,dt){if(!list||!list.length)return;const hs=heroes();
   for(const u of list){if(u.dead)continue;any=true;for(const h of hs){if(Math.hypot(h.p.x-u.pos.x,h.p.z-u.pos.z)<32){st.ft=0;return;}}}
   if(!any){st.ft=0;return;}st.ft=(st.ft||0)+dt;if(st.ft<25)return;st.ft=0;
   const lz=clamp(leadZ()+8,2,Zf().z1-1.5);for(const u of list){if(u.dead)continue;const w=lpos(rand(-2,2),lz);u.pos.set(w.x,0,w.z);u.aggro=true;X.colBurst(X.RED,w.x,1,w.z,14,4,.4,0);}}
-// загнанные: если от нужной группы осталось 1–2 врага и 35 с никто не погиб (стрелок убегает от бойца, шаман лечится быстрее,
-// чем его бьёт один танк, враг застрял на камне) — они оказываются рядом с ближайшим героем, оглушены и теряют 40% здоровья.
-// Иначе ворота могли держаться бесконечно (проверка ботами: шаман у стартовой стены 10 минут против одного паладина)
-function cornered(list,st,dt){const n=aliveN(list);if(n!==st.cn){st.cn=n;st.ct=0;return;}if(!n||n>2)return;st.ct=(st.ct||0)+dt;if(st.ct<35)return;st.ct=0;
+// загнанные: если от нужной группы осталось 1–2 врага и бой с ними не идёт — каждый из них 30 с не терял здоровья ниже прежнего
+// (стрелок убегает от бойца, шаман лечится быстрее, чем его бьёт один танк, враг застрял на камне) — они оказываются рядом
+// с ближайшим героем, оглушены и теряют 40% здоровья. Иначе ворота могли держаться бесконечно (проверка ботами: шаман у стартовой
+// стены 10 минут против одного паладина). Врага, которого герои реально добивают (здоровье падает), не трогаем — он остаётся живучим
+function cornered(list,st,dt){const n=aliveN(list);if(n!==st.cn){st.cn=n;st.ct=0;return;}if(!n||n>2)return;
+  let fight=false;for(const u of list){if(u.dead||X.ENEMIES.indexOf(u)<0)continue;
+    if(u._cmin==null||u.hp<u._cmin-Math.max(1,u.maxHp*.01)){u._cmin=u.hp;u._cnt=0;}else u._cnt=(u._cnt||0)+dt;
+    if(u._cnt<30)fight=true;}
+  if(fight){st.ct=0;return;}st.ct=(st.ct||0)+dt;if(st.ct<5)return;st.ct=0;
   const hs=heroes();if(!hs.length)return;let moved=false;
   for(const u of list){if(u.dead||X.ENEMIES.indexOf(u)<0)continue;let b=null,bd=1e9;for(const h of hs){const d=Math.hypot(h.p.x-u.pos.x,h.p.z-u.pos.z);if(d<bd){bd=d;b=h;}}
     if(!b)continue;if(bd>=5){const a=rand(0,TAU),r=rand(2.5,4);u.pos.set(b.p.x+Math.cos(a)*r,0,b.p.z+Math.sin(a)*r);}
@@ -176,16 +185,16 @@ function wave(n,mix,lzFn,offR,o){const out=[];for(let i=0;i<n;i++){const role=mi
 
 // ---------------------------------------------------------------- боссы: общее
 // pt — пороги фаз босса под фазы уровня (полоса и смена приёмов совпадают со щитами); баннеры фаз даёт сам уровень
-function bossSpawn(tid,hpm,sub,pt){
+function bossSpawn(tid,hpm,sub,pt,dk){
   const Z=Zf(),lz=Z.bossZ+5,w=lpos(0,lz);
   const lv=foeLv()+1,K=campK(lv);
-  const B=X.spawnEnemy(tid,w.x,w.z,lv,{gorge:true,aggro:true,hpMul:hpm*K*overK()*HPM,bsub:sub,phT:pt,phQ:true});B.skillCd=2.5;X.setBOSS(B);B.dmg=Math.round(B.dmg*dmgK(K));H.B=B;H.bsp=true;
+  const B=X.spawnEnemy(tid,w.x,w.z,lv,{gorge:true,aggro:true,hpMul:hpm*K*overK()*HPM,bsub:sub,phT:pt,phQ:true});B.skillCd=2.5;X.setBOSS(B);B.dmg=Math.round(B.dmg*dmgK(K)*(dk||1));H.B=B;H.bsp=true;
   X.bossIntro(B);return B;}
 function shieldOn(thr,kind){CS.sh=kind;CS.shc=0;H.lock=thr;H.shT=kind===2?40:60;H.lastCombo=MPm.combo|0;sendNow();}
 function shieldOff(text){CS.sh=0;sendNow();const B=X.BOSS;if(B){B.shredT=5;B.stun=2.2;B.busy=0;}bn(text[0],text[1]);}
-function addsAround(B,tids,n,hm){const out=[];const lv=foeLv(),K=campK(lv);for(let i=0;i<n;i++){const a=rand(0,TAU),d=rand(4,8);
+function addsAround(B,tids,n,hm,dk){const out=[];const lv=foeLv(),K=campK(lv);for(let i=0;i<n;i++){const a=rand(0,TAU),d=rand(4,8);
   const l=X.spawnMob(tids[i%tids.length],B.pos.x+Math.cos(a)*d,B.pos.z+Math.sin(a)*d,lv,{gorge:true,aggro:true,noPack:true,hpMul:(hm||1)*K*overK()*HPM,rw:1.3});
-  for(const e of l){tune(e,{dmg:1.4*dmgK(K)});out.push(e);}}return out;}
+  for(const e of l){tune(e,{dmg:(dk||1.4)*dmgK(K)});out.push(e);}}return out;}
 function holdShield(){const B=X.BOSS;if(CS.sh&&B&&!B.dead)B.hp=Math.max(B.hp,B.maxHp*H.lock);}
 
 // ---------------------------------------------------------------- описание каждого уровня
@@ -297,14 +306,14 @@ LVL[5]={
  shape(Z){mkEnc(Z,30,['hound2 grunt']);mkEnc(Z,66,['brute shooter2','hound grunt']);Z.arenas.push({z:Z.bossZ+4,len:22,w:16});},
  begin(){CS.ph=0;CS.cn=3;},
  tick(dt){const Z=Zf();holdShield();encTick(dt);barsTick();
-  if(!H.bsp){if(leadZ()>Z.bossZ-16&&(rearZ()>Z.bossZ-40||leadZ()>Z.bossZ-6)){bossSpawn('bonelord',3.2,'Страж ущелья «'+Z.th.n+'»',[.66,.33]);CS.ph=1;sendNow();}return;}
+  if(!H.bsp){if(leadZ()>Z.bossZ-16&&(rearZ()>Z.bossZ-40||leadZ()>Z.bossZ-6)){bossSpawn('bonelord',3.2,'Страж ущелья «'+Z.th.n+'»',[.66,.33],.88);CS.ph=1;sendNow();}return;}
   const B=X.BOSS;
   if(!B){if(!CS.done&&!X.bossShow){CS.ph=4;killLeft();setDone(['Страж повержен','Откройте сундук вдвоём и входите в портал']);}return;}
   if(H.adds){stragglers(H.adds,H.as||(H.as={}),dt);if(CS.sh)cornered(H.adds,H.ac||(H.ac={}),dt);}
   const f=B.hp/B.maxHp;
-  if(CS.ph===1&&f<=.66){CS.ph=2;shieldOn(.655,1);H.adds=addsAround(B,['skeleton','skeleton','wraith'],3,4);B.stun=1.5;holdShield();bn('Костяной щит','Убейте прислужников — щит спадёт',true);}
+  if(CS.ph===1&&f<=.66){CS.ph=2;shieldOn(.655,1);H.adds=addsAround(B,['skeleton','skeleton','wraith'],3,4,1.2);B.stun=1.5;holdShield();bn('Костяной щит','Убейте прислужников — щит спадёт',true);}
   else if(CS.ph===2&&CS.sh&&!alive(H.adds)){shieldOff(['Щит пал','Бейте стража!']);}
-  else if(CS.ph===2&&!CS.sh&&f<=.33){CS.ph=3;B.spd*=1.2;B.dmg=Math.round(B.dmg*1.15);shieldOn(.325,1);H.adds=addsAround(B,['skeleton','wraith','necro'],4,4);B.stun=1.5;holdShield();bn('Ярость стража','Прислужники вернулись. Щит снова на нём!',true);}
+  else if(CS.ph===2&&!CS.sh&&f<=.33){CS.ph=3;B.spd*=1.2;B.dmg=Math.round(B.dmg*1.15);shieldOn(.325,1);H.adds=addsAround(B,['skeleton','wraith','necro'],4,4,1.2);B.stun=1.5;holdShield();bn('Ярость стража','Прислужники вернулись. Щит снова на нём!',true);}
   else if(CS.ph===3&&CS.sh&&!alive(H.adds)){shieldOff(['Щит пал','Добейте стража!']);}},
  hud(){if(CS.done)return {g:'Страж повержен',s:'Сундук — вдвоём, потом портал',f:1};
   const B=X.BOSS;const f=B?clamp(B.hp/B.maxHp,0,1):CS.ph?0:1;
@@ -327,13 +336,15 @@ LVL[6]={
 };
 function wallSpeed(){return (2.4+Math.min(1.2,CS.el*.009))*(TEST?.6:1);}
 
-// 7. Охота: 6 элитных за 4 минуты; элитные крепкие, при каждом — один охранник; одновременно на поле не больше трёх
-const HUNT_T=240;
+// 7. Охота: 6 элитных за 5 минут; элитные крепкие, при каждом — один охранник; одновременно на поле не больше трёх.
+// 25.11 проверка ботами: 6 элитных падали за 2 минуты — элитные стали крепче (×4 вместо ×3,2), время 5 минут вместо 4;
+// урон элитных 1,3 (было 1,5): с крепкими элитными пара «маг + танк» погибала вдвоём в первые 20 с
+const HUNT_T=300,HUNT_HP=4,HUNT_DMG=1.3;
 LVL[7]={
  shape(Z){Z.arenas.push({z:64,len:46,w:20});},
  begin(){CS.cn=6;H.el=[];H.sp=0;},
  tick(dt){
-  if(CS.ph===0){if(leadZ()>24){CS.ph=1;CS.tm=HUNT_T*(TEST?3:1);for(let i=0;i<2;i++)huntSpawn(i);sendNow();bn('Охота началась','Убей 6 элитных врагов за 4 минуты. Они крепкие — бейте вдвоём',true);}return;}
+  if(CS.ph===0){if(leadZ()>24){CS.ph=1;CS.tm=HUNT_T*(TEST?3:1);for(let i=0;i<2;i++)huntSpawn(i);sendNow();bn('Охота началась','Убей 6 элитных врагов за 5 минут. Они крепкие — бейте вдвоём',true);}return;}
   if(CS.ph!==1)return;
   CS.tm-=dt;let c=0,al=0;for(const e of H.el){if(e.dead)c++;else al++;}
   if(c!==CS.c){CS.c=c;sendNow();}
@@ -341,7 +352,7 @@ LVL[7]={
   if(c>=6){CS.ph=2;killLeft();setDone(['Охота окончена','Откройте сундук вдвоём и входите в портал']);return;}
   if(CS.tm<=0){fail('Время вышло: убито элитных врагов — '+c+' из 6. Не тратьте время на мелочь и идите на элитных.');}},
  hud(){if(CS.done)return {g:'Охота окончена',s:'Сундук — вдвоём, потом портал',f:1};
-  if(CS.ph===0)return {g:'Охота: убей 6 элитных за 4 минуты',s:'Таймер пойдёт, когда вы зайдёте в туман',f:0};
+  if(CS.ph===0)return {g:'Охота: убей 6 элитных за 5 минут',s:'Таймер пойдёт, когда вы зайдёте в туман',f:0};
   let best=1e9,dir='';const P0=X.P,lm=X.toLocal(P0.pos.x,P0.pos.z);
   for(const en of X.ENEMIES){if(en.dead||!en.elite||en.boss)continue;const d=Math.hypot(en.pos.x-P0.pos.x,en.pos.z-P0.pos.z);if(d<best){best=d;dir=X.toLocal(en.pos.x,en.pos.z).z>lm.z?'впереди':'позади';}}
   return {g:'Элитные: '+CS.c+' / 6 · '+fmtT(Math.max(0,CS.tm)),s:best<1e8?'Ближайший: '+Math.round(best)+' м '+dir:'Ищите элитных врагов',f:CS.c/6,b:CS.tm<30};}
@@ -349,7 +360,7 @@ LVL[7]={
 function huntSpawn(i){H.sp++;const l=leadZ();let z=0;
   for(let t=0;t<8;t++){z=rand(34,108);if(Math.abs(z-l)>16)break;}
   const pools=['heavy','ranged','norm'],tid=pickPool(pools[(H.sp+i)%3]);
-  for(const en of spawnAt(tid,rand(-7,7),z,{elite:true,hpMul:3.2*HPM,rw:1.2})){tune(en,{dmg:1.5});H.el.push(en);}
+  for(const en of spawnAt(tid,rand(-7,7),z,{elite:true,hpMul:HUNT_HP*HPM,rw:1.2})){tune(en,{dmg:HUNT_DMG});H.el.push(en);}
   unit(H.sp%2?'grunt':'hound',rand(-7,7),z+rand(-3,3));}
 
 // 8. Финал: три засады (последняя — с чемпионом), потом хранитель: щит стихий, круги света, в ярости — прислужники
@@ -412,7 +423,7 @@ function shape(Z,c){
 function clearAll(){
   if(R){for(const d of R.disp){try{d.dispose&&d.dispose();}catch(e){}}if(R.rootL&&R.rootL.parent)R.rootL.parent.remove(R.rootL);if(R.rootW)X.scene.remove(R.rootW);R=null;}
   CS=null;H=null;uiKey='';
-  OBJ=null;for(const id of ['#campMap','#campArrow']){const e=$(id);if(e)e.hidden=true;}
+  OBJ=null;for(const id of ['#campMap','#campArrow']){const e=$(id);if(e)e.hidden=true;}layReset();
   const b=$('#campBox');if(b){b.hidden=true;b._f=null;}const h=$('#mpHud');if(h)h.classList.remove('camp');const pb=$('#campPull');if(pb)pb.hidden=true;}
 function fail(text){
   if(!CS||CS.fail)return;CS.fail=1;sendNow();
@@ -458,12 +469,17 @@ function next(){const k=CS?CS.k:0;if(!(X.MPH||!X.MPon))return;if(k>=1&&k<8)X.mpH
 function toLevels(){X.toSelect();if(MPm.role==='host'){MPm.status='lobby';X.mpOpenLobby();}}
 function resync(){ // гость вернулся посреди уровня: полное состояние цели и позиция хоста
   if(!X.MPH||!CS)return;
+  // гость вернулся: его позиция с этой минуты свежая (без этого за отметкой 40 м плиты и подъём у алтаря его не видели);
+  // позицию за закрытыми воротами peerOk по-прежнему не берёт
+  if(H)H.peerOk=true;
   X.mpSend({t:'camp',k:'st',s:CS,rj:1,hx:r2(X.P.pos.x),hz:r2(X.P.pos.z)});sendProg();
   if(CS.win)X.mpSend({t:'camp',k:'win',st:calcStars(),el:Math.round(CS.el),dn:CS.dn,fs:0});}
 function onMsg(m){
   switch(m.k){
    case 'st':{if(X.MPH||!CS||!m.s||m.s.k!==CS.k)return;const keep=CS.win,was=CS.gt.slice();Object.assign(CS,m.s);if(keep)CS.win=1;
-     if(m.rj&&m.hx!=null){X.P.pos.set(m.hx+1.3,0,m.hz);X.P.prev.copy(X.P.pos);}
+     // к хосту переносим, только если уровень у гостя только что (пере)запущен: лёгкая досылка ('rs' — потерялось появление врага)
+     // приходит посреди боя, и раньше гостя от неё дёргало к хозяину комнаты
+     if(m.rj&&m.hx!=null&&(!H||X.time-H.t0<4)){X.P.pos.set(m.hx+1.3,0,m.hz);X.P.prev.copy(X.P.pos);}
      if(R)for(let i=0;i<CS.gt.length;i++)if(CS.gt[i]&&!was[i])R.barFx(i);
      chestSync();
      break;}
@@ -591,13 +607,38 @@ function objective(){
   if(k===4&&CS.pl){const P=X.P.pos;let b=null,bd=1e9;for(const p of CS.pl){const w=lpos(p[0],p[1]),d=Math.hypot(w.x-P.x,w.z-P.z);if(d<bd){bd=d;b=w;}}return b&&{x:b.x,z:b.z,t:'plate',n:'Плита'};}
   if(k===7&&CS.ph===1){const P=X.P.pos;let b=null,bd=1e9;for(const e of X.ENEMIES){if(e.dead||!e.elite||e.boss)continue;const d=Math.hypot(e.pos.x-P.x,e.pos.z-P.z);if(d<bd){bd=d;b=e;}}return b&&{x:b.pos.x,z:b.pos.z,t:'elite',n:'Элитный'};}
   return null;}
-let OBJ=null,layT=0,topY=0;
+let OBJ=null,layT=0,topY=0,CTRL=[];
 const ovOn=()=>{for(const id of ['#win','#dead','#lvlup']){const e=$(id);if(e&&!e.hidden)return true;}return false;};
-// плашка цели сверху по центру: карту ставим под неё, если они сходятся по горизонтали; стрелку — не выше её низа
-function layout(){const box=R&&R.map,cb=$('#campBox'),app=$('#app');if(!box||!cb||!app||cb.hidden){topY=0;return;}
-  const a=app.getBoundingClientRect(),c=cb.getBoundingClientRect();topY=c.bottom-a.top;
+const rectOf=e=>{if(!e||e.hidden)return null;const q=e.getBoundingClientRect();if(q.width<2||q.height<2)return null;const cs=getComputedStyle(e);if(cs.display==='none'||cs.visibility==='hidden')return null;return q;};
+// верхняя стопка по центру (#topc): плашка цели, полоса босса, прогресс — общий прямоугольник видимых частей
+function topStack(){const tc=$('#topc');if(!tc)return null;let u=null;
+  for(const ch of tc.children){const q=rectOf(ch);if(!q)continue;u=u?{l:Math.min(u.l,q.left),t:Math.min(u.t,q.top),r:Math.max(u.r,q.right),b:Math.max(u.b,q.bottom)}:{l:q.left,t:q.top,r:q.right,b:q.bottom};}return u;}
+// раскладка раз в 0,5 с: (1) верхняя стопка не залезает под карточку напарника (портрет: карточка стоит под панелью героя);
+// (2) мини-карта — под всей стопкой, если сходится с ней по горизонтали (раньше — только под плашкой цели, и в бою со стражем
+// карта закрывала конец полосы босса); (3) связка не ложится на карту; (4) где кнопки управления — чтобы стрелка цели не легла на них
+function layout(){const app=$('#app'),cb=$('#campBox');if(!app)return;const a=app.getBoundingClientRect();
+  const tc=$('#topc'),card=$('#mpCard'),cr=rectOf(card),hud=$('#mpHud');
+  if(tc){const mt=parseFloat(tc.style.marginTop)||0;let need=0;
+    if(cr&&cb&&!cb.hidden&&hud&&!hud.hidden&&getComputedStyle(card).position==='absolute'){const u=topStack();
+      if(u&&cr.left<u.r&&cr.right>u.l){const base=u.t-mt;need=Math.max(0,Math.round(cr.bottom+6-base));}}
+    if(Math.abs(need-mt)>1)tc.style.marginTop=need?need+'px':'';}
+  const u=topStack();topY=u&&cb&&!cb.hidden?u.b-a.top:0;
+  CTRL=[];for(const e of document.querySelectorAll('#joy,#atk,#topr,#campPull,#app .sk')){const q=rectOf(e);if(q)CTRL.push([q.left-a.left,q.top-a.top,q.right-a.left,q.bottom-a.top]);}
+  // связка в портрете: сразу под верхней стопкой слева (её место по умолчанию — над шестерёнкой меню, там она ложилась на кнопку)
+  const cbo=$('#mpCombo');
+  if(cbo&&topY>0&&a.height>a.width&&getComputedStyle(cbo).position==='absolute'){const t=Math.round(topY+6)+'px';if(cbo.style.top!==t){cbo.style.top=t;cbo.style.bottom='auto';cbo._cm='p';}}
+  else if(cbo&&cbo._cm==='p'){cbo.style.top=cbo.style.bottom='';cbo._cm=0;}   // повернули в альбом — вернуть место по стилю
+  const box=R&&R.map;if(!box||box.hidden)return;
   box.style.top='';const m=box.getBoundingClientRect();
-  if(m.left<c.right&&m.right>c.left&&m.top<c.bottom+4)box.style.top=Math.round(c.bottom-a.top+6)+'px';}
+  if(u&&m.left<u.r&&m.right>u.l&&m.top<u.b+4)box.style.top=Math.round(u.b-a.top+6)+'px';
+  // подпись под картой («Напарник упал…») в низком альбоме ложилась на верхние кнопки чар — тогда она слева от карты
+  {const lb=box.lastChild;if(lb&&lb.tagName==='SPAN'){lb.classList.remove('side');if(lb.textContent){const q=lb.getBoundingClientRect();let hit=q.bottom>a.bottom-2;
+    for(const c of CTRL)if(q.left-a.left<c[2]&&q.right-a.left>c[0]&&q.top-a.top<c[3]&&q.bottom-a.top>c[1]){hit=true;break;}if(hit)lb.classList.add('side');}}}
+  const co=rectOf(cbo);
+  if(cbo&&a.height<=a.width){const mm=box.getBoundingClientRect(),lb=box.lastChild&&box.lastChild.textContent?box.lastChild.getBoundingClientRect():null,bot=Math.max(mm.bottom,lb?lb.bottom:0);
+    const cs=co&&getComputedStyle(cbo);
+    if(co&&cs.position==='absolute'&&co.left<mm.right&&co.right>mm.left&&co.top<bot+4&&co.bottom>mm.top-4){cbo.style.top=Math.round(bot-a.top+6)+'px';cbo.style.bottom='auto';cbo._cm='l';}}}
+function layReset(){const tc=$('#topc');if(tc)tc.style.marginTop='';const cbo=$('#mpCombo');if(cbo&&cbo._cm){cbo.style.top=cbo.style.bottom='';cbo._cm=0;}CTRL=[];topY=0;}
 const _v=new THREE.Vector3();
 function arrowUpdate(o){
   const el=R&&R.arrow;if(!el)return;
@@ -606,15 +647,19 @@ function arrowUpdate(o){
   const P=X.P.pos,d=Math.round(Math.hypot(o.x-P.x,o.z-P.z));
   if(Math.abs(nx)<.86&&Math.abs(ny)<.78&&_v.z<1){if(!el.hidden)el.hidden=true;return;}
   const app=$('#app'),W=app?app.clientWidth:innerWidth,Hh=app?app.clientHeight:innerHeight,m=Math.max(Math.abs(nx)/.86,Math.abs(ny)/.74)||1;
-  const x=clamp((nx/m*.5+.5)*W,30,W-30),y=clamp((ny/m*.5+.5)*Hh,Math.max(Hh*.24,topY+26),Hh*.76),a=Math.atan2(ny,nx);
+  // снизу стрелку держим над кнопками управления под ней (чары, атака, джойстик, меню): на 360×740 Hh·0,76 попадало на значки чар
+  const x=clamp((nx/m*.5+.5)*W,30,W-30),y0=Math.max(Hh*.24,topY+26);let y1=Hh*.76;
+  for(const q of CTRL)if(q[0]<x+44&&q[2]>x-44)y1=Math.min(y1,q[1]-30);
+  const y=clamp((ny/m*.5+.5)*Hh,y0,Math.max(y0,y1)),a=Math.atan2(ny,nx);
   el.hidden=false;el.style.transform=`translate(${Math.round(x)}px,${Math.round(y)}px)`;el.firstChild.style.transform=`rotate(${a.toFixed(2)}rad)`;
   const col='#'+(OBJC[o.t]||0xffffff).toString(16).padStart(6,'0');el.style.setProperty('--c',col);
   const t=o.n+' · '+d+' м';if(el._t!==t){el._t=t;el.lastChild.textContent=t;}}
 let mapT=0,mapBig=false;
 function mapDraw(dt){
   const box=R&&R.map;if(!box)return;const Z=Zf();
-  const show=!!(CS&&Z&&Z.camp&&X.mode==='game'&&!CS.win&&!ovOn());if(box.hidden===show)box.hidden=!show;if(!show)return;
-  layT-=dt;if(layT<=0){layT=.5;layout();}
+  // общая мини-карта игры (#mm) на ущельях и в кампании уже рисует то же самое — тогда своя не нужна, вторая карта не вылезает
+  const mm=$('#mm'),gen=!!(mm&&!mm.hidden&&mm.offsetWidth>0);
+  const show=!!(CS&&Z&&Z.camp&&X.mode==='game'&&!CS.win&&!ovOn()&&!gen);if(box.hidden===show){box.hidden=!show;if(show)layT=0;}if(!show)return;
   mapT-=dt;if(mapT>0)return;mapT=.12;
   const cv=box.firstChild,g=cv.getContext('2d'),sz=cv.width,c=sz/2,t=X.time;
   const pl=X.toLocal(X.P.pos.x,X.P.pos.z),Rw=mapBig?Math.max(55,Z.L*.52):40,k=c/Rw;
@@ -674,7 +719,7 @@ function hudUpdate(){
 }
 let lastVT=performance.now(),visErr=false;
 X.WORLD_ANIM.push(()=>{const n=performance.now(),dt=Math.min(.1,(n-lastVT)/1000);lastVT=n;try{visualUpdate(dt);hudUpdate();
-  if(CS&&R){OBJ=objective();beaconUpdate(OBJ,X.time);arrowUpdate(OBJ);mapDraw(dt);}}catch(e){if(!visErr){visErr=true;console.error('camp vis',e);}}});
+  if(CS&&R){OBJ=objective();beaconUpdate(OBJ,X.time);mapDraw(dt);layT-=dt;if(layT<=0){layT=.5;layout();}arrowUpdate(OBJ);}}catch(e){if(!visErr){visErr=true;console.error('camp vis',e);}}});
 
 // ---------------------------------------------------------------- интерфейс: стили, плашка, выбор уровня, комната
 const css=document.createElement('style');css.textContent=`
@@ -687,8 +732,10 @@ const css=document.createElement('style');css.textContent=`
 #campBox .bar i{background:var(--gold)}
 #campBox.warn{border-color:rgba(255,120,100,.7)}
 #campBox.warn .bar i{background:#ff7a5a}
-#mpHud.camp #mpCombo{top:calc(var(--m) + var(--sat) + 100px)}
-@media (orientation:portrait){#mpHud.camp #mpCard{top:calc(var(--sat) + 168px)}#mpHud.camp #mpCombo{top:calc(var(--sat) + 172px)}}
+/* связка в кампании ниже — только в альбоме. В портрете у неё снизу стоит bottom, и с top она растягивалась колонной
+   («×10, ×20 открывается сверху вниз вертикально»), поэтому там её не двигаем */
+@media (orientation:landscape){#mpHud.camp #mpCombo{top:calc(var(--m) + var(--sat) + 100px)}}
+@media (orientation:portrait){#mpHud.camp #mpCard{top:calc(var(--sat) + 168px)}}
 #campPull{position:absolute;left:50%;bottom:calc(var(--sab) + 18px);transform:translateX(-50%);pointer-events:auto;height:40px;padding:0 16px;border-radius:20px;border:1px solid rgba(242,196,107,.6);background:var(--panel);color:var(--gold);font:700 14px var(--f-ui);touch-action:manipulation}
 #campPull[hidden]{display:none}
 @media (orientation:portrait) and (max-width:600px){#campPull{left:calc(var(--m) + var(--sal));bottom:calc(var(--m) + var(--sab) + 116px);transform:none}}
@@ -699,6 +746,7 @@ const css=document.createElement('style');css.textContent=`
 #campMap canvas{display:block;width:100%;aspect-ratio:1;border-radius:50%;border:2px solid rgba(127,231,255,.55);background:#10151f;box-shadow:0 2px 10px rgba(0,0,0,.55)}
 #campMap span{position:absolute;right:0;top:100%;margin-top:3px;width:max-content;max-width:150px;text-align:right;font:600 10px/1.15 var(--f-ui);color:var(--text);text-shadow:0 1px 2px #000,0 0 4px #000;white-space:nowrap}
 #campMap span.warn{color:#ffb09a}
+#campMap span.side{top:auto;bottom:4px;right:calc(100% + 6px);margin-top:0;max-width:none}
 @media (orientation:portrait){#campMap{top:calc(var(--sat) + 166px);width:calc(92px * var(--u,1))}#campMap.big{width:calc(150px * var(--u,1))}}
 #campArrow{position:absolute;left:0;top:0;pointer-events:none;z-index:3;display:flex;flex-direction:column;align-items:center;gap:1px;margin:-17px 0 0 -17px;--c:#7fe7ff}
 #campArrow[hidden]{display:none}
@@ -740,7 +788,7 @@ function lobbyStrip(){
 
 const TCC={LV,cleanSave,shape,begin,update,goal,portal,next,toLevels,resync,onMsg,sendProg,openSelect,lobbyStrip,clear:clearAll,
   start(k){const c=LV[clamp(k|0,1,8)-1];X.startGorge(c.th,c);},
-  dbg:{CS:()=>CS,H:()=>H,vis:()=>({ent:!!(R&&R.ent),entVis:!!(R&&R.ent&&R.ent.g.visible&&R.ent.g.parent),beacon:!!(R&&R.beacon&&R.beacon.g.visible),obj:OBJ&&OBJ.t,map:!!(R&&R.map&&!R.map.hidden),arrow:!!(R&&R.arrow&&!R.arrow.hidden)}),killAll:()=>killLeft(),finish:()=>{if(CS&&!X.MPG){CS.done=1;finish();}},fail:t=>fail(t||'тест'),pull:pullAction,hud:()=>CS&&LVL[CS.k].hud(),dn:v=>{if(CS)CS.dn=v;}}};
+  dbg:{CS:()=>CS,H:()=>H,vis:()=>({ent:!!(R&&R.ent),entVis:!!(R&&R.ent&&R.ent.g.visible&&R.ent.g.parent),beacon:!!(R&&R.beacon&&R.beacon.g.visible),obj:OBJ&&OBJ.t,map:!!(R&&R.map&&!R.map.hidden)||!!(CS&&$('#mm')&&!$('#mm').hidden),arrow:!!(R&&R.arrow&&!R.arrow.hidden)}),killAll:()=>killLeft(),finish:()=>{if(CS&&!X.MPG){CS.done=1;finish();}},fail:t=>fail(t||'тест'),pull:pullAction,hud:()=>CS&&LVL[CS.k].hud(),dn:v=>{if(CS)CS.dn=v;}}};
 return TCC;
 };
 })();
