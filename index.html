@@ -1776,10 +1776,18 @@ const REG_R=[31,62,84,135,215,310,420,530,650],ZABYSS=REG_R.length;/* ZABYSS —
 const zoneOf=(x,z)=>{const r=Math.hypot(x,z);let i=0;while(i<ZABYSS&&r>=REG_R[i])i++;return i;};
 function lvOff(r){if(r<31)return -1;if(r<62)return 1;if(r<84)return 3;if(r<135)return 5;if(r<215)return 7+(r-135)/80*5;if(r<310)return 13+(r-215)/95*7;if(r<420)return 21+(r-310)/110*9;
   if(r<530)return 31+(r-420)/110*10;if(r<650)return 42+(r-530)/120*11;return 54+(r-650)/10;}
-function lvFloor(r){if(r<135)return 0;if(r<215)return 20+(r-135)/80*10;if(r<310)return 32+(r-215)/95*13;if(r<420)return 46+(r-310)/110*20;
-  if(r<530)return 68+(r-420)/110*22;if(r<650)return 92+(r-530)/120*24;return 118+(r-650)/5;}
+// 25.11 полосы уровней регионов (Артём: «на одной локации максимальный уровень ботов… потом на следующий перейти, и там боты сильнее»).
+// Уровень врага = герой + lvOff(r), зажатый в полосу точки [пол, потолок]; внутри региона оба растут от внутреннего края к внешнему:
+// потолок — от «макс. прошлого региона + 2» (на опушке — от 8 у базы) до макс. региона, пол — от мин. региона на 30 % полосы (на опушке всегда 1).
+// «Бездна» без потолка: пол 190 и +1 ур. на 5 м, враг = герой + 2 и +1 ур. на 25 м — растёт вместе с героем.
+const LVB=[[1,20],[15,30],[25,40],[35,55],[50,75],[70,100],[95,130],[125,160],[155,200],[190,0]];
+const bandTxt=z=>z>=ZABYSS?LVB[ZABYSS][0]+'+':LVB[z][0]+'–'+LVB[z][1];
+function lvBand(r){const z=zoneOf(r,0),mn=LVB[z][0],mx=LVB[z][1];
+  if(z>=ZABYSS)return {z,lo:mn+(r-REG_R[ZABYSS-1])/5,hi:Infinity};
+  const r0=z?REG_R[z-1]:0,t=Math.min(1,Math.max(0,(r-r0)/(REG_R[z]-r0))),ic=z?Math.min(mx,LVB[z-1][1]+2):8;
+  return {z,lo:z?mn+(mx-mn)*.3*t:1,hi:ic+(mx-ic)*t};}
+const enemyLvR=(r,H)=>{const b=lvBand(r);return Math.max(1,Math.round(b.z>=ZABYSS?Math.max(b.lo,H+2+(r-REG_R[ZABYSS-1])/25):Math.min(b.hi,Math.max(b.lo,H+lvOff(r)))));};
 const strongLv=()=>MPon&&MP.peer&&MP.peer.on?Math.max(S.lvl,MP.peer.lvl||S.lvl):S.lvl;
-const enemyLvR=(r,H)=>Math.max(1,Math.round(Math.max(lvFloor(r),H+lvOff(r))));
 const enemyLvAt=(x,z)=>enemyLvR(Math.hypot(x,z),strongLv());
 const rewardMul=r=>1+Math.max(0,lvOff(r)-5)*.06;
 function pathDist(x,z){let best=99;for(const a of PATHS){const dx=Math.cos(a),dz=Math.sin(a),t=x*dx+z*dz;if(t<0)continue;const w=Math.sin(t*.12)*2.5;best=Math.min(best,Math.abs(-x*dz+z*dx-w));}return best;}
@@ -2526,14 +2534,17 @@ const foeRelHp=d=>d>0?Math.pow(1+d/20,2.2)*Math.exp(2e-4*d*d):1,foeRelDmg=d=>d>0
 function foeScale(lv,H){const h0=1+.42*(lv-1),d0=1+.22*(lv-1);if(H==null)return {hp:h0,dmg:d0};const b=Math.min(lv,H),d=Math.max(0,lv-H);
   return {hp:Math.max(h0,(1+.42*(b-1))*foeBaseK(b)*foeRelHp(d)),dmg:Math.max(d0,(1+.22*(b-1))*foeRelDmg(d))};}
 // Опыт (Артём: «чем сильнее противник выше уровнем я убил, тем больше опыта, но не так, будто за 2 минуты до 100-го дошёл»):
-// за риск — ×(1+d/10)^0.75 (+10 ≈ ×1.7, +30 ≈ ×2.8, не больше ×5), враг ниже героя — меньше (×(1+0.05d), не меньше 0.3);
+// за риск — ×(1+d/10)^0.75 (+10 ≈ ×1.7, +30 ≈ ×2.8, не больше ×5), враг ниже героя — меньше (xpLow);
 // потолок за одного обычного врага — 4% уровня героя (элита ×5, страж ×3), но не меньше полуторного опыта врага своего уровня;
-// босс мира — от половины до целого уровня. Ущелья и кампания — прежняя формула.
-const xpRisk=d=>d<0?Math.max(.3,1+.05*d):Math.min(5,Math.pow(1+d/10,.75));
+// босс мира — от половины до целого уровня (босс ниже героя — та же скидка xpLow). Ущелья и кампания — прежняя формула.
+// 25.11 (Артём: «могу на базе стоять и до 100 уровня качаться»): опыт за врага ниже героя быстро тает —
+// −2 ≈ ×0.92, −3 ≈ ×0.83, −5 ≈ ×0.6, −8 ≈ ×0.27, −10 ≈ ×0.13, −15 и ниже — почти ничего (×0.01)
+const xpLow=d=>d>=0?1:Math.max(.01,Math.exp(-(d/7)*(d/7)));
+const xpRisk=d=>d<0?xpLow(d):Math.min(5,Math.pow(1+d/10,.75));
 function foeXp(t,lv,o,old){const tm=(o.elite?5:1)*(o.guard?3:1)*(o.mini?.3:1),L=S.lvl;
   if(old)return Math.round(t.xp*1.3*(1+.25*(Math.min(lv,L+8)-1))*tm*(o.rw||1));
   const own=t.xp*1.3*(1+.25*(Math.min(lv,L)-1))*tm,raw=own*xpRisk(lv-L)*(o.rw||1),n=xpNeed(Math.max(1,L));
-  if(t.boss&&!o.mini)return Math.round(clamp(raw,.5*n,n));
+  if(t.boss&&!o.mini)return Math.round(clamp(raw,.5*n*xpLow(lv-L),n));
   return Math.round(Math.min(raw,Math.max(1.5*own,.04*n*tm)));}
 // босс свободного мира (Артём: «боссы тоже должны реально чувствоваться»): здоровье ×2 и урон ×1.25 к прежним множителям босса —
 // у типичного билда своего уровня ~20–40 с сфокусированного боя и 3–4 удара без защиты до смерти
@@ -3940,7 +3951,7 @@ function updatePlayer(dt){
   P.atkCd-=dt;P.castT-=dt;P.swingT-=dt;
   if((hold||(auto&&getTarget(12)))&&P.atkCd<=0){const tg=getTarget(16);if(!CLS.melee||!tg||tg.pos.distanceTo(P.pos)<meleeReach(tg)||hold&&!tg)basicAttack();}
   if(auto){for(let i=0;i<activeSlots();i++){if(trySlot(i,false))break;}}
-  if(PLAY==='world'){const z=zoneOf(P.pos.x,P.pos.z);if(z!==P.zone){const up=z>(P.zone||0)&&z>=4&&P.zone!=null;P.zone=z;zoneTag(z);if(up)banner('⚠ Опасность: '+ZONES[z].name,zoneSub(z)+(ZONES[z].warn?' · '+ZONES[z].warn:''),true);}}
+  if(PLAY==='world'){const z=zoneOf(P.pos.x,P.pos.z);if(z!==P.zone){const up=z>(P.zone||0)&&z>=4&&P.zone!=null&&(z>=ZABYSS||S.lvl<LVB[z][1]);P.zone=z;zoneTag(z);if(up)banner('⚠ Опасность: '+ZONES[z].name,zoneSub(z)+(ZONES[z].warn?' · '+ZONES[z].warn:''),true);}}
   animateHero(dt,moving);
   ambT-=dt;if(ambT<=0){ambT=.1;const c=(PLAY==='gorge'&&GZ)?GZ.ambC:FFZ[P.zone||0];emit(PUFF,P.pos.x+rand(-15,15),rand(.4,2.4),P.pos.z+rand(-15,15),rand(-.3,.3),rand(-.1,.25),rand(-.3,.3),c,rand(2,3.5),0,0);}}
 function animateHero(dt,moving){
@@ -4495,7 +4506,17 @@ function banner(b,s,red,k,lbl){$('#bannerB').textContent=b;$('#bannerS').textCon
   el.classList.toggle('boss',kb);el.classList.toggle('win',kw);if(lbl)el.dataset.k=lbl;else delete el.dataset.k;
   el.classList.add('on');clearTimeout(banT);banT=setTimeout(()=>el.classList.remove('on'),k?2700:2600);}
 let zoneT=0;
-function zoneSub(z){const H=strongLv(),lo=enemyLvR(z?REG_R[z-1]+1:0,H);if(z>=ZABYSS)return 'Враги ур. '+lo+'+ и сильнее с каждым шагом';return 'Враги ур. '+lo+'–'+enemyLvR(REG_R[z],H);}
+// 25.11 на входе — полоса уровней региона (не зависит от героя) и короткая оценка: перерос / рано
+function zoneSub(z){const L=S.lvl,b=LVB[z];let s='Враги ур. '+bandTxt(z);if(z>=ZABYSS)s+=' и сильнее с каждым шагом';else if(L>b[1]+3)s+=' · ты сильнее — опыта почти нет';
+  if(L+5<b[0])s+=' · тебе пока опасно';return s;}
+// подсказка «перерос»: герой сильнее врагов вокруг на 6+ ур. — раз в 3 мин плашка, куда идти, и стрелка по экрану (как красная стрелка мини-карты)
+let zhT=15;const ARR8='↑↗→↘↓↙←↖';
+function zoneHint(dt){zhT-=dt;if(zhT>0)return;zhT=2;if(P.dead||luOpen||$('#banner').classList.contains('on'))return;
+  const L=S.lvl,r=Math.hypot(P.pos.x,P.pos.z),z=zoneOf(P.pos.x,P.pos.z);if(z>=ZABYSS||L<=enemyLvR(r+20,strongLv())+5)return;
+  let m;if(L>LVB[z][1]+3){let n=z+1;while(n<ZABYSS&&L+5>LVB[n][1])n++;/* первый регион, где есть куда расти (макс. ≥ герой + 5) */m='Здесь ты сильнее всех — опыта почти нет. Дальше: «'+ZONES[n].name+'», враги ур. '+bandTxt(n);}
+  else m='Враги тут слабее тебя — опыта мало. Сильнее — дальше от центра';
+  if(r>1){const ld=toLocal(P.pos.x/r,P.pos.z/r);m+=' '+ARR8[(Math.round(Math.atan2(-ld.x,ld.z)/(Math.PI/4))%8+8)%8];}
+  toast(m,6500);zhT=180;}
 function zoneTag(z){$('#zoneName').textContent=ZONES[z].name;$('#zoneSub').textContent=zoneSub(z);$('#zoneTag').classList.add('on');clearTimeout(zoneT);zoneT=setTimeout(()=>$('#zoneTag').classList.remove('on'),3200);}
 
 
@@ -4524,7 +4545,7 @@ function mmUpdate(dt){
   const lf=toLocal(Math.sin(P.face),Math.cos(P.face)),fx=-lf.x,fy=-lf.z,al=Math.atan2(fx,-fy);
   g.save();g.translate(c,c);g.rotate(al);g.fillStyle='#ffd36b';g.strokeStyle='#201400';g.lineWidth=2;g.beginPath();g.moveTo(0,-9);g.lineTo(6.5,7);g.lineTo(0,4);g.lineTo(-6.5,7);g.closePath();g.fill();g.stroke();g.restore();
   g.restore();
-  const z=zoneOf(P.pos.x,P.pos.z),t=ZONES[z].name+'|ур. '+enemyLvAt(P.pos.x,P.pos.z)+(z>=3?' ⚠':'');if(t!==mmTxt){mmTxt=t;const [a,b]=t.split('|');mmL.innerHTML='<b>'+a+'</b>враги '+b;}}
+  const z=zoneOf(P.pos.x,P.pos.z),lh=enemyLvAt(P.pos.x,P.pos.z),t=ZONES[z].name+'|'+bandTxt(z)+' · тут '+lh+(lh>=S.lvl+5?' ⚠':'');if(t!==mmTxt){mmTxt=t;const [a,b]=t.split('|');mmL.innerHTML='<b>'+a+'</b>враги '+b;}}
 
 // атмосфера регионов: туман, фон и небо меняют цвет с расстоянием от центра; табличка у ближайшей границы
 const ATM=[[0,0x1c2946,0x0e1630,[1,1,1]],[131,0x1c2946,0x0e1630,[1,1,1]],[139,0x2c4a66,0x16283c,[.9,1.25,1.5]],[211,0x2c4a66,0x16283c,[.9,1.25,1.5]],[219,0x44190f,0x240a06,[3.4,.9,.5]],[306,0x44190f,0x240a06,[3.4,.9,.5]],[314,0x4a3f78,0x241e44,[1.6,1.2,1.8]],[416,0x4a3f78,0x241e44,[1.6,1.2,1.8]],[424,0x642a5c,0x2c0f2c,[2.1,.95,1.6]],[526,0x642a5c,0x2c0f2c,[2.1,.95,1.6]],[534,0x24342c,0x0e1812,[.7,1.15,.85]],[646,0x24342c,0x0e1812,[.7,1.15,.85]],[654,0x0b0516,0x05020c,[.5,.35,1.1]]];
@@ -4536,14 +4557,14 @@ function updateAtmos(dt){
   _fa.setHex(a[1]);_fb.setHex(b[1]);_ft.copy(_fa).lerp(_fb,t);_fa.setHex(a[2]);_fb.setHex(b[2]);_bt.copy(_fa).lerp(_fb,t);
   const k=1-Math.exp(-dt*2.5);scene.fog.color.lerp(_ft,k);scene.background.lerp(_bt,k);
   for(let j=0;j<3;j++)_skyT[j]+=((a[3][j]+(b[3][j]-a[3][j])*t)-_skyT[j])*k;sky.material.color.setRGB(_skyT[0],_skyT[1],_skyT[2]);
-  signUpdate(dt);}
+  signUpdate(dt);zoneHint(dt);}
 let SIGN=null,signKey='',signT=0;
 function signUpdate(dt){signT-=dt;if(signT>0)return;signT=.25;
   const r=Math.hypot(P.pos.x,P.pos.z);let bi=-1,bd=1e9;GATES.forEach((g,i)=>{const dd=Math.abs(r-g.r);if(dd<bd){bd=dd;bi=i;}});
   if(bi<0||bd>75){if(SIGN)SIGN.visible=false;return;}
-  const g=GATES[bi],H=strongLv(),key=g.name+'|'+enemyLvR(g.r,H);
+  const g=GATES[bi],gz=zoneOf(g.r+.5,0),key=g.name;/* 25.11: на табличке — полоса уровней региона за воротами */
   if(!SIGN){SIGN=makeLabel('','', '#ff6a4a');SIGN.scale.set(11,2.75,1);scene.add(SIGN);}
-  if(key!==signKey){signKey=key;const n=makeLabel('⚠ Опасность · '+g.name,'враги ур. '+enemyLvR(g.r,H)+'+','#ff6a4a');SIGN.material.map.dispose();SIGN.material.map=n.material.map;SIGN.material.needsUpdate=true;n.material.dispose();}
+  if(key!==signKey){signKey=key;const n=makeLabel('⚠ Опасность · '+g.name,'враги ур. '+bandTxt(gz),'#ff6a4a');SIGN.material.map.dispose();SIGN.material.map=n.material.map;SIGN.material.needsUpdate=true;n.material.dispose();}
   const ang=Math.atan2(P.pos.z,P.pos.x),st=TAU/g.n,sa=Math.round(ang/st)*st;SIGN.position.set(Math.cos(sa)*g.r,8.2,Math.sin(sa)*g.r);SIGN.visible=true;}
 
 // =====================================================================
