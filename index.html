@@ -1756,7 +1756,7 @@ function addSway(mat,amp){mat.customProgramCacheKey=()=>'sway'+amp;mat.onBeforeC
   float hh=max(position.y,0.);float sw=(sin(uTime*1.7+ph)+.4*sin(uTime*3.1+ph*1.7))*${amp.toFixed(3)}*hh*hh;
   transformed.x+=sw;transformed.z+=sw*.6;`);};}
 // мягкий контровой свет по краю силуэта (в вершинном шейдере, почти бесплатно)
-function rimify(root,col,k){const us=[];root.traverse(o=>{const m=o.isMesh&&o.material;if(m&&m.userData.rimHook){us.push(m.userData.rimHook(col,k));return;}if(!m||!m.isMeshLambertMaterial||m.userData.rimU)return;
+function rimify(root,col,k){const us=[];root.traverse(o=>{if(o.userData.fmRim){us.push(o.userData.fmRim(col,k));return;}const m=o.isMesh&&o.material;if(!m||!m.isMeshLambertMaterial||m.userData.rimU)return;
   const u={value:new THREE.Color(col)};m.userData.rimU=u;us.push(u);const kk=m.userData.rimK!=null?m.userData.rimK:k;m.customProgramCacheKey=()=>'rim'+kk;
   m.onBeforeCompile=sh=>{sh.uniforms.uRim=u;
     sh.vertexShader=sh.vertexShader.replace('void main() {','varying float vRim;\nvoid main() {').replace('#include <project_vertex>','#include <project_vertex>\nvRim=pow(1.-clamp(dot(normalize(transformedNormal),normalize(-mvPosition.xyz)),0.,1.),2.4);');

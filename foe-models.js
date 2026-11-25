@@ -8,7 +8,7 @@
 (function () {
   'use strict';
   const T = THREE;
-  const FM = { ready: false, failed: false, st: 0, lib: {}, atl: {}, V: '1', geoC: {}, nInst: 0 };
+  const FM = { ready: false, failed: false, st: 0, lib: {}, atl: {}, V: '1', geoC: {} };
   const IDENT = new T.Matrix4();
 
   // ---------- загрузка ----------
@@ -123,43 +123,62 @@
     return (FM.geoC[gk] = g);
   }
 
-  // ---------- материалы ----------
-  const SKIN_V = ['X', 'Y', 'Z', 'W'].map((c, i) => `mat4 boneMat${c} = getBoneMatrix( skinIndex.${'xyzw'[i]} + uFr.x );\n\tboneMat${c} += ( getBoneMatrix( skinIndex.${'xyzw'[i]} + uFr.y ) - boneMat${c} ) * uFr.z;`).join('\n\t');
-  function patchV(sh, rim) {
+  // ---------- материал: один на всех врагов ----------
+  // Свои числа экземпляра (кадры A/B и доля, вспышка, ободок) лежат в его bindMatrix: three r128 шлёт её в шейдер
+  // для каждого скиннированного меша отдельно, даже когда материал общий (как и текстуру костей). Поэтому материал
+  // один на всех, без пересылки всех юниформ на каждого врага. bindMatrix: [0] кадр A, кадр B, доля; [1] вспышка rgb, сила
+  // ободка; [2] цвет ободка. Скиннинг ниже свой — без bindMatrix как матрицы.
+  const SKIN_V = ['X', 'Y', 'Z', 'W'].map((c, i) => `mat4 boneMat${c} = getBoneMatrix( skinIndex.${'xyzw'[i]} + bindMatrix[0].x );
+	boneMat${c} += ( getBoneMatrix( skinIndex.${'xyzw'[i]} + bindMatrix[0].y ) - boneMat${c} ) * bindMatrix[0].z;`).join('\n\t');
+  const SKIN_P = `vec4 skinned = vec4( 0.0 );
+	vec4 skinVertex = vec4( transformed, 1.0 );
+	skinned += boneMatX * skinVertex * skinWeight.x;
+	skinned += boneMatY * skinVertex * skinWeight.y;
+	skinned += boneMatZ * skinVertex * skinWeight.z;
+	skinned += boneMatW * skinVertex * skinWeight.w;
+	transformed = skinned.xyz;`;
+  const SKIN_N = `mat4 skinMatrix = skinWeight.x * boneMatX + skinWeight.y * boneMatY + skinWeight.z * boneMatZ + skinWeight.w * boneMatW;
+	objectNormal = vec4( skinMatrix * vec4( objectNormal, 0.0 ) ).xyz;`;
+  const VARY = `varying vec4 vFm;
+varying vec3 vEm;
+varying vec4 vRimC;
+varying float vRim;
+`;
+  function patchV(sh, full) {
     sh.vertexShader = sh.vertexShader
-      .replace('void main() {', 'attribute vec4 fmc;\nuniform vec4 uFr;\nvarying vec4 vFm;\n' + (rim ? 'varying float vRim;\n' : '') + 'void main() {\n\tvFm = fmc;')
-      .replace('#include <skinbase_vertex>', SKIN_V)
-      .replace('#include <project_vertex>', '#include <project_vertex>\n\tif ( fmc.a > 0.999 ) gl_Position = vec4( 0.0, 0.0, 2.0, 1.0 );' + (rim ? '\n\tvRim = pow( 1. - clamp( dot( normalize( transformedNormal ), normalize( -mvPosition.xyz ) ), 0., 1. ), 2.4 );' : ''));
+      .replace('void main() {', 'attribute vec4 fmc;\n' + (full ? VARY : '') + 'void main() {' + (full ? '\n\tvFm = fmc; vEm = bindMatrix[1].xyz; vRimC = vec4( bindMatrix[2].xyz, bindMatrix[1].w );' : ''))
+      .replace('#include <skinbase_vertex>', SKIN_V).replace('#include <skinning_vertex>', SKIN_P).replace('#include <skinnormal_vertex>', SKIN_N)
+      .replace('#include <project_vertex>', '#include <project_vertex>\n\tif ( fmc.a > 0.999 ) gl_Position = vec4( 0.0, 0.0, 2.0, 1.0 );' + (full ? '\n\tvRim = pow( 1. - clamp( dot( normalize( transformedNormal ), normalize( -mvPosition.xyz ) ), 0., 1. ), 2.4 );' : ''));
   }
-  function makeMat(A, rimCol, rimK) {
-    const U = { uFr: { value: new T.Vector4(0, 0, 0, 0) }, uRim: { value: new T.Color(rimCol != null ? rimCol : 0x8fb0ff) }, uRimK: { value: rimK != null ? rimK : .42 } };
+  FM.mat = function () {
+    if (FM._m) return FM._m;
     const m = new T.MeshLambertMaterial({ skinning: true });
-    m.userData.fm = U; m.userData.rimU = U.uRim; m.userData.rimHook = (c, k) => { U.uRim.value.set(c); U.uRimK.value = k; return U.uRim; };
-    m.customProgramCacheKey = () => 'fm1';
+    m.customProgramCacheKey = () => 'fm2';
     m.onBeforeCompile = sh => {
-      sh.uniforms.uFr = U.uFr; sh.uniforms.uRim = U.uRim; sh.uniforms.uRimK = U.uRimK; patchV(sh, true);
+      patchV(sh, true);
       sh.fragmentShader = sh.fragmentShader
-        .replace('void main() {', 'uniform vec3 uRim;\nuniform float uRimK;\nvarying vec4 vFm;\nvarying float vRim;\nvoid main() {')
+        .replace('void main() {', VARY + 'void main() {')
         .replace('#include <color_fragment>', '#include <color_fragment>\n\tdiffuseColor.rgb *= vFm.rgb;')
-        .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n\ttotalEmissiveRadiance += vFm.rgb * vFm.a * 1.3;')
-        .replace('gl_FragColor = vec4( outgoingLight, diffuseColor.a );', 'gl_FragColor = vec4( outgoingLight + uRim * vRim * uRimK, diffuseColor.a );');
+        .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n\ttotalEmissiveRadiance += vEm + vFm.rgb * vFm.a * 1.3;')
+        .replace('gl_FragColor = vec4( outgoingLight, diffuseColor.a );', 'gl_FragColor = vec4( outgoingLight + vRimC.rgb * vRim * vRimC.a, diffuseColor.a );');
     };
     const d = new T.MeshDepthMaterial({ depthPacking: T.RGBADepthPacking, skinning: true });
-    d.customProgramCacheKey = () => 'fmd1';
-    d.onBeforeCompile = sh => { sh.uniforms.uFr = U.uFr; patchV(sh, false); };
-    return { m, d, U };
-  }
+    d.customProgramCacheKey = () => 'fmd2'; d.onBeforeCompile = sh => patchV(sh, false);
+    return (FM._m = { m, d });
+  };
 
   // ---------- экземпляр ----------
+  // px — «материал» для кода игры: вспышка (emissive) и ободок (userData.rimU) пишутся сюда, update() переносит их в bindMatrix
   class Inst {
-    constructor(A, L, sp, geo, mat) {
-      this.A = A; this.L = L; this.sp = sp; this.U = mat.U; this.mat = mat.m; this.dmat = mat.d;
+    constructor(A, L, sp, geo, rimCol, rimK) {
+      this.A = A; this.L = L; this.sp = sp;
       this.g = new T.Group(); this.inner = new T.Group(); this.g.add(this.inner);
-      const mesh = new T.SkinnedMesh(geo, mat.m); mesh.bind(A.skel, IDENT); mesh.bindMode = 'detached'; mesh.customDepthMaterial = mat.d; mesh.castShadow = true; mesh.name = 'fm';
-      this.mesh = mesh; this.inner.add(mesh);
+      const M = FM.mat(), mesh = new T.SkinnedMesh(geo, M.m); mesh.bind(A.skel, IDENT); mesh.bindMode = 'detached'; mesh.customDepthMaterial = M.d; mesh.castShadow = true; mesh.name = 'fm';
+      const px = this.px = { emissive: new T.Color(0, 0, 0), userData: { rimU: { value: new T.Color(rimCol != null ? rimCol : 0x8fb0ff) } }, rimK: rimK != null ? rimK : .42, dispose() {} };
+      mesh.userData.fmRim = (c, k) => { px.userData.rimU.value.set(c); px.rimK = k; return px.userData.rimU; };
+      this.mesh = mesh; this.inner.add(mesh); this.mat = px;
       this.cur = null; this.prev = null; this.fade = 0; this.fadeD = .15; this.dead = false; this.hitCd = 0; this.ai = 0; this.t = 0;
       this.play('idle', { off: Math.random() });
-      FM.nInst++;
     }
     has(k) { return !!this.A.clips[k]; }
     play(k, o) {
@@ -179,9 +198,10 @@
     update(dt) {
       const s = this.cur; if (!s) return; this.t += dt; this.hitCd -= dt;
       s.t += dt * s.ts; if (this.prev) { this.prev.t += dt * this.prev.ts; this.fade -= dt; if (this.fade <= 0) this.prev = null; }
-      const nb = this.A.nb, a = this.fr(s);
-      if (this.prev) { const p = this.fr(this.prev), w = 1 - this.fade / this.fadeD; this.U.uFr.value.set(Math.round(p[0] + p[2]) * nb, Math.round(a[0] + a[2]) * nb, w, 0); }
-      else this.U.uFr.value.set(a[0] * nb, a[1] * nb, a[2], 0);
+      const nb = this.A.nb, a = this.fr(s), e = this.mesh.bindMatrix.elements, px = this.px, rc = px.userData.rimU.value;
+      if (this.prev) { const p = this.fr(this.prev); e[0] = Math.round(p[0] + p[2]) * nb; e[1] = Math.round(a[0] + a[2]) * nb; e[2] = 1 - this.fade / this.fadeD; }
+      else { e[0] = a[0] * nb; e[1] = a[1] * nb; e[2] = a[2]; }
+      e[4] = px.emissive.r; e[5] = px.emissive.g; e[6] = px.emissive.b; e[7] = px.rimK; e[8] = rc.r; e[9] = rc.g; e[10] = rc.b;
     }
     // st: {move, spd (м/с), sc (внешний масштаб), atk:'atk'|'atk2'|…, atkT (длительность удара, с), hit, cast, dead}
     drive(st) {
@@ -199,7 +219,7 @@
       } else this.play('idle', { fade: .2, ts: st.idleTs || 1 });
     }
     reset() { this.dead = false; this.prev = null; this.play('idle', { fade: 0, off: Math.random() }); }
-    dispose() { this.mat.dispose(); this.dmat.dispose(); if (this.g.parent) this.g.parent.remove(this.g); FM.nInst--; }
+    dispose() { if (this.g.parent) this.g.parent.remove(this.g); }
   }
   FM.Inst = Inst;
 
@@ -209,8 +229,8 @@
     const L = FM.lib[o.m]; if (!L) return null;
     const A = FM.bake(o.m, o.morph, o.mkey); if (!A) return null;
     const key = JSON.stringify([o.pal || 0, o.glow || 0, o.hide || 0]);
-    const geo = palGeo(L, o.pal, o.glow, o.hide, key), mat = makeMat(A, rimCol, rimK);
-    const I = new Inst(A, L, o, geo, mat);
+    const geo = palGeo(L, o.pal, o.glow, o.hide, key);
+    const I = new Inst(A, L, o, geo, rimCol, rimK); I.update(0);
     const hh = L.box.max.y - L.box.min.y, k = (o.h || 2) / Math.max(.01, hh);
     I.inner.scale.setScalar(k); I.inner.position.y = -L.box.min.y * k + (o.y || 0); if (o.ry) I.inner.rotation.y = o.ry;
     I.k = k;
@@ -220,7 +240,7 @@
   class Multi {
     constructor(list) {
       this.parts = list; this.g = new T.Group(); this.k = list[0].I.k; this.A = list[0].I.A; this.mats = [];
-      for (const p of list) { const I = p.I; I.g.position.set(p.x || 0, 0, p.z || 0); I.g.rotation.y = p.ry || 0; I.g.scale.setScalar(p.s || 1); this.g.add(I.g); this.mats.push(I.mat, I.dmat); p.lag = p.lag || 0; }
+      for (const p of list) { const I = p.I; I.g.position.set(p.x || 0, 0, p.z || 0); I.g.rotation.y = p.ry || 0; I.g.scale.setScalar(p.s || 1); this.g.add(I.g); this.mats.push(I.mat); p.lag = p.lag || 0; }
     }
     has(k) { return this.parts[0].I.has(k); }
     get busy() { return this.parts[0].I.busy; }
@@ -292,7 +312,7 @@
     const o = opts(S, t.col, t.h || 2);
     if (S.multi) { const list = S.multi.map(p => Object.assign({ I: FM.make(o, rimCol, rimK) }, p)); const M = new Multi(list); M.S = S; return { g: M.g, fm: M, mats: M.mats }; }
     const I = FM.make(o, rimCol, rimK); if (!I) return null; I.S = S;
-    return { g: I.g, fm: I, mats: [I.mat, I.dmat] };
+    return { g: I.g, fm: I, mats: [I.mat] };
   };
   // действие врага → клип модели: удар, тяжёлый удар, выстрел, чары
   const CH = { melee: ['atk', 'atk2'], heavy: ['atk3', 'atk2', 'atk'], shoot: ['shoot', 'atk2', 'atk'], cast: ['cast', 'atk2', 'atk'], jump: ['jump'] };
@@ -305,8 +325,6 @@
 
   // ---------- призывы ----------
   // c: цвета стихии {e: свечение, f: [шерсть, тёмная, свечение], g: [камень, тёмный, свечение]}
-  const BEAR = { Body: [1.45, .95, .95], Head: [1.35, 1.3, .7], 'Ear1.L': [.55, .55, .55], 'Ear1.R': [.55, .55, .55], Tail1: [.15, .15, .15], Neck1: [1.3, 1, 1.3],
-    'FrontUpperLeg.L': [1.4, .85, 1.4], 'FrontUpperLeg.R': [1.4, .85, 1.4], 'BackUpperLeg.L': [1.4, .85, 1.4], 'BackUpperLeg.R': [1.4, .85, 1.4] };
   const LION = { Head: [1.15, 1.15, .85], Body: [1.1, 1, 1] };
   FM.sumSpec = function (kind, el, cx, c) {
     const e = c.e, F = c.f, Gp = c.g;
@@ -314,7 +332,7 @@
       case 'golem': return cx === 'necro'
         ? { m: 'yeti', h: 2.9, hide: ['horns'], pal: { main: 0xd8ccae, secondary: 0x9a8e72, teeth: 0x9a8e72, tongue: 0x5a4e3a, rocks: 0xe8e0c8, core: 0xb07bff, eye_black: 0xb07bff, eye_white: 0x2a2030 }, glow: { core: 1, eye_black: 1 } }
         : { m: 'yeti', h: 2.9, hide: ['horns'], pal: { main: Gp[0], secondary: Gp[1], teeth: Gp[1], tongue: Gp[1], rocks: Gp[1], core: Gp[2], eye_black: Gp[2], eye_white: 0x2a2a30 }, glow: { core: 1, eye_black: 1 } };
-      case 'bear': return { m: 'wolf', h: 2.2, hide: ['mane', 'lmane'], pal: { main: el === 'earth' ? 0x6a4a30 : F[0], light: el === 'earth' ? 0x9a7a58 : F[1], eyes_black: e }, glow: { eyes_black: .9 }, morph: BEAR, mkey: 'bear' };
+      case 'bear': return { m: 'bear', h: 2.3, pal: { main: el === 'earth' ? 0x6a4a30 : F[0], light: el === 'earth' ? 0x9a7a58 : F[1], eyes_black: e }, glow: { eyes_black: .9 } };
       case 'wolves': return { m: 'wolf', h: 1.45, hide: ['mane', 'lmane'], pal: { main: F[0], light: F[1], eyes_black: e }, glow: { eyes_black: .9 } };
       case 'lion': return { m: 'wolf', h: 2.0, hide: ['mane'], pal: { main: 0xd0a058, light: 0xe8cc90, lmane: el === 'fire' ? 0xc4501a : F[0], eyes_black: e }, glow: { eyes_black: .9, lmane: el === 'fire' || el === 'storm' ? .4 : 0 }, morph: LION, mkey: 'lion' };
       case 'skelwar': return { m: 'skwar', h: 2.1, hide: ['axe', 'crown', 'helmet'], pal: { eyes: e, cloak: e }, glow: { eyes: 1 }, spawn: 1 };
