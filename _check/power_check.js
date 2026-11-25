@@ -25,7 +25,7 @@ function loadGame(root) {
   const THREE = { Color }, doc = { querySelector: () => null, getElementById: () => null };
   const src = `(function(THREE,document,localStorage){const $=s=>null;const TAU=Math.PI*2;const rand=(a,b)=>a+Math.random()*(b-a);const randi=(a,b)=>Math.floor(rand(a,b+1));
 const clamp=(v,a,b)=>v<a?a:v>b?b:v;const lerp=(a,b,t)=>a+(b-a)*t;const cap=s=>s[0].toUpperCase()+s.slice(1);const fmt=n=>String(n);const fmt2=n=>String(n);
-const P={mpRegen:8,maxHp:120,pos:{x:0,z:0}};let __v;
+const P={mpRegen:8,maxHp:120,pos:{x:0,z:0}};let __v;function cfStats(){}const isImp=()=>false;   // особенность класса (часть B) и «Невозможная» — в node без эффекта
 ${code}
 return {get:n=>eval(n),set:(n,v)=>{__v=v;eval(n+'=__v');},P};})`;
   const G = vm.runInNewContext(src, { Math, Map, Set, Array, Object, JSON, Float64Array, Float32Array, String, Number, console })(THREE, doc, {});
@@ -48,7 +48,7 @@ function nodeChecks(G, out) {
   const LV = [1, 20, 80];   // правило должно держаться на любом уровне героя (мана с уровнем растёт)
   for (const C of CLASSES) for (const L of LV) {
     useClass(G, C.id, { lvl: L });
-    const I = G.get('rarInfo')(), lS = G.get('lvlS')(L);
+    const I = G.get('rarInfo')(), lS = G.get('lvlS')(L) * G.get('slotBoost')();   // надбавка слотов (A) — общий множитель уровня
     for (const act of [true, false]) {
       const ids = [...C.pool].filter(id => SKILLS[id].active === act);
       // сила при одинаковом (пустом) билде на 1-м уровне: skPower без резонанса = база × ранг
@@ -85,7 +85,7 @@ function nodeChecks(G, out) {
     for (const act of [true, false]) { const ids = [...C.pool].filter(id => SKILLS[id].active === act);
       const pw = (id, r) => { G.get('S').ranks = r > 1 ? { [id]: r } : {}; return G.get('skParts')(SKILLS[id], false).pw; };
       const v = ids.map(id => ({ id, r: I.map.get(id) | 0, p1: pw(id, 1), p5: pw(id, RMAX), f: SKILLS[id].F.id }));
-      for (const x of v) { const k = x.p1 / (I.B[x.id] * G.get('lvlS')(40)); tf[x.f] = Math.max(tf[x.f] || 0, k); }
+      for (const x of v) { const k = x.p1 / (I.B[x.id] * G.get('lvlS')(40) * G.get('slotBoost')()); tf[x.f] = Math.max(tf[x.f] || 0, k); }
       for (const a of v) for (const b of v) { if (b.r !== a.r + 1) continue; tp++; if (a.p5 > b.p1) ti++; } } }
   G.get('S').ranks = {};
   out.push('', '## Справка: таланты своего вида', '', `Все таланты взяты (40-й уровень): соседних пар, где чара низшей редкости на 5-м ранге сильнее высшей на 1-м: ${(ti / tp * 100).toFixed(1)}% (${ti} из ${tp}). Это таланты одного вида — в разбивке силы видны как «таланты».`, '',
@@ -109,7 +109,8 @@ function compare(G, out) {
   for (const o of list) {
     useClass(G, o.cls);
     const sk = SKILLS[o.id], est = G.get('skParts')(sk, true).dps;   // замер — без множителя редкости (RARK_OFF в стенде)
-    const zero = est < 1e-6 && o.real < 1e-6; const ratio = zero ? 1 : o.real / Math.max(est, 1e-6);
+    const zero = est < 1e-6 && o.real < 0.5;   // без урона в оценке: замер ниже 0,5 ед./с — шум (урон от входящего удара 1)
+    const ratio = zero ? 1 : o.real / Math.max(est, 1e-6);
     const f = sk.F.id, k = f === 'summon' ? f + ':' + G.get('summInfo')(sk, o.cls).k : f;
     const b = byF[k] || (byF[k] = { n: 0, r: [], worst: [] }); b.n++; b.r.push(ratio);
     if (!zero && (ratio > 1 + TOL || ratio < 1 / (1 + TOL))) b.worst.push([ratio, sk.E.id + '/' + sk.M.id]);
@@ -131,7 +132,7 @@ function fit(G) {
       const dmg = F.power * (sk.M.dmg || 1) * (sk.E.dmg || 1); let H = sk.active ? o.real * o.cyc / dmg : o.real / dmg; let key = '_';
       if (f === 'summon') { const inf = G.get('summInfo')(sk, o.cls); key = inf.k; if (/^(totem_heal|clone)$/.test(key)) continue; H /= inf.n / (inf.D.n || 1);
         if (key === 'skelmage') { H /= G.get('summE')(sk, key); sm.push({ m: sk.m, L: Math.log(H) }); continue; } }
-      else if (o.cls !== 'windr') continue;
+      else if (o.cls !== (sk.F.sig || 'windr')) continue;   // фирменные — у своего класса
       if (sk.F.id === 'brand' || sk.F.id === 'orbit' || sk.F.id === 'surge') { /* поводы на стандартных частотах */ }
       if (H > 0) a.push({ e: sk.e, m: sk.m, key, L: Math.log(H) }); }
     if (!a.length) continue;
@@ -157,10 +158,10 @@ function jobsAll(G, konly) {
   const SKILLS = G.get('SKILLS'), CLASSES = G.get('CLASSES'), J = [];
   const summCls = Object.keys(G.get('SUMM_CLS'));
   const slow = new Set(['brand', 'orbit']), SEEDS = { brand: [11, 29, 47, 71, 83, 97], orbit: [11, 29, 47, 71] }, TT = { brand: 200, orbit: 120 };
-  if (!konly) for (const sk of SKILLS) { const f = sk.F.id;
+  if (!konly) for (const sk of SKILLS) { if (!sk) continue; const f = sk.F.id;   // SKILLS с дырами: фирменные — только в своей стихии
     const add = cls => { if (sk.active) { J.push({ id: sk.id, scen: 'one', cls }); J.push({ id: sk.id, scen: 'flow', cls, seed: 11 }); J.push({ id: sk.id, scen: 'flow', cls, seed: 29 }); }
       else for (const seed of SEEDS[f] || [11, 29]) J.push({ id: sk.id, scen: 'flow', cls, seed, T: TT[f] || 24 }); };
-    add('windr');
+    add(sk.F.sig || 'windr');
     if (f === 'summon') for (const c of summCls) { const C = CLASSES.find(x => x.id === c); if ([C.p, C.s, C.t].includes(sk.E.id)) add(c); } }
   // множитель редкости в бою: те же чары у трёх классов без множителя и с ним — отношение должно быть rarK (30-й уровень:
   // урон крупный, округление до целых не мешает)

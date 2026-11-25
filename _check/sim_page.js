@@ -6,8 +6,10 @@
 //   flow  — поток толпы: 6 врагов, каждый живёт 6 с: идёт к герою из 7 м со скоростью 2 м/с до своей точки
 //           (4 ближника — 1–2 м, 2 стрелка — 4,5–6 м), стоит там, потом «умирает» и приходит новый
 //           (статусы сбрасываются), направления — в передней полуплоскости ±100°;
-//   для пассивок — flow плюс «повод»: brand — 2,5 чужих попадания/с, surge — 1 каст/с, revenge — удар по герою 1/с,
-//           doom — убийство 0,5/с (ближайший к герою), trail — герой бегает по кругу r=2 м со скоростью 4 м/с.
+//   для пассивок — flow плюс «повод» по хукам формы (новые пассивки A — NFP): попадания (brand, hit) — 2,5 чужих попадания/с
+//           стихией чары, касты (surge, cast) — 1 каст/с (чара-повод — скачок той же стихии), удар по герою (revenge, dmgIn) — 1/с,
+//           убийство (doom, kill) — 0,5/с (ближайший к герою), trail — герой бегает по кругу r=2 м со скоростью 4 м/с.
+// Надбавка слотов (slotBoost) выключена: меряем механику.
 // Множитель редкости выключен (o.withK — включить), крит выключен, резонанса нет, уровень 1, ранг 1, без талантов. Мана — по формуле игры: каст раз в skCycle(sk,true).
 // Касты — по правилам автобоя (canCast), скачок и цепь — как ручное нажатие, щит — когда прошлый щит кончился.
 // Враги стоят на своих точках (отбрасывание и притяжение не двигают их) — контроль идёт в «пользу», не в урон.
@@ -22,6 +24,7 @@ function rngOf(seed){return mpRng(seed);}
 function wipe(){
   clearWorld();while(ORBS.length){const o=ORBS.pop();scene.remove(o.g);}
   PASS={aura:[],brand:[],doom:[],revenge:[],orbit:[],trail:[],surge:[]};auraT.clear();revCd.clear();trailT.clear();
+  for(const a of NFS.pa||[])nfPassDrop(a);NFS.pa=[];NFS.pn=[];
   BLEEDS.length=0;P.casts=0;P.moving=false;P.dashT=0;P.invulnT=0;P.shield=0;P.shieldSk=null;P.face=0;target=null;
   for(const k in P.cds)delete P.cds[k];DUM=[];}
 function dummy(x,z){const en=spawnEnemy('goblin',x,z,1,{});en.maxHp=en.hp=1e9;en.stun=1e9;en.aggro=false;en.anc={x,z};DUM.push(en);return en;}
@@ -39,33 +42,38 @@ function stepWorld(dt){
   P.invulnT-=dt;if(P.shield>0){P.shieldT-=dt;if(P.shieldT<=0)shieldBurst();}
   if(P.dashT>0){P.dashT-=dt;P.pos.addScaledVector(P.dashV,dt);}
   for(const k in P.cds)P.cds[k]-=dt;P.castT-=dt;P.swingT-=dt;P.hp=P.maxHp;P.mp=P.maxMp;
+  NFS.sa=activeSlots();NFS.sp=passiveSlots();NFS.lv=S.lvl;   // без баннера «Открыт слот» и автозаполнения слотов
   updateLater(dt);updateEnemies(dt);updatePassives(dt);updateProj(dt);updateMeteors(dt);updateSummons(dt);updateWhirls(dt);updateRains(dt);updateTraps(dt);updateZones(dt);updateFx(dt);}
 // один прогон: id чары, сценарий, класс (для призывов и маны), длительность
 SIM.run=function(o){
-  const sk=SKILLS[o.id],scen=o.scen,T=o.T||24,warm=o.warm||4,dt=1/30,keepCls=CLS;
+  const sk=SKILLS[o.id],scen=o.scen,warm=o.warm||4,dt=1/30,keepCls=CLS;let T=o.T||24;
   const R0=Math.random;rnd=rngOf(o.seed||12345);Math.random=rngOf((o.seed||12345)*7+1);
   if(o.cls)CLS=CLASS_BY[o.cls];
   gainXp=()=>{};dropLoot=()=>{};
   const keepK=rarK,keepL=S.lvl;if(!o.withK)rarK=()=>1;if(o.lvl)S.lvl=o.lvl;   // o.lvl — уровень героя (урон крупнее, меньше округлений)   // по умолчанию — без множителя редкости: меряем саму механику
-  const keepCrit=ST.crit;ST.crit=0;const keepR=RESO.slice();RESO.fill(1);
+  const keepCrit=ST.crit;ST.crit=0;const keepSB=SB_OFF;SB_OFF=true;const keepR=RESO.slice();RESO.fill(1);
   let res=null;
   try{
     wipe();time=0;P.pos.set(0,0,0);P.prev.set(0,0,0);
     if(scen==='one')dummy(0,SC.oneD);else flowSetup();
     pin();
     const act=sk.active,f=sk.F.id;let nextCast=0,lastCast=-9,drvT=0,drvN=0,d0=null;
+    const hk=(!act&&NFP[f])||{},DH=f==='brand'||!!hk.hit,DC=f==='surge'||!!hk.cast,DU=f==='revenge'||!!hk.dmgIn,DK=f==='doom'||!!hk.kill;
+    const CSK=SKILLS[sid(sk.E.id,'blink','swift')];let tH=0,tC=0,tU=0,tK=0;
     const cyc=act?skCycle(sk,true):0;
+    // долгая перезарядка (ульты 40–50 с): первый каст — после разогрева, окно — ровно два цикла
+    if(act&&cyc>=8&&sk.f>=NF0&&!o.T){T=warm+2*cyc;nextCast=warm;}   // только новые формы: таблицы прежних подогнаны под 24 с
     if(!act){S.passive=[sk.id].concat(Array(41).fill(null));rebuildPassives();}
     for(simT=0;simT<T;simT+=dt){
       if(simT>=warm&&d0===null)d0=dmgSum()-drvN;
       if(act&&simT>=nextCast){P.cds[sk.id]=0;P.mp=P.maxMp;const tg=getTarget(30);if(tg)faceTo(tg.pos);
         const man=f==='blink'||f==='chain'||f==='barrier'&&P.shield<=0;if(canCast(sk,man)==='ok'){cast(sk);lastCast=simT;nextCast=simT+cyc;}}
-      if(!act){drvT-=dt;
-        if(f==='brand'&&drvT<=0){drvT+=1/SC.brandRate;const tg=nearest(P.pos,30);if(tg){dealDamage(tg,1,-1,{depth:0,noReact:true,noKnock:true});drvN++;}}
-        if(f==='surge'&&drvT<=0){drvT+=1/SC.castRate;castProcs();}
-        if(f==='revenge'&&drvT<=0){drvT+=1/SC.hitRate;P.invulnT=0;hurtPlayer(1,null,{});}
-        if(f==='doom'&&drvT<=0&&simT>.5){drvT+=1/SC.killRate;let b=null,bd=1e9;for(const en of DUM){if(en.dead)continue;const d=Math.hypot(en.pos.x,en.pos.z);if(d<bd){bd=d;b=en;}}
-          if(b){const fi=b.fi;b.fi=null;kill(b,0,-1);const n=dummy(0,SC.flowFrom);flowNew(n,fi,0);}}
+      if(!act){tH-=dt;tC-=dt;tU-=dt;tK-=dt;
+        if(DH&&tH<=0){tH+=1/SC.brandRate;const tg=nearest(P.pos,30);if(tg){dealDamage(tg,1,f==='brand'?-1:sk.e,{depth:0,noReact:true,noKnock:true});drvN++;}}
+        if(DC&&tC<=0){tC+=1/SC.castRate;castProcs();nfOnCast(CSK,null);}
+        if(DU&&tU<=0){tU+=1/SC.hitRate;P.invulnT=0;hurtPlayer(1,null,{});}
+        if(DK&&tK<=0&&simT>.5){tK+=1/SC.killRate;let b=null,bd=1e9;for(const en of DUM){if(en.dead)continue;const d=Math.hypot(en.pos.x,en.pos.z);if(d<bd){bd=d;b=en;}}
+          if(b){const fi=b.fi;b.fi=null;kill(b,0,f==='doom'?-1:sk.e);const n=dummy(0,SC.flowFrom);flowNew(n,fi,0);}}
         if(f==='trail'){const a=simT*SC.trailV/SC.trailR;P.pos.set(Math.cos(a)*SC.trailR,0,Math.sin(a)*SC.trailR);P.moving=true;}}
       stepWorld(dt);
       if(scen!=='one')flowStep(dt);
@@ -75,7 +83,7 @@ SIM.run=function(o){
     const tot=dmgSum()-drvN-(d0||0);
     res={id:o.id,scen,cls:CLS.id,dps:tot/(T-warm),cyc,casts:P.casts,tag:o.tag||undefined};
   }finally{
-    rarK=keepK;S.lvl=keepL;gainXp=ORIG.gainXp;dropLoot=ORIG.dropLoot;ST.crit=keepCrit;for(let i=0;i<10;i++)RESO[i]=keepR[i];
+    rarK=keepK;S.lvl=keepL;SB_OFF=keepSB;gainXp=ORIG.gainXp;dropLoot=ORIG.dropLoot;ST.crit=keepCrit;for(let i=0;i<10;i++)RESO[i]=keepR[i];
     wipe();CLS=keepCls;Math.random=R0;
     S.passive=Array(42).fill(null);rebuildPassives();
   }

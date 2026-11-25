@@ -346,6 +346,12 @@ varying float vRim;
       case 'infernal': return { m: 'yeti', h: 3.9, hide: ['tongue'], pal: { main: 0x2a2020, secondary: 0x1a1414, teeth: 0x3a2a28, tongue: 0x3a2a28, horns: 0x3a2a28, rocks: 0x3a2a28, core: e, eye_black: e, eye_white: 0x140c0c }, glow: { core: 1, eye_black: 1, rocks: .15 } };
       case 'elemental': return { m: 'hywirl', h: 2.2, pal: { main: e }, glow: { main: .45, eye_black: .3 } };
       case 'stormbird': return { m: 'dragon', h: 1.5, pal: { main: F[0], belly: F[1], wings: F[1], eyes: e }, glow: { eyes: 1 } };
+      // существа фирменных чар (часть A): мертвецы некроманта, волки-духи шамана, бесы врат и инфернал чернокнижника, великий элементаль
+      case 'raised': return { m: 'skwar', h: 2.1, hide: ['axe', 'crown', 'helmet', 'shield'], pal: { eyes: e, cloak: 0x2a2632 }, glow: { eyes: 1 }, spawn: 1 };
+      case 'spiritwolf': return { m: 'wolf', h: 1.5, hide: ['mane', 'lmane'], pal: { main: 0x8fb4d8, light: 0xd8ecff, eyes_black: e }, glow: { eyes_black: 1, main: .35, light: .35 } };
+      case 'gateimp': return { m: 'demonf', h: 1.4, pal: { main: 0x9a2a2a, black: 0x2a0a0a, eye_black: e }, glow: { eye_black: .9 } };
+      case 'pactinf': return { m: 'yeti', h: 3.9, hide: ['tongue'], pal: { main: 0x2a2020, secondary: 0x1a1414, teeth: 0x3a2a28, tongue: 0x3a2a28, horns: 0x3a2a28, rocks: 0x3a2a28, core: e, eye_black: e, eye_white: 0x140c0c }, glow: { core: 1, eye_black: 1, rocks: .25 } };
+      case 'bigelem': return { m: 'hywirl', h: 2.2, pal: { main: e }, glow: { main: .55, eye_black: .4 } };
     }
     return null;
   };
