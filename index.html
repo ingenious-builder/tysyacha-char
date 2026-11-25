@@ -1494,6 +1494,7 @@ function validChar(d,c){if(!d||!Array.isArray(d.active)||!Array.isArray(d.passiv
     const f=newChar(c);s.lvl=1;s.xp=0;s.ess=0;s.ranks={};s.talents={};s.active=f.active;s.passive=f.passive;s.learned=f.learned;
     for(const id of f.learned)if(!s.book.includes(id))s.book.push(id);
   }else{s.book=Array.isArray(d.book)?[...new Set(d.book.filter(v=>c.poolAll.has(v)))]:[...s.learned];for(const id of s.learned)if(!s.book.includes(id))s.book.push(id);}
+  if(d.drop&&Array.isArray(d.drop.b)&&Array.isArray(d.drop.i))s.drop={b:d.drop.b.filter(Number.isInteger).slice(0,18),i:d.drop.i.filter(v=>c.poolAll.has(v)).slice(0,18)}; // память выпадения чар
   return s;}
 let saveTimer=0;
 function save(){if(CLS&&S){SAVE.chars[CLS.id]=S;SAVE.cur=CLS.id;}try{localStorage.setItem(SAVE_KEY,JSON.stringify(SAVE));}catch(e){}}
@@ -2697,12 +2698,40 @@ function showUpg(sk,u){if(luOpen||bookOpen){hideUpg();return;}UPG=sk.id;const T_
 function hideUpg(){UPG=null;clearTimeout(upgTm);const el=$('#upg');if(el)el.hidden=true;}
 function refreshUpg(){if(UPG==null)return;const sk=SKILLS[UPG],u=upgradeFor(sk);if(!u)hideUpg();else showUpg(sk,u);}
 function unlearnedPool(){const a=[];CLS.pool.forEach(id=>{if(!LEARNED.has(id))a.push(SKILLS[id]);});return a;}
-// свитки и выбор уровня: сначала новые базы чар (а не ещё один вариант уже известной), чары ядра класса втрое чаще
-function rollPool(){const all=unlearnedPool(),lb=new Set();LEARNED.forEach(id=>lb.add(SKILLS[id].bk));const nb=all.filter(s=>!lb.has(s.bk));return nb.length&&Math.random()<.9?nb:all;}
-function wpick(c){let t=0;const bk=bookOn(),w=c.map(s=>(CLS.core.has(s.bk)?3:1)*(bk&&BOOK.has(s.id)?2.5:1));for(const x of w)t+=x;let r=Math.random()*t;for(let i=0;i<c.length;i++){r-=w[i];if(r<=0)return c[i];}return c[0];}
-function learnRandom(){const pool=rollPool();
-  if(!pool.length||S.sandbox){S.ess+=60;toast('Свиток рассыпался в 60 эссенции');return;}
-  const sk=wpick(pool);learn(sk.id,true);fxPillar(P.pos.x,P.pos.z,.8,5,GOLD,.7);colBurst(GOLD,P.pos.x,1.2,P.pos.z,20,4,.7,-2);
+// ---- выпадение чар: свитки и выбор уровня (Артём 25.11: «очень часто выпадают одни и те же чары») ----
+// Было: 90% выборов — только новые базы; когда их нет (к ~25 уровню) — любые варианты известных, 75–96% из них слабее того,
+// что уже есть, и одна база по 20–38 раз за 50 выборов. Теперь каждая невыученная чара — «новая» (базы ещё нет),
+// «сильнее» (вариант известной базы сильнее твоего лучшего на ней при равном ранге или выше редкостью), «вариант» (почти как твой)
+// или «слабее» (почти не выпадает). Память недавно показанных баз, чар и видов (S.drop, в сохранении) режет их вес;
+// ядро класса ×2 (было ×3), Книга чар ×1.8 (было ×2.5). Полезных мало — бесплатный ранг чаре из билда.
+const DROP_MEM=18,INTRC={};
+const intrP=sk=>{const m=INTRC[CLS.id]||(INTRC[CLS.id]=new Map());let v=m.get(sk.id);if(v===undefined){v=skPower(sk,null,true);m.set(sk.id,v);}return v;};
+function dropMem(){const d=S.drop;return d&&Array.isArray(d.b)&&Array.isArray(d.i)?d:(S.drop={b:[],i:[]});}
+function dropSeen(list){const d=dropMem();for(const sk of list){d.b.unshift(sk.bk);d.i.unshift(sk.id);}if(d.b.length>DROP_MEM)d.b.length=DROP_MEM;if(d.i.length>DROP_MEM)d.i.length=DROP_MEM;}
+// штраф памяти: база в прошлом выборе ×0.1, 2–6 выборов назад ×0.25–0.8; та же чара ещё ×0.35; тот же вид (форма) ×0.6–0.8
+function dropPen(sk){const d=dropMem();let w=1;const pb=d.b.indexOf(sk.bk);if(pb>=0)w*=pb<3?.1:pb<6?.25:pb<9?.45:pb<12?.6:.8;if(d.i.indexOf(sk.id)>=0)w*=.35;
+  for(let j=0;j<6&&j<d.b.length;j++)if(d.b[j]%NF===sk.f){w*=j<3?.6:.8;break;}return w;}
+let DROPK=null; // id -> [вид: 0 новая, 1 сильнее, 2 вариант, 3 слабее; прирост силы; лучшая твоя чара этой базы]
+function dropScan(){const best=new Map(),K=new Map(),u=[],side=[],weak=[],nb=new Map();
+  for(const id of LEARNED){const s=SKILLS[id],p=intrP(s),r=rarOf(s),b=best.get(s.bk);if(!b)best.set(s.bk,[p,id,r]);else{if(p>b[0]){b[0]=p;b[1]=id;}if(r>b[2])b[2]=r;}}
+  for(const s of unlearnedPool()){const b=best.get(s.bk);let k=0,g=0,t=null;
+    if(b){g=intrP(s)/b[0]-1;t=b[1];k=g>.07||rarOf(s)>b[2]?1:g>=-.15?2:3;}
+    K.set(s.id,[k,g,t]);(k<2?u:k===2?side:weak).push(s);if(k<2)nb.set(s.bk,(nb.get(s.bk)||0)+1);}
+  for(const s of u)K.get(s.id).push(Math.sqrt(nb.get(s.bk)));DROPK=K;return {u,side,weak};}
+// вес базы не растёт от числа её вариантов в розыгрыше (÷√n): база с шестью сильными вариантами не вытесняет остальные
+function dropW(sk){const k=(DROPK&&DROPK.get(sk.id))||[0,0];let w=(k[0]===0?1:k[0]===1?.55+Math.min(.9,Math.max(0,k[1])):k[0]===2?.15:.01)/(k[3]||1);
+  if(CLS.core.has(sk.bk))w*=k[0]?1.3:2;if(bookOn()&&BOOK.has(sk.id))w*=1.8;return w*dropPen(sk);}
+// только полезные: новые базы и сильные варианты известных (пусто — значит, нового стоящего не осталось)
+function rollPool(){return dropScan().u;}
+function wpick(c,mul){let t=0;const w=c.map(s=>{const v=dropW(s)*(mul?mul(s):1);t+=v;return v;});let r=Math.random()*t;for(let i=0;i<c.length;i++){r-=w[i];if(r<=0)return c[i];}return c[c.length-1];}
+const rankOffers=()=>{const a=[];for(const id of EQUIPPED)if(rk(id)<5)a.push(SKILLS[id]);return a;};
+const rankCard=sk=>{const o=Object.create(sk);o.rankUp=true;return o;};
+function rankUp(sk){S.ranks[sk.id]=rk(sk.id)+1;onBuildChanged();saveSoon();}
+function learnRandom(){const pool=S.sandbox?[]:rollPool();
+  if(!pool.length&&!S.sandbox){const ro=rankOffers();if(ro.length){const sk=pickW(ro.map(s=>[s,dropPen(s)]));dropSeen([sk]);rankUp(sk);
+    fxPillar(P.pos.x,P.pos.z,.8,5,GOLD,.7);toast('Свиток: новых сильных чар нет — ранг «'+skName(sk)+'» → '+rk(sk.id));return;}}
+  if(!pool.length){S.ess+=60;toast('Свиток рассыпался в 60 эссенции');return;}
+  const sk=wpick(pool);dropSeen([sk]);learn(sk.id,true);fxPillar(P.pos.x,P.pos.z,.8,5,GOLD,.7);colBurst(GOLD,P.pos.x,1.2,P.pos.z,20,4,.7,-2);
   toastSk(sk,'Свиток: «'+skName(sk)+'»'+(EQUIPPED.has(sk.id)?' — сразу в билде':' — в книге'),'Из свитка'+(EQUIPPED.has(sk.id)?' — сразу в билде':' — в книге'));}
 
 // =====================================================================
@@ -4649,9 +4678,29 @@ let NEWVER=false;window.addEventListener('tc-newversion',async()=>{try{const t=a
 // LEVEL-UP CHOICE
 // =====================================================================
 let luOpen=false;
-function rollChoices(){const pool=rollPool();if(!pool.length)return[];const res=[];
-  const take=f=>{const c=pool.filter(s=>f(s)&&!res.some(r=>r.bk===s.bk));if(c.length)res.push(wpick(c));};
-  take(s=>s.active);take(s=>!s.active);take(s=>s.E.id===CLS.s);let g=0;while(res.length<3&&g++<9)take(()=>true);return res;}
+// три карточки: активная, пассивная и любая; внутри выбора — разные базы, виды, стихии и роли. Кроме полезных чар
+// в розыгрыш идут «корзины»: бесплатный ранг чаре из билда (вес 0.6) и вариант известной (0.25) — пока полезных много,
+// они почти не выпадают; когда мало — заполняют выбор вместо одних и тех же остатков (варианты из двух прошлых выборов
+// не повторяются вовсе). Заметно слабее твоей — не предлагаем; совсем нечего — за уровень эссенция (luNone).
+let LU_LAST=[];
+function rollChoices(){const D=dropScan(),ro=rankOffers(),res=[];
+  const div=s=>{let m=1;for(const r of res){if(r.e===s.e)m*=.45;if(r.f===s.f)m*=.15;else if(r.F.role===s.F.role)m*=.5;}return m;};
+  const take=f=>{const free=s=>f(s)&&!res.some(r=>r.bk===s.bk),opts=[];for(const s of D.u)if(free(s))opts.push([s,dropW(s)*div(s)]);
+    const bucket=(list,W,mk)=>{const c=list.filter(s=>free(s)&&(mk||dropPen(s)>=.3));if(!c.length)return;const s=pickW(c.map(x=>[x,(mk?dropPen(x):dropW(x))*div(x)]));opts.push([mk?mk(s):s,W*dropPen(s)*div(s)]);};
+    bucket(ro,.6,rankCard);bucket(D.side,.25);if(opts.length)res.push(pickW(opts));};
+  take(s=>s.active);take(s=>!s.active);let g=0;while(res.length<3&&g++<9)take(()=>true);
+  dropSeen(res);LU_LAST=res;return res;}
+// выбранная карточка: изучить чару или поднять ранг чаре из билда
+let luNoneSaid=false;
+function luNone(){const n=luQueue;luQueue=0;if(n<1||S.sandbox)return;const e=n*(20+S.lvl*5);S.ess+=e;saveSoon();
+  if(!luNoneSaid){luNoneSaid=true;toast('Все сильные чары собраны, ранги на максимуме — за '+(n===1?'уровень':n+' ур.')+' +'+e+' эссенции');}else float(P.pos,'+'+e+' эссенции за уровень','#d4b0ff',13);}
+function luPick(sk){if(sk.rankUp)rankUp(sk);else learn(sk.id,true);}
+function luTag(sk){if(sk.rankUp)return '<i class="nv">ранг '+rk(sk.id)+' → '+(rk(sk.id)+1)+' бесплатно</i>';const k=(DROPK&&DROPK.get(sk.id))||[0],T_=k[2]!=null?SKILLS[k[2]]:null;
+  if(!k[0]||!T_)return '<i class="nv">новая чара</i>';
+  return '<i class="nv">'+(k[0]===1?(k[1]>.07?'сильнее твоего варианта «'+T_.M.name+'» на '+pct(k[1])+'%':'редкость выше твоего варианта «'+T_.M.name+'»'):k[0]===2?'вариант известной':'слабее твоего варианта «'+T_.M.name+'»')+'</i>';}
+function rkPow(sk){const r=rarOf(sk),r0=S.ranks[sk.id],a=pwr(sk);S.ranks[sk.id]=rk(sk.id)+1;const b=skPower(sk);if(r0==null)delete S.ranks[sk.id];else S.ranks[sk.id]=r0;
+  return `<small class="pw" data-r="${r}">${RARITY[r].n} · сила ${Math.round(a)} → ${Math.round(b)} (+${pct(b/a-1)}%)</small>`;}
+const rkWhere=sk=>`<span class="where ${sk.active?'a':'p'}">Уже в билде: ранг выше — урон +20%${sk.active?', перезарядка короче':''}</span>`;
 const knownBase=sk=>{for(const id of LEARNED)if(SKILLS[id].bk===sk.bk)return true;return false;};
 const IC_A='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 1 4 13.5h6L8.5 23 20 9.5h-6.5z"/></svg>',IC_P='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>';
 const apTag=(sk,big)=>`<span class="aptag ${sk.active?'a':'p'}${big?' big':''}">${sk.active?IC_A+'Активная · нажимаешь сам':IC_P+'Пассивная · работает сама'}</span>`;
@@ -4660,23 +4709,25 @@ function cardStat(sk){return sk.active?`${fmt(skDmg(sk))} урона · ${skMana
 function cardPow(sk){const r=rarOf(sk),u=upgradeFor(sk,true),arr=sk.active?S.active:S.passive,n=sk.active?activeSlots():passiveSlots();
   const free=baseSlot(sk)==null&&arr.findIndex((v,i)=>i<n&&v==null)>=0&&formSlot(sk)==null;
   return `<small class="pw" data-r="${r}">${RARITY[r].n} · сила ${Math.round(pwr(sk))}${free?' · встанет в свободный слот':u?' · ↑ сильнее «'+skName(SKILLS[u.tgt])+'» на '+pct(u.gain)+'%':''}</small>`;}
-function luScore(sk){const u=upgradeFor(sk,true),arr=sk.active?S.active:S.passive,n=sk.active?activeSlots():passiveSlots();
+function luScore(sk){if(sk.rankUp)return 1.15e6+pwr(sk);const u=upgradeFor(sk,true),arr=sk.active?S.active:S.passive,n=sk.active?activeSlots():passiveSlots();
   const free=baseSlot(sk)==null&&arr.findIndex((v,i)=>i<n&&v==null)>=0&&formSlot(sk)==null;
   return (free?2e6:0)+(u?1e6*(1+u.gain):0)+pwr(sk);}
-function luAutoRun(n){const names=[];let best=null;while(n-->0&&luQueue>0){const ch=rollChoices();if(!ch.length){luQueue=0;break;}
+function luAutoRun(n){const names=[];let best=null,nr=0;while(n-->0&&luQueue>0){const ch=rollChoices();if(!ch.length){luNone();break;}
   let b=ch[0],bs=-1;for(const sk of ch){const v=luScore(sk);if(v>bs){bs=v;b=sk;}}
-  learn(b.id,true);luQueue--;names.push(skName(b));if(!best||rarOf(b)>rarOf(best))best=b;}
-  const tt=names.length===1?'Изучено: '+names[0]:'Изучено '+names.length+': '+names.slice(0,3).join(', ')+(names.length>3?'…':'');
+  luPick(b);luQueue--;if(b.rankUp)nr++;names.push(b.rankUp?'ранг «'+skName(b)+'» → '+rk(b.id):skName(b));if(!b.rankUp&&(!best||rarOf(b)>rarOf(best)))best=b;}
+  const hd=nr===names.length?'Ранг выше':'Изучено',tt=names.length===1?hd+': '+names[0]:hd+' '+names.length+': '+names.slice(0,3).join(', ')+(names.length>3?'…':'');
   if(best&&rarOf(best)>=2)rarPop(best,names.length>1?tt:'Изучена'+(EQUIPPED.has(best.id)?' — сразу в билде':' — в книге'));else if(names.length)toast(tt);
   luDelay=.5;}
 function luSync(){const a=$('#luAuto');if(a)a.textContent='Авто-выбор: '+(S.autoLu?'вкл':'выкл');const l=$('#luAll');if(l){l.hidden=luQueue<2;l.textContent='Авто для всех '+luQueue;}}
 function setAutoLu(v){S.autoLu=!!v;if(S.autoLu)S.autoBest=true;saveSoon();const c=$('#autoLu');if(c)c.checked=S.autoLu;const b=$('#autoBest');if(b)b.checked=!!S.autoBest;}
-function openLevelUp(){if(S.autoLu){luAutoRun(luQueue);return;}const ch=rollChoices();if(!ch.length){luQueue=0;return;}luOpen=true;hideUpg();syncPause();
+function openLevelUp(){if(S.autoLu){luAutoRun(luQueue);return;}const ch=rollChoices();if(!ch.length){luNone();return;}luOpen=true;hideUpg();syncPause();
   $('#luTitle').textContent='Уровень '+S.lvl+(luQueue>1?' · ещё '+(luQueue-1):'');$('#luSub').textContent='Выбери новые чары. Если есть свободный слот, они сразу встанут в билд.'+(talFreeUse()?' Очков талантов: '+tpFree()+'.':'');luSync();
-  $('#luCards').innerHTML=ch.map(sk=>{const r=rarOf(sk);return `<button type="button" class="card" data-id="${sk.id}" data-r="${r}"><span class="rbn">${rarGem(r)}<span>${RARITY[r].n}</span>${rarGem(r)}</span><span class="ico${sk.active?'':' p'}" data-r="${r}" style="--c:${sk.E.hex}">${svg(sk.F.id)}${modBadge(sk)}${rarDeco(r)}</span><span class="ct">${apTag(sk)}<span class="tag">${sk.F.role} · ${sk.E.name}${knownBase(sk)?'<i class="nv">вариант известной</i>':'<i class="nv">новая чара</i>'}${bookOn()&&BOOK.has(sk.id)?'<i class="nv">из Книги чар</i>':''}</span><b>${sk.base}</b><span class="var">${sk.M.name}: ${sk.M.desc}</span><small>${cap(skLead(sk))}</small><small>${cardStat(sk)}</small>${cardPow(sk)}${apWhere(sk)}</span></button>`;}).join('');
+  $('#luCards').innerHTML=ch.map(sk=>{const r=rarOf(sk);return `<button type="button" class="card" data-id="${sk.id}" data-r="${r}"><span class="rbn">${rarGem(r)}<span>${RARITY[r].n}</span>${rarGem(r)}</span><span class="ico${sk.active?'':' p'}" data-r="${r}" style="--c:${sk.E.hex}">${svg(sk.F.id)}${modBadge(sk)}${rarDeco(r)}</span><span class="ct">${apTag(sk)}<span class="tag">${sk.F.role} · ${sk.E.name}${luTag(sk)}${bookOn()&&!sk.rankUp&&BOOK.has(sk.id)?'<i class="nv">из Книги чар</i>':''}</span><b>${sk.base}</b><span class="var">${sk.M.name}: ${sk.M.desc}</span><small>${cap(skLead(sk))}</small><small>${cardStat(sk)}</small>${sk.rankUp?rkPow(sk)+rkWhere(sk):cardPow(sk)+apWhere(sk)}</span></button>`;}).join('');
   $('#luSkip').textContent='Пропустить: +'+(20+S.lvl*5)+' эссенции';$('#lvlup').hidden=false;}
 function closeLevelUp(){luOpen=false;$('#lvlup').hidden=true;luQueue=Math.max(0,luQueue-1);luDelay=1.2;syncPause();}
-$('#luCards').addEventListener('click',e=>{const b=e.target.closest('.card');if(!b)return;const sk=SKILLS[+b.dataset.id];learn(sk.id,true);toastSk(sk,'Изучено: '+skName(sk)+(EQUIPPED.has(sk.id)?' — в билде':' — в книге'),'Изучена'+(EQUIPPED.has(sk.id)?' — сразу в билде':' — в книге'));closeLevelUp();});
+$('#luCards').addEventListener('click',e=>{const b=e.target.closest('.card');if(!b)return;const id=+b.dataset.id,sk=LU_LAST.find(x=>x.id===id)||SKILLS[id];
+  if(sk.rankUp){luPick(sk);toast('Ранг выше: '+skName(sk)+' — ранг '+rk(sk.id));closeLevelUp();return;}
+  learn(sk.id,true);toastSk(sk,'Изучено: '+skName(sk)+(EQUIPPED.has(sk.id)?' — в билде':' — в книге'),'Изучена'+(EQUIPPED.has(sk.id)?' — сразу в билде':' — в книге'));closeLevelUp();});
 $('#luAuto').addEventListener('click',()=>{setAutoLu(!S.autoLu);if(S.autoLu){luOpen=false;$('#lvlup').hidden=true;luAutoRun(luQueue);syncPause();toast('Авто-выбор чар включён (и автозамена в билде)');}else luSync();});
 $('#luAll').addEventListener('click',()=>{luOpen=false;$('#lvlup').hidden=true;luAutoRun(luQueue);syncPause();});
 $('#autoLu').addEventListener('change',e=>{setAutoLu(e.target.checked);toast(S.autoLu?'Чары после уровня выбираются сами (и автозамена в билде)':'Чары после уровня — через окно выбора');});
