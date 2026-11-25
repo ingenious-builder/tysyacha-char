@@ -6295,7 +6295,7 @@ const MP_RELAYS=['nos.lol','nostr.mom','nostr.sathoarder.com','relay.fountain.fm
 // Запасной канал «через сервер»: Supabase Realtime (broadcast), net-relay.js. Ключ — только публичный publishable, секретного в браузере нет.
 const MP_SB={url:'wss://mugzpapozmuryzkfqldr.supabase.co/realtime/v1/websocket',key:'sb_publishable_2vCpEK1hJ3X-pmTtjbY8ZA_w9WUdvUu'};
 const NICK_KEY='tysyacha-nick',ROOM_KEY='tysyacha-room';
-Object.assign(MP,{verBad:null,pingQ:[],pingRaw:0,active:false,play:'world',g:0,status:'idle',err:'',code:'',joinCode:null,lastRx:0,pingAt:0,byUid:new Map(),hitQ:[],pickGorge:false,down:false,revT:0,tBroken:false,pl:null,plCd:0,chest:null,wiped:false,hint:'',hintT:0});
+Object.assign(MP,{verBad:null,pingQ:[],pingRaw:0,pingCh:'',active:false,play:'world',g:0,status:'idle',err:'',code:'',joinCode:null,lastRx:0,pingAt:0,byUid:new Map(),hitQ:[],pickGorge:false,down:false,revT:0,tBroken:false,pl:null,plCd:0,chest:null,wiped:false,hint:'',hintT:0});
 let mpLib=null,mpRoom=null,mpSendFn=null,mpTimer=0,mpSeq=0,mpHintUntil=0;
 // два канала одной комнаты: P2P (Trystero) и «через сервер» (Supabase). Id пира у обоих одинаковый (selfId задаём сами).
 let mpTry=null,mpTrySend=null,mpRel=null,mpRelSend=null,mpP2P=new Set(),mpSrv=new Set(),mpOpenGen=0;
@@ -6323,7 +6323,9 @@ const IP_OUT={x:0,z:0},PEER_DELAY=95,ENEMY_DELAY=110;
 // буфер плавности под сеть (25.11): сколько ждать следующий пакет = p95 от (промежуток между пакетами + опоздание этого пакета) + 5 мс.
 // Только уменьшает прежние 95/110 мс: при ровной сети (P2P) друг и враги видны раньше на 30–45 мс; при рваной — как было.
 function NetJit(lo,hi){this.lo=lo;this.hi=hi;this.d=hi;this.off=null;this.pts=null;this.w=[];this.n=0;}
-NetJit.prototype.push=function(ts){if(ts==null)return;if(this.pts!==null&&ts<=this.pts)return;const c=performance.now()-ts;
+NetJit.prototype.push=function(ts){if(ts==null)return;
+  if(this.pts!==null&&ts<this.pts-2000)this.reset(); // часы отправителя ушли назад: напарник перезагрузил страницу и вернулся — это новый отправитель
+  if(this.pts!==null&&ts<=this.pts)return;const c=performance.now()-ts;
   if(this.off===null||c<this.off)this.off=c;else this.off+=(c-this.off)*.02;
   if(this.pts!==null){const gap=ts-this.pts;if(gap<1500){this.w.push(gap+Math.max(0,c-this.off));if(this.w.length>48)this.w.shift();}}
   this.pts=ts;
@@ -6359,6 +6361,9 @@ function mpRoute(o,id){
   if(mpTrySend&&mpP2P.has(id))return mpTrySend(o,id);
   if(mpRelSend&&mpSrv.has(id))return mpRelSend(o,id);
   if(mpTrySend)return mpTrySend(o,id);}
+// пинг привязан к каналу (25.11): P2P открылся/закрылся или сервер ↔ Trystero — старую цифру другого канала не показываем, до первого замера — «на связи»
+function mpPingCh(){const id=MP.peerId;return !id?'':mpDc&&mpDc.isOpen(id)?'dc':mpP2P.has(id)&&mpTry?'try':'rel';}
+function mpPingSync(){const c=mpPingCh();if(c!==MP.pingCh){MP.pingCh=c;MP.ping=0;MP.pingQ=[];MP.pingRaw=0;MP.pingAt=0;}return c;}
 function mpVia(){const id=MP.peerId;return !id?'':(mpDc&&mpDc.isOpen(id))||mpP2P.has(id)?'p2p':mpSrv.has(id)?'relay':'';}
 function mpProbeNostr(){
   mpDiag.nostr={ok:0,total:MP_RELAYS.length,done:0};const d=mpDiag.nostr;
@@ -6393,7 +6398,7 @@ function mpNetDetail(){
   return L.join('\n');}
 function mpRefreshNet(){
   const a=document.getElementById('mpNetSt'),b=document.getElementById('mpDiag');
-  if(a)a.textContent=mpNetLine();if(b&&!b.hidden)b.textContent=mpNetDetail();lobRefreshNet();}
+  if(a){const t=mpNetLine();if(a.textContent!==t)a.textContent=t;}if(b&&!b.hidden){const t=mpNetDetail();if(b.textContent!==t)b.textContent=t;}lobRefreshNet();}
 function mpSend(o){if(MP.peerId)mpSendTo(o,MP.peerId);}
 async function mpOpen(role,code){
   mpCloseRoom();const gen=++mpOpenGen;
@@ -6431,7 +6436,7 @@ function mpCloseRoom(){
   mpOpenGen++;
   try{if(mpDc)mpDc.leave();}catch(e){}mpDc=null;try{if(mpRel)mpRel.leave();}catch(e){}try{if(mpTry)mpTry.leave();}catch(e){}
   mpRel=null;mpRelSend=null;mpTry=null;mpTrySend=null;mpP2P.clear();mpSrv.clear();
-  MP.verBad=null;MP.pingQ=[];MP.ping=0;
+  MP.verBad=null;MP.pingQ=[];MP.ping=0;MP.pingCh='';
   mpRoom=null;mpSendFn=null;MP.peerId=null;MP.peer&&mpPeerModelDrop();MP.peer=null;clearInterval(mpTimer);}
 // вход/выход пира на одном из каналов; для игры пир один, канал выбирается на лету
 function mpChanJoin(ch,id){
@@ -6471,7 +6476,8 @@ function mpGuestLost(){
 function mpHello(){mpSend({t:'hi',n:mpNick(),c:CLS.id,l:RUN.on?S.lvl:1,ml:mastLvl(),g:S.gorge|0,r:MP.role,v:1,b:APP_BUILD});lobSend();}
 function mpTick(){
   const now=performance.now();
-  if(!(mpTick.n=(mpTick.n||0)+1)%20&&!$('#coop').hidden)mpRefreshNet();
+  const pch=mpPingSync();
+  if(!((mpTick.n=(mpTick.n||0)+1)%20)&&!$('#coop').hidden)mpRefreshNet(); // раз в секунду: статус связи, значок лобби, «Подробнее»
   if(MP.peerId){
     if(now-MP.lastRx>9000){mpPeerGone('timeout');return;}
     if(MP.active&&mode==='game'&&MP.peer&&MP.peer.on){
@@ -6481,7 +6487,7 @@ function mpTick(){
       if(MP.pvDirty||now-(MP.pvAt||0)>5000){MP.pvDirty=false;MP.pvAt=now;mpSendPv();}
     }else if(now-MP.kaAt>2000||!MP.kaAt){MP.kaAt=now;mpSend({t:'ka'});}
     if(mpRel&&mpRel.flush)mpRel.flush(); // всё, что накопилось за такт (позиция, снимок, удары, события кадров), — одним конвертом сейчас
-    if(mpDc&&mpDc.isOpen(MP.peerId)){const r=mpDc.rtt();if(r)MP.ping=r;}else if(now-MP.pingAt>2500){MP.pingAt=now;try{const pr=mpP2P.has(MP.peerId)&&mpTry?mpTry:mpRel;if(pr)pr.ping(MP.peerId).then(ms=>{MP.pingRaw=ms;const q=MP.pingQ;q.push(ms);if(q.length>5)q.shift();MP.ping=q.slice().sort((a,b)=>a-b)[q.length>>1];}).catch(()=>{});}catch(e){}}
+    if(pch==='dc'){const r=mpDc.rtt();if(r)MP.ping=r;}else if(now-MP.pingAt>2500){MP.pingAt=now;try{const pr=pch==='try'?mpTry:mpRel;if(pr)pr.ping(MP.peerId).then(ms=>{if(MP.pingCh!==pch)return;MP.pingRaw=ms;const q=MP.pingQ;q.push(ms);if(q.length>5)q.shift();MP.ping=q.slice().sort((a,b)=>a-b)[q.length>>1];}).catch(()=>{});}catch(e){}}
   }else if(MP.role&&MP.code&&mpRoom&&now-MP.t0>(MP.role==='guest'?25000:60000)){MP.t0=now;mpOpen(MP.role,MP.code);}
 }
 function mpSendPos(){
@@ -6541,6 +6547,7 @@ function mpOnHi(m){
   if(MP.verBad){MP.verBad=null;MP.err='';mpRenderLobby();}
   const cls=CLASS_BY[m.c]?m.c:'pyro';
   const first=!MP.peer;
+  if(first){NJ.p.reset();if(MP.role==='guest')NJ.s.reset();} // новый напарник (вернулся после перезагрузки) — буфер плавности считаем заново
   if(first)MP.peer={ib:new Interp(),on:false,pos:new THREE.Vector3(),vel:new THREE.Vector3(),tx:0,tz:0,tf:0,dead:false,hp:100,maxHp:100,walk:0,castT:0,hero:null,lbl:null,placed:false,mv:0,sh:0,rp:0};
   const pr=MP.peer;if(first){pr.ready=false;pr.md='camp';pr.g=1;}pr.nick=nickClean(m.n)||'Напарник';pr.cls=cls;pr.lvl=m.l|0||1;pr.ml=m.ml|0;pr.gorge=m.g|0;
   MP.status=MP.active?'playing':'lobby';
@@ -7064,6 +7071,7 @@ function mpPlayersHtml(){
   return `<div class="coop-players">${me}${o}</div>`;}
 function mpNetBlock(){return `<div class="coop-net"><span id="mpNetSt">${esc(mpNetLine())}</span> <button class="ghost sm" data-a="diag" type="button">Подробнее</button></div><pre id="mpDiag" class="coop-diag" ${mpDiag.open?'':'hidden'}>${esc(mpDiag.open?mpNetDetail():'')}</pre>`;}
 function mpRenderLobby(){
+  mpPingSync();
   if(mode==='select'&&MP._selRole!==MP.role){MP._selRole=MP.role;renderSelInfo();}
   const ov=$('#coop');if(ov.hidden)return;const c=$('#coopCard');
   const pr=MP.peer;let h='';
@@ -7217,7 +7225,7 @@ function mpOnLob(m){
   if(MP.role==='guest'){pr.md=m.md==='world'?'world':'camp';pr.g=clamp(m.g|0,1,8);}
   if(!coopEl.hidden)mpRenderLobby();}
 function lobNetText(){const v=mpVia(),p=MP.ping?' · '+Math.round(MP.ping)+' мс':'';return (v==='p2p'?'P2P':v==='relay'?'Сервер':'…')+p;}
-function lobRefreshNet(){const a=document.getElementById('lobNet');if(a){a.textContent=lobNetText();a.dataset.v=mpVia();}}
+function lobRefreshNet(){const a=document.getElementById('lobNet');if(a){const t=lobNetText(),v=mpVia();if(a.textContent!==t)a.textContent=t;if(a.dataset.v!==v)a.dataset.v=v;}}
 function lobTagHtml(i){
   if(!i){
     if(MP.role==='host')return `<div class="lt empty"><b>Ждём друга…</b><small>Место свободно</small><button class="lt-btn" data-l="invite" type="button">${performance.now()<LOB.copiedT?'Ссылка скопирована':'Пригласить'}</button></div>`;

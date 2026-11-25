@@ -111,9 +111,58 @@ function interpTests() {
   ok(r.adapt.delay <= 78 && r.adapt.extrap < 3, 'враги P2P: ' + r.adapt.delay + ' мс вместо ' + E);
 }
 
+// ---------- 3) напарник вернулся после перезагрузки; пинг привязан к каналу; статус раз в секунду ----------
+function rejoinTests() {
+  console.log('NetJit: напарник перезагрузил страницу');
+  const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
+  const a = html.indexOf('function Interp(){'), b = html.indexOf('// ---------- ник ----------');
+  let clock = 0; const perf = { now: () => clock };
+  const M = new Function('performance', html.slice(a, b) + ';return {NetJit};')(perf);
+  const nj = new M.NetJit(50, 95); let ts = 600000;
+  for (clock = 1000; clock < 21000; clock += 50) { ts += 50; nj.push(ts - 10); }
+  const d1 = nj.d; let seed = 3; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const n0 = nj.n; let ts2 = 3000; // новые часы гостя, канал через сервер (100–180 мс)
+  for (let i = 0; i < 1200; i++) { clock += 50; ts2 += 50; nj.push(ts2 - 100 - rnd() * 80); }
+  ok(d1 < 70 && nj.d >= 90 && nj.n > 0 && nj.pts > 3000 && nj.pts < 70000, 'после P2P буфер ' + Math.round(d1) + ' мс; вернулся через сервер — подстроился до ' + Math.round(nj.d) + ' мс (пакетов принято ' + nj.n + ')');
+  const nj2 = new M.NetJit(50, 95); ts = 1000; for (clock = 1000; clock < 3000; clock += 50) { ts += 50; nj2.push(ts); }
+  const n1 = nj2.n; nj2.push(ts - 1500); nj2.push(ts - 40);
+  ok(nj2.n === n1 && nj2.pts === ts, 'старый пакет (на 1,5 с и на 40 мс раньше) просто отброшен, буфер не сброшен');
+}
+async function pingChanTests() {
+  console.log('пинг по каналу и обновление статуса (mpTick)');
+  const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
+  const cut = (from, to) => { const i = html.indexOf(from), j = html.indexOf(to, i + 1); if (i < 0 || j < 0) throw new Error('нет ' + from); return html.slice(i, j); };
+  const src = cut('function mpPingCh(', 'function mpVia(') + cut('function mpVia(', 'function mpProbeNostr(') + cut('function mpTick(', 'function mpSendPos(') + cut('function lobNetText(', 'function lobRefreshNet(');
+  let clock = 0, refresh = 0; const relPings = [];
+  const env = { MP: { peerId: 'g', pingQ: [], pingRaw: 0, pingCh: '', ping: 0, pingAt: 0, lastRx: 0, kaAt: 0, active: false, role: 'host' },
+    dcOpen: false, dcRtt: 0, P2P: new Set(), Srv: new Set(['g']) };
+  const factory = new Function('E', 'performance', '$', 'mpRefreshNet', 'mpSend', 'mpPeerGone',
+    'let MP=E.MP,mode="camp",MPH=false,mpTry=null,mpP2P=E.P2P,mpSrv=E.Srv;' +
+    'let mpDc={isOpen:()=>E.dcOpen,rtt:()=>E.dcRtt};' +
+    'let mpRel={flush(){},ping(id){return new Promise(r=>E.relPings.push(r));}};' + src + ';return {mpTick,lobNetText,mpPingSync};');
+  env.relPings = relPings;
+  const F = factory(env, { now: () => clock }, () => ({ hidden: false }), () => refresh++, () => {}, () => {});
+  const tick = async n => { for (let i = 0; i < n; i++) { clock += 50; env.MP.lastRx = clock; F.mpTick(); await Promise.resolve(); } };
+  await tick(100);
+  ok(refresh === 5, 'статус связи и значок лобби обновляются раз в секунду: ' + refresh + ' раз за 5 с (было 0 — условие !(n)%20)');
+  while (relPings.length) relPings.shift()(410); await Promise.resolve(); await Promise.resolve();
+  ok(env.MP.ping === 410 && F.lobNetText() === 'Сервер · 410 мс', 'через сервер: ' + F.lobNetText());
+  await tick(40); const late = relPings.splice(0); // замер через сервер ещё в пути
+  env.dcOpen = true; env.dcRtt = 0; await tick(1);
+  ok(env.MP.ping === 0 && F.lobNetText() === 'P2P', 'P2P открылся, понга ещё нет: «' + F.lobNetText() + '» — без старой цифры сервера');
+  late.forEach(r => r(420)); await Promise.resolve(); await Promise.resolve();
+  ok(env.MP.ping === 0, 'опоздавший замер старого канала не подставился');
+  env.dcRtt = 6; await tick(1);
+  ok(F.lobNetText() === 'P2P · 6 мс', 'первый понг P2P: «' + F.lobNetText() + '»');
+  env.dcOpen = false; await tick(1);
+  ok(env.MP.ping === 0 && relPings.length === 1, 'P2P закрылся: цифра P2P снята, замер через сервер ушёл сразу');
+}
+
 (async () => {
   await relayTests();
   interpTests();
+  rejoinTests();
+  await pingChanTests();
   console.log(fails ? 'ИТОГ: брак ' + fails : 'ИТОГ: всё ок');
   process.exit(fails ? 1 : 0);
 })().catch(e => { console.log('FAIL', e && e.stack || e); process.exit(1); });
