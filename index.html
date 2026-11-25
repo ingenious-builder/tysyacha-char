@@ -2554,7 +2554,7 @@ function fmVis(en,dt){const I=en.fm,t=en.t,b=t.as||en.tid,A=en.A;
   // скорость — по настоящему сдвигу за кадр (бег, блуждание, рывок, отброс): ноги не скользят
   const v=Math.hypot(en.pos.x-f.px,en.pos.z-f.pz)/Math.max(1e-3,dt);f.px=en.pos.x;f.pz=en.pos.z;f.v+=(Math.min(v,40)-f.v)*Math.min(1,dt*10);
   I.drive({move:f.v>.45&&(en.moving||!!en.charge||f.v>1.5),spd:f.v,sc:I.k*en.g.scale.x,act,actT,hit});
-  I.update(dt*(en.frozenT>0?0:en.stun>0?.25:1));}
+  I.update(dt*(en.frozenT>0?0:en.stun>0?.25:1),!en.boss&&Math.hypot(en.pos.x-camT.x,en.pos.z-camT.z)>13);}
 // ---- сила врага (v13.9; Артём: «на 70 уровне ботов 200 уровня за 2 секунды убивал») ----
 // Свободный мир: база — от уровня врага (не выше уровня сильнейшего героя): до 4-го как раньше, дальше догоняет рост силы героя
 // (таланты, ранги, слоты, мастерство), чтобы враг своего уровня жил ~1–1.5 с реального боя; сверх неё — от разницы «враг − герой»:

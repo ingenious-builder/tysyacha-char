@@ -128,8 +128,9 @@
   // для каждого скиннированного меша отдельно, даже когда материал общий (как и текстуру костей). Поэтому материал
   // один на всех, без пересылки всех юниформ на каждого врага. bindMatrix: [0] кадр A, кадр B, доля; [1] вспышка rgb, сила
   // ободка; [2] цвет ободка. Скиннинг ниже свой — без bindMatrix как матрицы.
-  const SKIN_V = ['X', 'Y', 'Z', 'W'].map((c, i) => `mat4 boneMat${c} = getBoneMatrix( skinIndex.${'xyzw'[i]} + bindMatrix[0].x );
-	boneMat${c} += ( getBoneMatrix( skinIndex.${'xyzw'[i]} + bindMatrix[0].y ) - boneMat${c} ) * bindMatrix[0].z;`).join('\n\t');
+  // второй кадр читаем, только когда есть смешение (дальние враги — без него: вдвое меньше выборок)
+  const SKIN_V = ['X', 'Y', 'Z', 'W'].map((c, i) => `mat4 boneMat${c} = getBoneMatrix( skinIndex.${'xyzw'[i]} + bindMatrix[0].x );`).join('\n\t') +
+    '\n\tif ( bindMatrix[0].z > 0.0 ) {\n\t\t' + ['X', 'Y', 'Z', 'W'].map((c, i) => `boneMat${c} += ( getBoneMatrix( skinIndex.${'xyzw'[i]} + bindMatrix[0].y ) - boneMat${c} ) * bindMatrix[0].z;`).join('\n\t\t') + '\n\t}';
   const SKIN_P = `vec4 skinned = vec4( 0.0 );
 	vec4 skinVertex = vec4( transformed, 1.0 );
 	skinned += boneMatX * skinVertex * skinWeight.x;
@@ -195,12 +196,15 @@ varying float vRim;
       const x = ((s.t / c.d) % 1 + 1) % 1 * c.n, f = Math.floor(x) % c.n; return [c.off + f, c.off + (f + 1) % c.n, x - Math.floor(x)];
     }
     get busy() { const s = this.cur; return !!(s && s.once && s.t < s.c.d - .02); }
-    update(dt) {
+    // far — далеко от камеры: ближайший кадр без смешения (кроме перехода между клипами) и без настоящей тени
+    update(dt, far) {
       const s = this.cur; if (!s) return; this.t += dt; this.hitCd -= dt;
       s.t += dt * s.ts; if (this.prev) { this.prev.t += dt * this.prev.ts; this.fade -= dt; if (this.fade <= 0) this.prev = null; }
       const nb = this.A.nb, a = this.fr(s), e = this.mesh.bindMatrix.elements, px = this.px, rc = px.userData.rimU.value;
       if (this.prev) { const p = this.fr(this.prev); e[0] = Math.round(p[0] + p[2]) * nb; e[1] = Math.round(a[0] + a[2]) * nb; e[2] = 1 - this.fade / this.fadeD; }
+      else if (far) { e[0] = (a[2] < .5 ? a[0] : a[1]) * nb; e[1] = e[0]; e[2] = 0; }
       else { e[0] = a[0] * nb; e[1] = a[1] * nb; e[2] = a[2]; }
+      this.mesh.castShadow = !far;
       e[4] = px.emissive.r; e[5] = px.emissive.g; e[6] = px.emissive.b; e[7] = px.rimK; e[8] = rc.r; e[9] = rc.g; e[10] = rc.b;
     }
     // st: {move, spd (м/с), sc (внешний масштаб), atk:'atk'|'atk2'|…, atkT (длительность удара, с), hit, cast, dead}
@@ -247,7 +251,7 @@ varying float vRim;
     get dead() { return this.parts[0].I.dead; }
     play(k, o) { for (const p of this.parts) p.I.play(k, o); }
     drive(st) { for (const p of this.parts) p.I.drive(Object.assign({}, st, p.lag && st.act ? { act: null } : null)); for (const p of this.parts) if (p.lag && st.act) setTimeout(() => p.I.drive(st), p.lag * 1000); }
-    update(dt) { for (const p of this.parts) p.I.update(dt); }
+    update(dt, far) { for (const p of this.parts) p.I.update(dt, far); }
     reset() { for (const p of this.parts) p.I.reset(); }
   }
 
@@ -264,19 +268,19 @@ varying float vRim;
     bomber: { m: 'demonw', hide: ['weapon'], tint: { main: 1 }, glow: { spark: 1 }, hk: 1.05 },
     brute: { m: 'yeti', hide: ['rocks', 'core'], tint: { main: 1, secondary: .55 }, pal: { horns: 0xe8dcc0 }, glow: { eye_black: .0 } },
     wraith: { m: 'ghost', tint: { main: .75 }, glow: { eye_white: .5 }, hk: 1.05 },
-    colossus: { m: 'yeti', hide: ['horns'], tint: { main: 1, secondary: .7, teeth: .7, tongue: .45 }, pal: { rocks: 0x55565e, core: 0xff7a33, eye_black: 0xff7a33, eye_white: 0x3a3b42 }, glow: { core: 1, eye_black: 1 } },
+    colossus: { m: 'yeti', hide: ['horns', 'tongue'], tint: { main: 1, secondary: .7, teeth: .7, tongue: .45 }, pal: { rocks: 0x55565e, core: 0xff7a33, eye_black: 0xff7a33, eye_white: 0x3a3b42 }, glow: { core: 1, eye_black: 1 } },
     shield: { m: 'skwar', hide: ['axe', 'crown'], tint: { cloak: 1 }, glow: { eyes: .8 } },
-    wolf: { m: 'wolf', hide: ['mane', 'lmane'], tint: { main: 1, light: 1.35 } },
+    wolf: { m: 'wolf', hide: ['mane', 'lmane'], tint: { main: 1, light: 1.35 }, hk: 1.3 },
     spider: { m: 'spider', hide: ['crown'], tint: { main: 1 }, pal: { eyes: 0xd02a2a }, glow: { eyes: .6 }, hk: .62 },
     mage: { m: 'wizard', tint: { main: 1 }, glow: { secondary: .35 } },
-    necro: { m: 'skmag', tint: { hat: 1 }, pal: { eyes: 0x7dff5a }, glow: { eyes: 1 } },
+    necro: { m: 'skmag', tint: { hat: 1, body: .75 }, pal: { eyes: 0x7dff5a }, glow: { eyes: 1 } },
     sniper: { m: 'skrog', tint: { hood: 1, cape: .8 }, pal: { eyes: 0xff4040 }, glow: { eyes: 1 }, act: { shoot: 'shoot' } },
     shroom: { m: 'mush', tint: { secondary: 1 }, hk: 1.05 },
     elemental: { m: 'hywirl', tint: { main: 1 }, glow: { main: .3, eye_black: .2 } },
     imp: { m: 'demonf', tint: { main: 1 } },
-    bat: { m: 'bat', tint: { main: 1 }, hk: .62 },
-    golem: { m: 'yeti', hide: ['horns'], tint: { main: 1, secondary: .72, teeth: .72, tongue: .5, rocks: .75 }, pal: { core: 0xffd24a, eye_black: 0xffd24a, eye_white: 0x3a3b42 }, glow: { core: 1, eye_black: 1 } },
-    skeleton: { m: 'skmin', tint: { head: 1, jaw: 1, arm: 1, leg: 1 }, glow: { eyes: .9 } },
+    bat: { m: 'bat', tint: { main: 1 }, hk: 1.0 },
+    golem: { m: 'yeti', hide: ['horns', 'tongue'], tint: { main: 1, secondary: .72, teeth: .72, tongue: .5, rocks: .75 }, pal: { core: 0xffd24a, eye_black: 0xffd24a, eye_white: 0x3a3b42 }, glow: { core: 1, eye_black: 1 } },
+    skeleton: { m: 'skmin', tint: { head: .82, jaw: .82, arm: .82, leg: .82 }, glow: { eyes: .9 } },
     spitter: { m: 'dino', tint: { main: 1 }, hk: 1.25 },
     // боссы
     wolfking: { m: 'wolf', hide: ['lmane'], tint: { main: 1, light: 1.3 }, pal: { eyes_black: 0xff3030 }, glow: { eyes_black: 1 } },
@@ -295,9 +299,9 @@ varying float vRim;
     executioner: { m: 'yeti', hide: ['rocks', 'core'], tint: { main: 1, secondary: .7 }, pal: { horns: 0x2a2020, eye_black: 0xff3030 }, glow: { eye_black: 1 } },
     deadknight: { m: 'skwar', hide: ['axe', 'crown', 'shield'], tint: { cloak: .55, head: 1, jaw: 1, arm: 1, leg: 1 }, pal: { eyes: 0x9affc8 }, glow: { eyes: 1 } },
     skyknight: { m: 'skwar', hide: ['axe', 'crown'], tint: { cloak: 1, helmet: 1.1 }, pal: { eyes: 0xfff2a8 }, glow: { eyes: 1 } },
-    gargoyle: { m: 'bat', tint: { main: 1, belly: .8 }, pal: { eyes: 0xff5030 }, glow: { eyes: 1 }, hk: .7 },
+    gargoyle: { m: 'bat', tint: { main: 1, belly: .8 }, pal: { eyes: 0xff5030 }, glow: { eyes: 1 }, hk: 1.1 },
     lichking: { m: 'skwar', hide: ['blade', 'shield', 'helmet'], tint: { cloak: .45, head: 1, jaw: 1, arm: 1, leg: 1 }, pal: { eyes: 0x9affc8, crown: 0x9affc8 }, glow: { eyes: 1, crown: .6 } },
-    prismgiant: { m: 'yeti', hide: ['horns'], tint: { main: 1, secondary: .7, teeth: .7, tongue: .5, rocks: 1.2 }, pal: { core: 0xffffff, eye_black: 0xffffff }, glow: { core: 1, eye_black: 1, rocks: .35 } },
+    prismgiant: { m: 'yeti', hide: ['horns', 'tongue'], tint: { main: 1, secondary: .7, teeth: .7, tongue: .5, rocks: 1.2 }, pal: { core: 0xffffff, eye_black: 0xffffff }, glow: { core: 1, eye_black: 1, rocks: .35 } },
   };
   const scl = (c, k) => { const r = Math.min(255, Math.round((c >> 16 & 255) * k)), g = Math.min(255, Math.round((c >> 8 & 255) * k)), b = Math.min(255, Math.round((c & 255) * k)); return (r << 16) | (g << 8) | b; };
   function opts(S, col, h) {
@@ -330,8 +334,8 @@ varying float vRim;
     const e = c.e, F = c.f, Gp = c.g;
     switch (kind) {
       case 'golem': return cx === 'necro'
-        ? { m: 'yeti', h: 2.9, hide: ['horns'], pal: { main: 0xd8ccae, secondary: 0x9a8e72, teeth: 0x9a8e72, tongue: 0x5a4e3a, rocks: 0xe8e0c8, core: 0xb07bff, eye_black: 0xb07bff, eye_white: 0x2a2030 }, glow: { core: 1, eye_black: 1 } }
-        : { m: 'yeti', h: 2.9, hide: ['horns'], pal: { main: Gp[0], secondary: Gp[1], teeth: Gp[1], tongue: Gp[1], rocks: Gp[1], core: Gp[2], eye_black: Gp[2], eye_white: 0x2a2a30 }, glow: { core: 1, eye_black: 1 } };
+        ? { m: 'yeti', h: 2.9, hide: ['horns', 'tongue'], pal: { main: 0xd8ccae, secondary: 0x9a8e72, teeth: 0x9a8e72, tongue: 0x5a4e3a, rocks: 0xe8e0c8, core: 0xb07bff, eye_black: 0xb07bff, eye_white: 0x2a2030 }, glow: { core: 1, eye_black: 1 } }
+        : { m: 'yeti', h: 2.9, hide: ['horns', 'tongue'], pal: { main: Gp[0], secondary: Gp[1], teeth: Gp[1], tongue: Gp[1], rocks: Gp[1], core: Gp[2], eye_black: Gp[2], eye_white: 0x2a2a30 }, glow: { core: 1, eye_black: 1 } };
       case 'bear': return { m: 'bear', h: 2.3, pal: { main: el === 'earth' ? 0x6a4a30 : F[0], light: el === 'earth' ? 0x9a7a58 : F[1], eyes_black: e }, glow: { eyes_black: .9 } };
       case 'wolves': return { m: 'wolf', h: 1.45, hide: ['mane', 'lmane'], pal: { main: F[0], light: F[1], eyes_black: e }, glow: { eyes_black: .9 } };
       case 'lion': return { m: 'wolf', h: 2.0, hide: ['mane'], pal: { main: 0xd0a058, light: 0xe8cc90, lmane: el === 'fire' ? 0xc4501a : F[0], eyes_black: e }, glow: { eyes_black: .9, lmane: el === 'fire' || el === 'storm' ? .4 : 0 }, morph: LION, mkey: 'lion' };
@@ -339,7 +343,7 @@ varying float vRim;
       case 'skelmage': return { m: 'skmag', h: 2.2, pal: { eyes: e, hat: 0x2a1a3a }, glow: { eyes: 1 }, spawn: 1 };
       case 'bonedrake': return { m: 'dragon', h: 2.4, pal: { main: 0xe3dac0, belly: 0x9a8e72, wings: 0x3a3040, claws: 0x9a8e72, eyes: e }, glow: { eyes: 1 } };
       case 'imps': return { m: 'demonf', h: 1.4, pal: { main: el === 'fire' || el === 'blood' ? 0x9a2a2a : F[0], black: F[1], eye_black: e }, glow: { eye_black: .9 } };
-      case 'infernal': return { m: 'yeti', h: 3.9, hide: [], pal: { main: 0x2a2020, secondary: 0x1a1414, teeth: 0x3a2a28, tongue: 0x3a2a28, horns: 0x3a2a28, rocks: 0x3a2a28, core: e, eye_black: e, eye_white: 0x140c0c }, glow: { core: 1, eye_black: 1, rocks: .15 } };
+      case 'infernal': return { m: 'yeti', h: 3.9, hide: ['tongue'], pal: { main: 0x2a2020, secondary: 0x1a1414, teeth: 0x3a2a28, tongue: 0x3a2a28, horns: 0x3a2a28, rocks: 0x3a2a28, core: e, eye_black: e, eye_white: 0x140c0c }, glow: { core: 1, eye_black: 1, rocks: .15 } };
       case 'elemental': return { m: 'hywirl', h: 2.2, pal: { main: e }, glow: { main: .45, eye_black: .3 } };
       case 'stormbird': return { m: 'dragon', h: 1.5, pal: { main: F[0], belly: F[1], wings: F[1], eyes: e }, glow: { eyes: 1 } };
     }
