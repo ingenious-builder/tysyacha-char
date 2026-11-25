@@ -1091,6 +1091,7 @@ html[data-ui=tab] #layPan{width:min(460px,calc(100% - 40px));padding:16px 18px;g
         <section class="set-sec"><h3>Камера</h3><div class="set-stp"><button type="button" class="chip" id="camM" aria-label="Камера ближе">−</button><span id="camV">116 %</span><button type="button" class="chip" id="camP" aria-label="Камера дальше">+</button></div><p class="hint">Дальше — видно больше мира, герой мельче. Ближе — крупнее, но обзор меньше.</p></section>
         <section class="set-sec"><h3>Отступ снизу</h3><div class="set-stp"><button type="button" class="chip" id="botM" aria-label="Меньше отступ снизу">−</button><span id="botV">0 px</span><button type="button" class="chip" id="botP" aria-label="Больше отступ снизу">+</button></div><p class="hint">Если снизу тёмная полоса и кнопки обрезаны — добавь отступ (шаг 8).</p></section>
         <section class="set-sec"><h3>Управление</h3><button class="btn" id="setLay" type="button">Расположение кнопок</button><p class="hint" id="layBtnHint">Перетащи джойстик, атаку и кнопки меню куда удобно, поменяй размер или стороны (для левшей). Отдельно для вертикального и горизонтального экрана.</p></section>
+        <section class="set-sec"><h3>Благодарности</h3><p class="hint">Модели героев — KayKit Adventurers, автор Kay Lousberg (kaylousberg.com), лицензия CC0.</p></section>
       </div>
       <div class="set-foot">
         <div class="set-exit">
@@ -1395,7 +1396,7 @@ const CLASS_BY={};CLASSES.forEach(c=>{CLASS_BY[c.id]=c;c.icon='w_'+c.look.weapon
   c.t=THIRD[c.id];c.core=new Set([...c.pa.map(f=>[c.p,f]),...c.pp.map(f=>[c.p,f]),...c.sa.map(f=>[c.s,f]),...c.sp.map(f=>[c.s,f])].map(([e,f])=>EL[e]*NF+FORM[f]));
   c.pairs=[];c.pairsAll=[];for(const e of [c.p,c.s,c.t])for(const F of FORMS){c.pairsAll.push([e,F.id]);if(!c.ban.has(F.id))c.pairs.push([e,F.id]);}
   c.pool=new Set();c.poolAll=new Set();for(const [e,f] of c.pairsAll)for(const m of MODS){const id=sid(e,f,m.id);c.poolAll.add(id);if(!c.ban.has(f))c.pool.add(id);}
-  c.color=ELEMENTS[EL[c.p]].color;c.hex=ELEMENTS[EL[c.p]].hex;});
+  c.color=ELEMENTS[EL[c.p]].color;c.hex=ELEMENTS[EL[c.p]].hex;c.look.cid=c.id;});
 
 const BRANCHES=[{name:'Стихии',sub:'урон и реакции',c:'#ff8a3d'},{name:'Стойкость',sub:'выживание и ближний бой',c:'#6fd08c'},{name:'Таинство',sub:'мана, призывы, пассивки',c:'#b58cff'}];
 const TALENTS=[
@@ -1756,10 +1757,10 @@ function addSway(mat,amp){mat.customProgramCacheKey=()=>'sway'+amp;mat.onBeforeC
   transformed.x+=sw;transformed.z+=sw*.6;`);};}
 // мягкий контровой свет по краю силуэта (в вершинном шейдере, почти бесплатно)
 function rimify(root,col,k){const us=[];root.traverse(o=>{const m=o.isMesh&&o.material;if(!m||!m.isMeshLambertMaterial||m.userData.rimU)return;
-  const u={value:new THREE.Color(col)};m.userData.rimU=u;us.push(u);m.customProgramCacheKey=()=>'rim'+k;
+  const u={value:new THREE.Color(col)};m.userData.rimU=u;us.push(u);const kk=m.userData.rimK!=null?m.userData.rimK:k;m.customProgramCacheKey=()=>'rim'+kk;
   m.onBeforeCompile=sh=>{sh.uniforms.uRim=u;
     sh.vertexShader=sh.vertexShader.replace('void main() {','varying float vRim;\nvoid main() {').replace('#include <project_vertex>','#include <project_vertex>\nvRim=pow(1.-clamp(dot(normalize(transformedNormal),normalize(-mvPosition.xyz)),0.,1.),2.4);');
-    sh.fragmentShader=sh.fragmentShader.replace('void main() {','uniform vec3 uRim;varying float vRim;\nvoid main() {').replace('gl_FragColor = vec4( outgoingLight, diffuseColor.a );','gl_FragColor = vec4( outgoingLight + uRim*vRim*'+k.toFixed(2)+', diffuseColor.a );');};});return us;}
+    sh.fragmentShader=sh.fragmentShader.replace('void main() {','uniform vec3 uRim;varying float vRim;\nvoid main() {').replace('gl_FragColor = vec4( outgoingLight, diffuseColor.a );','gl_FragColor = vec4( outgoingLight + uRim*vRim*'+kk.toFixed(2)+', diffuseColor.a );');};});return us;}
 const treeM=new THREE.MeshLambertMaterial({vertexColors:true});addSway(treeM,.012);
 const tuftM=new THREE.MeshLambertMaterial({vertexColors:true});addSway(tuftM,.55);
 const propM=new THREE.MeshLambertMaterial({vertexColors:true});
@@ -2334,7 +2335,7 @@ function recalcStats(){const hr=P.maxHp?P.hp/P.maxHp:1,mr=P.maxMp?P.mp/P.maxMp:1
   P.maxHp=Math.round((120+24*(S.lvl-1))*ST.hpMul*CLS.hp);P.maxMp=Math.round((100+10*(S.lvl-1))*ST.mana*CLS.mp);P.mpRegen=(8+.4*(S.lvl-1))*ST.mana*CLS.mp;P.hpRegen=1.5+.25*S.lvl+ST.regen;P.speed=6.2*CLS.spd;
   P.hp=Math.min(P.maxHp,hr*P.maxHp);P.mp=Math.min(P.maxMp,mr*P.maxMp);}
 let hero=null;
-function buildHero(L){
+function buildHero(L,o){
   const g=new THREE.Group(),body=new THREE.Group();g.add(body);const D=[];
   const M=c=>{const m=lam(c);D.push(m);return m;},Bm=c=>{const m=basic(c);D.push(m);return m;};
   const c1=M(L.c1),c2=M(L.c2),skin=M(L.skin||0xf1c7a0),dark=M(0x1f1a18),hc=M(L.hc||L.c1),eyeM=Bm(L.eyes||0x9fe8ff),metal=M(0xc8ccd8),wood=M(0x7a5434),bone=M(0xe8dcc0);
@@ -2417,9 +2418,38 @@ function buildHero(L){
   const rims=rimify(g,0x9fb8ff,.5);
   castAll(g);
   scene.add(g);
-  return {g,body,armL:AL.a,armR:AR.a,orb,halo,pool,cape,capeBase,shieldM,D,legs,rims,al:0,ar:0,fists:L.weapon==='fists'};
+  const h={g,body,armL:AL.a,armR:AR.a,orb,halo,pool,cape,capeBase,shieldM,D,legs,rims,al:0,ar:0,fists:L.weapon==='fists',cid:L.cid,sil:!!(o&&o.sil)};
+  if(L.cid&&!HM_OFF){if(HMW)hmAttach(h);else{HM_PEND.add(h);hmBoot();}}
+  return h;
 }
 function rebuildHero(){if(hero){scene.remove(hero.g);hero.D.forEach(d=>d.dispose());hero.halo.material.dispose();hero.pool.material.dispose();hero.shieldM.material.dispose();}hero=buildHero(CLS.look);hero.g.position.copy(P.pos);heroColor(CLS.color);applyCosmetics();}
+// ---------- модели героев KayKit Adventurers (Kay Lousberg, CC0): грузятся лениво; пока нет или ошибка — процедурные ----------
+const HM_V='1',HM_OFF=/[?&]nomdl=1/.test(location.search),HM_PEND=new Set(),HM_GS=1.2;let HMW=null;
+const LOB_SILSK=new THREE.MeshBasicMaterial({color:0x5b72b8,transparent:true,opacity:.3,depthWrite:false,skinning:true});
+function hmScript(src){return new Promise((ok,no)=>{const s=document.createElement('script');s.src=src;s.async=true;s.onload=ok;s.onerror=()=>no(new Error(src));document.head.appendChild(s);});}
+function hmBoot(){if(HM_OFF||hmBoot.p||HMW)return;clearTimeout(hmBoot.tm);
+  hmBoot.p=(THREE.GLTFLoader?Promise.resolve():hmScript('vendor/GLTFLoader.js?v='+HM_V)).then(()=>window.HM?0:hmScript('hero-models.js?v='+HM_V))
+    .then(()=>{window.HM.V=HM_V;return window.HM.load('');}).then(()=>{HMW=window.HM;for(const h of HM_PEND)if(h.g.parent)hmAttach(h);HM_PEND.clear();if(hero&&hero.mdl&&S)applyCosmetics();})
+    .catch(e=>{console.warn('Модели героев не загрузились — остаются простые',e);hmBoot.p=null;hmBoot.n=(hmBoot.n||0)+1;
+      for(const h of HM_PEND)if(!h.g.parent)HM_PEND.delete(h);
+      if(hmBoot.n<6)hmBoot.tm=setTimeout(hmBoot,Math.min(60000,4000*2**(hmBoot.n-1)));else HM_PEND.clear();});}
+addEventListener('online',()=>{if(!HM_OFF&&!HMW&&!hmBoot.p){hmBoot.n=0;hmBoot();}});
+function hmAttach(h){
+  if(h.mdl||!HMW||!HMW.has(h.cid))return;let m;
+  try{m=HMW.make(h.cid,h.sil?{mat:LOB_SILMAT,matSk:LOB_SILSK}:{});}catch(e){console.warn('модель героя',h.cid,e);return;}
+  if(!m)return;
+  h.pbody=h.body;h.pbody.visible=false;
+  const wrap=new THREE.Group();wrap.add(m.root);h.g.add(wrap);h.body=wrap;h.mdl=m;
+  m.tip.add(h.orb);h.orb.position.set(0,0,0);m.tip.add(h.halo);h.halo.position.set(0,0,0);
+  if(!h.sil){const r=rimify(m.root,0x9fb8ff,.5),c=h.rims&&h.rims[0]?h.rims[0].value:null;if(c)for(const u of r)u.value.copy(c);h.rims=r;}
+  if(h.fists)for(const f of m.fists){const gl=glowSprite(0xffffff,.7,.9);gl.userData.fist=1;f.add(gl);h.D.push(gl.material);}
+  h.cape=null;h.legs=[];h.D.push({dispose:()=>m.dispose()});}
+// анимации моделей идут всегда (и на экране смерти, и в лобби); состояние задают animateHero, mpUpdatePeer, lobAnim
+function hmFrame(dt){if(!HMW)return;
+  if(hero&&hero.mdl){if(P.dead&&mode==='game'){hero.g.rotation.z=0;hero.g.position.y=0;hero.lhit=P.hitAt||0;hero.mdl.drive({dead:true});}const gs=mode==='game'?HM_GS:1;hero.body.scale.setScalar(gs);hero.mdl.gs=gs;hero.mdl.update(dt);}
+  const pr=MP.peer;if(pr&&pr.hero&&pr.hero.mdl){pr.hero.body.scale.setScalar(HM_GS);pr.hero.mdl.gs=HM_GS;pr.hero.mdl.update(dt);}
+  if(LOB.ph&&LOB.ph.h.mdl)LOB.ph.h.mdl.update(dt);
+  if(LOB.sil&&LOB.sil.h.mdl){LOB_SILSK.opacity=LOB_SILMAT.opacity;LOB.sil.h.mdl.update(dt);}}
 function heroColor(c){if(hero.rims)for(const u of hero.rims)u.value.copy(c).lerp(WHITE,.4);hero.orb.material.color.copy(c).lerp(WHITE,.3);hero.halo.material.color.copy(c);hero.pool.material.color.copy(c);if(hero.fists)hero.g.traverse(o=>{if(o.userData&&o.userData.fist)o.material.color.copy(c);});}
 
 // =====================================================================
@@ -2756,7 +2786,7 @@ function kill(en,depth,el,o){o=o||{};if(en.dead)return;
 function fireBlast(x,z,r){fxBurst(x,.8,z,r,FIREC,.4,.7);fxRing(x,z,.5,r+.5,FIREC,.45);fxGlow(x,z,r*1.4,FIREC,.5,.9);elBurst(EL.fire,x,.6,z,24,1.3);puffs(x,.6,z,new THREE.Color(0x553322),6,1.5,1);shake=Math.max(shake,.3);}
 function hurtPlayer(d,src,o){o=o||{};if(P.dead||P.invulnT>0)return;let dmg=d*ST.armor;if(src&&src.blindT>0)dmg*=.7;dmg=Math.max(1,Math.round(dmg));
   if(P.shield>0){const a=Math.min(P.shield,dmg);P.shield-=a;dmg-=a;if(!o.dot)colBurst(elCol(P.shieldSk?P.shieldSk.e:-1),P.pos.x,1.2,P.pos.z,5,3,.3,0);if(P.shield<=0)shieldBurst();if(dmg<=0)return;}
-  P.hp-=dmg;hurtFlash=Math.min(1,hurtFlash+(o.dot?.12:.45));float(P.pos,'−'+dmg,'#ff8a8a',o.dot?12:15);
+  P.hp-=dmg;if(!o.dot)P.hitAt=time;hurtFlash=Math.min(1,hurtFlash+(o.dot?.12:.45));float(P.pos,'−'+dmg,'#ff8a8a',o.dot?12:15);
   if(o.slow)P.slowT=Math.max(P.slowT,o.slow);if(src&&src.affix&&src.affix.has('frost')){P.slowT=2;elBurst(EL.ice,P.pos.x,1,P.pos.z,8);}
   if(!o.dot){for(const s of PASS.revenge){const cd=revCd.get(s.id)||0;if(cd>0)continue;revCd.set(s.id,s.F.icd*(s.M.cd||1));const R=skR(s);mpPE('r',s.id,P.pos.x,P.pos.z,4*R);
     multi(s,()=>{aoe(P.pos,4*R,skDmg(s),s.e,{sk:s,depth:1,knockFrom:P.pos.clone()});spikesFx(s,P.pos.x,P.pos.z,R);});}}
@@ -2803,6 +2833,7 @@ function applyCosmetics(){if(!hero||!S)return;const l=mastLvl();
   if(hero.auraM){hero.g.remove(hero.auraM);hero.auraM=null;}
   if(l>=2){const col=l>=25?0xf2c46b:CLS.color,m=new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:.5,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide}),
     ring=new THREE.Mesh(new THREE.RingGeometry(.75,.9,28).rotateX(-Math.PI/2),m);ring.position.y=.06;hero.g.add(ring);hero.auraM=ring;hero.D.push(ring.geometry,m);}
+  if(hero.mdl)hero.mdl.setCapeTint(l>=12?(l>=20?0xf2c46b:CLS.look.c2):null,l>=20?.55:.4);
   if(hero.cape&&CLS.look.cape!=null){const base=new THREE.Color(CLS.look.cape);if(l>=12){base.lerp(new THREE.Color(l>=20?0xf2c46b:CLS.look.c2),l>=20?.55:.4);}hero.cape.material.color.copy(base);}}
 function bossDown(en){S.bosses++;threat=0;BOSS=null;bossDeathShow(en);saveSoon();}
 function spawnBoss(tid0){if(BOSS)return;const C=mpSpawnCenter(),zb=WBOSS[zoneOf(C.x,C.z)],tid=tid0&&MOBS[tid0]&&MOBS[tid0].boss?tid0:zb[randi(0,zb.length-1)];const a=Math.atan2(-C.z,-C.x)+rand(-.8,.8);const x=C.x+Math.cos(a)*13,z=C.z+Math.sin(a)*13;
@@ -3915,6 +3946,10 @@ function updatePlayer(dt){
 function animateHero(dt,moving){
   hero.g.position.copy(P.pos);
   let a=P.face-hero.g.rotation.y;a=Math.atan2(Math.sin(a),Math.cos(a));hero.g.rotation.y+=a*Math.min(1,dt*14);
+  if(hero.mdl){hero.body.rotation.y=WHIRLS.length?hero.body.rotation.y+dt*22:0;
+    const sw=hero.lsw!=null&&P.swingT>hero.lsw+.02,cs=hero.lcs!=null&&P.castT>hero.lcs+.02,hit=(P.hitAt||0)>(hero.lhit||0);hero.lsw=P.swingT;hero.lcs=P.castT;hero.lhit=P.hitAt||0;
+    hero.mdl.drive({move:moving,spd:Math.hypot(P.vel.x,P.vel.z),swing:sw,cast:cs&&!sw,hit});}
+  else{
   P.walk+=dt*(moving?11:0);const sw=moving?Math.sin(P.walk)*.6:0;
   hero.body.position.y=moving?Math.abs(Math.sin(P.walk))*.08:Math.sin(time*2)*.02;
   hero.body.rotation.y=WHIRLS.length?hero.body.rotation.y+dt*22:0;
@@ -3923,7 +3958,7 @@ function animateHero(dt,moving){
   hero.body.rotation.x+=(((moving?.1:0)+(P.castT>0?-.1:0)+(P.swingT>0?.2:0))-hero.body.rotation.x)*Math.min(1,dt*10);hero.body.scale.y=1+Math.sin(time*2)*.012;
   if(hero.legs.length){hero.legs[0].rotation.x=sw*.9;hero.legs[1].rotation.x=-sw*.9;}
   if(hero.cape){hero.cape.rotation.x=.1+(moving?.25:0);const cp=hero.cape.geometry.attributes.position,cb=hero.capeBase,mv=moving?.36:.08,cw=moving?1.6:1;
-    for(let i=0;i<cp.count;i++){const bx=cb[i*3],by=cb[i*3+1],tt=Math.min(1,-by/1.1);cp.array[i*3]=bx*(1+.3*tt)+Math.sin(time*2.2+tt*3)*.035*tt;cp.array[i*3+2]=cb[i*3+2]+mv*tt+Math.sin(time*4.2-by*5+bx*3)*.07*tt*cw;}cp.needsUpdate=true;}
+    for(let i=0;i<cp.count;i++){const bx=cb[i*3],by=cb[i*3+1],tt=Math.min(1,-by/1.1);cp.array[i*3]=bx*(1+.3*tt)+Math.sin(time*2.2+tt*3)*.035*tt;cp.array[i*3+2]=cb[i*3+2]+mv*tt+Math.sin(time*4.2-by*5+bx*3)*.07*tt*cw;}cp.needsUpdate=true;}}
   hero.orb.scale.setScalar(hero.fists?.001:.1+(P.castT>0?.07:0)+Math.sin(time*5)*.01);hero.halo.scale.setScalar(1+(P.castT>0?.8:0)+Math.sin(time*4)*.08);
   hero.pool.material.opacity=.22+(P.castT>0?.25:0);
   if(hero.shieldM.visible){hero.shieldM.rotation.y+=dt;hero.shieldM.material.opacity=.12+.1*(P.shield/P.shieldMax)+.04*Math.sin(time*6);}}
@@ -4010,7 +4045,7 @@ function die(){P.dead=true;P.hp=0;hero.g.rotation.z=1.4;hero.g.position.y=.2;if(
 function dieFull(){P.dead=true;P.hp=0;hero.g.rotation.z=1.4;hero.g.position.y=.2;const lost=PLAY==='world'?Math.floor(S.ess*.2):0;S.ess-=lost;
   $('#deadTxt').textContent=PLAY==='gorge'&&GZ&&GZ.camp?(GZ.failText||'Уровень '+GZ.camp.k+' «'+GZ.camp.name+'» не пройден: оба героя пали.')+' Опыт, чары и эссенция сохранены — хозяин комнаты может начать уровень заново.':PLAY==='gorge'&&GZ?'Ущелье '+GZ.g+' «'+GORGES[GZ.g-1]+'» не пройдено. Опыт, чары и эссенция сохранены, попробуй ещё раз или прокачайся в свободном мире.':CLS.name+', уровень '+S.lvl+'. Врагов побеждено: '+S.kills+'. Потеряно '+lost+' эссенции. Чары, билд и таланты на месте.';
   $('#reviveBtn').textContent=PLAY==='gorge'?'Пройти заново':'Воскреснуть';later(1,()=>{$('#dead').hidden=false;syncPause();});saveSoon();}
-function revive(){if(MPon){mpReviveBtn();return;}if(PLAY==='gorge'&&GZ){startGorge(GZ.g,GZ.camp);return;}P.dead=false;$('#dead').hidden=true;hero.g.rotation.z=0;hero.g.position.y=0;P.pos.set(0,0,0);P.prev.set(0,0,0);P.hp=P.maxHp;P.mp=P.maxMp;
+function revive(){if(MPon){mpReviveBtn();return;}if(PLAY==='gorge'&&GZ){startGorge(GZ.g,GZ.camp);return;}P.dead=false;$('#dead').hidden=true;hero.g.rotation.z=0;hero.g.position.y=0;hero.lhit=P.hitAt||0;P.pos.set(0,0,0);P.prev.set(0,0,0);P.hp=P.maxHp;P.mp=P.maxMp;
   for(let i=ENEMIES.length-1;i>=0;i--){if(!ENEMIES[i].boss&&ENEMIES[i].pos.length()<24)removeEnemy(i);}
   if(BOSS){const i=ENEMIES.indexOf(BOSS);if(i>=0)removeEnemy(i);BOSS=null;threat=Math.floor(THREAT_MAX*.6);}
   for(let i=EPROJ.length-1;i>=0;i--){dropProjVis(EPROJ[i].o);EPROJ.splice(i,1);}
@@ -5118,7 +5153,7 @@ function loop(now){
     P.castT-=dt;if(Math.random()<.5*FRK){const c=CLS.color;const a=rand(0,TAU);emit(SPARK,(LOB.on?LOB.myX:0)+Math.cos(a)*1.2,rand(0,.3),Math.sin(a)*1.2,0,rand(.6,1.6),0,c,1,-.5,.5);}}
   else if(P.dead){time+=dt;updateFx(dt);updateLater(dt);}
   else time+=dt*.3;
-  lobTick(dt);
+  lobTick(dt);hmFrame(paused&&mode!=='select'&&!P.dead?dt*.3:dt);
   if(MPon)mpUpdate(dt);
   for(const f of WORLD_ANIM)f();
   updateGfx(paused&&mode!=='select'?0:dt);
@@ -5141,7 +5176,7 @@ const r2=x=>Math.round(x*100)/100;
 function mpRng(seed){let a=seed>>>0;return()=>{a=(a+0x6D2B79F5)>>>0;let t=a;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296;};}
 function mpSeeded(seed,fn){if(!MPon){fn();return;}const old=Math.random;Math.random=mpRng(seed);try{fn();}finally{Math.random=old;}}
 
-const APP_BUILD='v13.20';window.APP_BUILD=APP_BUILD;// = VERSION в sw.js; при выпуске менять в обоих местах (кооператив сверяет сборки игроков)
+const APP_BUILD='v13.21';window.APP_BUILD=APP_BUILD;// = VERSION в sw.js; при выпуске менять в обоих местах (кооператив сверяет сборки игроков)
 const MP_APP='ingenious-builder/tysyacha-char/v1';
 const MP_RELAYS=['nos.lol','nostr.mom','nostr.sathoarder.com','relay.fountain.fm','multiplexer.huszonegy.world'].map(u=>'wss://'+u);
 // TURN убран: openrelay.metered.ca закрыт (DNS не резолвится, relay-кандидатов нет). STUN у Trystero свой (Google и др.).
@@ -5639,13 +5674,16 @@ function mpUpdatePeer(dt){
   const ox=pr.pos.x,oz=pr.pos.z,k=1-Math.exp(-dt*16);
   if(pr.ib&&pr.ib.at(PEER_DELAY,IP_OUT)){pr.pos.x=IP_OUT.x;pr.pos.z=IP_OUT.z;}else if(Math.hypot(pr.tx-ox,pr.tz-oz)>12){pr.pos.x=pr.tx;pr.pos.z=pr.tz;}else{pr.pos.x+=(pr.tx-ox)*k;pr.pos.z+=(pr.tz-oz)*k;}
   pr.vel.set((pr.pos.x-ox)/Math.max(dt,1e-3),0,(pr.pos.z-oz)/Math.max(dt,1e-3));
-  h.g.position.set(pr.pos.x,pr.dead?.2:0,pr.pos.z);
-  let a=pr.tf-h.g.rotation.y;a=Math.atan2(Math.sin(a),Math.cos(a));h.g.rotation.y+=a*Math.min(1,dt*14);h.g.rotation.z=pr.dead?1.4:0;
+  h.g.position.set(pr.pos.x,pr.dead&&!h.mdl?.2:0,pr.pos.z);
+  let a=pr.tf-h.g.rotation.y;a=Math.atan2(Math.sin(a),Math.cos(a));h.g.rotation.y+=a*Math.min(1,dt*14);h.g.rotation.z=pr.dead&&!h.mdl?1.4:0;
   pr.castT-=dt;pr.walk+=dt*(pr.mv?11:0);const sw=pr.mv?Math.sin(pr.walk)*.6:0,cl=CLASS_BY[pr.cls];
+  if(h.mdl){const s=!!pr.sw&&!h.lsw,c=h.lcs!=null&&pr.castT>h.lcs+.02;h.lsw=!!pr.sw;h.lcs=pr.castT;
+    h.mdl.drive({dead:!!pr.dead,move:!!pr.mv,spd:Math.max(3,Math.min(9,Math.hypot(pr.vel.x,pr.vel.z))),swing:s,cast:c&&!s});}
+  else{
   h.body.position.y=pr.mv?Math.abs(Math.sin(pr.walk))*.08:Math.sin(time*2)*.02;
   h.armL.rotation.x=cl.look.weapon==='bow'&&pr.castT>0?-1.5:sw;
   h.armR.rotation.x=pr.castT>0?-1.5*(pr.castT/.35)-.2:-sw*.5;
-  if(h.cape)h.cape.rotation.x=.12+(pr.mv?.45:0)+Math.sin(time*3)*.05;
+  if(h.cape)h.cape.rotation.x=.12+(pr.mv?.45:0)+Math.sin(time*3)*.05;}
   h.orb.scale.setScalar(h.fists?.001:.1+(pr.castT>0?.07:0)+Math.sin(time*5)*.01);h.halo.scale.setScalar(1+(pr.castT>0?.8:0)+Math.sin(time*4)*.08);
   h.pool.material.opacity=.22+(pr.castT>0?.25:0);
   h.shieldM.visible=!!pr.sh;if(pr.sh){h.shieldM.rotation.y+=dt;h.shieldM.material.opacity=.16+.04*Math.sin(time*6);h.shieldM.material.color.copy(pr.color);}
@@ -5721,7 +5759,7 @@ function mpOnCast(sk,A){
 // ---------- подъём павшего ----------
 function mpDowned(){MP.down=true;MP.revT=0;P.shield=0;hint('Ты упал. Напарник может поднять тебя — нужно постоять рядом 3 секунды.',0);hurtFlash=1;}
 function mpRevived(){
-  if(!P.dead)return;P.dead=false;MP.down=false;hero.g.rotation.z=0;hero.g.position.y=0;P.hp=Math.max(1,P.maxHp*.5);P.invulnT=2.5;
+  if(!P.dead)return;P.dead=false;MP.down=false;hero.g.rotation.z=0;hero.g.position.y=0;hero.lhit=P.hitAt||0;P.hp=Math.max(1,P.maxHp*.5);P.invulnT=2.5;
   fxPillar(P.pos.x,P.pos.z,1.4,7,GOLD,.9);fxRing(P.pos.x,P.pos.z,.5,4,GOLD,.6);colBurst(GOLD,P.pos.x,1,P.pos.z,30,5,.9,-1);
   hint('Тебя подняли!',2.5);syncPause();}
 function mpRevive(dt){
@@ -5978,8 +6016,8 @@ function lobBurst(x,col,n){fxPillar(x,0,1.2,7,col,1);colBurst(col,x,1,0,40,5,1,-
 function lobColorHero(h,c){if(h.rims)for(const u of h.rims)u.value.copy(c).lerp(WHITE,.4);h.orb.material.color.copy(c).lerp(WHITE,.3);h.halo.material.color.copy(c);h.pool.material.color.copy(c);}
 function lobMakePeer(cls){const c=CLASS_BY[cls],h=buildHero(c.look);lobColorHero(h,c.color);h.g.position.set(LOB.peX,LOB_Y,0);h.g.rotation.y=-Math.sign(LOB.peX)*.3;h.g.scale.setScalar(.01);
   return {h,cls,c,castT:0,castAt:time+1.2,born:time};}
-function lobMakeSil(){const h=buildHero(CLASSES[0].look);
-  h.g.traverse(o=>{if(o.isMesh&&o.material!==shMat&&o.material!==h.pool.material&&o.material!==h.shieldM.material&&o!==h.orb)o.material=LOB_SILMAT;});
+function lobMakeSil(){const h=buildHero(CLASSES[0].look,{sil:1});
+  h.g.traverse(o=>{if(o.isMesh&&!o.userData.hm&&o.material!==shMat&&o.material!==h.pool.material&&o.material!==h.shieldM.material&&o!==h.orb)o.material=LOB_SILMAT;});
   h.orb.visible=false;h.halo.visible=false;h.pool.visible=false;h.shieldM.visible=false;
   h.g.position.set(LOB.peX,LOB_Y,0);h.g.rotation.y=-Math.sign(LOB.peX)*.3;return {h,sil:true};}
 function lobDrop(o){if(!o)return;const h=o.h;scene.remove(h.g);h.D.forEach(d=>d.dispose());h.halo.material.dispose();h.pool.material.dispose();h.shieldM.material.dispose();}
@@ -6003,10 +6041,11 @@ function lobAnim(o,dt){
   const h=o.h,t=time,e=Math.min(1,(time-o.born)/.55),s=e<1?1+2.2*Math.pow(e-1,3)+1.2*Math.pow(e-1,2):1;
   h.g.scale.setScalar(Math.max(.01,s));h.g.position.y=LOB_Y;
   const a=-Math.sign(LOB.peX)*.3-h.g.rotation.y;h.g.rotation.y+=a*Math.min(1,dt*10);
-  h.body.position.y=Math.sin(t*2+1)*.02;h.body.scale.y=1+Math.sin(t*2+1)*.012;
+  if(!h.mdl){h.body.position.y=Math.sin(t*2+1)*.02;h.body.scale.y=1+Math.sin(t*2+1)*.012;}
   o.castT=Math.max(0,o.castT-dt);
   if(time>o.castAt){o.castAt=time+1.6+Math.random()*.4;o.castT=.35;const el=Math.random()<.65?EL[o.c.p]:EL[o.c.s];lobColorHero(h,ELEMENTS[el].color);
     ringBurst(el,LOB.peX,0,2.6,22);fxGlow(LOB.peX,0,2.2,ELEMENTS[el].color,.6,.8);elBurst(el,LOB.peX,1.8,0,14);}
+  if(h.mdl){const c=o.lcs!=null&&o.castT>o.lcs+.02;o.lcs=o.castT;h.mdl.drive({cast:c});}
   const k=Math.min(1,dt*22),tR=o.castT>0?-1.5*(o.castT/.35)-.2:Math.sin(t*1.4)*.06,tL=Math.sin(t*1.4+1)*.05;
   h.al+=(tL-h.al)*k;h.ar+=(tR-h.ar)*k;h.armL.rotation.x=h.al;h.armR.rotation.x=h.ar;
   if(h.cape){h.cape.rotation.x=.1;const cp=h.cape.geometry.attributes.position,cb=h.capeBase;
@@ -6122,7 +6161,7 @@ function mpInit(){
 const TCC=window.TCCF?window.TCCF({THREE,clamp,rand,randi,lerp,TAU,toLocal,toWorld,gcx,ghw,spawnMob,spawnEnemy,pickW,banner,hint,float,fxPillar,fxRing,colBurst,GOLD,RED,FXG,emit,SPARK,glowSprite,hurtPlayer,kill,dieFull,syncPause,toSelect,mpSend,MP,P,save,gainXp,learnRandom,xpNeed,scene,camera,gorgeGroup,WORLD_ANIM,ENEMIES,mpHostStart,mpOpenLobby,mpChestSpawn,mpRenderLobby,startGorge,runWon,
   get GZ(){return GZ;},get BOSS(){return BOSS;},setBOSS:v=>{BOSS=v;},bossIntro,get bossShow(){return time<bossShowT;},shake:v=>{shake=Math.max(shake,v);},get S(){return S;},get SAVE(){return SAVE;},get MPon(){return MPon;},get MPH(){return MPH;},get MPG(){return MPG;},get mode(){return mode;},get paused(){return paused;},get time(){return time;},get FRK(){return FRK;}}):null;
 function start(hot){
-  loadSave(hot||{});
+  hmBoot();loadSave(hot||{});
   W=app.clientWidth;H=app.clientHeight;applyQuality(true);
   selectClass(SAVE.cur||'pyro');mpInit();
   {const mg=Object.entries(SAVE.chars).filter(([,v])=>v.mig>0);if(mg.length){const t=mg.map(([id,v])=>CLASS_BY[id].name+' '+v.mig+' ур. → мастерство '+mastLvlOf(v.mx)).join('; ');mg.forEach(([,v])=>{v.mig=0;});if(S)S.mig=0;save();
@@ -6140,7 +6179,7 @@ if(H_&&H_.ready)H_.ready(start);else start((H_&&H_.data)||{});
 <script>
 // версия, проверка обновлений и диагностика экрана
 (function(){
-const CUR=window.APP_BUILD||'v13.20';let reg=null;
+const CUR=window.APP_BUILD||'v13.21';let reg=null;
 const $=id=>document.getElementById(id);
 function showUpd(v){if($('updBar'))return;const b=document.createElement('div');b.id='updBar';b.innerHTML='<span>Есть обновление '+v+'</span><button type="button">Обновить</button>';b.querySelector('button').onclick=async()=>{b.firstChild.textContent='Обновляю…';try{if(reg)await reg.update();}catch(e){}try{const ks=await caches.keys();await Promise.all(ks.filter(k=>k.startsWith('tysyacha-char-')).map(k=>caches.delete(k)));}catch(e){}try{if(reg&&reg.waiting)reg.waiting.postMessage('skip');}catch(e){}appUpdateNow();};($('app')||document.body).appendChild(b);}
 async function chk(){try{const r=await fetch('sw.js?'+Date.now(),{cache:'no-store'});const t=await r.text();const m=t.match(/VERSION\s*=\s*['"]([^'"]+)['"]/);if(m&&m[1]!==CUR)showUpd(m[1]);}catch(e){}}

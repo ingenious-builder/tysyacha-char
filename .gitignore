@@ -4,3 +4,7 @@ node_modules/
 _shots/
 _m.js
 _o.html
+qa_models/before/
+qa_models/after/
+qa_models/v_*.png
+qa_models/
