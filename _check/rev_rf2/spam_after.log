@@ -1,0 +1,14 @@
+[замок] жду: браузеров 2/3, процессор 90% (порог 80%)
+[замок] место получено через 24 с
+{"rar":"0/13/0/0/0","aoePerS":1.2,"bigAoePerS":0,"castFxPerS":1.7,"hitFxPerS":0,"shkPerS":0.8,"shkRarPerS":0.8,"shakeTimePct":85,"cls":"pyro","bld":"low"}
+{"rar":"0/0/4/9/0","aoePerS":1.5,"bigAoePerS":1.5,"castFxPerS":1.8,"hitFxPerS":4.1,"shkPerS":1.9,"shkRarPerS":1.9,"shakeTimePct":71,"cls":"pyro","bld":"leg"}
+{"rar":"0/0/4/7/2","aoePerS":1.5,"bigAoePerS":1.5,"castFxPerS":1.8,"hitFxPerS":4.1,"shkPerS":1.9,"shkRarPerS":1.9,"shakeTimePct":89,"cls":"pyro","bld":"imp"}
+{"rar":"0/13/0/0/0","aoePerS":0.9,"bigAoePerS":0,"castFxPerS":1.1,"hitFxPerS":0,"shkPerS":0.4,"shkRarPerS":0.4,"shakeTimePct":11,"cls":"bers","bld":"low"}
+{"rar":"0/0/1/12/0","aoePerS":1.4,"bigAoePerS":1.4,"castFxPerS":1.4,"hitFxPerS":4.1,"shkPerS":0.9,"shkRarPerS":0.9,"shakeTimePct":18,"cls":"bers","bld":"leg"}
+{"rar":"0/0/1/10/2","aoePerS":1.5,"bigAoePerS":1.5,"castFxPerS":1.4,"hitFxPerS":4.4,"shkPerS":0.9,"shkRarPerS":0.9,"shakeTimePct":21,"cls":"bers","bld":"imp"}
+{"rar":"0/13/0/0/0","aoePerS":0.6,"bigAoePerS":0,"castFxPerS":0.9,"hitFxPerS":0,"shkPerS":0.5,"shkRarPerS":0.5,"shakeTimePct":7,"cls":"necro","bld":"low"}
+{"rar":"0/0/1/12/0","aoePerS":0.6,"bigAoePerS":0.6,"castFxPerS":0.9,"hitFxPerS":4.4,"shkPerS":0,"shkRarPerS":0,"shakeTimePct":20,"cls":"necro","bld":"leg"}
+{"rar":"1/0/1/9/2","aoePerS":0.6,"bigAoePerS":0.6,"castFxPerS":0.6,"hitFxPerS":4.5,"shkPerS":0,"shkRarPerS":0,"shakeTimePct":21,"cls":"necro","bld":"imp"}
+{"rar":"0/12/1/0/0","aoePerS":0.5,"bigAoePerS":0,"castFxPerS":0.7,"hitFxPerS":0,"shkPerS":0.9,"shkRarPerS":0.9,"shakeTimePct":14,"cls":"paladin","bld":"low"}
+{"rar":"0/0/1/12/0","aoePerS":0.8,"bigAoePerS":0.8,"castFxPerS":1,"hitFxPerS":4.3,"shkPerS":0.8,"shkRarPerS":0.8,"shakeTimePct":43,"cls":"paladin","bld":"leg"}
+{"rar":"0/0/2/9/2","aoePerS":0.8,"bigAoePerS":0.8,"castFxPerS":1.2,"hitFxPerS":3.2,"shkPerS":1,"shkRarPerS":1,"shakeTimePct":27,"cls":"paladin","bld":"imp"}
