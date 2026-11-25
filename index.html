@@ -6071,6 +6071,9 @@ function talSmart(n,foe){if(n==null)n=tpFree();const R=talRole(),F=talFoe(foe||t
       for(const t of TALS()){if(!talOpen(t))continue;const v=tryV([t.id]),d=sum(v)-B;gain[t.id]=d;vec[t.id]=v;
         if(!best||d>best.d+1e-12)best={d,t,v};}
       if(!best)break;const one=best.t;
+      {const C=TALS().filter(t=>t.b===3&&talOpen(t));   // ветка особенности — каждое третье очко, с первых уровней (иначе до ~35-го пусто)
+        if(C.length){let cp=0,all=0;for(const t of TALS()){const v=T(t.id);all+=v;if(t.b===3)cp+=v;}
+          if(cp*3<all){const t=C.sort((a,b)=>(b.key|0)-(a.key|0)||gain[b.id]-gain[a.id]||rank(a)-rank(b))[0];put(t.id,1);log.push({id:t.id,why:'class'});base=talVec(F,R);n--;continue;}}}
       for(const t of TALS()){if(!talLocked(t))continue;const m=talNeed(t)-branchPts(t.b);if(m+1>n)continue;
         const fill=TALS().filter(x=>x.b===t.b&&talOpen(x)).sort((a,b)=>gain[b.id]-gain[a.id]||rank(a)-rank(b)),add=[];let left=m;
         for(const x of fill){const k=Math.min(left,x.max-T(x.id));for(let i=0;i<k;i++)add.push(x.id);left-=k;if(!left)break;}
@@ -6081,7 +6084,7 @@ function talSmart(n,foe){if(n==null)n=tpFree();const R=talRole(),F=talFoe(foe||t
       base=talVec(F,R);n--;}}
   finally{computeStats();}
   return log;}
-const talWhyTxt=e=>{if(e.why==='open')return 'открыть «'+(TAL_BY[e.via].sn||TAL_BY[e.via].name)+'»';if(e.why==='reserve')return 'про запас';
+const talWhyTxt=e=>{if(e.why==='class'){const t=TAL_BY[e.id];return t&&t.wy?t.wy:'особенность класса';}if(e.why==='open')return 'открыть «'+(TAL_BY[e.via].sn||TAL_BY[e.via].name)+'»';if(e.why==='reserve')return 'про запас';
   const nw=(TAL_WHY[e.id]&&TAL_WHY[e.id][e.why])||(TAL_NEEDS.find(nd=>nd.id===e.why)||{why:e.why}).why,t=TAL_BY[e.id];return t&&t.wy?nw+' → '+t.wy:nw;};
 // строка итога: ветка класса одной частью («ветка «Пожар» +14 (сильнее Вспышка)»), дальше общие — больше очков вперёд
 function talAutoMsg(log){const g=new Map(),cg={n:0,i:1e9,w:new Map()};
