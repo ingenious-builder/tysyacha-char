@@ -41,6 +41,24 @@ async function enter(g, cid) {
         }
         if (g.errs.length) console.log('ошибки страницы', g.errs.slice(0, 5));
       } finally { await g.ctx.close(); }
+    } else if (SECT === 'cpu') {
+      // без отрисовки (карта занята рендером): время JS на шаг боя и число эффектов — толпа 30, авто-бой, билд 60-го с легендарными и 2 невозможными
+      const CL = (process.argv[3] || 'pyro,necro').split(','), REP = +(process.argv[4] || 2), res = [];
+      for (const cid of CL) for (let r = 0; r < REP; r++) for (const dir of (r % 2 ? ['tc-wt-rarfeel', 'tc-wt-rarfeel0'] : ['tc-wt-rarfeel0', 'tc-wt-rarfeel'])) {
+        const g = await openGame(b, BASE, dir, { seed: 12345 + r });
+        try {
+          await enter(g, cid); await g.E(FREEZE(60));
+          await g.E(`render=function(){};window.__R=render;Q.pp=true;spawnBoss=function(){};spawnPack=function(){};LEARNED=new Set(CLS.pool);S.learned=[...LEARNED];applyBestBuild();
+            {const L=equippedIds().filter(id=>rarBase(SKILLS[id])>=3).sort((a,b)=>pwr(SKILLS[b])-pwr(SKILLS[a]));S.imp=L.slice(0,2);impDirty();onBuildChanged();}
+            P.maxHp=P.hp=1e9;P.maxMp=P.mp=1e7;rebuildPassives();S.auto=true;
+            window.__crowd=()=>{const ids=Object.keys(MOBS).filter(k=>!MOBS[k].boss&&!MOBS[k].as).slice(0,4);let n=ENEMIES.filter(e=>!e.dead).length,i=0;while(n<30){const a=(i++)*2.4,d=4+(i%5)*1.6;spawnEnemy(ids[i%ids.length],P.pos.x+Math.cos(a)*d,P.pos.z+Math.sin(a)*d,60+(i%3));n++;}};true`);
+          const q = await g.E(`(()=>{let js=0,fx=0,fxMax=0,pb=0,n=0;__crowd();__step(2);for(let k=0;k<40;k++){__crowd();P.mp=P.maxMp;const t=performance.now();__step(.25);js+=performance.now()-t;n+=15;fx+=FX.length;fxMax=Math.max(fxMax,FX.length);pb+=500-pBudget;}
+            const h=[0,0,0,0,0];for(const id of equippedIds())h[rarOf(SKILLS[id])]++;return {msStep:+(js/n).toFixed(3),fxAvg:+(fx/40).toFixed(1),fxMax,partFrame:+(pb/40).toFixed(0),rar:h.join('/'),kills:S.kills};})()`);
+          q.dir = dir; q.cls = cid; q.errs = g.errs.length; res.push(q); console.log(JSON.stringify(q));
+        } catch (e) { console.log('ПРОВАЛ', cid, dir, e.message); } finally { await g.ctx.close(); }
+      }
+      fs.writeFileSync(path.join(OUT, 'cpu.json'), JSON.stringify(res, null, 1));
+      for (const dir of ['tc-wt-rarfeel0', 'tc-wt-rarfeel']) { const a = res.filter(x => x.dir === dir); if (!a.length) continue; const m = k => (a.reduce((s, x) => s + x[k], 0) / a.length).toFixed(2); console.log(dir, 'мс JS на шаг', m('msStep'), 'FX ср.', m('fxAvg'), 'FX макс', Math.max(...a.map(x => x.fxMax)), 'частиц на кадр', m('partFrame'), 'убийств', m('kills')); }
     } else if (SECT === 'fps') {
       const CL = (process.argv[3] || 'pyro,necro').split(','), REP = +(process.argv[4] || 2), SEC = +(process.argv[5] || 10), res = [];
       for (const cid of CL) for (let r = 0; r < REP; r++) for (const dir of (r % 2 ? ['tc-wt-rarfeel', 'tc-wt-rarfeel0'] : ['tc-wt-rarfeel0', 'tc-wt-rarfeel'])) {

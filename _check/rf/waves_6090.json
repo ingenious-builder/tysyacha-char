@@ -1,0 +1,8960 @@
+{
+ "tc-wt-rarfeel0": {
+  "pyro": {
+   "60:rare": {
+    "build": {
+     "h": [
+      1,
+      12,
+      0,
+      0,
+      0
+     ],
+     "n": 13,
+     "pw": 69613,
+     "tal": 59,
+     "hp": 1728
+    },
+    "d0": {
+     "t": 11.6,
+     "deaths": 0,
+     "lost": 0.1,
+     "left": 0,
+     "waves": [
+      {
+       "t": 12.4,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 15.4,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 7,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.29
+      }
+     ]
+    },
+    "d5": {
+     "t": 11.06,
+     "deaths": 0,
+     "lost": 0.15,
+     "left": 0,
+     "waves": [
+      {
+       "t": 11.63,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 9.63,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.44
+      },
+      {
+       "t": 11.93,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d10": {
+     "t": 28.62,
+     "deaths": 0,
+     "lost": 0.16,
+     "left": 1,
+     "waves": [
+      {
+       "t": 37.87,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.12
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0.37
+      },
+      {
+       "t": 8,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    }
+   },
+   "60:epic": {
+    "build": {
+     "h": [
+      0,
+      0,
+      13,
+      0,
+      0
+     ],
+     "n": 13,
+     "pw": 112145,
+     "tal": 59,
+     "hp": 1728
+    },
+    "d0": {
+     "t": 4.13,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 4.97,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 0.63,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 6.8,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 3.86,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 2.03,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 4.53,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 5.03,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d10": {
+     "t": 19.03,
+     "deaths": 0,
+     "lost": 0.11,
+     "left": 1,
+     "waves": [
+      {
+       "t": 13.47,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0.25
+      },
+      {
+       "t": 3.63,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.09
+      }
+     ]
+    }
+   },
+   "60:leg": {
+    "build": {
+     "h": [
+      0,
+      0,
+      8,
+      5,
+      0
+     ],
+     "n": 13,
+     "pw": 131892,
+     "tal": 59,
+     "hp": 1728
+    },
+    "d0": {
+     "t": 0.71,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 0.57,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 0.77,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 0.8,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 1.29,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 1.17,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 2.13,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 0.57,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d10": {
+     "t": 7.17,
+     "deaths": 0,
+     "lost": 0.07,
+     "left": 0,
+     "waves": [
+      {
+       "t": 3.2,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.22
+      },
+      {
+       "t": 16.53,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 1.77,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    }
+   },
+   "60:leg+2imp": {
+    "build": {
+     "h": [
+      0,
+      0,
+      7,
+      4,
+      2
+     ],
+     "n": 13,
+     "pw": 138773,
+     "tal": 59,
+     "hp": 1728
+    },
+    "d0": {
+     "t": 0.89,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 1.17,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 0.93,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 0.57,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 2.77,
+     "deaths": 0,
+     "lost": 0.03,
+     "left": 0,
+     "waves": [
+      {
+       "t": 1.17,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 1.9,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.09
+      },
+      {
+       "t": 5.23,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d10": {
+     "t": 5.06,
+     "deaths": 0,
+     "lost": 0.06,
+     "left": 0,
+     "waves": [
+      {
+       "t": 3.97,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.19
+      },
+      {
+       "t": 4.8,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 6.4,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    }
+   },
+   "90:rare": {
+    "build": {
+     "h": [
+      1,
+      14,
+      0,
+      0,
+      0
+     ],
+     "n": 15,
+     "pw": 124644,
+     "tal": 73,
+     "hp": 2538
+    },
+    "d0": {
+     "t": 4.44,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 0.8,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 5,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 7.53,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 10.4,
+     "deaths": 0,
+     "lost": 0.14,
+     "left": 0,
+     "waves": [
+      {
+       "t": 6.83,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.15
+      },
+      {
+       "t": 9.93,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 14.43,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.26
+      }
+     ]
+    },
+    "d10": {
+     "t": 18.64,
+     "deaths": 0,
+     "lost": 0.45,
+     "left": 0,
+     "waves": [
+      {
+       "t": 22.13,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.36
+      },
+      {
+       "t": 15.43,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.38
+      },
+      {
+       "t": 18.37,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.6
+      }
+     ]
+    }
+   },
+   "90:epic": {
+    "build": {
+     "h": [
+      0,
+      1,
+      14,
+      0,
+      0
+     ],
+     "n": 15,
+     "pw": 197541,
+     "tal": 73,
+     "hp": 2538
+    },
+    "d0": {
+     "t": 2.59,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 3.7,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 1.87,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 2.2,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 5.96,
+     "deaths": 0,
+     "lost": 0.15,
+     "left": 0,
+     "waves": [
+      {
+       "t": 3.33,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.14
+      },
+      {
+       "t": 5.33,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.23
+      },
+      {
+       "t": 9.23,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.09
+      }
+     ]
+    },
+    "d10": {
+     "t": 2.88,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 1.93,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 2.13,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 4.57,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    }
+   },
+   "90:leg": {
+    "build": {
+     "h": [
+      0,
+      0,
+      8,
+      7,
+      0
+     ],
+     "n": 15,
+     "pw": 229904,
+     "tal": 73,
+     "hp": 2538
+    },
+    "d0": {
+     "t": 1.67,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 1.17,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 1.17,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 2.67,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 0.88,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 0.57,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 0.9,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 1.17,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d10": {
+     "t": 3.88,
+     "deaths": 0,
+     "lost": 0.06,
+     "left": 0,
+     "waves": [
+      {
+       "t": 2.57,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.09
+      },
+      {
+       "t": 6.93,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.1
+      },
+      {
+       "t": 2.13,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    }
+   },
+   "90:leg+2imp": {
+    "build": {
+     "h": [
+      0,
+      0,
+      8,
+      5,
+      2
+     ],
+     "n": 15,
+     "pw": 257409,
+     "tal": 73,
+     "hp": 2538
+    },
+    "d0": {
+     "t": 1.21,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 1.17,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 1.6,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 0.87,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 1.37,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 1.17,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 2.03,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 0.9,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d10": {
+     "t": 9.49,
+     "deaths": 0,
+     "lost": 0.16,
+     "left": 0,
+     "waves": [
+      {
+       "t": 2.67,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 20.53,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.48
+      },
+      {
+       "t": 5.27,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    }
+   }
+  },
+  "necro": {
+   "60:rare": {
+    "build": {
+     "h": [
+      2,
+      11,
+      0,
+      0,
+      0
+     ],
+     "n": 13,
+     "pw": 105882,
+     "tal": 59,
+     "hp": 1958
+    },
+    "d0": {
+     "t": 13.99,
+     "deaths": 0,
+     "lost": 0.07,
+     "left": 0,
+     "waves": [
+      {
+       "t": 13.67,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.09
+      },
+      {
+       "t": 15.67,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 12.63,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.11
+      }
+     ]
+    },
+    "d5": {
+     "t": 25.87,
+     "deaths": 0,
+     "lost": 0.22,
+     "left": 5,
+     "waves": [
+      {
+       "t": 18.7,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.26
+      },
+      {
+       "t": 40,
+       "left": 5,
+       "deaths": 0,
+       "lost": 0.3
+      },
+      {
+       "t": 18.9,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.09
+      }
+     ]
+    },
+    "d10": {
+     "t": 40,
+     "deaths": 0,
+     "lost": 0.71,
+     "left": 6,
+     "waves": [
+      {
+       "t": 40,
+       "left": 3,
+       "deaths": 0,
+       "lost": 1.09
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0.7
+      },
+      {
+       "t": 40,
+       "left": 2,
+       "deaths": 0,
+       "lost": 0.34
+      }
+     ]
+    }
+   },
+   "60:epic": {
+    "build": {
+     "h": [
+      2,
+      2,
+      9,
+      0,
+      0
+     ],
+     "n": 13,
+     "pw": 117433,
+     "tal": 59,
+     "hp": 1958
+    },
+    "d0": {
+     "t": 9.82,
+     "deaths": 0,
+     "lost": 0.01,
+     "left": 0,
+     "waves": [
+      {
+       "t": 10.23,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.04
+      },
+      {
+       "t": 9.63,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 9.6,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 16.1,
+     "deaths": 0,
+     "lost": 0.08,
+     "left": 0,
+     "waves": [
+      {
+       "t": 17.07,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.09
+      },
+      {
+       "t": 15.57,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.11
+      },
+      {
+       "t": 15.67,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.05
+      }
+     ]
+    },
+    "d10": {
+     "t": 18.06,
+     "deaths": 0,
+     "lost": 0.34,
+     "left": 0,
+     "waves": [
+      {
+       "t": 14.93,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.3
+      },
+      {
+       "t": 19.17,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.34
+      },
+      {
+       "t": 20.07,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.39
+      }
+     ]
+    }
+   },
+   "60:leg": {
+    "build": {
+     "h": [
+      2,
+      0,
+      2,
+      9,
+      0
+     ],
+     "n": 13,
+     "pw": 119510,
+     "tal": 59,
+     "hp": 1958
+    },
+    "d0": {
+     "t": 16,
+     "deaths": 0,
+     "lost": 0.06,
+     "left": 0,
+     "waves": [
+      {
+       "t": 18.43,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 14.93,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.17
+      },
+      {
+       "t": 14.63,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.01
+      }
+     ]
+    },
+    "d5": {
+     "t": 27.5,
+     "deaths": 0,
+     "lost": 0.26,
+     "left": 0,
+     "waves": [
+      {
+       "t": 24.43,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.22
+      },
+      {
+       "t": 31.93,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.19
+      },
+      {
+       "t": 26.13,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.38
+      }
+     ]
+    },
+    "d10": {
+     "t": 25.73,
+     "deaths": 0,
+     "lost": 0.51,
+     "left": 0,
+     "waves": [
+      {
+       "t": 20.3,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.55
+      },
+      {
+       "t": 32.47,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.49
+      },
+      {
+       "t": 24.43,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.49
+      }
+     ]
+    }
+   },
+   "60:leg+2imp": {
+    "build": {
+     "h": [
+      2,
+      0,
+      2,
+      7,
+      2
+     ],
+     "n": 13,
+     "pw": 141788,
+     "tal": 59,
+     "hp": 1958
+    },
+    "d0": {
+     "t": 14.57,
+     "deaths": 0,
+     "lost": 0.07,
+     "left": 0,
+     "waves": [
+      {
+       "t": 13.6,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.08
+      },
+      {
+       "t": 15.9,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 14.2,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.13
+      }
+     ]
+    },
+    "d5": {
+     "t": 18.59,
+     "deaths": 0,
+     "lost": 0.25,
+     "left": 0,
+     "waves": [
+      {
+       "t": 22.1,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.22
+      },
+      {
+       "t": 17.27,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.2
+      },
+      {
+       "t": 16.4,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.32
+      }
+     ]
+    },
+    "d10": {
+     "t": 25.99,
+     "deaths": 0,
+     "lost": 0.59,
+     "left": 0,
+     "waves": [
+      {
+       "t": 27.4,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.67
+      },
+      {
+       "t": 23.17,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.71
+      },
+      {
+       "t": 27.4,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.38
+      }
+     ]
+    }
+   },
+   "90:rare": {
+    "build": {
+     "h": [
+      2,
+      13,
+      0,
+      0,
+      0
+     ],
+     "n": 15,
+     "pw": 182918,
+     "tal": 74,
+     "hp": 2876
+    },
+    "d0": {
+     "t": 12.23,
+     "deaths": 0,
+     "lost": 0.14,
+     "left": 0,
+     "waves": [
+      {
+       "t": 11.7,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.08
+      },
+      {
+       "t": 12.5,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.12
+      },
+      {
+       "t": 12.5,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.21
+      }
+     ]
+    },
+    "d5": {
+     "t": 24.48,
+     "deaths": 0,
+     "lost": 0.24,
+     "left": 1,
+     "waves": [
+      {
+       "t": 14.9,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.33
+      },
+      {
+       "t": 18.53,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.25
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0.15
+      }
+     ]
+    },
+    "d10": {
+     "t": 40,
+     "deaths": 0,
+     "lost": 0.84,
+     "left": 8,
+     "waves": [
+      {
+       "t": 40,
+       "left": 2,
+       "deaths": 0,
+       "lost": 0.97
+      },
+      {
+       "t": 40,
+       "left": 2,
+       "deaths": 0,
+       "lost": 0.86
+      },
+      {
+       "t": 40,
+       "left": 4,
+       "deaths": 0,
+       "lost": 0.7
+      }
+     ]
+    }
+   },
+   "90:epic": {
+    "build": {
+     "h": [
+      2,
+      3,
+      10,
+      0,
+      0
+     ],
+     "n": 15,
+     "pw": 206233,
+     "tal": 74,
+     "hp": 2876
+    },
+    "d0": {
+     "t": 8.01,
+     "deaths": 0,
+     "lost": 0.02,
+     "left": 0,
+     "waves": [
+      {
+       "t": 8,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.05
+      },
+      {
+       "t": 5.9,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 10.13,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 10.44,
+     "deaths": 0,
+     "lost": 0.04,
+     "left": 0,
+     "waves": [
+      {
+       "t": 9.83,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.05
+      },
+      {
+       "t": 12.27,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 9.23,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.06
+      }
+     ]
+    },
+    "d10": {
+     "t": 17.08,
+     "deaths": 0,
+     "lost": 0.24,
+     "left": 0,
+     "waves": [
+      {
+       "t": 14.93,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.13
+      },
+      {
+       "t": 15.67,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.13
+      },
+      {
+       "t": 20.63,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.46
+      }
+     ]
+    }
+   },
+   "90:leg": {
+    "build": {
+     "h": [
+      2,
+      0,
+      3,
+      10,
+      0
+     ],
+     "n": 15,
+     "pw": 288167,
+     "tal": 74,
+     "hp": 2876
+    },
+    "d0": {
+     "t": 9.85,
+     "deaths": 0,
+     "lost": 0.13,
+     "left": 0,
+     "waves": [
+      {
+       "t": 12.57,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.18
+      },
+      {
+       "t": 7.8,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.08
+      },
+      {
+       "t": 9.17,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.12
+      }
+     ]
+    },
+    "d5": {
+     "t": 13.01,
+     "deaths": 0,
+     "lost": 0.19,
+     "left": 0,
+     "waves": [
+      {
+       "t": 12.57,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.16
+      },
+      {
+       "t": 13.33,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.27
+      },
+      {
+       "t": 13.13,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.14
+      }
+     ]
+    },
+    "d10": {
+     "t": 17.24,
+     "deaths": 0,
+     "lost": 0.43,
+     "left": 0,
+     "waves": [
+      {
+       "t": 22.1,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.28
+      },
+      {
+       "t": 14.7,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.47
+      },
+      {
+       "t": 14.93,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.53
+      }
+     ]
+    }
+   },
+   "90:leg+2imp": {
+    "build": {
+     "h": [
+      2,
+      0,
+      3,
+      8,
+      2
+     ],
+     "n": 15,
+     "pw": 323654,
+     "tal": 74,
+     "hp": 2876
+    },
+    "d0": {
+     "t": 11.14,
+     "deaths": 0,
+     "lost": 0.15,
+     "left": 0,
+     "waves": [
+      {
+       "t": 12.57,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.16
+      },
+      {
+       "t": 8.43,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.13
+      },
+      {
+       "t": 12.43,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.16
+      }
+     ]
+    },
+    "d5": {
+     "t": 13.09,
+     "deaths": 0,
+     "lost": 0.15,
+     "left": 0,
+     "waves": [
+      {
+       "t": 13.83,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.16
+      },
+      {
+       "t": 12.87,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.15
+      },
+      {
+       "t": 12.57,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.15
+      }
+     ]
+    },
+    "d10": {
+     "t": 15.24,
+     "deaths": 0,
+     "lost": 0.31,
+     "left": 0,
+     "waves": [
+      {
+       "t": 18.23,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.28
+      },
+      {
+       "t": 14.93,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.25
+      },
+      {
+       "t": 12.57,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.41
+      }
+     ]
+    }
+   }
+  },
+  "monk": {
+   "60:rare": {
+    "build": {
+     "h": [
+      0,
+      13,
+      0,
+      0,
+      0
+     ],
+     "n": 13,
+     "pw": 77733,
+     "tal": 59,
+     "hp": 2650
+    },
+    "d0": {
+     "t": 26.8,
+     "deaths": 0,
+     "lost": 0.03,
+     "left": 0,
+     "waves": [
+      {
+       "t": 21.47,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.03
+      },
+      {
+       "t": 37.53,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.06
+      },
+      {
+       "t": 21.4,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.01
+      }
+     ]
+    },
+    "d5": {
+     "t": 40,
+     "deaths": 0,
+     "lost": 0.02,
+     "left": 6,
+     "waves": [
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0.01
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 4,
+       "deaths": 0,
+       "lost": 0.04
+      }
+     ]
+    },
+    "d10": {
+     "t": 40,
+     "deaths": 0,
+     "lost": 0.12,
+     "left": 11,
+     "waves": [
+      {
+       "t": 40,
+       "left": 2,
+       "deaths": 0,
+       "lost": 0.05
+      },
+      {
+       "t": 40,
+       "left": 7,
+       "deaths": 0,
+       "lost": 0.19
+      },
+      {
+       "t": 40,
+       "left": 2,
+       "deaths": 0,
+       "lost": 0.11
+      }
+     ]
+    }
+   },
+   "60:epic": {
+    "build": {
+     "h": [
+      0,
+      1,
+      12,
+      0,
+      0
+     ],
+     "n": 13,
+     "pw": 103643,
+     "tal": 59,
+     "hp": 2650
+    },
+    "d0": {
+     "t": 22.2,
+     "deaths": 0,
+     "lost": 0.02,
+     "left": 1,
+     "waves": [
+      {
+       "t": 10.73,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.04
+      },
+      {
+       "t": 15.87,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.01
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0.02
+      }
+     ]
+    },
+    "d5": {
+     "t": 38.49,
+     "deaths": 0,
+     "lost": 0.05,
+     "left": 2,
+     "waves": [
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0.09
+      },
+      {
+       "t": 35.47,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.03
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0.03
+      }
+     ]
+    },
+    "d10": {
+     "t": 40,
+     "deaths": 0,
+     "lost": 0.1,
+     "left": 3,
+     "waves": [
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0.24
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0.03
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0.03
+      }
+     ]
+    }
+   },
+   "60:leg": {
+    "build": {
+     "h": [
+      0,
+      0,
+      2,
+      11,
+      0
+     ],
+     "n": 13,
+     "pw": 134983,
+     "tal": 59,
+     "hp": 2650
+    },
+    "d0": {
+     "t": 17.41,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 14.63,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 16,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 21.6,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 15.13,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 14.93,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 15.17,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 15.3,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.01
+      }
+     ]
+    },
+    "d10": {
+     "t": 24.35,
+     "deaths": 0,
+     "lost": 0.07,
+     "left": 0,
+     "waves": [
+      {
+       "t": 21.93,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.03
+      },
+      {
+       "t": 21.8,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.12
+      },
+      {
+       "t": 29.33,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.05
+      }
+     ]
+    }
+   },
+   "60:leg+2imp": {
+    "build": {
+     "h": [
+      0,
+      0,
+      2,
+      9,
+      2
+     ],
+     "n": 13,
+     "pw": 157165,
+     "tal": 59,
+     "hp": 2650
+    },
+    "d0": {
+     "t": 12.95,
+     "deaths": 0,
+     "lost": 0.01,
+     "left": 0,
+     "waves": [
+      {
+       "t": 13.33,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 14.93,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 10.6,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.02
+      }
+     ]
+    },
+    "d5": {
+     "t": 29.07,
+     "deaths": 0,
+     "lost": 0,
+     "left": 1,
+     "waves": [
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 22.93,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 24.27,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.01
+      }
+     ]
+    },
+    "d10": {
+     "t": 24.22,
+     "deaths": 0,
+     "lost": 0.03,
+     "left": 0,
+     "waves": [
+      {
+       "t": 35.33,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.03
+      },
+      {
+       "t": 16,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.07
+      },
+      {
+       "t": 21.33,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    }
+   },
+   "90:rare": {
+    "build": {
+     "h": [
+      0,
+      15,
+      0,
+      0,
+      0
+     ],
+     "n": 15,
+     "pw": 126300,
+     "tal": 76,
+     "hp": 3892
+    },
+    "d0": {
+     "t": 32.58,
+     "deaths": 0,
+     "lost": 0,
+     "left": 1,
+     "waves": [
+      {
+       "t": 28.6,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 29.13,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 40,
+     "deaths": 0,
+     "lost": 0,
+     "left": 7,
+     "waves": [
+      {
+       "t": 40,
+       "left": 3,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 2,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 2,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d10": {
+     "t": 40,
+     "deaths": 0,
+     "lost": 0.05,
+     "left": 16,
+     "waves": [
+      {
+       "t": 40,
+       "left": 5,
+       "deaths": 0,
+       "lost": 0.04
+      },
+      {
+       "t": 40,
+       "left": 4,
+       "deaths": 0,
+       "lost": 0.02
+      },
+      {
+       "t": 40,
+       "left": 7,
+       "deaths": 0,
+       "lost": 0.08
+      }
+     ]
+    }
+   },
+   "90:epic": {
+    "build": {
+     "h": [
+      0,
+      1,
+      14,
+      0,
+      0
+     ],
+     "n": 15,
+     "pw": 174119,
+     "tal": 76,
+     "hp": 3892
+    },
+    "d0": {
+     "t": 24.89,
+     "deaths": 0,
+     "lost": 0.02,
+     "left": 0,
+     "waves": [
+      {
+       "t": 22.73,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.01
+      },
+      {
+       "t": 23.47,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.01
+      },
+      {
+       "t": 28.47,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.03
+      }
+     ]
+    },
+    "d5": {
+     "t": 40,
+     "deaths": 0,
+     "lost": 0.01,
+     "left": 3,
+     "waves": [
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0.02
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d10": {
+     "t": 40,
+     "deaths": 0,
+     "lost": 0.02,
+     "left": 4,
+     "waves": [
+      {
+       "t": 40,
+       "left": 2,
+       "deaths": 0,
+       "lost": 0.01
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0.06
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    }
+   },
+   "90:leg": {
+    "build": {
+     "h": [
+      0,
+      0,
+      4,
+      11,
+      0
+     ],
+     "n": 15,
+     "pw": 243132,
+     "tal": 76,
+     "hp": 3892
+    },
+    "d0": {
+     "t": 18.43,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 22.77,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 18.13,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 14.4,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 25.81,
+     "deaths": 0,
+     "lost": 0.01,
+     "left": 1,
+     "waves": [
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0.02
+      },
+      {
+       "t": 21.83,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 15.6,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d10": {
+     "t": 28.28,
+     "deaths": 0,
+     "lost": 0.01,
+     "left": 1,
+     "waves": [
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0.03
+      },
+      {
+       "t": 14.97,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 29.87,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    }
+   },
+   "90:leg+2imp": {
+    "build": {
+     "h": [
+      0,
+      0,
+      4,
+      9,
+      2
+     ],
+     "n": 15,
+     "pw": 276700,
+     "tal": 76,
+     "hp": 3892
+    },
+    "d0": {
+     "t": 10.56,
+     "deaths": 0,
+     "lost": 0.01,
+     "left": 0,
+     "waves": [
+      {
+       "t": 14.4,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.02
+      },
+      {
+       "t": 10.7,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 6.57,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 30.91,
+     "deaths": 0,
+     "lost": 0.01,
+     "left": 1,
+     "waves": [
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0.02
+      },
+      {
+       "t": 29.87,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 22.87,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d10": {
+     "t": 31.89,
+     "deaths": 0,
+     "lost": 0.01,
+     "left": 1,
+     "waves": [
+      {
+       "t": 26.67,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0.02
+      },
+      {
+       "t": 29,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    }
+   }
+  },
+  "hunter": {
+   "60:rare": {
+    "build": {
+     "h": [
+      1,
+      12,
+      0,
+      0,
+      0
+     ],
+     "n": 13,
+     "pw": 58317,
+     "tal": 59,
+     "hp": 2074
+    },
+    "d0": {
+     "t": 23.31,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 20.37,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 25.17,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 24.4,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 31.33,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 26.7,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 29.63,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 37.67,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d10": {
+     "t": 37.84,
+     "deaths": 0,
+     "lost": 0,
+     "left": 5,
+     "waves": [
+      {
+       "t": 40,
+       "left": 3,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 2,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 33.53,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    }
+   },
+   "60:epic": {
+    "build": {
+     "h": [
+      0,
+      0,
+      13,
+      0,
+      0
+     ],
+     "n": 13,
+     "pw": 91654,
+     "tal": 59,
+     "hp": 2074
+    },
+    "d0": {
+     "t": 15.7,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 14.83,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 14.97,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 17.3,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 26.13,
+     "deaths": 0,
+     "lost": 0.19,
+     "left": 0,
+     "waves": [
+      {
+       "t": 20.7,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.26
+      },
+      {
+       "t": 27.5,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.05
+      },
+      {
+       "t": 30.2,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.27
+      }
+     ]
+    },
+    "d10": {
+     "t": 39.28,
+     "deaths": 0,
+     "lost": 0.11,
+     "left": 2,
+     "waves": [
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0.07
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0.21
+      },
+      {
+       "t": 37.83,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.05
+      }
+     ]
+    }
+   },
+   "60:leg": {
+    "build": {
+     "h": [
+      0,
+      0,
+      1,
+      12,
+      0
+     ],
+     "n": 13,
+     "pw": 111867,
+     "tal": 59,
+     "hp": 2074
+    },
+    "d0": {
+     "t": 16.96,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 17.3,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 16.4,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 17.17,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 20.3,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 16.37,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 25.1,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 19.43,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d10": {
+     "t": 38,
+     "deaths": 0,
+     "lost": 0,
+     "left": 1,
+     "waves": [
+      {
+       "t": 35.77,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 38.23,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    }
+   },
+   "60:leg+2imp": {
+    "build": {
+     "h": [
+      0,
+      0,
+      1,
+      10,
+      2
+     ],
+     "n": 13,
+     "pw": 129140,
+     "tal": 59,
+     "hp": 2074
+    },
+    "d0": {
+     "t": 18.74,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 16.37,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 20.73,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 19.13,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 22.76,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 19.43,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 24.43,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 24.43,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d10": {
+     "t": 40,
+     "deaths": 0,
+     "lost": 0,
+     "left": 5,
+     "waves": [
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 3,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    }
+   },
+   "90:rare": {
+    "build": {
+     "h": [
+      1,
+      14,
+      0,
+      0,
+      0
+     ],
+     "n": 15,
+     "pw": 97935,
+     "tal": 74,
+     "hp": 3046
+    },
+    "d0": {
+     "t": 19.96,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 17,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 25.97,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 16.9,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 30.92,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 22.77,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 32.97,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 37.03,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d10": {
+     "t": 36.86,
+     "deaths": 0,
+     "lost": 0,
+     "left": 4,
+     "waves": [
+      {
+       "t": 40,
+       "left": 4,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 31.17,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 39.4,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    }
+   },
+   "90:epic": {
+    "build": {
+     "h": [
+      0,
+      0,
+      15,
+      0,
+      0
+     ],
+     "n": 15,
+     "pw": 153530,
+     "tal": 74,
+     "hp": 3046
+    },
+    "d0": {
+     "t": 16.87,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 15.63,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 14.97,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 20,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 24.45,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 26,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 20.67,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 26.67,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d10": {
+     "t": 37.11,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 38.93,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 37.53,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 34.87,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    }
+   },
+   "90:leg": {
+    "build": {
+     "h": [
+      0,
+      0,
+      2,
+      13,
+      0
+     ],
+     "n": 15,
+     "pw": 191595,
+     "tal": 74,
+     "hp": 3046
+    },
+    "d0": {
+     "t": 13.68,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 12.97,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 14.9,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 13.17,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 19.38,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 16.77,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 23.4,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 17.97,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d10": {
+     "t": 31.08,
+     "deaths": 0,
+     "lost": 0,
+     "left": 1,
+     "waves": [
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 30.4,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 22.83,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    }
+   },
+   "90:leg+2imp": {
+    "build": {
+     "h": [
+      0,
+      0,
+      2,
+      11,
+      2
+     ],
+     "n": 15,
+     "pw": 217440,
+     "tal": 74,
+     "hp": 3046
+    },
+    "d0": {
+     "t": 14.04,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 13.2,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 15.03,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 13.9,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 23.7,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 21.9,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 26.1,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 23.1,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d10": {
+     "t": 38.38,
+     "deaths": 0,
+     "lost": 0,
+     "left": 3,
+     "waves": [
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 2,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 35.13,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    }
+   }
+  },
+  "cryo": {
+   "60:rare": {
+    "build": {
+     "h": [
+      0,
+      13,
+      0,
+      0,
+      0
+     ],
+     "n": 13,
+     "pw": 69462,
+     "tal": 59,
+     "hp": 1797
+    },
+    "d0": {
+     "t": 40,
+     "deaths": 0,
+     "lost": 0,
+     "left": 6,
+     "waves": [
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 4,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 40,
+     "deaths": 0,
+     "lost": 0,
+     "left": 11,
+     "waves": [
+      {
+       "t": 40,
+       "left": 3,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 4,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 4,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d10": {
+     "t": 40,
+     "deaths": 0,
+     "lost": 0,
+     "left": 9,
+     "waves": [
+      {
+       "t": 40,
+       "left": 5,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 3,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    }
+   },
+   "60:epic": {
+    "build": {
+     "h": [
+      0,
+      0,
+      13,
+      0,
+      0
+     ],
+     "n": 13,
+     "pw": 109687,
+     "tal": 59,
+     "hp": 1797
+    },
+    "d0": {
+     "t": 35.91,
+     "deaths": 0,
+     "lost": 0,
+     "left": 2,
+     "waves": [
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 27.73,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 40,
+     "deaths": 0,
+     "lost": 0,
+     "left": 10,
+     "waves": [
+      {
+       "t": 40,
+       "left": 3,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 4,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 3,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d10": {
+     "t": 40,
+     "deaths": 0,
+     "lost": 0,
+     "left": 6,
+     "waves": [
+      {
+       "t": 40,
+       "left": 3,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 2,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    }
+   },
+   "60:leg": {
+    "build": {
+     "h": [
+      0,
+      0,
+      7,
+      6,
+      0
+     ],
+     "n": 13,
+     "pw": 139540,
+     "tal": 59,
+     "hp": 1797
+    },
+    "d0": {
+     "t": 18.09,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 27.8,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 18.5,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 7.97,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 40,
+     "deaths": 0,
+     "lost": 0,
+     "left": 4,
+     "waves": [
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 2,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d10": {
+     "t": 40,
+     "deaths": 0,
+     "lost": 0,
+     "left": 7,
+     "waves": [
+      {
+       "t": 40,
+       "left": 3,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 3,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    }
+   },
+   "60:leg+2imp": {
+    "build": {
+     "h": [
+      0,
+      0,
+      7,
+      4,
+      2
+     ],
+     "n": 13,
+     "pw": 167885,
+     "tal": 59,
+     "hp": 1797
+    },
+    "d0": {
+     "t": 25.18,
+     "deaths": 0,
+     "lost": 0,
+     "left": 2,
+     "waves": [
+      {
+       "t": 16.4,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 2,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 19.13,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 37.16,
+     "deaths": 0,
+     "lost": 0,
+     "left": 4,
+     "waves": [
+      {
+       "t": 40,
+       "left": 2,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 2,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 31.47,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d10": {
+     "t": 40,
+     "deaths": 0,
+     "lost": 0,
+     "left": 8,
+     "waves": [
+      {
+       "t": 40,
+       "left": 2,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 3,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 3,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    }
+   },
+   "90:rare": {
+    "build": {
+     "h": [
+      0,
+      15,
+      0,
+      0,
+      0
+     ],
+     "n": 15,
+     "pw": 111949,
+     "tal": 72,
+     "hp": 2640
+    },
+    "d0": {
+     "t": 40,
+     "deaths": 0,
+     "lost": 0,
+     "left": 5,
+     "waves": [
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 2,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 2,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 40,
+     "deaths": 0,
+     "lost": 0,
+     "left": 11,
+     "waves": [
+      {
+       "t": 40,
+       "left": 4,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 4,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 3,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d10": {
+     "t": 40,
+     "deaths": 0,
+     "lost": 0,
+     "left": 13,
+     "waves": [
+      {
+       "t": 40,
+       "left": 5,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 5,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 3,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    }
+   },
+   "90:epic": {
+    "build": {
+     "h": [
+      0,
+      0,
+      15,
+      0,
+      0
+     ],
+     "n": 15,
+     "pw": 176976,
+     "tal": 72,
+     "hp": 2640
+    },
+    "d0": {
+     "t": 35.77,
+     "deaths": 0,
+     "lost": 0,
+     "left": 1,
+     "waves": [
+      {
+       "t": 33.33,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 33.97,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 40,
+     "deaths": 0,
+     "lost": 0,
+     "left": 8,
+     "waves": [
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 5,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 2,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d10": {
+     "t": 40,
+     "deaths": 0,
+     "lost": 0.04,
+     "left": 7,
+     "waves": [
+      {
+       "t": 40,
+       "left": 3,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 2,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 2,
+       "deaths": 0,
+       "lost": 0.11
+      }
+     ]
+    }
+   },
+   "90:leg": {
+    "build": {
+     "h": [
+      0,
+      0,
+      8,
+      7,
+      0
+     ],
+     "n": 15,
+     "pw": 224188,
+     "tal": 72,
+     "hp": 2640
+    },
+    "d0": {
+     "t": 37.61,
+     "deaths": 0,
+     "lost": 0,
+     "left": 2,
+     "waves": [
+      {
+       "t": 32.83,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 40,
+     "deaths": 0,
+     "lost": 0,
+     "left": 5,
+     "waves": [
+      {
+       "t": 40,
+       "left": 3,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d10": {
+     "t": 40,
+     "deaths": 0,
+     "lost": 0,
+     "left": 8,
+     "waves": [
+      {
+       "t": 40,
+       "left": 3,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 4,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    }
+   },
+   "90:leg+2imp": {
+    "build": {
+     "h": [
+      0,
+      0,
+      8,
+      5,
+      2
+     ],
+     "n": 15,
+     "pw": 265545,
+     "tal": 72,
+     "hp": 2640
+    },
+    "d0": {
+     "t": 28.63,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 30.6,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 39.9,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 15.4,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 40,
+     "deaths": 0,
+     "lost": 0,
+     "left": 5,
+     "waves": [
+      {
+       "t": 40,
+       "left": 2,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 2,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d10": {
+     "t": 40,
+     "deaths": 0,
+     "lost": 0,
+     "left": 7,
+     "waves": [
+      {
+       "t": 40,
+       "left": 3,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 2,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 2,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    }
+   }
+  },
+  "bers": {
+   "60:rare": {
+    "build": {
+     "h": [
+      0,
+      13,
+      0,
+      0,
+      0
+     ],
+     "n": 13,
+     "pw": 73657,
+     "tal": 59,
+     "hp": 2650
+    },
+    "d0": {
+     "t": 12.19,
+     "deaths": 0,
+     "lost": 0.04,
+     "left": 0,
+     "waves": [
+      {
+       "t": 13.93,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.07
+      },
+      {
+       "t": 7.3,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.04
+      },
+      {
+       "t": 15.33,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 26.57,
+     "deaths": 0,
+     "lost": 0.11,
+     "left": 1,
+     "waves": [
+      {
+       "t": 16.73,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.14
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0.12
+      },
+      {
+       "t": 22.97,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.08
+      }
+     ]
+    },
+    "d10": {
+     "t": 33.48,
+     "deaths": 0,
+     "lost": 0.26,
+     "left": 1,
+     "waves": [
+      {
+       "t": 37.67,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.29
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0.2
+      },
+      {
+       "t": 22.77,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.29
+      }
+     ]
+    }
+   },
+   "60:epic": {
+    "build": {
+     "h": [
+      0,
+      0,
+      13,
+      0,
+      0
+     ],
+     "n": 13,
+     "pw": 111180,
+     "tal": 59,
+     "hp": 2650
+    },
+    "d0": {
+     "t": 10.82,
+     "deaths": 0,
+     "lost": 0.07,
+     "left": 0,
+     "waves": [
+      {
+       "t": 14.47,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.06
+      },
+      {
+       "t": 9.27,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.03
+      },
+      {
+       "t": 8.73,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.12
+      }
+     ]
+    },
+    "d5": {
+     "t": 18.81,
+     "deaths": 0,
+     "lost": 0.1,
+     "left": 0,
+     "waves": [
+      {
+       "t": 14.43,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.04
+      },
+      {
+       "t": 13.83,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.19
+      },
+      {
+       "t": 28.17,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.06
+      }
+     ]
+    },
+    "d10": {
+     "t": 40,
+     "deaths": 0,
+     "lost": 0.19,
+     "left": 5,
+     "waves": [
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0.11
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0.16
+      },
+      {
+       "t": 40,
+       "left": 3,
+       "deaths": 0,
+       "lost": 0.29
+      }
+     ]
+    }
+   },
+   "60:leg": {
+    "build": {
+     "h": [
+      0,
+      0,
+      1,
+      12,
+      0
+     ],
+     "n": 13,
+     "pw": 167725,
+     "tal": 59,
+     "hp": 2650
+    },
+    "d0": {
+     "t": 9.76,
+     "deaths": 0,
+     "lost": 0.17,
+     "left": 0,
+     "waves": [
+      {
+       "t": 11.23,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.19
+      },
+      {
+       "t": 11.37,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.23
+      },
+      {
+       "t": 6.67,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.08
+      }
+     ]
+    },
+    "d5": {
+     "t": 15.05,
+     "deaths": 0,
+     "lost": 0.22,
+     "left": 0,
+     "waves": [
+      {
+       "t": 9.23,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.08
+      },
+      {
+       "t": 21.9,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.34
+      },
+      {
+       "t": 14.03,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.25
+      }
+     ]
+    },
+    "d10": {
+     "t": 27.17,
+     "deaths": 0,
+     "lost": 0.36,
+     "left": 1,
+     "waves": [
+      {
+       "t": 20.23,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.44
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0.3
+      },
+      {
+       "t": 21.27,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.35
+      }
+     ]
+    }
+   },
+   "60:leg+2imp": {
+    "build": {
+     "h": [
+      0,
+      0,
+      1,
+      10,
+      2
+     ],
+     "n": 13,
+     "pw": 191722,
+     "tal": 59,
+     "hp": 2650
+    },
+    "d0": {
+     "t": 6.42,
+     "deaths": 0,
+     "lost": 0.16,
+     "left": 0,
+     "waves": [
+      {
+       "t": 6.73,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.15
+      },
+      {
+       "t": 5.87,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.12
+      },
+      {
+       "t": 6.67,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.21
+      }
+     ]
+    },
+    "d5": {
+     "t": 19.84,
+     "deaths": 0,
+     "lost": 0.28,
+     "left": 0,
+     "waves": [
+      {
+       "t": 20.43,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.32
+      },
+      {
+       "t": 24.6,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.23
+      },
+      {
+       "t": 14.5,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.29
+      }
+     ]
+    },
+    "d10": {
+     "t": 25.37,
+     "deaths": 0,
+     "lost": 0.32,
+     "left": 1,
+     "waves": [
+      {
+       "t": 20.7,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.26
+      },
+      {
+       "t": 15.4,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.18
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0.51
+      }
+     ]
+    }
+   },
+   "90:rare": {
+    "build": {
+     "h": [
+      0,
+      15,
+      0,
+      0,
+      0
+     ],
+     "n": 15,
+     "pw": 123404,
+     "tal": 74,
+     "hp": 3892
+    },
+    "d0": {
+     "t": 13.37,
+     "deaths": 0,
+     "lost": 0.06,
+     "left": 0,
+     "waves": [
+      {
+       "t": 10.5,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.04
+      },
+      {
+       "t": 7.6,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.08
+      },
+      {
+       "t": 22,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.07
+      }
+     ]
+    },
+    "d5": {
+     "t": 35.39,
+     "deaths": 0,
+     "lost": 0.1,
+     "left": 2,
+     "waves": [
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0.16
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0.03
+      },
+      {
+       "t": 26.17,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.11
+      }
+     ]
+    },
+    "d10": {
+     "t": 19.94,
+     "deaths": 0,
+     "lost": 0.16,
+     "left": 0,
+     "waves": [
+      {
+       "t": 24.53,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.11
+      },
+      {
+       "t": 25.67,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.19
+      },
+      {
+       "t": 9.63,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.19
+      }
+     ]
+    }
+   },
+   "90:epic": {
+    "build": {
+     "h": [
+      0,
+      0,
+      15,
+      0,
+      0
+     ],
+     "n": 15,
+     "pw": 188591,
+     "tal": 74,
+     "hp": 3892
+    },
+    "d0": {
+     "t": 8.57,
+     "deaths": 0,
+     "lost": 0.02,
+     "left": 0,
+     "waves": [
+      {
+       "t": 9.93,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.01
+      },
+      {
+       "t": 7.3,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.06
+      },
+      {
+       "t": 8.47,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 16,
+     "deaths": 0,
+     "lost": 0.03,
+     "left": 0,
+     "waves": [
+      {
+       "t": 18.9,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 18.27,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 10.83,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.1
+      }
+     ]
+    },
+    "d10": {
+     "t": 30.36,
+     "deaths": 0,
+     "lost": 0.09,
+     "left": 2,
+     "waves": [
+      {
+       "t": 11.07,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.05
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0.18
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0.05
+      }
+     ]
+    }
+   },
+   "90:leg": {
+    "build": {
+     "h": [
+      0,
+      0,
+      3,
+      12,
+      0
+     ],
+     "n": 15,
+     "pw": 298223,
+     "tal": 74,
+     "hp": 3892
+    },
+    "d0": {
+     "t": 8.05,
+     "deaths": 0,
+     "lost": 0.18,
+     "left": 0,
+     "waves": [
+      {
+       "t": 7.7,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.17
+      },
+      {
+       "t": 9.23,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.13
+      },
+      {
+       "t": 7.23,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.23
+      }
+     ]
+    },
+    "d5": {
+     "t": 10.68,
+     "deaths": 0,
+     "lost": 0.24,
+     "left": 0,
+     "waves": [
+      {
+       "t": 11.63,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.3
+      },
+      {
+       "t": 7,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.1
+      },
+      {
+       "t": 13.4,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.31
+      }
+     ]
+    },
+    "d10": {
+     "t": 12.34,
+     "deaths": 0,
+     "lost": 0.26,
+     "left": 0,
+     "waves": [
+      {
+       "t": 18.07,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.24
+      },
+      {
+       "t": 10.03,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.3
+      },
+      {
+       "t": 8.93,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.23
+      }
+     ]
+    }
+   },
+   "90:leg+2imp": {
+    "build": {
+     "h": [
+      0,
+      0,
+      3,
+      10,
+      2
+     ],
+     "n": 15,
+     "pw": 338413,
+     "tal": 74,
+     "hp": 3892
+    },
+    "d0": {
+     "t": 6.49,
+     "deaths": 0,
+     "lost": 0.13,
+     "left": 0,
+     "waves": [
+      {
+       "t": 6.8,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.12
+      },
+      {
+       "t": 5.07,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.1
+      },
+      {
+       "t": 7.6,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.18
+      }
+     ]
+    },
+    "d5": {
+     "t": 10.87,
+     "deaths": 0,
+     "lost": 0.23,
+     "left": 0,
+     "waves": [
+      {
+       "t": 10.13,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.29
+      },
+      {
+       "t": 10.57,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.17
+      },
+      {
+       "t": 11.9,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.23
+      }
+     ]
+    },
+    "d10": {
+     "t": 10.74,
+     "deaths": 0,
+     "lost": 0.19,
+     "left": 0,
+     "waves": [
+      {
+       "t": 11,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.21
+      },
+      {
+       "t": 9.13,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.13
+      },
+      {
+       "t": 12.1,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.23
+      }
+     ]
+    }
+   }
+  },
+  "_errs": []
+ },
+ "tc-wt-rarfeel": {
+  "pyro": {
+   "60:rare": {
+    "build": {
+     "h": [
+      1,
+      12,
+      0,
+      0,
+      0
+     ],
+     "n": 13,
+     "pw": 75707,
+     "tal": 59,
+     "hp": 1728
+    },
+    "d0": {
+     "t": 11.55,
+     "deaths": 0,
+     "lost": 0.07,
+     "left": 0,
+     "waves": [
+      {
+       "t": 9.57,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.07
+      },
+      {
+       "t": 4.8,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.14
+      },
+      {
+       "t": 20.27,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 18.71,
+     "deaths": 0,
+     "lost": 0.32,
+     "left": 0,
+     "waves": [
+      {
+       "t": 19.73,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.24
+      },
+      {
+       "t": 10.23,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.16
+      },
+      {
+       "t": 26.17,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.55
+      }
+     ]
+    },
+    "d10": {
+     "t": 30.25,
+     "deaths": 0,
+     "lost": 0.23,
+     "left": 1,
+     "waves": [
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0.26
+      },
+      {
+       "t": 17.53,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.39
+      },
+      {
+       "t": 33.23,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.05
+      }
+     ]
+    }
+   },
+   "60:epic": {
+    "build": {
+     "h": [
+      0,
+      0,
+      13,
+      0,
+      0
+     ],
+     "n": 13,
+     "pw": 134158,
+     "tal": 59,
+     "hp": 1728
+    },
+    "d0": {
+     "t": 4.95,
+     "deaths": 0,
+     "lost": 0.04,
+     "left": 0,
+     "waves": [
+      {
+       "t": 5.6,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 5.03,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 4.23,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.11
+      }
+     ]
+    },
+    "d5": {
+     "t": 2.82,
+     "deaths": 0,
+     "lost": 0.11,
+     "left": 0,
+     "waves": [
+      {
+       "t": 2.8,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.18
+      },
+      {
+       "t": 1.5,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 4.17,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.14
+      }
+     ]
+    },
+    "d10": {
+     "t": 4.82,
+     "deaths": 0,
+     "lost": 0.2,
+     "left": 0,
+     "waves": [
+      {
+       "t": 5.67,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.22
+      },
+      {
+       "t": 1.77,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 7.03,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.37
+      }
+     ]
+    }
+   },
+   "60:leg": {
+    "build": {
+     "h": [
+      0,
+      0,
+      8,
+      5,
+      0
+     ],
+     "n": 13,
+     "pw": 163178,
+     "tal": 59,
+     "hp": 1728
+    },
+    "d0": {
+     "t": 0.97,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 0.57,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 1.17,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 1.17,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 1.65,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 1.8,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 1.77,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 1.37,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d10": {
+     "t": 5.61,
+     "deaths": 0,
+     "lost": 0.07,
+     "left": 0,
+     "waves": [
+      {
+       "t": 3.2,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.22
+      },
+      {
+       "t": 7.23,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 6.4,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    }
+   },
+   "60:leg+2imp": {
+    "build": {
+     "h": [
+      0,
+      0,
+      7,
+      4,
+      2
+     ],
+     "n": 13,
+     "pw": 172421,
+     "tal": 59,
+     "hp": 1728
+    },
+    "d0": {
+     "t": 0.77,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 0.57,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 1.17,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 0.57,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 3.03,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 2.1,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 0.57,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 6.43,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d10": {
+     "t": 3.82,
+     "deaths": 0,
+     "lost": 0.22,
+     "left": 0,
+     "waves": [
+      {
+       "t": 4.9,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.33
+      },
+      {
+       "t": 0.87,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 5.7,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.33
+      }
+     ]
+    }
+   },
+   "90:rare": {
+    "build": {
+     "h": [
+      1,
+      14,
+      0,
+      0,
+      0
+     ],
+     "n": 15,
+     "pw": 135673,
+     "tal": 73,
+     "hp": 2538
+    },
+    "d0": {
+     "t": 8.98,
+     "deaths": 0,
+     "lost": 0.13,
+     "left": 0,
+     "waves": [
+      {
+       "t": 3.37,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.04
+      },
+      {
+       "t": 16.8,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.2
+      },
+      {
+       "t": 6.77,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.14
+      }
+     ]
+    },
+    "d5": {
+     "t": 13.26,
+     "deaths": 0,
+     "lost": 0.12,
+     "left": 0,
+     "waves": [
+      {
+       "t": 7.5,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 6.97,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.14
+      },
+      {
+       "t": 25.3,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.22
+      }
+     ]
+    },
+    "d10": {
+     "t": 15.28,
+     "deaths": 0,
+     "lost": 0.17,
+     "left": 0,
+     "waves": [
+      {
+       "t": 16.93,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.28
+      },
+      {
+       "t": 21.87,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.23
+      },
+      {
+       "t": 7.03,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    }
+   },
+   "90:epic": {
+    "build": {
+     "h": [
+      0,
+      1,
+      14,
+      0,
+      0
+     ],
+     "n": 15,
+     "pw": 235795,
+     "tal": 73,
+     "hp": 2538
+    },
+    "d0": {
+     "t": 1.54,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 1.67,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 1.07,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 1.87,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 6.96,
+     "deaths": 0,
+     "lost": 0.03,
+     "left": 0,
+     "waves": [
+      {
+       "t": 5.1,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.08
+      },
+      {
+       "t": 13.8,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 1.97,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d10": {
+     "t": 6.45,
+     "deaths": 0,
+     "lost": 0.16,
+     "left": 0,
+     "waves": [
+      {
+       "t": 6.6,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.27
+      },
+      {
+       "t": 5.97,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.22
+      },
+      {
+       "t": 6.77,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    }
+   },
+   "90:leg": {
+    "build": {
+     "h": [
+      0,
+      0,
+      8,
+      7,
+      0
+     ],
+     "n": 15,
+     "pw": 285802,
+     "tal": 73,
+     "hp": 2538
+    },
+    "d0": {
+     "t": 0.86,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 1.33,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 0.63,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 0.63,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 3.69,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 2.03,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 4.73,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 4.3,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d10": {
+     "t": 2.14,
+     "deaths": 0,
+     "lost": 0.04,
+     "left": 0,
+     "waves": [
+      {
+       "t": 3.13,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.13
+      },
+      {
+       "t": 1.17,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 2.13,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    }
+   },
+   "90:leg+2imp": {
+    "build": {
+     "h": [
+      0,
+      0,
+      8,
+      5,
+      2
+     ],
+     "n": 15,
+     "pw": 319220,
+     "tal": 73,
+     "hp": 2538
+    },
+    "d0": {
+     "t": 0.91,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 1.33,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 0.6,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 0.8,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 2.42,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 1.17,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 0.73,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 5.37,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d10": {
+     "t": 2.63,
+     "deaths": 0,
+     "lost": 0.07,
+     "left": 0,
+     "waves": [
+      {
+       "t": 3.63,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.22
+      },
+      {
+       "t": 1.17,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 3.1,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    }
+   }
+  },
+  "necro": {
+   "60:rare": {
+    "build": {
+     "h": [
+      2,
+      11,
+      0,
+      0,
+      0
+     ],
+     "n": 13,
+     "pw": 115809,
+     "tal": 59,
+     "hp": 1958
+    },
+    "d0": {
+     "t": 13.64,
+     "deaths": 0,
+     "lost": 0.04,
+     "left": 0,
+     "waves": [
+      {
+       "t": 12.63,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.04
+      },
+      {
+       "t": 12.63,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.07
+      },
+      {
+       "t": 15.67,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 32,
+     "deaths": 0,
+     "lost": 0.27,
+     "left": 3,
+     "waves": [
+      {
+       "t": 16,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.3
+      },
+      {
+       "t": 40,
+       "left": 2,
+       "deaths": 0,
+       "lost": 0.26
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0.25
+      }
+     ]
+    },
+    "d10": {
+     "t": 40,
+     "deaths": 0,
+     "lost": 0.62,
+     "left": 8,
+     "waves": [
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0.82
+      },
+      {
+       "t": 40,
+       "left": 5,
+       "deaths": 0,
+       "lost": 0.48
+      },
+      {
+       "t": 40,
+       "left": 2,
+       "deaths": 0,
+       "lost": 0.56
+      }
+     ]
+    }
+   },
+   "60:epic": {
+    "build": {
+     "h": [
+      2,
+      2,
+      9,
+      0,
+      0
+     ],
+     "n": 13,
+     "pw": 134026,
+     "tal": 59,
+     "hp": 1958
+    },
+    "d0": {
+     "t": 8.85,
+     "deaths": 0,
+     "lost": 0.03,
+     "left": 0,
+     "waves": [
+      {
+       "t": 9.6,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.04
+      },
+      {
+       "t": 5.87,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 11.07,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.04
+      }
+     ]
+    },
+    "d5": {
+     "t": 15.09,
+     "deaths": 0,
+     "lost": 0.05,
+     "left": 0,
+     "waves": [
+      {
+       "t": 16.77,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.05
+      },
+      {
+       "t": 13.07,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.05
+      },
+      {
+       "t": 15.43,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.06
+      }
+     ]
+    },
+    "d10": {
+     "t": 15.76,
+     "deaths": 0,
+     "lost": 0.24,
+     "left": 0,
+     "waves": [
+      {
+       "t": 15.67,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.33
+      },
+      {
+       "t": 16.07,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.28
+      },
+      {
+       "t": 15.53,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.11
+      }
+     ]
+    }
+   },
+   "60:leg": {
+    "build": {
+     "h": [
+      2,
+      0,
+      2,
+      9,
+      0
+     ],
+     "n": 13,
+     "pw": 153749,
+     "tal": 59,
+     "hp": 1958
+    },
+    "d0": {
+     "t": 12.78,
+     "deaths": 0,
+     "lost": 0.04,
+     "left": 0,
+     "waves": [
+      {
+       "t": 12.43,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.08
+      },
+      {
+       "t": 13.07,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 12.83,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.05
+      }
+     ]
+    },
+    "d5": {
+     "t": 21.35,
+     "deaths": 0,
+     "lost": 0.09,
+     "left": 0,
+     "waves": [
+      {
+       "t": 22.27,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.08
+      },
+      {
+       "t": 22.1,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.05
+      },
+      {
+       "t": 19.67,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.13
+      }
+     ]
+    },
+    "d10": {
+     "t": 22.57,
+     "deaths": 0,
+     "lost": 0.4,
+     "left": 0,
+     "waves": [
+      {
+       "t": 25.53,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.43
+      },
+      {
+       "t": 19.77,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.39
+      },
+      {
+       "t": 22.4,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.38
+      }
+     ]
+    }
+   },
+   "60:leg+2imp": {
+    "build": {
+     "h": [
+      2,
+      0,
+      2,
+      7,
+      2
+     ],
+     "n": 13,
+     "pw": 180100,
+     "tal": 59,
+     "hp": 1958
+    },
+    "d0": {
+     "t": 12.63,
+     "deaths": 0,
+     "lost": 0.1,
+     "left": 0,
+     "waves": [
+      {
+       "t": 12.8,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 11.6,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.13
+      },
+      {
+       "t": 13.5,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.18
+      }
+     ]
+    },
+    "d5": {
+     "t": 21.97,
+     "deaths": 0,
+     "lost": 0.2,
+     "left": 0,
+     "waves": [
+      {
+       "t": 27.4,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.08
+      },
+      {
+       "t": 16.4,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.28
+      },
+      {
+       "t": 22.1,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.25
+      }
+     ]
+    },
+    "d10": {
+     "t": 30.23,
+     "deaths": 0,
+     "lost": 0.43,
+     "left": 0,
+     "waves": [
+      {
+       "t": 30.17,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.49
+      },
+      {
+       "t": 33.6,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.39
+      },
+      {
+       "t": 26.93,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.4
+      }
+     ]
+    }
+   },
+   "90:rare": {
+    "build": {
+     "h": [
+      2,
+      13,
+      0,
+      0,
+      0
+     ],
+     "n": 15,
+     "pw": 200067,
+     "tal": 74,
+     "hp": 2876
+    },
+    "d0": {
+     "t": 9.08,
+     "deaths": 0,
+     "lost": 0.07,
+     "left": 0,
+     "waves": [
+      {
+       "t": 10.1,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.04
+      },
+      {
+       "t": 6.63,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.14
+      },
+      {
+       "t": 10.5,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.04
+      }
+     ]
+    },
+    "d5": {
+     "t": 12.57,
+     "deaths": 0,
+     "lost": 0.28,
+     "left": 0,
+     "waves": [
+      {
+       "t": 10.53,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.24
+      },
+      {
+       "t": 14.6,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.35
+      },
+      {
+       "t": 12.57,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.24
+      }
+     ]
+    },
+    "d10": {
+     "t": 25.28,
+     "deaths": 0,
+     "lost": 0.52,
+     "left": 0,
+     "waves": [
+      {
+       "t": 38.97,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.67
+      },
+      {
+       "t": 14.77,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.5
+      },
+      {
+       "t": 22.1,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.4
+      }
+     ]
+    }
+   },
+   "90:epic": {
+    "build": {
+     "h": [
+      2,
+      2,
+      11,
+      0,
+      0
+     ],
+     "n": 15,
+     "pw": 239539,
+     "tal": 74,
+     "hp": 2876
+    },
+    "d0": {
+     "t": 9.8,
+     "deaths": 0,
+     "lost": 0.02,
+     "left": 0,
+     "waves": [
+      {
+       "t": 10.13,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 8.03,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 11.23,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.05
+      }
+     ]
+    },
+    "d5": {
+     "t": 13.06,
+     "deaths": 0,
+     "lost": 0.12,
+     "left": 0,
+     "waves": [
+      {
+       "t": 10.93,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.11
+      },
+      {
+       "t": 13.33,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.16
+      },
+      {
+       "t": 14.93,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.08
+      }
+     ]
+    },
+    "d10": {
+     "t": 15.97,
+     "deaths": 0,
+     "lost": 0.19,
+     "left": 0,
+     "waves": [
+      {
+       "t": 15.7,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.05
+      },
+      {
+       "t": 16.53,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.37
+      },
+      {
+       "t": 15.67,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.14
+      }
+     ]
+    }
+   },
+   "90:leg": {
+    "build": {
+     "h": [
+      2,
+      0,
+      3,
+      10,
+      0
+     ],
+     "n": 15,
+     "pw": 371034,
+     "tal": 74,
+     "hp": 2876
+    },
+    "d0": {
+     "t": 9.96,
+     "deaths": 0,
+     "lost": 0.08,
+     "left": 0,
+     "waves": [
+      {
+       "t": 9.63,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.09
+      },
+      {
+       "t": 10.13,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.12
+      },
+      {
+       "t": 10.13,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.04
+      }
+     ]
+    },
+    "d5": {
+     "t": 12.26,
+     "deaths": 0,
+     "lost": 0.18,
+     "left": 0,
+     "waves": [
+      {
+       "t": 13.17,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.16
+      },
+      {
+       "t": 13.1,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.2
+      },
+      {
+       "t": 10.5,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.17
+      }
+     ]
+    },
+    "d10": {
+     "t": 15.71,
+     "deaths": 0,
+     "lost": 0.31,
+     "left": 0,
+     "waves": [
+      {
+       "t": 17.37,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.11
+      },
+      {
+       "t": 14.37,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.5
+      },
+      {
+       "t": 15.4,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.32
+      }
+     ]
+    }
+   },
+   "90:leg+2imp": {
+    "build": {
+     "h": [
+      2,
+      0,
+      3,
+      8,
+      2
+     ],
+     "n": 15,
+     "pw": 414150,
+     "tal": 74,
+     "hp": 2876
+    },
+    "d0": {
+     "t": 9.87,
+     "deaths": 0,
+     "lost": 0.06,
+     "left": 0,
+     "waves": [
+      {
+       "t": 11.97,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.13
+      },
+      {
+       "t": 9.83,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.04
+      },
+      {
+       "t": 7.8,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 12.96,
+     "deaths": 0,
+     "lost": 0.1,
+     "left": 0,
+     "waves": [
+      {
+       "t": 12.57,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.2
+      },
+      {
+       "t": 11.93,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 14.37,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.09
+      }
+     ]
+    },
+    "d10": {
+     "t": 13.95,
+     "deaths": 0,
+     "lost": 0.33,
+     "left": 0,
+     "waves": [
+      {
+       "t": 12.9,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.19
+      },
+      {
+       "t": 13.97,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.42
+      },
+      {
+       "t": 14.97,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.38
+      }
+     ]
+    }
+   }
+  },
+  "monk": {
+   "60:rare": {
+    "build": {
+     "h": [
+      0,
+      13,
+      0,
+      0,
+      0
+     ],
+     "n": 13,
+     "pw": 85020,
+     "tal": 59,
+     "hp": 2650
+    },
+    "d0": {
+     "t": 27.22,
+     "deaths": 0,
+     "lost": 0.03,
+     "left": 0,
+     "waves": [
+      {
+       "t": 30.5,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.02
+      },
+      {
+       "t": 32.13,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.05
+      },
+      {
+       "t": 19.03,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.02
+      }
+     ]
+    },
+    "d5": {
+     "t": 40,
+     "deaths": 0,
+     "lost": 0.01,
+     "left": 3,
+     "waves": [
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0.03
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0.01
+      }
+     ]
+    },
+    "d10": {
+     "t": 40,
+     "deaths": 0,
+     "lost": 0.04,
+     "left": 9,
+     "waves": [
+      {
+       "t": 40,
+       "left": 2,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 2,
+       "deaths": 0,
+       "lost": 0.13
+      },
+      {
+       "t": 40,
+       "left": 5,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    }
+   },
+   "60:epic": {
+    "build": {
+     "h": [
+      0,
+      1,
+      12,
+      0,
+      0
+     ],
+     "n": 13,
+     "pw": 123295,
+     "tal": 59,
+     "hp": 2650
+    },
+    "d0": {
+     "t": 19.42,
+     "deaths": 0,
+     "lost": 0.03,
+     "left": 0,
+     "waves": [
+      {
+       "t": 21.93,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.02
+      },
+      {
+       "t": 28.47,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.04
+      },
+      {
+       "t": 7.87,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.02
+      }
+     ]
+    },
+    "d5": {
+     "t": 40,
+     "deaths": 0,
+     "lost": 0.05,
+     "left": 3,
+     "waves": [
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0.09
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0.03
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0.03
+      }
+     ]
+    },
+    "d10": {
+     "t": 33.23,
+     "deaths": 0,
+     "lost": 0.06,
+     "left": 1,
+     "waves": [
+      {
+       "t": 35.4,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.06
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0.05
+      },
+      {
+       "t": 24.3,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.08
+      }
+     ]
+    }
+   },
+   "60:leg": {
+    "build": {
+     "h": [
+      0,
+      0,
+      2,
+      11,
+      0
+     ],
+     "n": 13,
+     "pw": 175016,
+     "tal": 59,
+     "hp": 2650
+    },
+    "d0": {
+     "t": 11.37,
+     "deaths": 0,
+     "lost": 0.02,
+     "left": 0,
+     "waves": [
+      {
+       "t": 10.67,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.03
+      },
+      {
+       "t": 14.9,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.03
+      },
+      {
+       "t": 8.53,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 19.54,
+     "deaths": 0,
+     "lost": 0.01,
+     "left": 0,
+     "waves": [
+      {
+       "t": 22.37,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 16.53,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 19.73,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.02
+      }
+     ]
+    },
+    "d10": {
+     "t": 28.23,
+     "deaths": 0,
+     "lost": 0.01,
+     "left": 0,
+     "waves": [
+      {
+       "t": 28.9,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.03
+      },
+      {
+       "t": 28.97,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 26.83,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    }
+   },
+   "60:leg+2imp": {
+    "build": {
+     "h": [
+      0,
+      0,
+      2,
+      9,
+      2
+     ],
+     "n": 13,
+     "pw": 201967,
+     "tal": 59,
+     "hp": 2650
+    },
+    "d0": {
+     "t": 13.47,
+     "deaths": 0,
+     "lost": 0.02,
+     "left": 0,
+     "waves": [
+      {
+       "t": 11.2,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 14.9,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 14.3,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.05
+      }
+     ]
+    },
+    "d5": {
+     "t": 19.84,
+     "deaths": 0,
+     "lost": 0.01,
+     "left": 0,
+     "waves": [
+      {
+       "t": 21.33,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.03
+      },
+      {
+       "t": 15,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 23.2,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d10": {
+     "t": 20.44,
+     "deaths": 0,
+     "lost": 0.03,
+     "left": 0,
+     "waves": [
+      {
+       "t": 21.33,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.04
+      },
+      {
+       "t": 18.67,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.04
+      },
+      {
+       "t": 21.33,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    }
+   },
+   "90:rare": {
+    "build": {
+     "h": [
+      0,
+      15,
+      0,
+      0,
+      0
+     ],
+     "n": 15,
+     "pw": 138141,
+     "tal": 76,
+     "hp": 3892
+    },
+    "d0": {
+     "t": 33.8,
+     "deaths": 0,
+     "lost": 0,
+     "left": 1,
+     "waves": [
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0.01
+      },
+      {
+       "t": 30.63,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 30.77,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 40,
+     "deaths": 0,
+     "lost": 0,
+     "left": 8,
+     "waves": [
+      {
+       "t": 40,
+       "left": 3,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 2,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 3,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d10": {
+     "t": 40,
+     "deaths": 0,
+     "lost": 0,
+     "left": 15,
+     "waves": [
+      {
+       "t": 40,
+       "left": 3,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 6,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 6,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    }
+   },
+   "90:epic": {
+    "build": {
+     "h": [
+      0,
+      1,
+      14,
+      0,
+      0
+     ],
+     "n": 15,
+     "pw": 207283,
+     "tal": 76,
+     "hp": 3892
+    },
+    "d0": {
+     "t": 23.05,
+     "deaths": 0,
+     "lost": 0.02,
+     "left": 0,
+     "waves": [
+      {
+       "t": 17.9,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.03
+      },
+      {
+       "t": 22.77,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.02
+      },
+      {
+       "t": 28.47,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 32.38,
+     "deaths": 0,
+     "lost": 0.01,
+     "left": 3,
+     "waves": [
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 2,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 17.13,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.04
+      }
+     ]
+    },
+    "d10": {
+     "t": 36.33,
+     "deaths": 0,
+     "lost": 0.03,
+     "left": 3,
+     "waves": [
+      {
+       "t": 29,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.02
+      },
+      {
+       "t": 40,
+       "left": 2,
+       "deaths": 0,
+       "lost": 0.04
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0.03
+      }
+     ]
+    }
+   },
+   "90:leg": {
+    "build": {
+     "h": [
+      0,
+      0,
+      4,
+      11,
+      0
+     ],
+     "n": 15,
+     "pw": 312747,
+     "tal": 76,
+     "hp": 3892
+    },
+    "d0": {
+     "t": 14.98,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 12.1,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 21.33,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 11.5,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 21.88,
+     "deaths": 0,
+     "lost": 0.01,
+     "left": 0,
+     "waves": [
+      {
+       "t": 24.53,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.02
+      },
+      {
+       "t": 17.73,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 23.37,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d10": {
+     "t": 23.01,
+     "deaths": 0,
+     "lost": 0.02,
+     "left": 0,
+     "waves": [
+      {
+       "t": 22.73,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 22.83,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.04
+      },
+      {
+       "t": 23.47,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.02
+      }
+     ]
+    }
+   },
+   "90:leg+2imp": {
+    "build": {
+     "h": [
+      0,
+      0,
+      4,
+      9,
+      2
+     ],
+     "n": 15,
+     "pw": 353531,
+     "tal": 76,
+     "hp": 3892
+    },
+    "d0": {
+     "t": 14.62,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 17.73,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 13.87,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 12.27,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 23.62,
+     "deaths": 0,
+     "lost": 0.01,
+     "left": 0,
+     "waves": [
+      {
+       "t": 34.63,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 22.77,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.02
+      },
+      {
+       "t": 13.47,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d10": {
+     "t": 30.99,
+     "deaths": 0,
+     "lost": 0.02,
+     "left": 0,
+     "waves": [
+      {
+       "t": 23.1,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.04
+      },
+      {
+       "t": 40,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.01
+      },
+      {
+       "t": 29.87,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.02
+      }
+     ]
+    }
+   }
+  },
+  "hunter": {
+   "60:rare": {
+    "build": {
+     "h": [
+      0,
+      13,
+      0,
+      0,
+      0
+     ],
+     "n": 13,
+     "pw": 61894,
+     "tal": 59,
+     "hp": 2074
+    },
+    "d0": {
+     "t": 21.3,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 22.93,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 18.97,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 22,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 29.6,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 24.83,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 35.97,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 28,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d10": {
+     "t": 40,
+     "deaths": 0,
+     "lost": 0.13,
+     "left": 22,
+     "waves": [
+      {
+       "t": 40,
+       "left": 5,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 8,
+       "deaths": 0,
+       "lost": 0.03
+      },
+      {
+       "t": 40,
+       "left": 9,
+       "deaths": 0,
+       "lost": 0.36
+      }
+     ]
+    }
+   },
+   "60:epic": {
+    "build": {
+     "h": [
+      0,
+      0,
+      13,
+      0,
+      0
+     ],
+     "n": 13,
+     "pw": 109645,
+     "tal": 59,
+     "hp": 2074
+    },
+    "d0": {
+     "t": 15.24,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 12.53,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 17.23,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 15.97,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 23.37,
+     "deaths": 0,
+     "lost": 0.01,
+     "left": 0,
+     "waves": [
+      {
+       "t": 21.37,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 26.5,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 22.23,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.03
+      }
+     ]
+    },
+    "d10": {
+     "t": 36.02,
+     "deaths": 0,
+     "lost": 0.05,
+     "left": 3,
+     "waves": [
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0.1
+      },
+      {
+       "t": 28.07,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 2,
+       "deaths": 0,
+       "lost": 0.05
+      }
+     ]
+    }
+   },
+   "60:leg": {
+    "build": {
+     "h": [
+      0,
+      0,
+      1,
+      12,
+      0
+     ],
+     "n": 13,
+     "pw": 130206,
+     "tal": 59,
+     "hp": 2074
+    },
+    "d0": {
+     "t": 11.16,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 9.07,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 15.4,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 9,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 16.64,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 13.7,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 18,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 18.23,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d10": {
+     "t": 26.91,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 26.6,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 21.63,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 32.5,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    }
+   },
+   "60:leg+2imp": {
+    "build": {
+     "h": [
+      0,
+      0,
+      1,
+      10,
+      2
+     ],
+     "n": 13,
+     "pw": 150488,
+     "tal": 59,
+     "hp": 2074
+    },
+    "d0": {
+     "t": 11.1,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 8.37,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 9.53,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 15.4,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 15.89,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 16.4,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 14.87,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 16.4,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d10": {
+     "t": 20.88,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 22.97,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 18.07,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 21.6,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    }
+   },
+   "90:rare": {
+    "build": {
+     "h": [
+      0,
+      15,
+      0,
+      0,
+      0
+     ],
+     "n": 15,
+     "pw": 104592,
+     "tal": 74,
+     "hp": 3046
+    },
+    "d0": {
+     "t": 20.04,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 19.8,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 20.3,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 20.03,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 28.99,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 21.87,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 31.83,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 33.27,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d10": {
+     "t": 37.09,
+     "deaths": 0,
+     "lost": 0,
+     "left": 1,
+     "waves": [
+      {
+       "t": 36.7,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 34.57,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    }
+   },
+   "90:epic": {
+    "build": {
+     "h": [
+      0,
+      0,
+      15,
+      0,
+      0
+     ],
+     "n": 15,
+     "pw": 183666,
+     "tal": 74,
+     "hp": 3046
+    },
+    "d0": {
+     "t": 12.87,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 13.17,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 11.7,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 13.73,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 23.53,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 22.9,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 25.67,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 22.03,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d10": {
+     "t": 36.1,
+     "deaths": 0,
+     "lost": 0,
+     "left": 1,
+     "waves": [
+      {
+       "t": 34.97,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 33.33,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    }
+   },
+   "90:leg": {
+    "build": {
+     "h": [
+      0,
+      0,
+      2,
+      13,
+      0
+     ],
+     "n": 15,
+     "pw": 248305,
+     "tal": 74,
+     "hp": 3046
+    },
+    "d0": {
+     "t": 11.22,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 8.93,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 13.17,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 11.57,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 17.26,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 17.7,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 13.17,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 20.9,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d10": {
+     "t": 26.52,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 26.87,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 29.13,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 23.57,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    }
+   },
+   "90:leg+2imp": {
+    "build": {
+     "h": [
+      0,
+      0,
+      2,
+      11,
+      2
+     ],
+     "n": 15,
+     "pw": 279706,
+     "tal": 74,
+     "hp": 3046
+    },
+    "d0": {
+     "t": 10.95,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 9.4,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 10.67,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 12.77,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 13.59,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 15.83,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 12.77,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 12.17,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d10": {
+     "t": 23.55,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 26.03,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 22.83,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 21.8,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    }
+   }
+  },
+  "cryo": {
+   "60:rare": {
+    "build": {
+     "h": [
+      0,
+      13,
+      0,
+      0,
+      0
+     ],
+     "n": 13,
+     "pw": 75974,
+     "tal": 59,
+     "hp": 1797
+    },
+    "d0": {
+     "t": 40,
+     "deaths": 0,
+     "lost": 0,
+     "left": 7,
+     "waves": [
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 3,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 3,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 40,
+     "deaths": 0,
+     "lost": 0,
+     "left": 10,
+     "waves": [
+      {
+       "t": 40,
+       "left": 3,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 3,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 4,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d10": {
+     "t": 40,
+     "deaths": 0,
+     "lost": 0,
+     "left": 10,
+     "waves": [
+      {
+       "t": 40,
+       "left": 4,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 2,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 4,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    }
+   },
+   "60:epic": {
+    "build": {
+     "h": [
+      0,
+      0,
+      13,
+      0,
+      0
+     ],
+     "n": 13,
+     "pw": 122939,
+     "tal": 59,
+     "hp": 1797
+    },
+    "d0": {
+     "t": 30.88,
+     "deaths": 0,
+     "lost": 0,
+     "left": 2,
+     "waves": [
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 12.63,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 40,
+     "deaths": 0,
+     "lost": 0,
+     "left": 8,
+     "waves": [
+      {
+       "t": 40,
+       "left": 2,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 3,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 3,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d10": {
+     "t": 40,
+     "deaths": 0,
+     "lost": 0.11,
+     "left": 9,
+     "waves": [
+      {
+       "t": 40,
+       "left": 3,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 3,
+       "deaths": 0,
+       "lost": 0.11
+      },
+      {
+       "t": 40,
+       "left": 3,
+       "deaths": 0,
+       "lost": 0.21
+      }
+     ]
+    }
+   },
+   "60:leg": {
+    "build": {
+     "h": [
+      0,
+      0,
+      7,
+      6,
+      0
+     ],
+     "n": 13,
+     "pw": 164325,
+     "tal": 59,
+     "hp": 1797
+    },
+    "d0": {
+     "t": 21.5,
+     "deaths": 0,
+     "lost": 0,
+     "left": 1,
+     "waves": [
+      {
+       "t": 15.2,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 9.3,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 40,
+     "deaths": 0,
+     "lost": 0,
+     "left": 6,
+     "waves": [
+      {
+       "t": 40,
+       "left": 2,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 3,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d10": {
+     "t": 40,
+     "deaths": 0,
+     "lost": 0,
+     "left": 5,
+     "waves": [
+      {
+       "t": 40,
+       "left": 3,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    }
+   },
+   "60:leg+2imp": {
+    "build": {
+     "h": [
+      0,
+      0,
+      7,
+      4,
+      2
+     ],
+     "n": 13,
+     "pw": 208656,
+     "tal": 59,
+     "hp": 1797
+    },
+    "d0": {
+     "t": 22.26,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 19.9,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 32.9,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 13.97,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 40,
+     "deaths": 0,
+     "lost": 0,
+     "left": 5,
+     "waves": [
+      {
+       "t": 40,
+       "left": 2,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 2,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d10": {
+     "t": 40,
+     "deaths": 0,
+     "lost": 0,
+     "left": 7,
+     "waves": [
+      {
+       "t": 40,
+       "left": 3,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 2,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 2,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    }
+   },
+   "90:rare": {
+    "build": {
+     "h": [
+      0,
+      15,
+      0,
+      0,
+      0
+     ],
+     "n": 15,
+     "pw": 122445,
+     "tal": 72,
+     "hp": 2640
+    },
+    "d0": {
+     "t": 40,
+     "deaths": 0,
+     "lost": 0,
+     "left": 6,
+     "waves": [
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 3,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 2,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 40,
+     "deaths": 0,
+     "lost": 0,
+     "left": 10,
+     "waves": [
+      {
+       "t": 40,
+       "left": 4,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 4,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 2,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d10": {
+     "t": 40,
+     "deaths": 0,
+     "lost": 0,
+     "left": 7,
+     "waves": [
+      {
+       "t": 40,
+       "left": 3,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 3,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    }
+   },
+   "90:epic": {
+    "build": {
+     "h": [
+      0,
+      0,
+      15,
+      0,
+      0
+     ],
+     "n": 15,
+     "pw": 211715,
+     "tal": 72,
+     "hp": 2640
+    },
+    "d0": {
+     "t": 38.61,
+     "deaths": 0,
+     "lost": 0,
+     "left": 2,
+     "waves": [
+      {
+       "t": 35.83,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 40,
+     "deaths": 0,
+     "lost": 0.05,
+     "left": 6,
+     "waves": [
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 3,
+       "deaths": 0,
+       "lost": 0.07
+      },
+      {
+       "t": 40,
+       "left": 2,
+       "deaths": 0,
+       "lost": 0.09
+      }
+     ]
+    },
+    "d10": {
+     "t": 40,
+     "deaths": 0,
+     "lost": 0.04,
+     "left": 6,
+     "waves": [
+      {
+       "t": 40,
+       "left": 3,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 2,
+       "deaths": 0,
+       "lost": 0.11
+      }
+     ]
+    }
+   },
+   "90:leg": {
+    "build": {
+     "h": [
+      0,
+      0,
+      8,
+      7,
+      0
+     ],
+     "n": 15,
+     "pw": 282355,
+     "tal": 72,
+     "hp": 2640
+    },
+    "d0": {
+     "t": 21.87,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 21.8,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 25.33,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 18.47,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 40,
+     "deaths": 0,
+     "lost": 0,
+     "left": 3,
+     "waves": [
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d10": {
+     "t": 40,
+     "deaths": 0,
+     "lost": 0,
+     "left": 7,
+     "waves": [
+      {
+       "t": 40,
+       "left": 3,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 2,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 2,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    }
+   },
+   "90:leg+2imp": {
+    "build": {
+     "h": [
+      0,
+      0,
+      8,
+      5,
+      2
+     ],
+     "n": 15,
+     "pw": 350791,
+     "tal": 72,
+     "hp": 2640
+    },
+    "d0": {
+     "t": 20.62,
+     "deaths": 0,
+     "lost": 0,
+     "left": 0,
+     "waves": [
+      {
+       "t": 21.8,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 25.33,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 14.73,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 40,
+     "deaths": 0,
+     "lost": 0,
+     "left": 6,
+     "waves": [
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 3,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 2,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d10": {
+     "t": 40,
+     "deaths": 0,
+     "lost": 0,
+     "left": 9,
+     "waves": [
+      {
+       "t": 40,
+       "left": 2,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 3,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 4,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    }
+   }
+  },
+  "bers": {
+   "60:rare": {
+    "build": {
+     "h": [
+      0,
+      13,
+      0,
+      0,
+      0
+     ],
+     "n": 13,
+     "pw": 80562,
+     "tal": 59,
+     "hp": 2650
+    },
+    "d0": {
+     "t": 9.49,
+     "deaths": 0,
+     "lost": 0.06,
+     "left": 0,
+     "waves": [
+      {
+       "t": 11.43,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.07
+      },
+      {
+       "t": 4.53,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.04
+      },
+      {
+       "t": 12.5,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.07
+      }
+     ]
+    },
+    "d5": {
+     "t": 34.7,
+     "deaths": 0,
+     "lost": 0.09,
+     "left": 2,
+     "waves": [
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0.14
+      },
+      {
+       "t": 24.1,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.12
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d10": {
+     "t": 29.38,
+     "deaths": 0,
+     "lost": 0.1,
+     "left": 1,
+     "waves": [
+      {
+       "t": 20.37,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.21
+      },
+      {
+       "t": 27.77,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.08
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    }
+   },
+   "60:epic": {
+    "build": {
+     "h": [
+      0,
+      0,
+      13,
+      0,
+      0
+     ],
+     "n": 13,
+     "pw": 133003,
+     "tal": 59,
+     "hp": 2650
+    },
+    "d0": {
+     "t": 10.16,
+     "deaths": 0,
+     "lost": 0.01,
+     "left": 0,
+     "waves": [
+      {
+       "t": 9.2,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 11.17,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.04
+      },
+      {
+       "t": 10.1,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      }
+     ]
+    },
+    "d5": {
+     "t": 15.74,
+     "deaths": 0,
+     "lost": 0.07,
+     "left": 0,
+     "waves": [
+      {
+       "t": 17.63,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.04
+      },
+      {
+       "t": 13.47,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.1
+      },
+      {
+       "t": 16.13,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.08
+      }
+     ]
+    },
+    "d10": {
+     "t": 18.78,
+     "deaths": 0,
+     "lost": 0.13,
+     "left": 0,
+     "waves": [
+      {
+       "t": 14.23,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.11
+      },
+      {
+       "t": 27.83,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.14
+      },
+      {
+       "t": 14.27,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.14
+      }
+     ]
+    }
+   },
+   "60:leg": {
+    "build": {
+     "h": [
+      0,
+      0,
+      1,
+      12,
+      0
+     ],
+     "n": 13,
+     "pw": 218250,
+     "tal": 59,
+     "hp": 2650
+    },
+    "d0": {
+     "t": 5.38,
+     "deaths": 0,
+     "lost": 0.11,
+     "left": 0,
+     "waves": [
+      {
+       "t": 4.8,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.09
+      },
+      {
+       "t": 5.63,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.13
+      },
+      {
+       "t": 5.7,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.1
+      }
+     ]
+    },
+    "d5": {
+     "t": 8.97,
+     "deaths": 0,
+     "lost": 0.09,
+     "left": 0,
+     "waves": [
+      {
+       "t": 7.67,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.1
+      },
+      {
+       "t": 4.23,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.04
+      },
+      {
+       "t": 15,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.12
+      }
+     ]
+    },
+    "d10": {
+     "t": 20.61,
+     "deaths": 0,
+     "lost": 0.27,
+     "left": 0,
+     "waves": [
+      {
+       "t": 11.07,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.18
+      },
+      {
+       "t": 29.9,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.4
+      },
+      {
+       "t": 20.87,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.24
+      }
+     ]
+    }
+   },
+   "60:leg+2imp": {
+    "build": {
+     "h": [
+      0,
+      0,
+      1,
+      10,
+      2
+     ],
+     "n": 13,
+     "pw": 247405,
+     "tal": 59,
+     "hp": 2650
+    },
+    "d0": {
+     "t": 9.38,
+     "deaths": 0,
+     "lost": 0.17,
+     "left": 0,
+     "waves": [
+      {
+       "t": 6.83,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.14
+      },
+      {
+       "t": 11.7,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.22
+      },
+      {
+       "t": 9.6,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.15
+      }
+     ]
+    },
+    "d5": {
+     "t": 14.02,
+     "deaths": 0,
+     "lost": 0.2,
+     "left": 0,
+     "waves": [
+      {
+       "t": 11.37,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.24
+      },
+      {
+       "t": 17.13,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.16
+      },
+      {
+       "t": 13.57,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.19
+      }
+     ]
+    },
+    "d10": {
+     "t": 19.28,
+     "deaths": 0,
+     "lost": 0.27,
+     "left": 0,
+     "waves": [
+      {
+       "t": 16.37,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.14
+      },
+      {
+       "t": 20.57,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.29
+      },
+      {
+       "t": 20.9,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.37
+      }
+     ]
+    }
+   },
+   "90:rare": {
+    "build": {
+     "h": [
+      0,
+      15,
+      0,
+      0,
+      0
+     ],
+     "n": 15,
+     "pw": 134973,
+     "tal": 74,
+     "hp": 3892
+    },
+    "d0": {
+     "t": 10.86,
+     "deaths": 0,
+     "lost": 0.05,
+     "left": 0,
+     "waves": [
+      {
+       "t": 8.67,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.07
+      },
+      {
+       "t": 12.67,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 11.23,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.08
+      }
+     ]
+    },
+    "d5": {
+     "t": 21.83,
+     "deaths": 0,
+     "lost": 0.13,
+     "left": 1,
+     "waves": [
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0.19
+      },
+      {
+       "t": 7.4,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.1
+      },
+      {
+       "t": 18.1,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.09
+      }
+     ]
+    },
+    "d10": {
+     "t": 28.12,
+     "deaths": 0,
+     "lost": 0.08,
+     "left": 2,
+     "waves": [
+      {
+       "t": 23.43,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 20.93,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.12
+      },
+      {
+       "t": 40,
+       "left": 2,
+       "deaths": 0,
+       "lost": 0.12
+      }
+     ]
+    }
+   },
+   "90:epic": {
+    "build": {
+     "h": [
+      0,
+      0,
+      15,
+      0,
+      0
+     ],
+     "n": 15,
+     "pw": 225610,
+     "tal": 74,
+     "hp": 3892
+    },
+    "d0": {
+     "t": 9.21,
+     "deaths": 0,
+     "lost": 0.01,
+     "left": 0,
+     "waves": [
+      {
+       "t": 10.43,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 7.2,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.01
+      },
+      {
+       "t": 10,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.02
+      }
+     ]
+    },
+    "d5": {
+     "t": 21.41,
+     "deaths": 0,
+     "lost": 0.02,
+     "left": 1,
+     "waves": [
+      {
+       "t": 11.2,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 40,
+       "left": 1,
+       "deaths": 0,
+       "lost": 0
+      },
+      {
+       "t": 13.03,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.06
+      }
+     ]
+    },
+    "d10": {
+     "t": 16.91,
+     "deaths": 0,
+     "lost": 0.14,
+     "left": 0,
+     "waves": [
+      {
+       "t": 11.1,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.12
+      },
+      {
+       "t": 16.77,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.14
+      },
+      {
+       "t": 22.87,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.17
+      }
+     ]
+    }
+   },
+   "90:leg": {
+    "build": {
+     "h": [
+      0,
+      0,
+      2,
+      13,
+      0
+     ],
+     "n": 15,
+     "pw": 383652,
+     "tal": 74,
+     "hp": 3892
+    },
+    "d0": {
+     "t": 6.63,
+     "deaths": 0,
+     "lost": 0.18,
+     "left": 0,
+     "waves": [
+      {
+       "t": 6.4,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.14
+      },
+      {
+       "t": 8.47,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.26
+      },
+      {
+       "t": 5.03,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.14
+      }
+     ]
+    },
+    "d5": {
+     "t": 8.17,
+     "deaths": 0,
+     "lost": 0.21,
+     "left": 0,
+     "waves": [
+      {
+       "t": 5.3,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.14
+      },
+      {
+       "t": 10.3,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.16
+      },
+      {
+       "t": 8.9,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.33
+      }
+     ]
+    },
+    "d10": {
+     "t": 13.3,
+     "deaths": 0,
+     "lost": 0.3,
+     "left": 0,
+     "waves": [
+      {
+       "t": 13.83,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.35
+      },
+      {
+       "t": 9.1,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.15
+      },
+      {
+       "t": 16.97,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.39
+      }
+     ]
+    }
+   },
+   "90:leg+2imp": {
+    "build": {
+     "h": [
+      0,
+      0,
+      2,
+      11,
+      2
+     ],
+     "n": 15,
+     "pw": 430778,
+     "tal": 74,
+     "hp": 3892
+    },
+    "d0": {
+     "t": 5.19,
+     "deaths": 0,
+     "lost": 0.14,
+     "left": 0,
+     "waves": [
+      {
+       "t": 4.9,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.14
+      },
+      {
+       "t": 6.03,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.12
+      },
+      {
+       "t": 4.63,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.16
+      }
+     ]
+    },
+    "d5": {
+     "t": 8.38,
+     "deaths": 0,
+     "lost": 0.18,
+     "left": 0,
+     "waves": [
+      {
+       "t": 7.43,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.19
+      },
+      {
+       "t": 7.8,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.19
+      },
+      {
+       "t": 9.9,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.16
+      }
+     ]
+    },
+    "d10": {
+     "t": 17.98,
+     "deaths": 0,
+     "lost": 0.32,
+     "left": 0,
+     "waves": [
+      {
+       "t": 17.17,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.35
+      },
+      {
+       "t": 15.13,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.21
+      },
+      {
+       "t": 21.63,
+       "left": 0,
+       "deaths": 0,
+       "lost": 0.39
+      }
+     ]
+    }
+   }
+  },
+  "_errs": []
+ }
+}
