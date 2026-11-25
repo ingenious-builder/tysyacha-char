@@ -1753,8 +1753,9 @@ const CP_MORE={
  lock:['doom','aura','surge','rebirth','harvest','trail'],     // адский взрыв трупов, ореол пламени, перегрев, возрождение из пепла, похищение жизни, адский след
  inq:['execute','rebirth','deflect','link','volley','focus'],   // казнь-приговор, благословение, эгид-отбойник, цепь света, святые болты, прицел стоя
  alch:['volley','surge','twin','focus','slip','orbit'],        // колбы за спиной, брожение, двойник, шар яда, дымовое ускользание, колбы-стражи
- // Тимур (слияние int/v1331): 10 разных форм, с Пиромантом совпадает 6, с Криомантом/Повелителем бури/Геомантом — 5; защитных 2 (потолок мага 3)
- timur:['link','battery','doom','brand','rebirth','brink']};   // угощение по цепочке, самовар-батарея, взрыв павших, метка гостя, второе дыхание, миг на краю
+ // Тимур (слияние int/v1331): 10 разных форм, с Пиромантом и Криомантом совпадает 6, с Геомантом 6, с Повелителем бури 5; защитных 2 (потолок
+ // мага 3). «Метку» (brand) не даём: в бою 60-го ур. с ней Тимур бил в 1,45 раза сильнее Пироманта и Криоманта (без неё — 0,94)
+ timur:['link','battery','doom','orbit','rebirth','brink']};   // угощение по цепочке, самовар-батарея, взрыв павших, эчпочмаки вокруг, второе дыхание, миг на краю
 for(const id in CP_MORE)if(CLASS_KIT[id])for(const f of CP_MORE[id])if(!CLASS_KIT[id].cp.includes(f))CLASS_KIT[id].cp.push(f);   // c.cp героя — тот же массив
 // Проверка 25.11 со смертным героем (_check/rev_pas/surv.js): «Лучший билд» брал две «Вторые жизни» (и два «Кокона») у 14 героев из 20 —
 // у каждой свой откат, то есть два спасения от смерти за бой. Теперь PAS_ONE — в билде по одной (автоустановка, автозамена, «Лучший
@@ -2559,6 +2560,10 @@ const skK=sk=>rarK(sk)*rkMul(sk.id)*slotBoost()*talQ(sk);
 // t чары не ниже «обычного» прироста группы G (нижняя четверть t пула, TAL_LIFT): u = max(t, G), предел и поправка считаются от u.
 // Прежний потолок (симметричное окно ×1,45 вокруг среднего) держал порядок только на одном ранге и оставлял от шага редкости запас
 // ×1,02 — в реальном уроне (оценка против боя ±10–15%) пары переворачивались (_check/rev2, _check/rev4).
+// 25.11 (слияние int/v1331, решение Петра): сродство особенности класса (CT_AFF: «Пиромант — огонь ×1,2», формы героя) — тоже в
+// потолке. Без этого чара основной стихии на 5-м ранге обгоняла чару редкостью выше (1,44 × 1,2 = 1,73 > 1,62). Порядок держится по
+// силе с особенностью: w = max(t, G) × a, пределы — по w, и без очков в талантах тоже (t = 1). Низшие чары основной стихии теряют
+// до ×1/1,2 (у легендарных особенность целиком); Артём просит сильную, ощутимую разницу редкостей — шаг ×1,75 эту потерю перекрывает.
 const TAL_CAP=1;
 const TAL_LIFT=.25;   // доля пула: «обычный» прирост от талантов — нижняя четверть t группы; ниже него чару подтягивает
 const TQ={raw:0,sig:'',key:null,L:0,cls:null,cut:null,G:null,c:TAL_CAP,lift:TAL_LIFT,fast:0,t:new Map(),q:new Map(),p0:new Map(),p0k:'',smc:null,smp:null};
@@ -2580,34 +2585,38 @@ function tqP0(ids){const k=CLS.id+'|'+S.lvl+'|'+mastB();if(TQ.p0k!==k){TQ.p0k=k;
   if(ids.every(id=>TQ.p0.has(id)))return;const need=[...new Set([...ids,...CLS.pool])].filter(id=>!TQ.p0.has(id));
   tqClean(()=>{for(const id of need)TQ.p0.set(id,skParts(SKILLS[id],false).pw/rkMul(id));},{});}
 // множитель талантов t у чар ids
-function tqT(ids){const need=ids.filter(id=>!TQ.t.has(id));
+function tqT(ids){if(!TQ.sig)return ids.map(()=>1);const need=ids.filter(id=>!TQ.t.has(id));
   if(need.length){tqP0(need);tqClean(()=>{for(const id of need){const a=skParts(SKILLS[id],false).pw/rkMul(id),b=TQ.p0.get(id);TQ.t.set(id,a>0&&b>0?a/b:1);}});}
   return ids.map(id=>TQ.t.get(id));}
 // пределы t' по ступеням: cut[группа][ступень] = TAL_CAP × наименьший t' чар выше этой ступени (Infinity — выше нет никого).
 // Весь пул класса (264 чары); пока «Авто» перебирает раскладки (TQ.fast) — каждая 3-я чара: пределы чуть шире, итоговая раскладка
 // считается заново по всему пулу (ключ кэша — с режимом).
 // ступень для потолка — всегда с «Невозможными» (IMP_OFF=false): иначе вызов из impBasePwr записал бы в кэш пределы без них
+// сродство особенности класса для потолка (ctAff объявлен ниже, с особенностями классов); без особенности (CT_ON=0: замеры формы,
+// стенды) надбавки в бою нет — и резать нечего
+const tqOn=()=>typeof CT_ON!=='undefined'&&!!CT_ON&&typeof ctAff==='function';
+const tqA=sk=>tqOn()?ctAff(sk):1;
 function tqRar(sk){const k=typeof IMP_OFF!=='undefined'&&IMP_OFF;if(k)IMP_OFF=false;try{return Math.min(4,rarOf(sk));}finally{if(k)IMP_OFF=true;}}
 function tqCut(){let ids;if(TQ.fast){if(TQ.smc!==CLS){TQ.smc=CLS;TQ.smp=[...CLS.pool].filter((_,i)=>i%3===0);}ids=TQ.smp;}else ids=[...CLS.pool];
   const t=tqT(ids),mn=[[1/0,1/0,1/0,1/0,1/0],[1/0,1/0,1/0,1/0,1/0]],tg=[[],[]];for(let i=0;i<ids.length;i++)tg[SKILLS[ids[i]].active?0:1].push(t[i]);
   const G=TQ.G=tg.map(a=>{if(!a.length||!(TQ.lift>=0))return 0;a.sort((x,y)=>x-y);return a[Math.min(a.length-1,Math.floor(a.length*TQ.lift))];});
   const mxL=TQ.mxL=[0,0];
-  for(let i=0;i<ids.length;i++){const sk=SKILLS[ids[i]],g=sk.active?0:1,r=tqRar(sk),u=Math.max(t[i],G[g]);if(u<mn[g][r])mn[g][r]=u;if(r===3&&u>mxL[g])mxL[g]=u;}
+  for(let i=0;i<ids.length;i++){const sk=SKILLS[ids[i]],g=sk.active?0:1,r=tqRar(sk),u=Math.max(t[i],G[g])*tqA(sk);if(u<mn[g][r])mn[g][r]=u;if(r===3&&u>mxL[g])mxL[g]=u;}
   // «Невозможная» (ступень 4) легендарные не режет — иначе выпавшая невозможная ослабляла бы легендарные чары «своего вида»;
   // вместо этого она сама получает от талантов не меньше лучшей легендарной пула (mxL): ×1,7 над легендарной держится и с талантами
   const cut=[[],[]];for(let g=0;g<2;g++){let m=1/0;cut[g][4]=1/0;for(let r=3;r>=0;r--){cut[g][r]=TQ.c*m;const tm=Math.min(mn[g][r],cut[g][r]);if(tm<m)m=tm;}}
   TQ.cut=cut;}
-function talQ(sk){if(TQ.raw||!TQ.sig||!S||!CLS)return 1;
-  const key=TQ.sig+(TQ.fast?'|f':'')+'|'+TQ.c+'|'+TQ.lift;
+function talQ(sk){if(TQ.raw||!S||!CLS||!TQ.sig&&!tqOn())return 1;
+  const key=TQ.sig+(TQ.fast?'|f':'')+'|'+TQ.c+'|'+TQ.lift+(tqOn()?'|a':'');
   if(TQ.key!==key||TQ.L!==S.lvl||TQ.cls!==CLS){TQ.key=key;TQ.L=S.lvl;TQ.cls=CLS;TQ.cut=null;TQ.t.clear();TQ.q.clear();}
   let v=TQ.q.get(sk.id);if(v!==undefined)return v;
   if(TQ.cut===null)tqCut();
-  const g=sk.active?0:1,t=tqT([sk.id])[0],r=tqRar(sk),c=TQ.cut[g][r];v=Math.min(Math.max(t,TQ.G[g],r===4?TQ.mxL[g]:0),c)/t;TQ.q.set(sk.id,v);return v;}
+  const g=sk.active?0:1,t=tqT([sk.id])[0],r=tqRar(sk),c=TQ.cut[g][r],a=tqA(sk);v=Math.min(Math.max(Math.max(t,TQ.G[g])*a,r===4?TQ.mxL[g]:0),c)/(t*a);TQ.q.set(sk.id,v);return v;}
 // разбивка силы для листа чары и книги: база × ранг × уровень × таланты × резонанс × реакции
 function powerBreak(sk){const I=rarInfo();rarK(sk);const base=I.B[sk.id],rm=rkMul(sk.id),cur=skParts(sk,false).pw;
-  const kt=S.talents;let lv=cur;S.talents={};computeStats();try{lv=skParts(sk,false).pw;}finally{S.talents=kt;computeStats();}
+  const kt=S.talents;let lv=cur;S.talents={};computeStats();TQ.raw++;try{lv=skParts(sk,false).pw;}finally{TQ.raw--;S.talents=kt;computeStats();}
   const re=resoMul(sk),rv=reactVal(sk.e,RESO_N),n=RESO_N[sk.e]+(EQUIPPED.has(sk.id)?0:1),im=isImp(sk.id)?(sk.active?IMP.dmg/IMP.cd:IMP.pdmg)*IMP.fl:1,sb=slotBoost(),lk=sb===1?1:lvTab(RAR_LVK,S.lvl);
-  // особенность класса (CT_AFF: «Пиромант — огонь ×1,2») входит в силу чары (обёртка skPower) — и в разбор, иначе «Сила» разбора была меньше книги
+  // особенность класса (ctAff: основная стихия и формы героя) — тот же множитель, что в «Силе» строки характеристик (pwr → skPower)
   const af=typeof ctAff==='function'?ctAff(sk):1;
   return {r:rarOf(sk),base,rank:rm,imp:im,slot:sb,slotS:sb/lk,lvk:lk,lvl:lv/(base*rm*im*sb),tal:cur/lv,cap:talQ(sk),aff:af,reso:re,react:rv,total:cur*re*rv*af,same:n};}
 const slotNm=(act,i)=>(act?'слоте ':'пассивном слоте ')+(i+1);
@@ -3251,7 +3260,7 @@ function impJump(en){if((en.ibJ|0)>=3||procBudget<=0)return;procBudget--;const n
 // голубая кайма ядра снаряда (RIM), голубое кольцо на касте, тонкая голубая нить в луче, кольцо под призванным; ступени крупнее
 // (снаряд ×1,1/1,2/1,35, ореол ×1,2/1,35/1,55, луч шире ×1,1/1,2/1,3, призыв ×1,05/1,1/1,15).
 // Облик площади (волна, тряска) — только на касте (RAR_CAST: каст, снаряд, метеор, мина, первый удар дождя и вихря); тики ауры, вихря,
-// поля, удары призывов и «каждый N-й каст» — лёгкий отсвет цвета редкости не чаще раза в 1,4 с на чару и без тряски (было до 4,6 волн
+// поля, удары призывов и «каждый N-й каст» — у легендарной и невозможной лёгкий отсвет не чаще раза в 1,4 с на чару, без тряски (было до 4,6 волн
 // с тряской в секунду, экран трясся 30–42 % времени).
 const RARC=[WHITE,new THREE.Color(0x6ab8ff),new THREE.Color(0xc58bff),new THREE.Color(0xffb02e),IMPC],RSZ=[1,1.1,1.2,1.35,1.4],GLK=[1,1.2,1.35,1.55],RTK=[0,.45,.5,.6];
 const RIMK=[0,1.7,1.85,2.1,2.1],BWK=[1,1.1,1.2,1.3],SUMK=[1,1.05,1.1,1.15,1.18];
@@ -3276,7 +3285,7 @@ function rarTrail(p,g){const r=rarV(p.sk);if(r<2||r>=4||!fk())return;const q=g.p
 // площадь (нова, взрыв, удар сверху, клеймо, рок): эпическая — кольцо по краю, легендарная — золотая ударная волна и тряска, невозможная — тёмная волна
 function rarAoeFx(sk,pos,R,depth){const r=rarV(sk);if(r<1||depth>1||rarAoeN>=2||!fk())return;const cast=RAR_CAST;
   if(!fxGap(sk.id,cast?.3:1.4))return;rarAoeN++;const rc=rarCol(r);
-  if(!cast){fxGlow(pos.x,pos.z,R*1.1,rc,.35,r>=3?.4:.32);return;}
+  if(!cast){if(r>=3)fxGlow(pos.x,pos.z,R*1.1,rc,.35,.4);return;}   // тики: золотой/тёмный отсвет только у легендарной и невозможной
   if(r===1){fxGlow(pos.x,pos.z,R*1.1,RARC[1],.35,.35);fxRing(pos.x,pos.z,R*.85,R*1.05,RARC[1],.3,.6);return;}
   if(r===2){fxGlow(pos.x,pos.z,R*1.15,RARC[2],.4,.42);fxRing(pos.x,pos.z,R*.7,R*1.1,RARC[2],.38,.6);return;}
   fxShock(pos.x,pos.z,R*1.25,r>=4?IMPD:RARC[3],.5);if(r>=4)fxRing(pos.x,pos.z,R*.5,R*1.15,IMPC,.45,.6);else fxGlow(pos.x,pos.z,R*1.1,RARC[3],.4,.35);shk(r>=4?.12:.06,pos.x,pos.z);}
@@ -4054,10 +4063,12 @@ function wvBurst(C,k){const two=WV.w>=5&&WV.burst%2===0,a=WV.dir+(two?Math.PI*.7
     WV.q.shift();const x=bx+rand(-3,3),z=bz+rand(-3,3);
     const zk=wvZK(WV.z);for(const e of spawnMob(sp.tid,x,z,WV.lv,{rw,hunt:true,aggro:true,noPack:true,elite:!!sp.el,affixList:sp.el?wvAffix(WV.lv):undefined,hpMul:WV_HP*zk.hp*(sp.el?.5:1),dmgMul:WV_DM*zk.dm*(wvCoop()?1.1:1),xpMul:WV_XP})){e.noDespawn=true;e.aggro=true;wvMark(e,WV.id);}}
   puffs(bx,1,bz,new THREE.Color(0x553344),10,2.5,1.2);}
-// босс волны на 1 ур. выше волны (владыка — на 2): прежний босс мира (+2 ур.) у героя 8–10-го уровня сносил хрупкого мага одним ударом
+// босс волны на 1 ур. выше волны (владыка — на 2): прежний босс мира (+2 ур.) у героя 8–10-го уровня сносил хрупкого мага одним ударом.
+// int/v1331 (16 пассивок, у мага не больше 3 защитных): удар колосса 3-й волны снимал Пироманту 8-го ур. 73% здоровья (176 из 242), бот
+// падал на 3-й и 6-й волне до 7 раз подряд — урон боссов 3-й и 6-й волн ×0,65 и ×0,75 (было ×0,75 и ×0,85), владыка края — как был
 function wvBoss(sp,x,z,rw){const main=sp.boss===2,lv=WV.lv+(main?2:1);
   // вдвоём босс крепче (к ×1,6 кооператива ещё ×1,3) и бьёт на 10 % больнее: двое с танком проходили 3-ю волну, не опускаясь ниже 89 % здоровья
-  const zk=wvZK(WV.z),first=WV.w<=3,cp=wvCoop();BOSS=spawnEnemy(sp.tid,x,z,lv,{rw,hpMul:(main?WV_BMAIN:WV_BHP[first?0:1])*zk.hp*(cp?1.3:1),dmgMul:(main?.95:first?.75:.85)*zk.dm*(cp?1.1:1),bsub:(main?'Владыка края':'Босс '+WV.w+'-й волны')+' «'+ZONES[WV.z].name+'»'});
+  const zk=wvZK(WV.z),first=WV.w<=3,cp=wvCoop();BOSS=spawnEnemy(sp.tid,x,z,lv,{rw,hpMul:(main?WV_BMAIN:WV_BHP[first?0:1])*zk.hp*(cp?1.3:1),dmgMul:(main?.95:first?.65:.75)*zk.dm*(cp?1.1:1),bsub:(main?'Владыка края':'Босс '+WV.w+'-й волны')+' «'+ZONES[WV.z].name+'»'});
   BOSS.skillCd=2.5;wvMark(BOSS,WV.id);bossIntro(BOSS);puffs(x,1,z,new THREE.Color(0x553344),20,2.5,1.4);}
 // награда за волну: до цели края T(w) = мин + (макс − мин)·(0,25 + 0,75·w/10), не больше 3 уровней за раз; перерос цель — тает
 function wvReward(z,w){const L=S.lvl,n=xpNeed(L);if(z>=ZABYSS)return Math.round(.25*n);
@@ -4753,11 +4764,12 @@ function spawnSummon(sk,o){o=o||{};const ghost=!!o.ghost;
     fxPillar(x,z,.7*(k==='infernal'?2:1),3,s.col,.5);elBurst(sk.e,x,1,z,k==='imps'?8:16);fxRune(x,z,2*Math.min(1.6,sc),s.col,.9);fxShock(x,z,2.2*Math.min(1.6,sc),s.col,.45);
     if(k==='infernal'){fxRing(x,z,.4,3.6,RED,.75,.5);}}
   if(sk.M.echo&&!o.echo)later(.6,()=>{if(ghost&&(!MP.peer||!MP.active))return;spawnSummon(sk,Object.assign({},o,{echo:1}));});}
-// кольцо редкости под призванным: тонкое цвета редкости (редкая — голубое, эпическая — фиолетовое), у легендарной и невозможной — двойное;
+// кольцо редкости под призванным: тонкое цвета редкости (редкая — голубое, эпическая — фиолетовое), у легендарной — двойное золотое,
+// у невозможной — золотое снаружи и фиолетовое внутри (отлично от эпической) плюс чёрный дым над существом;
 // меши из пула, материалы общие на редкость — без новых источников света
 const SRM=[],SRP=[];
 function sumRingMat(r){return SRM[r]||(SRM[r]=new THREE.MeshBasicMaterial({color:rarCol(r),transparent:true,opacity:r>=3?.8:.6,depthWrite:false,blending:THREE.AdditiveBlending}));}
-function sumRing(s,r){s.rings=[];for(let i=0;i<(r>=3?2:1);i++){const m=SRP.pop()||new THREE.Mesh(FXG.ring);m.material=sumRingMat(r);const k=i?.62:.9;m.scale.set(k,1,k);m.position.set(0,.05+.01*i,0);m.renderOrder=1;s.g.add(m);s.rings.push(m);}}
+function sumRing(s,r){s.rings=[];for(let i=0;i<(r>=3?2:1);i++){const m=SRP.pop()||new THREE.Mesh(FXG.ring);m.material=sumRingMat(r>=4&&!i?3:r);const k=i?.62:.9;m.scale.set(k,1,k);m.position.set(0,.05+.01*i,0);m.renderOrder=1;s.g.add(m);s.rings.push(m);}}
 function disposeSummon(s){if(s.rings){for(const m of s.rings){s.g.remove(m);SRP.push(m);}s.rings=null;}scene.remove(s.g,s.bar);(SPOOL[s.key]||(SPOOL[s.key]=[])).push(s.m);}
 function removeSummon(i){const s=SUMMONS[i];cfSummGone(s,1);disposeSummon(s);SUMMONS.splice(i,1);}
 function killSummon(s,quiet){if(s.dying)return;s.dying=.35;s.bar.visible=false;const p=s.g.position;cfSummGone(s,quiet);
@@ -6967,9 +6979,9 @@ function reactName(e,c){let best=null,bw=0;for(let e2=0;e2<10;e2++){if(e2===e||!
   const w=R.type==='mult'?(R.k-1)*.16:R.type==='aoe'?R.k*.07:R.type==='freeze'?R.k*.06:R.type==='heal'?R.k*.2:.03;if(w>bw){bw=w;best={R,e2};}}return best;}
 function pwBreakHtml(sk){const b=powerBreak(sk),x=(v,t,c)=>`<span${c?' class="'+c+'"':''}>×${fmt2(v)}<i>${t}</i></span>`,on=v=>Math.abs(v-1)>.005;
   const rn=reactName(sk.e,RESO_N),parts=[`<span class="bd">${Math.round(b.base)}<i>${RARITY[Math.min(b.r,3)].n.toLowerCase()}</i></span>`,x(b.rank,'ранг '+rk(sk.id))];if(on(b.imp))parts.push(x(b.imp,'невозможная'));
-  if(on(b.lvl)&&b.lvl>0)parts.push(x(b.lvl,'уровень '+S.lvl));if(on(b.slotS))parts.push(x(b.slotS,'мало слотов'));if(on(b.lvk))parts.push(x(b.lvk,'поправка уровня'));if(on(b.tal))parts.push(x(b.tal,'таланты'));
+  if(on(b.lvl)&&b.lvl>0)parts.push(x(b.lvl,'уровень '+S.lvl));if(on(b.slotS))parts.push(x(b.slotS,'мало слотов'));if(on(b.lvk))parts.push(x(b.lvk,'поправка уровня'));const tl=TQ.sig?'таланты':'потолок редкости';if(on(b.tal))parts.push(x(b.tal,tl));
   if(on(b.aff))parts.push(x(b.aff,'особенность'));if(on(b.reso))parts.push(x(b.reso,'резонанс','bl'));if(on(b.react))parts.push(x(b.react,'реакция','bl'));
-  const tn=!on(b.cap)||!(b.total>0)?'':b.cap<1?' В «таланты» входит потолок ×'+fmt2(b.cap)+': таланты поднимают чару не выше, чем самую слабо усиленную чару редкостью выше, — так редкость остаётся силой.':
+  const tn=!on(b.cap)||!(b.total>0)?'':b.cap<1?(TQ.sig?' В «таланты» входит потолок ×':' Потолок редкости ×')+fmt2(b.cap)+': таланты и особенность класса поднимают чару не выше, чем самую слабо усиленную чару редкостью выше, — так редкость остаётся силой.':
     ' В «таланты» входит +'+pct(b.cap-1)+'%: таланты усиливают эту чару слабее обычного — ей добавлен обычный прирост.';
   // сила 0 у копий (клон, «Разлом», «Философский камень»): в билде нет чар, которые они повторяют (CLONE_F)
   const z0=!(b.total>0)&&(sk.F.id==='s_rift'||sk.F.id==='s_philstone'||sk.F.id==='summon'&&CLS&&summInfo(sk,CLS.id).k==='clone')?' Сила 0: в билде нет чар, которые она повторяет (снаряд, кольцо, метеор, цепь, луч, дождь, ловушка).':'';
@@ -10128,7 +10140,7 @@ function ctTmTable(L){let c=L[0],bn=-1;for(const e of L){let n=0;for(const m of 
   ctProc(p,'Застолье!','#ffd36b',r);}
 
 // ---------- оценка силы с особенностью («Лучший билд» и авто-выбор чар) ----------
-// основная стихия героя и формы, которые особенность усиливает; редкость (intr) не меняется. Стихия × форма — не больше ×1,45 (шаг редкости
+// основная стихия героя и формы, которые особенность усиливает; редкость (intr) не меняется, порядок редкостей держит потолок (tqA в talQ). Стихия × форма — не больше ×1,45 (шаг редкости
 // с разбросом ×1,48):
 // «Удар в сердце» ×1,5 у Ассасина поднимал в книге низшую редкость над высшей на том же ранге (25.11)
 const CT_AFF={pyro:{e:{fire:1.2}},cryo:{e:{ice:1.2}},storm:{e:{storm:1.1},f:{chain:1.1}},plague:{e:{poison:1.2}},necro:{e:{shadow:1.2},c:{sum:1.15}},

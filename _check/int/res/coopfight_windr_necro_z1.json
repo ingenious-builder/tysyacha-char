@@ -1,0 +1,38 @@
+{
+ "host": "windr",
+ "guest": "necro",
+ "lvl": 26,
+ "z": 1,
+ "waves": [
+  {
+   "w": 3,
+   "sec": 29,
+   "ok": true,
+   "downsHost": 0,
+   "downsGuest": 0,
+   "minHpHost": 0.94,
+   "minHpGuest": 0.88,
+   "maxAlive": 8,
+   "lvl": [
+    27,
+    27
+   ]
+  },
+  {
+   "w": 4,
+   "sec": 46,
+   "ok": true,
+   "downsHost": 0,
+   "downsGuest": 0,
+   "minHpHost": 0.81,
+   "minHpGuest": 1,
+   "maxAlive": 10,
+   "lvl": [
+    28,
+    28
+   ]
+  }
+ ],
+ "errsA": [],
+ "errsB": []
+}

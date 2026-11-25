@@ -1,0 +1,16 @@
+[замок] жду: браузеров 2/3, процессор 84% (порог 80%)
+[замок] место получено через 13 с
+{"fps":42.7,"p95":30.8,"jsMs":15.75,"fxAvg":54.9,"shakePct":93,"rar":"0/0/4/7/2","kills":120,"q":"mid","dir":"tc-wt-rarfeel0","cls":"pyro","qm":"mid","errs":0}
+{"fps":43.7,"p95":31.1,"jsMs":15.27,"fxAvg":57.1,"shakePct":97,"rar":"0/0/4/7/2","kills":154,"q":"mid","dir":"tc-wt-rarfeel","cls":"pyro","qm":"mid","errs":0}
+{"fps":40.7,"p95":32.6,"jsMs":16.73,"fxAvg":54.1,"shakePct":98,"rar":"0/0/4/7/2","kills":121,"q":"mid","dir":"tc-wt-rarfeel","cls":"pyro","qm":"mid","errs":0}
+{"fps":38.5,"p95":34.2,"jsMs":17.48,"fxAvg":51.2,"shakePct":84,"rar":"0/0/4/7/2","kills":131,"q":"mid","dir":"tc-wt-rarfeel0","cls":"pyro","qm":"mid","errs":0}
+{"fps":29.8,"p95":45,"jsMs":21.71,"fxAvg":33.7,"shakePct":64,"rar":"0/0/1/10/2","kills":144,"q":"mid","dir":"tc-wt-rarfeel0","cls":"bers","qm":"mid","errs":0}
+{"fps":29.8,"p95":46,"jsMs":21.43,"fxAvg":42.4,"shakePct":72,"rar":"0/0/1/10/2","kills":148,"q":"mid","dir":"tc-wt-rarfeel","cls":"bers","qm":"mid","errs":0}
+{"fps":35,"p95":42.7,"jsMs":18.12,"fxAvg":31.2,"shakePct":48,"rar":"0/0/1/10/2","kills":133,"q":"mid","dir":"tc-wt-rarfeel","cls":"bers","qm":"mid","errs":0}
+{"fps":29.6,"p95":46.8,"jsMs":21.93,"fxAvg":34.6,"shakePct":72,"rar":"0/0/1/10/2","kills":167,"q":"mid","dir":"tc-wt-rarfeel0","cls":"bers","qm":"mid","errs":0}
+{"fps":34.3,"p95":42.1,"jsMs":19.9,"fxAvg":28.1,"shakePct":44,"rar":"0/0/1/10/2","kills":210,"q":"mid","dir":"tc-wt-rarfeel0","cls":"necro","qm":"mid","errs":0}
+{"fps":35.7,"p95":39.5,"jsMs":19.13,"fxAvg":21.6,"shakePct":43,"rar":"0/0/1/10/2","kills":131,"q":"mid","dir":"tc-wt-rarfeel","cls":"necro","qm":"mid","errs":0}
+{"fps":37.5,"p95":37.5,"jsMs":18.43,"fxAvg":29.2,"shakePct":44,"rar":"0/0/1/10/2","kills":226,"q":"mid","dir":"tc-wt-rarfeel","cls":"necro","qm":"mid","errs":0}
+{"fps":31.9,"p95":43.7,"jsMs":21.23,"fxAvg":23.8,"shakePct":45,"rar":"0/0/1/10/2","kills":172,"q":"mid","dir":"tc-wt-rarfeel0","cls":"necro","qm":"mid","errs":0}
+mid tc-wt-rarfeel0 FPS 34.5 p95 40.4 мс JS 19.7 FX 37.7 тряска % 67.0
+mid tc-wt-rarfeel FPS 37.1 p95 38.2 мс JS 18.2 FX 39.3 тряска % 67.0

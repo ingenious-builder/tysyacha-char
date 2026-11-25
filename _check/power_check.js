@@ -22,7 +22,8 @@ const W_ONE = 0.35;                   // доля боя «один враг р�
 function loadGame(root) {
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
   const cut = (a, b) => { const i = html.indexOf(a), j = html.indexOf(b, i); if (i < 0 || j < 0) throw new Error('не нашёл кусок ' + a + ' … ' + b); return html.slice(i, j); };
-  const code = cut('const ELEMENTS=[', 'function weakest(') + '\n' + cut('const ADJP=', 'const hexOf=') + '\n' + cut('const SUMM_CLS=', 'const summLead=');
+  let aff = ''; try { aff = cut('const CT_AFF=', '{const f0=skPower;'); } catch (e) {}   // особенность класса: сродство стихии и форм (int/v1331)
+  const code = cut('const ELEMENTS=[', 'function weakest(') + '\n' + cut('const ADJP=', 'const hexOf=') + '\n' + cut('const SUMM_CLS=', 'const summLead=') + '\nvar CT_ON=0;\n' + aff;
   class Color { constructor(h) { this.h = h; } clone() { return this; } }
   const THREE = { Color }, doc = { querySelector: () => null, getElementById: () => null };
   const src = `(function(THREE,document,localStorage){const $=s=>null;const TAU=Math.PI*2;const rand=(a,b)=>a+Math.random()*(b-a);const randi=(a,b)=>Math.floor(rand(a,b+1));
@@ -104,6 +105,27 @@ function nodeChecks(G, out) {
       for (let r = 0; r + 1 < NR; r++) { const lo = tier[r], hi = tier[r + 1]; if (!lo.n || !hi.n) continue; sp++; const m = hi.min / lo.max; sm = Math.min(sm, m); if (m < 1 - 1e-9) { sb++; sw.push(C.id + ' ур.' + L + ' ' + (act ? 'акт' : 'пас') + ' ' + RARITY[r].n + '→' + RARITY[r + 1].n + ' ×' + m.toFixed(3)); } } } }
   out.push('', '## Правило «редкость = сила» с талантами', '', `Все общие таланты и полная ветка класса (уровни 40, 160), один ранг: проверено ${sp} пар соседних редкостей, нарушений: **${sb}**, наименьший запас ×${sm.toFixed(3)} (потолок талантов ×${G.get('TAL_CAP')}).` + (sb ? ' Нарушены: ' + sw.slice(0, 5).join('; ') : ''));
   bad += sb;
+  // правило с особенностью класса (int/v1331, решение Петра 25.11): сила × сродство (CT_AFF — «Пиромант: огонь ×1,2») — чара редкостью
+  // выше на 1-м ранге не слабее чары ниже на 5-м, без талантов и со всеми талантами. Потолок talQ режет низшие чары основной стихии.
+  let ap = 0, ab = 0, am = 9, aLoss = 1; const aw = [];
+  if (G.get('typeof ctAff') === 'function') {
+    G.set('CT_ON', 1);
+    try {
+      for (const [L, withTal] of [[1, false], [20, false], [80, false], [40, true], [160, true]]) for (const C of CLASSES) {
+        const tal = withTal ? Object.assign({}, TAL, { vit: 5, armor: 5, regen: 3, leech: 3 }) : {}; if (withTal) for (const t of CTT[C.id] || []) tal[t.id] = t.max;
+        useClass(G, C.id, { lvl: L, talents: tal }); G.set('CT_ON', 1); const I = G.get('rarInfo')(), af = G.get('ctAff');
+        const pw = (id, r) => { G.get('S').ranks = r > 1 ? { [id]: r } : {}; G.get('PWC').clear(); return G.get('skParts')(SKILLS[id], false).pw * af(SKILLS[id]); };
+        for (const act of [true, false]) { const tier = Array.from({ length: NR }, () => ({ min1: Infinity, maxM: 0, n: 0, a: null, b: null }));
+          for (const id of [...C.pool]) { if (SKILLS[id].active !== act) continue; const r = I.map.get(id) | 0, t = tier[r], p1 = pw(id, 1), pm = pw(id, RMAX); t.n++;
+            if (p1 < t.min1) { t.min1 = p1; t.b = id; } if (pm > t.maxM) { t.maxM = pm; t.a = id; }
+            if (!withTal && L === 20 && r < 3) { const q = G.get('talQ')(SKILLS[id]); aLoss = Math.min(aLoss, q); } }
+          for (let r = 0; r + 1 < NR; r++) { const lo = tier[r], hi = tier[r + 1]; if (!lo.n || !hi.n) continue; ap++; const m = hi.min1 / lo.maxM; am = Math.min(am, m);
+            if (m < 1 - 1e-9) { ab++; aw.push(C.id + ' ур.' + L + (withTal ? ' с талантами ' : ' ') + (act ? 'акт' : 'пас') + ' ' + RARITY[r].n + ' р.5 ' + lo.a + ' → ' + RARITY[r + 1].n + ' р.1 ' + hi.b + ' ×' + m.toFixed(3)); } } } }
+    } finally { G.set('CT_ON', 0); G.get('S').ranks = {}; G.get('PWC').clear(); }
+    out.push('', '## Правило «редкость = сила» с особенностью класса', '', `Сила × сродство класса (CT_AFF), чара редкостью выше на 1-м ранге против чары ниже на 5-м, без талантов (ур. 1, 20, 80) и со всеми талантами (ур. 40, 160): проверено ${ap} пар, нарушений: **${ab}**, наименьший запас ×${am.toFixed(3)}; низшие чары основной стихии теряют до ×${aLoss.toFixed(3)}.`);
+    if (aw.length) out.push('', ...aw.slice(0, 12).map(x => '- ' + x));
+    bad += ab;
+  }
   return bad;
 }
 
@@ -114,7 +136,7 @@ function realRows(file) { const R = JSON.parse(fs.readFileSync(file, 'utf8')); c
 function checkK(G, out) {
   if (!fs.existsSync(REAL)) return 0; const R = JSON.parse(fs.readFileSync(REAL, 'utf8')), SKILLS = G.get('SKILLS'), m = {};
   for (const x of R.rows) { if (!x.tag) continue; const k = x.id + '|' + x.cls, o = m[k] || (m[k] = { id: x.id, cls: x.cls, k0: [0, 0], k1: [0, 0] }); const w = x.scen === 'one' ? W_ONE : SKILLS[x.id].active ? 1 - W_ONE : 1; o[x.tag][0] += w * x.dps; o[x.tag][1] += w; }
-  let n = 0, bad = 0, worst = []; for (const o of Object.values(m)) { const a = o.k0[0] / o.k0[1], b = o.k1[0] / o.k1[1]; if (!(a > .5)) continue; useClass(G, o.cls, { lvl: KLV }); const K = G.get('rarK')(SKILLS[o.id]), r = b / a / K; n++; if (Math.abs(r - 1) > .06) { bad++; worst.push([r, o.cls + ' ' + SKILLS[o.id].F.id + '/' + SKILLS[o.id].E.id + '/' + SKILLS[o.id].M.id]); } }
+  let n = 0, bad = 0, worst = []; for (const o of Object.values(m)) { const a = o.k0[0] / o.k0[1], b = o.k1[0] / o.k1[1]; if (!(Math.min(a, b) >= 20)) continue; /* урон меньше 20 ед./с — округление до целых (2 → 2 при rarK 0,62) и шум, не множитель */ useClass(G, o.cls, { lvl: KLV }); const K = G.get('rarK')(SKILLS[o.id]), r = b / a / K; n++; if (Math.abs(r - 1) > .06) { bad++; worst.push([r, o.cls + ' ' + SKILLS[o.id].F.id + '/' + SKILLS[o.id].E.id + '/' + SKILLS[o.id].M.id]); } }
   out.push('', '## Множитель редкости в бою', '', `Чар проверено: ${n}; урон с множителем / без множителя = rarK с точностью 6%: ${n - bad} из ${n}.` + (bad ? ' Не сошлись: ' + worst.slice(0, 4).map(w => w[1] + ' ×' + w[0].toFixed(2)).join(', ') : ''));
   return bad > n * .1 ? 1 : 0; }
 function compare(G, out) {

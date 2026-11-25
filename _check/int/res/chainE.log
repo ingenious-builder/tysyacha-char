@@ -1,0 +1,4 @@
+итог {"cls":"pyro","dir":"new","min":18,"lvl":32,"deaths":2,"bosses":6,"kills":359,"aliveAvg":2.5,"aliveMax":11,"waveAliveAvg":3.6,"waveAliveMax":11,"errs":0}
+итог {"cls":"pyro","dir":"new","min":16,"lvl":32,"deaths":1,"bosses":6,"kills":293,"aliveAvg":2.4,"aliveMax":10,"waveAliveAvg":3.7,"waveAliveMax":10,"errs":0}
+итог {"cls":"hunter","dir":"new","min":14,"lvl":32,"deaths":1,"bosses":6,"kills":312,"aliveAvg":2,"aliveMax":11,"waveAliveAvg":3.2,"waveAliveMax":11,"errs":0}
+ГОТОВО_E

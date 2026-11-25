@@ -1,0 +1,6 @@
+итог {"cls":"pyro","dir":"new","min":20,"lvl":33,"deaths":7,"bosses":6,"kills":456,"aliveAvg":2.6,"aliveMax":11,"waveAliveAvg":3.8,"waveAliveMax":11,"errs":0}
+итог {"cls":"paladin","dir":"new","min":30,"lvl":33,"deaths":1,"bosses":6,"kills":388,"aliveAvg":3.1,"aliveMax":11,"waveAliveAvg":4,"waveAliveMax":11,"errs":0}
+итог {"cls":"necro","dir":"new","min":10,"lvl":32,"deaths":0,"bosses":6,"kills":303,"aliveAvg":2,"aliveMax":10,"waveAliveAvg":3.7,"waveAliveMax":10,"errs":0}
+итог {"cls":"windr","dir":"new","min":12,"lvl":32,"deaths":0,"bosses":6,"kills":294,"aliveAvg":1.9,"aliveMax":10,"waveAliveAvg":2.9,"waveAliveMax":10,"errs":0}
+итог {"cls":"timur","dir":"new","min":16,"lvl":32,"deaths":0,"bosses":6,"kills":310,"aliveAvg":1.9,"aliveMax":12,"waveAliveAvg":2.9,"waveAliveMax":12,"errs":0}
+ГОТОВО_A

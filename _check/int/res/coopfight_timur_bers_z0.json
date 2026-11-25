@@ -1,0 +1,52 @@
+{
+ "host": "timur",
+ "guest": "bers",
+ "lvl": 9,
+ "z": 0,
+ "waves": [
+  {
+   "w": 1,
+   "sec": 24,
+   "ok": true,
+   "downsHost": 0,
+   "downsGuest": 0,
+   "minHpHost": 1,
+   "minHpGuest": 0.89,
+   "maxAlive": 5,
+   "lvl": [
+    9,
+    9
+   ]
+  },
+  {
+   "w": 2,
+   "sec": 26,
+   "ok": true,
+   "downsHost": 0,
+   "downsGuest": 0,
+   "minHpHost": 0.91,
+   "minHpGuest": 1,
+   "maxAlive": 7,
+   "lvl": [
+    10,
+    10
+   ]
+  },
+  {
+   "w": 3,
+   "sec": 19,
+   "ok": true,
+   "downsHost": 0,
+   "downsGuest": 0,
+   "minHpHost": 0.78,
+   "minHpGuest": 0.66,
+   "maxAlive": 6,
+   "lvl": [
+    12,
+    12
+   ]
+  }
+ ],
+ "errsA": [],
+ "errsB": []
+}

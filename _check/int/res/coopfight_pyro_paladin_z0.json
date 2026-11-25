@@ -1,0 +1,38 @@
+{
+ "host": "pyro",
+ "guest": "paladin",
+ "lvl": 18,
+ "z": 0,
+ "waves": [
+  {
+   "w": 9,
+   "sec": 36,
+   "ok": true,
+   "downsHost": 0,
+   "downsGuest": 0,
+   "minHpHost": 0.59,
+   "minHpGuest": 0.95,
+   "maxAlive": 12,
+   "lvl": [
+    19,
+    19
+   ]
+  },
+  {
+   "w": 10,
+   "sec": 42,
+   "ok": true,
+   "downsHost": 0,
+   "downsGuest": 0,
+   "minHpHost": 0.68,
+   "minHpGuest": 0.78,
+   "maxAlive": 10,
+   "lvl": [
+    21,
+    21
+   ]
+  }
+ ],
+ "errsA": [],
+ "errsB": []
+}
