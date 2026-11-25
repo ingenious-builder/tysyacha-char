@@ -1277,13 +1277,18 @@ ZONE_MIX.push(
  [['frostwolf',18],['yeti',12],['frostskel',14],['icemage',10],['elemental',12],['icegolem',8],['frostarcher',10],['snowbat',8],['frostshield',8]],
  [['magmaimp',20],['lavagolem',10],['cinderbrute',12],['emberarcher',12],['cinderbomber',12],['lavasniper',8],['flamemage',10],['cinderskel',10],['fireelem',8]],
  [['stormwraith',16],['skymage',12],['sentinel',12],['harpy',14],['skyelem',10],['skysniper',10],['skyknight',10],['windarcher',8]],
+ [['crystwolf',16],['crystspider',12],['shardelem',12],['prismmage',12],['crystgolem',10],['crystshroom',10],['shardarcher',12],['glassbat',10],['prismgiant',4]],
+ [['fallenguard',14],['plaguedog',14],['townghost',14],['plaguenecro',10],['ghostbolt',10],['deadknight',14],['gargoyle',10],['plaguebomber',8],['bellgolem',8],['executioner',4]],
  [['voidimp',16],['voidwraith',16],['abyssbrute',12],['voidmage',12],['voidnecro',12],['voidspider',10],['voidgolem',8],['voidsniper',8],['voidshield',6]]);
 const CHAMP=[['shield','brute','wolf','spider'],['golem','necro','spitter','mage'],['golem','necro','sniper','elemental'],['golem','elemental','imp','necro'],
- ['yeti','icegolem','icemage','frostwolf'],['lavagolem','cinderbrute','flamemage','magmaimp'],['sentinel','skymage','stormwraith','skyelem'],['voidgolem','voidnecro','voidwraith','abyssbrute']];
+ ['yeti','icegolem','icemage','frostwolf'],['lavagolem','cinderbrute','flamemage','magmaimp'],['sentinel','skymage','stormwraith','skyelem'],
+ ['prismgiant','crystgolem','prismmage','shardelem'],['executioner','bellgolem','plaguenecro','deadknight'],['voidgolem','voidnecro','voidwraith','abyssbrute']];
 const WBOSS=[['colossus','wolfking','spiderq','queen'],['queen','hydra','shroomk','eagle','reaper'],['reaper','bonelord','banshee','eagle','hydra'],['demon','heart','bonelord','banshee','colossus'],
- ['frostking','icelord','frostbanshee'],['magmatyrant','lavahydra','emberreaper'],['stormking','seraph','skycolossus'],['voidlord','devourer','abysshydra','voidqueen']];
+ ['frostking','icelord','frostbanshee'],['magmatyrant','lavahydra','emberreaper'],['stormking','seraph','skycolossus'],
+ ['crystqueen','prismheart','gemcolossus'],['lichking','bellreaper','widow'],['voidlord','devourer','abysshydra','voidqueen']];
 const ZONES=[{name:'Тихая опушка',sub:'Враги твоего уровня'},{name:'Гнилые топи',sub:'Враги на 2 уровня сильнее'},{name:'Курганы мертвецов',sub:'Враги на 4 уровня сильнее'},{name:'Пепельные пустоши',sub:'Враги на 6 уровней сильнее'},
- {name:'Ледяные пустоши',sub:''},{name:'Вулканический разлом',sub:''},{name:'Небесные руины',sub:''},{name:'Бездна',sub:''}];
+ {name:'Ледяные пустоши',sub:''},{name:'Вулканический разлом',sub:''},{name:'Небесные руины',sub:''},
+ {name:'Хрустальный лес',sub:'',warn:'Берегись призматических исполинов'},{name:'Мёртвый город',sub:'',warn:'По улицам бродит Палач'},{name:'Бездна',sub:''}];
 const AFFIX=[['fire','Огненный'],['fast','Быстрый'],['armor','Бронированный'],['frost','Морозный'],['bomb','Взрывной'],['summ','Призыватель'],['regen','Живучий']];
 
 // =====================================================================
@@ -1582,10 +1587,13 @@ const propM=new THREE.MeshLambertMaterial({vertexColors:true});
 const WORLD=1400,COLL=[];
 const PATHS=[.35,2.45,4.4];
 // --- регионы свободного мира: кольца от центра, чем дальше — тем сильнее враги, на краю («Бездна») без потолка ---
-const REG_R=[31,62,84,135,215,310,420];
-const zoneOf=(x,z)=>{const r=Math.hypot(x,z);return r<31?0:r<62?1:r<84?2:r<135?3:r<215?4:r<310?5:r<420?6:7;};
-function lvOff(r){if(r<31)return -1;if(r<62)return 1;if(r<84)return 3;if(r<135)return 5;if(r<215)return 7+(r-135)/80*5;if(r<310)return 13+(r-215)/95*7;if(r<420)return 21+(r-310)/110*9;return 31+(r-420)/10;}
-function lvFloor(r){if(r<135)return 0;if(r<215)return 20+(r-135)/80*10;if(r<310)return 32+(r-215)/95*13;if(r<420)return 46+(r-310)/110*20;return 68+(r-420)/5;}
+// 25.11: между «Небесными руинами» и «Бездной» — «Хрустальный лес» (420–530) и «Мёртвый город» (530–650); «Бездна» с 650
+const REG_R=[31,62,84,135,215,310,420,530,650],ZABYSS=REG_R.length;/* ZABYSS — номер «Бездны» (последней, без внешней границы) */
+const zoneOf=(x,z)=>{const r=Math.hypot(x,z);let i=0;while(i<ZABYSS&&r>=REG_R[i])i++;return i;};
+function lvOff(r){if(r<31)return -1;if(r<62)return 1;if(r<84)return 3;if(r<135)return 5;if(r<215)return 7+(r-135)/80*5;if(r<310)return 13+(r-215)/95*7;if(r<420)return 21+(r-310)/110*9;
+  if(r<530)return 31+(r-420)/110*10;if(r<650)return 42+(r-530)/120*11;return 54+(r-650)/10;}
+function lvFloor(r){if(r<135)return 0;if(r<215)return 20+(r-135)/80*10;if(r<310)return 32+(r-215)/95*13;if(r<420)return 46+(r-310)/110*20;
+  if(r<530)return 68+(r-420)/110*22;if(r<650)return 92+(r-530)/120*24;return 118+(r-650)/5;}
 const strongLv=()=>MPon&&MP.peer&&MP.peer.on?Math.max(S.lvl,MP.peer.lvl||S.lvl):S.lvl;
 const enemyLvR=(r,H)=>Math.max(1,Math.round(Math.max(lvFloor(r),H+lvOff(r))));
 const enemyLvAt=(x,z)=>enemyLvR(Math.hypot(x,z),strongLv());
@@ -1600,35 +1608,50 @@ function scatter(geo,mat,items,shadow,parent){const im=new THREE.InstancedMesh(g
 let GROUND=null;
 function makeGround(){
   const cc=h=>{const c=new THREE.Color(h);return c;};
-  const regC=[0x527d50,0x3c5c55,0x5d5752,0x5a3c36,0x8fa9bf,0x2b2224,0x8c8470,0x1c1230].map(cc);
+  const regC=[0x527d50,0x3c5c55,0x5d5752,0x5a3c36,0x8fa9bf,0x2b2224,0x8c8470,0x9a7eaa,0x4e504a,0x1c1230].map(cc);
   const v3=h=>{const c=new THREE.Color(h);return 'vec3('+c.r.toFixed(4)+','+c.g.toFixed(4)+','+c.b.toFixed(4)+')';};
   let pathsGLSL='float pd=99.;';
   for(const a of PATHS){pathsGLSL+='{float tt=dot(p,vec2('+Math.cos(a).toFixed(5)+','+Math.sin(a).toFixed(5)+'));if(tt>=0.)pd=min(pd,abs(-p.x*'+Math.sin(a).toFixed(5)+'+p.y*'+Math.cos(a).toFixed(5)+'-sin(tt*.12)*2.5));}';}
-  const FS='varying vec2 vWP;uniform vec3 gC0,gC1,gC2,gC3,gC4,gC5,gC6,gC7;\n'+
+  const FS='varying vec2 vWP;uniform vec3 gC0,gC1,gC2,gC3,gC4,gC5,gC6,gC7,gC8,gC9;uniform float gT;\n'+
   'float gh(vec2 p){return fract(sin(dot(p,vec2(12.9898,78.233)))*43758.5453);}\n'+
-  'vec3 gcol(vec2 p,out float lava,out float vein){float r=length(p);'+
+  'vec3 gcol(vec2 p,out vec3 em){float r=length(p);em=vec3(0.);'+
   'float n=(sin(p.x*.11)+cos(p.y*.13)+sin((p.x-p.y)*.05))/3.;float n2=sin(p.x*.37+p.y*.21)*cos(p.y*.29-p.x*.17);'+
   'vec3 t=gC0;t=mix(t,gC1,clamp((r-28.)/7.,0.,1.));t=mix(t,gC2,clamp((r-58.)/8.,0.,1.));t=mix(t,gC3,clamp((r-82.)/7.,0.,1.));'+
   't=mix(t,gC4,clamp((r-131.)/8.,0.,1.));t=mix(t,gC5,clamp((r-211.)/8.,0.,1.));t=mix(t,gC6,clamp((r-306.)/8.,0.,1.));t=mix(t,gC7,clamp((r-416.)/8.,0.,1.));'+
+  't=mix(t,gC8,clamp((r-526.)/8.,0.,1.));t=mix(t,gC9,clamp((r-646.)/8.,0.,1.));'+
   't*=.88+n*.18+n2*.06+gh(floor(p*1.5))*.05;float inner=1.-clamp((r-110.)/25.,0.,1.);'+
   'float pn=sin(p.x*.19+1.7)*sin(p.y*.21-.6)+.6*sin((p.x+p.y)*.07);'+
   'if(pn>.9)t=mix(t,'+v3(0x6b5a3e)+',min(.4,(pn-.9)*.8)*inner);else if(pn<-.85)t*=1.+min(.18,(-.85-pn)*.3);'+
   pathsGLSL+
   'if(pd<2.6&&r>4.)t=mix(t,'+v3(0x8a7558)+'*(.85+gh(floor(p*3.))*.15),(1.-pd/2.6)*.85*inner);'+
   'if(r<6.)t=mix(t,'+v3(0x8b8a96)+',clamp(1.-r/6.,0.,1.)*.6);'+
-  'float wV=clamp((r-211.)/8.,0.,1.)*(1.-clamp((r-306.)/8.,0.,1.));float v=sin(p.x*.09+sin(p.y*.07)*2.)*sin(p.y*.11+sin(p.x*.06)*2.);lava=(1.-smoothstep(0.,.05,abs(v)))*wV;'+
-  'float wA=clamp((r-416.)/8.,0.,1.);float v2=sin(p.x*.13+sin(p.y*.09)*2.3)*sin(p.y*.1+sin(p.x*.08)*2.);vein=(1.-smoothstep(0.,.045,abs(v2)))*wA;'+
+  'float wV=clamp((r-211.)/8.,0.,1.)*(1.-clamp((r-306.)/8.,0.,1.));float v=sin(p.x*.09+sin(p.y*.07)*2.)*sin(p.y*.11+sin(p.x*.06)*2.);em+=vec3(1.,.38,.08)*(1.-smoothstep(0.,.05,abs(v)))*wV*1.5;'+
+  'float wA=clamp((r-646.)/8.,0.,1.);float v2=sin(p.x*.13+sin(p.y*.09)*2.3)*sin(p.y*.1+sin(p.x*.08)*2.);em+=vec3(.55,.18,1.)*(1.-smoothstep(0.,.045,abs(v2)))*wA*1.3;'+
   'float wS=clamp((r-306.)/8.,0.,1.)*(1.-clamp((r-416.)/8.,0.,1.));vec2 q=abs(fract(p/7.)-.5);t=mix(t,t*.7,smoothstep(.45,.5,max(q.x,q.y))*wS);'+
   'float wI=clamp((r-131.)/8.,0.,1.)*(1.-clamp((r-211.)/8.,0.,1.));t=mix(t,t*1.12,smoothstep(.2,.5,n2)*wI);'+
+  // «Хрустальный лес»: розовый кварц из неровных треугольных граней (розовые и бирюзовые пятна), тонкие светящиеся жилы и мерцающие искры
+  'float wC=clamp((r-416.)/8.,0.,1.)*(1.-clamp((r-526.)/8.,0.,1.));'+
+  'if(wC>0.){vec2 s=p*.3+vec2(sin(p.y*.11),cos(p.x*.09))*.35;s.x+=s.y*.5;vec2 fi=floor(s),ff=fract(s);float tr=step(ff.y,ff.x),h=gh(fi*1.7+tr*vec2(5.3,2.9));'+
+  'vec3 cc=mix('+v3(0xc890c4)+','+v3(0x78b8b8)+',smoothstep(-.25,.25,n*1.5+(h-.5)*.35))*(.86+h*.26);'+
+  'float e=min(min(min(ff.x,1.-ff.x),min(ff.y,1.-ff.y)),abs(ff.x-ff.y)*.7),ed=1.-smoothstep(0.,.05,e);'+
+  't=mix(t,cc,wC*.62)*(1.-ed*.16*wC);'+
+  'float v4=sin(p.x*.06+sin(p.y*.045)*2.4)*sin(p.y*.07+sin(p.x*.05)*2.1),cv=(1.-smoothstep(0.,.022,abs(v4)))*wC;em+=mix('+v3(0xff6ad8)+','+v3(0x5ff0e0)+',step(0.,n))*cv*.55;'+
+  'vec2 sq=p*2.2,sf=fract(sq)-.5;float sh=gh(floor(sq)+7.1);em+=vec3(1.,.86,1.)*step(.975,sh)*max(0.,sin(gT*2.6+sh*80.))*(1.-smoothstep(.05,.25,length(sf)))*1.4*wC;}'+
+  // «Мёртвый город»: тёмная брусчатка рядами со швами, мох пятнами, редкие трещины с призрачным зелёным светом
+  'float wT=clamp((r-526.)/8.,0.,1.)*(1.-clamp((r-646.)/8.,0.,1.));'+
+  'if(wT>0.){vec2 b=p*vec2(1.05,1.4);b.x+=mod(floor(b.y),2.)*.5;vec2 bi=floor(b),bf=fract(b);float h=gh(bi*1.3+.7);'+
+  'float mo=1.-smoothstep(.04,.12,min(min(bf.x,1.-bf.x)*1.35,min(bf.y,1.-bf.y)));'+
+  'vec3 sc=gC8*(.8+h*.34);sc=mix(sc,'+v3(0x3e4c30)+',smoothstep(.3,.95,n2*.6+n*.9+(h-.5)*.5)*.55);sc*=1.-mo*.45;t=mix(t,sc,wT);'+
+  'float v3=sin(p.x*.075+sin(p.y*.05)*2.6)*sin(p.y*.085+sin(p.x*.045)*2.2),ck=(1.-smoothstep(0.,.018,abs(v3)))*wT*smoothstep(.1,.5,sin(p.x*.021+1.3)*sin(p.y*.019-.4)+.35);t=mix(t,t*.4,ck);em+=vec3(.2,.9,.5)*ck*.36;}'+
   'return t;}\n';
   const m=new THREE.MeshLambertMaterial({map:groundTex});
-  m.customProgramCacheKey=()=>'tcground2';
-  m.onBeforeCompile=sh=>{regC.forEach((c,i)=>{sh.uniforms['gC'+i]={value:c};});
+  m.customProgramCacheKey=()=>'tcground3';
+  m.onBeforeCompile=sh=>{regC.forEach((c,i)=>{sh.uniforms['gC'+i]={value:c};});sh.uniforms.gT=timeU;
     sh.vertexShader=sh.vertexShader.replace('void main() {','varying vec2 vWP;\nvoid main() {').replace('#include <begin_vertex>','#include <begin_vertex>\nvWP=(modelMatrix*vec4(transformed,1.)).xz;');
     sh.fragmentShader=sh.fragmentShader.replace('void main() {',FS+'void main() {')
       .replace('#include <map_fragment>','vec4 texelColor=texture2D(map,vWP*.104);texelColor=mapTexelToLinear(texelColor);diffuseColor*=texelColor;')
-      .replace('#include <color_fragment>','float lv_=0.,vn_=0.;diffuseColor.rgb*=gcol(vWP,lv_,vn_);')
-      .replace('#include <emissivemap_fragment>','#include <emissivemap_fragment>\ntotalEmissiveRadiance+=vec3(1.,.38,.08)*lv_*1.5+vec3(.55,.18,1.)*vn_*1.3;');};
+      .replace('#include <color_fragment>','vec3 em_=vec3(0.);diffuseColor.rgb*=gcol(vWP,em_);')
+      .replace('#include <emissivemap_fragment>','#include <emissivemap_fragment>\ntotalEmissiveRadiance+=em_;');};
   const g=new THREE.PlaneGeometry(300,300,2,2);g.rotateX(-Math.PI/2);
   const ground=new THREE.Mesh(g,m);ground.receiveShadow=true;ground.frustumCulled=false;worldGroup.add(ground);return ground;}
 const _rnd0=Math.random;Math.random=mpRng(4242);
@@ -1720,9 +1743,41 @@ const K={};
  K.pine=pk(snow,treeM,2200);K.dead=pk(GEO.dead,treeM,2200);K.rock=pk(GEO.rock,lam(0xffffff),3000);K.pillar=pk(GEO.pillar,propM,1200);K.tuft=pk(GEO.tuft,tuftM,5000);
  K.crystal=pk(new THREE.OctahedronGeometry(1,0).scale(1,2.2,1).translate(0,1.1,0),basic(0xffffff),1500);K.spire=pk(new THREE.ConeGeometry(.55,3.2,5).translate(0,1.6,0),lam(0xffffff),2000);
  K.lava=pk(new THREE.CircleGeometry(1,14).rotateX(-Math.PI/2).scale(1,1,.7),basic(0xffffff),900);K.island=pk(island,treeM,500);K.arch=pk(arch,propM,300);K.pylon=pk(pylon,propM,200);
- K.gem=pk(new THREE.OctahedronGeometry(.55,0).scale(1,1.8,1),basic(0xffffff),200);K.tomb=pk(GEO.tomb,propM,800);}
+ K.gem=pk(new THREE.OctahedronGeometry(.55,0).scale(1,1.8,1),basic(0xffffff),200);K.tomb=pk(GEO.tomb,propM,800);
+ // --- 25.11: «Хрустальный лес» и «Мёртвый город» ---
+ // кристаллы светятся сами (MeshBasic): у каждой грани запечён свой оттенок, поэтому они гранёные и яркие даже ночью
+ const geoF=(geo,color,lo)=>{const g=geo.index?geo.toNonIndexed():geo.clone();g.computeVertexNormals();const c=new THREE.Color(color),pa=g.attributes.position,na=g.attributes.normal,n=pa.count,a=new Float32Array(n*3);
+   for(let i=0;i<n;i++){const nx=na.getX(i),ny=na.getY(i),nz=na.getZ(i),k=lo+(1-lo)*Math.max(0,nx*.38+ny*.82+nz*.43)+.18*Math.abs(nx)*(nz>0?1:.4);a[i*3]=Math.min(1,c.r*k);a[i*3+1]=Math.min(1,c.g*k);a[i*3+2]=Math.min(1,c.b*k);}
+   g.setAttribute('color',new THREE.BufferAttribute(a,3));return g;};
+ const oc=(w,h,x,z,tx,tz,y)=>new THREE.OctahedronGeometry(1,0).scale(w,h,w).translate(0,h*.75,0).rotateX(tx).rotateZ(tz).translate(x,y||0,z);
+ const crystM=new THREE.MeshBasicMaterial({vertexColors:true});
+ const ctree=merge([geoF(new THREE.CylinderGeometry(.14,.27,2.4,6).translate(0,1.2,0),0xb4a4cc,.55),
+   geoF(new THREE.CylinderGeometry(.05,.1,1.3,5).translate(0,.65,0).rotateZ(-.8).translate(.08,1.7,0),0xb4a4cc,.55),geoF(new THREE.CylinderGeometry(.05,.1,1.2,5).translate(0,.6,0).rotateZ(.85).translate(-.08,1.5,0),0xb4a4cc,.55),
+   geoF(oc(.66,1.75,0,0,0,0,2.2),0xffffff,.6),geoF(oc(.46,1.2,.98,.1,0,-.55,2.3),0xffffff,.6),geoF(oc(.44,1.1,-.95,-.15,0,.6,2),0xffffff,.6),
+   geoF(oc(.34,.95,.1,.6,.6,0,2.35),0xffffff,.6),geoF(oc(.32,.9,-.12,-.6,-.6,0,2.45),0xffffff,.6),geoF(oc(.26,.7,.55,-.45,-.5,-.4,2.9),0xffffff,.6),geoF(oc(.24,.65,-.5,.45,.5,.4,3),0xffffff,.6)]);
+ const ccl=merge([[0,0,0,0,.5,2],[.45,.1,0,-.5,.34,1.3],[-.42,.2,.3,.55,.32,1.15],[.05,-.45,-.55,.1,.3,1],[-.2,.5,.5,-.2,.26,.85],[.4,-.3,-.35,-.45,.22,.7]].map(([x,z,tx,tz,w,h])=>geoF(oc(w,h,x,z,tx,tz),0xffffff,.55)));
+ const ST=0x8e8f88,RF=0x5a3c36,DK=0x16161a;
+ const house=merge([geoC(new THREE.BoxGeometry(4.2,3.2,.35).translate(0,1.6,-1.9),ST,1),geoC(new THREE.BoxGeometry(.35,3.2,3.5).translate(-1.95,1.6,0),ST,1),
+   geoC(new THREE.BoxGeometry(.35,1.7,3.5).translate(1.95,.85,0),0x84857e,1),geoC(new THREE.BoxGeometry(.35,1.5,1.6).translate(1.95,2.45,-.95),0x84857e,1),
+   geoC(new THREE.BoxGeometry(1.45,3.2,.35).translate(-1.38,1.6,1.9),ST,1),geoC(new THREE.BoxGeometry(1.45,3.2,.35).translate(1.38,1.6,1.9),ST,1),geoC(new THREE.BoxGeometry(1.3,.7,.35).translate(0,2.85,1.9),ST,1),
+   geoC(new THREE.CylinderGeometry(2.42,2.42,.35,3).rotateZ(Math.PI/2).rotateX(-Math.PI/2).scale(1,.426,1).translate(-1.95,3.72,0),ST,1),
+   geoC(new THREE.BoxGeometry(4.7,.2,2.75).rotateX(-.62).translate(0,3.95,-1.05),RF,1),geoC(new THREE.BoxGeometry(2.3,.2,2.75).rotateX(.62).translate(-1.15,3.95,1.05),RF,1),
+   geoC(new THREE.BoxGeometry(.25,.25,4.4).translate(0,4.8,0),0x3a2c24,1),geoC(new THREE.BoxGeometry(.7,.85,.06).translate(-1,1.9,-2.09),DK,1),geoC(new THREE.BoxGeometry(.06,.85,.7).translate(-2.14,1.9,.8),DK,1),
+   geoC(new THREE.BoxGeometry(1.05,2.3,.06).translate(0,1.15,1.72),DK,1),geoC(new THREE.DodecahedronGeometry(.5,0).translate(2.6,.2,.7),0x6e6f68,1),geoC(new THREE.DodecahedronGeometry(.34,0).translate(2.55,.15,-.4),0x76776f,1)]);
+ const tower=merge([geoC(new THREE.BoxGeometry(2.4,7,2.4).translate(0,3.5,0),0x8a8a82,1),geoC(new THREE.BoxGeometry(2.8,.35,2.8).translate(0,7.1,0),0x6e6f68,1),
+   ...[[-1,-1],[1,-1],[-1,1],[1,1]].map(([a,b])=>geoC(new THREE.BoxGeometry(.35,2.2,.35).translate(a*1.1,8.35,b*1.1),0x7e7f78,1)),
+   geoC(new THREE.ConeGeometry(2.1,2.6,4).rotateY(Math.PI/4).translate(0,10.75,0),0x4a3430,1),geoC(new THREE.CylinderGeometry(.4,.75,.9,8).translate(0,8.35,0),0x9a7a3a,1),
+   geoC(new THREE.BoxGeometry(1,1.8,.06).translate(0,.9,1.22),DK,1),geoC(new THREE.BoxGeometry(.5,.9,.06).translate(0,5,1.22),DK,1),geoC(new THREE.BoxGeometry(.06,.9,.5).translate(1.22,4.2,0),DK,1)]);
+ const lamp=merge([geoC(new THREE.CylinderGeometry(.07,.11,2.9,6).translate(0,1.45,0),0x2e2e32,1),geoC(new THREE.BoxGeometry(.72,.07,.07).translate(.3,2.8,0),0x2e2e32,1),
+   geoC(new THREE.ConeGeometry(.24,.2,6).translate(.6,2.7,0),0x2e2e32,1),geoC(new THREE.CylinderGeometry(.2,.24,.16,6).translate(0,.08,0),0x2e2e32,1)]);
+ // свет на земле под кристаллами и фонарями: мягкое пятно, в тумане гаснет в темноту (а не светлеет)
+ const glowM=new THREE.MeshBasicMaterial({map:glowTex,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending});glowM.customProgramCacheKey=()=>'gpool';
+ glowM.onBeforeCompile=sh=>{sh.fragmentShader=sh.fragmentShader.replace('#include <fog_fragment>','#ifdef USE_FOG\ngl_FragColor.rgb*=1.-smoothstep(fogNear,fogFar,fogDepth);\n#endif');};
+ K.ctree=pk(ctree,crystM,1200);K.ccl=pk(ccl,crystM,900);K.house=pk(house,propM,700);K.tower=pk(tower,propM,120);K.lamp=pk(lamp,propM,600);
+ K.lglow=pk(new THREE.OctahedronGeometry(.16,0).scale(1,1.45,1).translate(.6,2.42,0),basic(0xffffff),600);K.cglow=pk(new THREE.PlaneGeometry(2,2).rotateX(-Math.PI/2),glowM,1600);}
 const ckey=(cx,cz)=>(cx+64)*256+(cz+64);
-const GATES=[{r:135,hex:0x7fe8ff,name:'Ледяные пустоши'},{r:215,hex:0xff7a30,name:'Вулканический разлом'},{r:310,hex:0xffe08a,name:'Небесные руины'},{r:420,hex:0xa070ff,name:'Бездна'}];
+const GATES=[{r:135,hex:0x7fe8ff,name:'Ледяные пустоши'},{r:215,hex:0xff7a30,name:'Вулканический разлом'},{r:310,hex:0xffe08a,name:'Небесные руины'},
+ {r:420,hex:0xff6ad0,name:'Хрустальный лес'},{r:530,hex:0x6dffb0,name:'Мёртвый город'},{r:650,hex:0xa070ff,name:'Бездна'}];
 const PYL=new Map();
 GATES.forEach(g=>{g.n=Math.round(TAU*g.r/55);for(let i=0;i<g.n;i++){const a=i/g.n*TAU,x=Math.cos(a)*g.r,z=Math.sin(a)*g.r,k=ckey(Math.floor(x/CS),Math.floor(z/CS));if(!PYL.has(k))PYL.set(k,[]);PYL.get(k).push({x,z,hex:g.hex});}});
 // таблицы: [вид, вес, цвет, масштаб от, до, радиус столкновения, параметры]
@@ -1730,8 +1785,14 @@ const TAB={3:[[K.dead,40,0xc8b0a8,.9,1.6,.35],[K.pillar,12,0xb08a8a,.9,1.2,.55,{
  4:[[K.pine,42,0xffffff,.9,1.7,.42],[K.crystal,16,0x9fe8ff,.5,1.1,.4],[K.rock,22,0xd8e8f4,.7,1.8,.6,{y:.25,sy:.7}],[K.spire,20,0xcfe8ff,.8,1.6,.45,{sy:[1,1.8]}]],
  5:[[K.spire,38,0x3a2c28,.9,2,.5,{sy:[1,2.2]}],[K.dead,16,0x8a7066,.9,1.5,.35],[K.rock,20,0x3a3230,.8,2,.6,{y:.25,sy:.7}],[K.lava,26,0xff6a1c,1,2.6,0,{k:.9,y:.04}]],
  6:[[K.pillar,28,0xfff0d8,.9,1.3,.55,{sy:[.4,1.6]}],[K.arch,10,0xffffff,1,1.4,0,{arch:1}],[K.island,16,0xe8e0f0,.8,1.6,0,{fy:[6,12]}],[K.rock,16,0xd0c6a8,.7,1.6,.55,{y:.25,sy:.7}],[K.crystal,12,0xffe08a,.6,1.2,.4]],
- 7:[[K.spire,30,0x4a2a7a,1,2.4,.5,{sy:[1,2.4]}],[K.crystal,24,0x9a4aff,.9,2,.5],[K.dead,12,0xa080d0,1,1.7,.35],[K.lava,14,0x8a3aff,1,2.6,0,{k:.9,y:.04}],[K.island,12,0x9a8abf,.9,1.8,0,{fy:[6,13]}]]};
-const TUFTC={3:0x7a5a44,4:0xdbeaf8,5:0x4a3a30,6:0xd8cfae,7:0x6a3aa0};
+ 7:[[K.ctree,40,0,1,1.55,.4,{pal:1,glow:2.6}],[K.ccl,22,0,.7,1.3,.75,{pal:1,glow:2}],[K.ccl,3,0,2.6,3.8,.8,{pal:1,glow:1.9}],[K.rock,16,0xc8b4e4,.6,1.5,.5,{y:.25,sy:.7}],[K.crystal,10,0,.22,.42,0,{pal:1}]],
+ 8:[[K.rock,30,0x6a6c66,.5,1.5,.5,{y:.2,sy:.55}],[K.lamp,14,0xffffff,.95,1.15,.22,{lamp:1}],[K.tomb,10,0xa8aca2,.8,1.2,.4],[K.dead,10,0x5a524a,.9,1.5,.35]],
+ 9:[[K.spire,30,0x4a2a7a,1,2.4,.5,{sy:[1,2.4]}],[K.crystal,24,0x9a4aff,.9,2,.5],[K.dead,12,0xa080d0,1,1.7,.35],[K.lava,14,0x8a3aff,1,2.6,0,{k:.9,y:.04}],[K.island,12,0x9a8abf,.9,1.8,0,{fy:[6,13]}]]};
+const TUFTC={3:0x7a5a44,4:0xdbeaf8,5:0x4a3a30,6:0xd8cfae,7:0xe0a0e4,8:0x56664c,9:0x6a3aa0};
+const CPAL=[0xff8ad8,0x6ff0e4,0xc49cff,0xffb8ec,0x8ae8ff];/* цвета кристаллов «Хрустального леса» */
+const CITY=12;/* шаг кварталов «Мёртвого города», м */
+// что стоит в квартале (i,j): -1 вне города, 0 пусто (площадь), 1 дом, 2 колокольня — по хэшу клетки, одинаково у всех частей мира и у напарника
+function cityCell(i,j){const x=i*CITY,z=j*CITY,rr=Math.hypot(x,z);if(rr<535||rr>645)return -1;let h=(i*374761393+j*668265263)|0;h=Math.imul(h^(h>>>13),1274126177);h^=h>>>16;const q=(h>>>0)/4294967296;return q<.46?1:q<.51?2:0;}
 const CH=new Map();
 const _cc=new THREE.Color();
 function genChunk(cx,cz){
@@ -1740,20 +1801,39 @@ function genChunk(cx,cz){
   const put=(k,x,z,s,hex,o)=>{o=o||{};const b=B[k];dummy.position.set(x,o.y||0,z);dummy.rotation.set(0,o.ry==null?rn(0,TAU):o.ry,0);dummy.scale.set(s,o.sy||s,s);dummy.updateMatrix();
     const e=dummy.matrix.elements;for(let i=0;i<16;i++)b.m.push(e[i]);_cc.setHex(hex).multiplyScalar((o.k||1)*rn(.82,1.1));b.c.push(_cc.r,_cc.g,_cc.b);b.n++;
     if(o.cr)col.push({x,z,r:o.cr});};
+  // фонарь «Мёртвого города»: столб, зелёный огонь в фонаре и пятно света на брусчатке
+  const lampAt=(x,z,s)=>{const ry=rn(0,TAU);put(K.lamp,x,z,s,0xffffff,{ry,cr:.22});put(K.lglow,x,z,s,0x86ffbe,{ry,k:1.2});put(K.cglow,x+.6*s*Math.cos(ry),z-.6*s*Math.sin(ry),3.4,0x2a9a60,{y:.07,ry:0});};
+  // «Мёртвый город»: дома и колокольни стоят по сетке кварталов (между ними улицы), фонари — на перекрёстках
+  for(let i=Math.ceil(x0/CITY);i*CITY<x0+CS;i++)for(let j=Math.ceil(z0/CITY);j*CITY<z0+CS;j++){const x=i*CITY,z=j*CITY,q=cityCell(i,j);if(q<0)continue;
+    const bx=x+rn(-.8,.8),bz=z+rn(-.8,.8),s=rn(.92,1.12),ry=(R()*4|0)*Math.PI/2+rn(-.06,.06);
+    if(q===1){put(K.house,bx,bz,s,0xd6d8cc,{ry});col.push({x:bx,z:bz,r:2.2*s});for(const [a,b] of [[-1,-1],[1,-1],[-1,1],[1,1]])col.push({x:bx+a*1.75*s,z:bz+b*1.75*s,r:.55*s});}
+    else if(q===2)put(K.tower,bx,bz,s,0xe0ddd2,{ry,cr:1.55*s});
+    if(R()<.34){const lx=x+CITY/2,lz=z+CITY/2,rl=Math.hypot(lx,lz);if(rl>533&&rl<647)lampAt(lx,lz,rn(.95,1.1));}}
+  const inBld=(x,z)=>{const i=Math.round(x/CITY),j=Math.round(z/CITY);return cityCell(i,j)>0&&Math.abs(x-i*CITY)<3.6&&Math.abs(z-j*CITY)<3.6;};
   for(let i=0;i<34;i++){const x=x0+R()*CS,z=z0+R()*CS,rr=Math.hypot(x,z);if(rr<112||rr>WORLD)continue;const zn=zoneOf(x,z),tb=TAB[zn];if(!tb)continue;
     let t=0;for(const e of tb)t+=e[1];let q=R()*t,e=tb[0];for(const c of tb){q-=c[1];if(q<=0){e=c;break;}}
     const s=rn(e[3],e[4]),o=e[6]||{};
     if(o.arch){const ry=rn(0,TAU),ca=Math.cos(ry),sa=Math.sin(ry);put(e[0],x,z,s,e[2],{ry,cr:0});col.push({x:x-2.2*s*ca,z:z+2.2*s*sa,r:.6*s},{x:x+2.2*s*ca,z:z-2.2*s*sa,r:.6*s});continue;}
+    if(zn===8&&inBld(x,z))continue;
+    if(o.lamp){lampAt(x,z,s);continue;}
+    const hex=o.pal?CPAL[R()*CPAL.length|0]:e[2];
     const sy=o.sy?(typeof o.sy==='number'?s*o.sy:rn(o.sy[0],o.sy[1])*s):s;
-    put(e[0],x,z,s,e[2],{y:o.fy?rn(o.fy[0],o.fy[1]):(o.y?o.y*s:0),sy,k:o.k,cr:e[5]?e[5]*s:0});}
+    put(e[0],x,z,s,hex,{y:o.fy?rn(o.fy[0],o.fy[1]):(o.y?o.y*s:0),sy,k:o.k,cr:e[5]?e[5]*s:0});
+    if(o.glow)put(K.cglow,x,z,s*o.glow,hex,{y:.06,ry:0,k:.42});}
+  // «Хрустальный лес» гуще остальных: ещё рощица кристальных деревьев (только в частях, задевающих кольцо 420–530)
+  const rIn=Math.hypot(clamp(0,x0,x0+CS),clamp(0,z0,z0+CS)),rOut=Math.max(Math.hypot(x0,z0),Math.hypot(x0+CS,z0),Math.hypot(x0,z0+CS),Math.hypot(x0+CS,z0+CS));
+  if(rOut>420&&rIn<530)for(let i=0;i<16;i++){const x=x0+R()*CS,z=z0+R()*CS;if(zoneOf(x,z)!==7)continue;const s=rn(.9,1.5),hex=CPAL[R()*CPAL.length|0];
+    put(K.ctree,x,z,s,hex,{cr:.4*s});put(K.cglow,x,z,s*2.6,hex,{y:.06,ry:0,k:.42});}
   for(let i=0;i<150;i++){const x=x0+R()*CS,z=z0+R()*CS,rr=Math.hypot(x,z);if(rr<112||rr>WORLD)continue;const zn=zoneOf(x,z);
+    if(zn===8&&R()<.55)continue;/* на брусчатке травы меньше */
+    if(zn===7&&R()<.1){put(K.crystal,x,z,rn(.1,.2),CPAL[R()*CPAL.length|0]);continue;}/* мелкие осколки в траве */
     if(R()<.14)put(K.rock,x,z,rn(.25,.6),TUFTC[zn],{y:.1,sy:.25});else put(K.tuft,x,z,rn(.7,1.5),TUFTC[zn]);}
   for(const p of PYL.get(ckey(cx,cz))||[]){put(K.pylon,p.x,p.z,1,0xffffff,{ry:0,cr:.7});put(K.gem,p.x,p.z,1,p.hex,{y:5.8,ry:0,k:1.6});}
   const ch={cx,cz,b:B,col};for(const c of col){const k=cgk(Math.floor(c.x/8),Math.floor(c.z/8));if(!CG.has(k))CG.set(k,[]);CG.get(k).push(c);}
   const bb=B.map(b=>({m:new Float32Array(b.m),c:new Float32Array(b.c),n:b.n}));ch.b=bb;return ch;}
 function unloadChunk(ch){for(const c of ch.col){const k=cgk(Math.floor(c.x/8),Math.floor(c.z/8)),l=CG.get(k);if(l){const i=l.indexOf(c);if(i>=0)l.splice(i,1);}}}
 function rebuildChunks(){for(const k of PK){let n=0;const im=k.im;for(const ch of CH.values()){const b=ch.b[k.i];if(!b.n)continue;if(n+b.n>k.cap)break;im.instanceMatrix.array.set(b.m,n*16);im.instanceColor.array.set(b.c,n*3);n+=b.n;}
-  im.count=n;im.instanceMatrix.needsUpdate=true;im.instanceColor.needsUpdate=true;}}
+  im.count=n;im.visible=n>0;/* пустые виды (чужих регионов) не рисуем — меньше вызовов отрисовки */im.instanceMatrix.needsUpdate=true;im.instanceColor.needsUpdate=true;}}
 const SC={cx:-9999,cz:-9999,q:[]};
 function streamWorld(){
   if(PLAY!=='world'||!GROUND)return;
@@ -1929,7 +2009,7 @@ const moteM=new THREE.ShaderMaterial({uniforms:moteU,transparent:true,depthWrite
   fragmentShader:'uniform vec3 uCol;varying float vA;void main(){float d=length(gl_PointCoord-.5)*2.;gl_FragColor=vec4(uCol*smoothstep(1.,0.,d)*vA,1.);}'});
 const motes=new THREE.Points(moteG,moteM);motes.frustumCulled=false;scene.add(motes);
 const GMOTE=[null,[.1,0,1,0xcfd8e8],[-.6,1.2,1,0xe8f4ff],[.15,0,1.1,0xc090ff],[0,6,.9,0xfff2c0],[.2,0,1,0xc8ff6a],[.05,0,1.3,0x7affd0],[.35,0,1.2,0x9dff3a],[.04,.5,1.4,0xd8e4f4],[.08,0,.9,0xeee8c0],[.12,0,1.2,0xcfa8ff],[1.1,.4,1.1,0xff7a2a],[-.15,0,1,0x9fe8ff]];
-const WMOTE=[[.12,0,1],[.1,0,1],[.08,0,1],[.8,.2,1.1],[-.5,1.6,1.2],[.55,.3,1.1],[.06,.5,1],[.18,.1,1.3]];
+const WMOTE=[[.12,0,1],[.1,0,1],[.08,0,1],[.8,.2,1.1],[-.5,1.6,1.2],[.55,.3,1.1],[.06,.5,1],[.22,.15,1.25],[.04,.45,1.15],[.18,.1,1.3]];
 let sigB=6,gfxExt=true;
 function updateGfx(dt){
   const ext=Q.pp&&SAVE.q!=='low';if(ext!==gfxExt){gfxExt=ext;worldExtra.visible=ext;if(GZ&&GZ.fxex)GZ.fxex.forEach(m=>m.visible=ext);motes.visible=ext;}
@@ -3061,6 +3141,16 @@ MOBV('eagle','stormking','Громовой владыка',0xfff2a8,1.2);MOBV('b
 MOBV('imp','voidimp','Бес пустоты',0x6a2aff);MOBV('wraith','voidwraith','Призрак бездны',0x2a1a4a);MOBV('brute','abyssbrute','Громила бездны',0x1a1a2a,1.4);MOBV('mage','voidmage','Маг пустоты',0xa02aff);
 MOBV('necro','voidnecro','Некромант бездны',0x401a60);MOBV('spider','voidspider','Паук пустоты',0x20103a);MOBV('golem','voidgolem','Голем пустоты',0x30204a,1.4);MOBV('sniper','voidsniper','Снайпер пустоты',0x5a2a9a);MOBV('shield','voidshield','Щитоносец бездны',0x3a2a5a);
 MOBV('demon','voidlord','Владыка Бездны',0x4a1a8a,1.2);MOBV('heart','devourer','Пожиратель',0x2a0a4a,1.2);MOBV('hydra','abysshydra','Гидра бездны',0x3a1a6a,1.2);MOBV('queen','voidqueen','Королева пустоты',0x5a2aa0,1.2);
+// Хрустальный лес (25.11): розово-бирюзовые кристальные звери; местный сильный — Призматический исполин (чемпион/страж)
+MOBV('wolf','crystwolf','Хрустальный волк',0xff9ad8);MOBV('spider','crystspider','Самоцветный паук',0x5fe8d8);MOBV('elemental','shardelem','Осколочный элементаль',0xff8ad0);
+MOBV('mage','prismmage','Призматический маг',0xb07aff);MOBV('golem','crystgolem','Хрустальный голем',0xe8a8f0,1.4);MOBV('shroom','crystshroom','Кристальный взрыватель',0x7ff0e0);
+MOBV('archer','shardarcher','Лучник-осколок',0xffb0e8);MOBV('bat','glassbat','Стеклокрыл',0xb8fff0);MOBV('golem','prismgiant','Призматический исполин',0xff6ac8,2.4,1.3);
+MOBV('spiderq','crystqueen','Хрустальная Ткачиха',0xff8ae0,1.25);MOBV('heart','prismheart','Сердце кристалла',0xff9ae8,1.25);MOBV('colossus','gemcolossus','Самоцветный колосс',0x6ae8e0,1.25);
+// Мёртвый город (25.11): павшая стража, чума и призраки; местный сильный — Палач (чемпион/страж)
+MOBV('shield','fallenguard','Павший стражник',0x8a9a8c);MOBV('wolf','plaguedog','Чумной пёс',0x6a6a4e);MOBV('wraith','townghost','Призрак горожанина',0x9affc8);
+MOBV('necro','plaguenecro','Чумной некромант',0x3a5a3a);MOBV('sniper','ghostbolt','Арбалетчик-призрак',0x7affb0);MOBV('skeleton','deadknight','Мёртвый рыцарь',0xa8b4a4,1.6);
+MOBV('bat','gargoyle','Горгулья',0x7a7e86,1.5);MOBV('bomber','plaguebomber','Чумной подрывник',0x8aff6a);MOBV('golem','bellgolem','Колокольный голем',0x8a7a5a,1.4);MOBV('brute','executioner','Палач',0x4a3a3a,2.4,1.3);
+MOBV('bonelord','lichking','Король-лич',0x9affc8,1.25);MOBV('reaper','bellreaper','Звонарь',0x5a7a6a,1.25);MOBV('banshee','widow','Вдова-призрак',0xc8ffe0,1.25);
 const dk=(c,k)=>new THREE.Color(c).multiplyScalar(k).getHex();
 function legs4(g,M,col,x,z,len,th){const L=[];for(const [sx,sz] of [[-1,1],[1,1],[-1,-1],[1,-1]])L.push(part(G.box,M(col),th,len,th,sx*x,len/2,sz*z,g));return L;}
 function wolfBody(g,M,A,s,col,eye){const fur=M(col),dark=M(dk(col,.6));
@@ -3313,7 +3403,7 @@ function updatePlayer(dt){
   P.atkCd-=dt;P.castT-=dt;P.swingT-=dt;
   if((hold||(auto&&getTarget(12)))&&P.atkCd<=0){const tg=getTarget(16);if(!CLS.melee||!tg||tg.pos.distanceTo(P.pos)<meleeReach(tg)||hold&&!tg)basicAttack();}
   if(auto){for(let i=0;i<activeSlots();i++){if(trySlot(i,false))break;}}
-  if(PLAY==='world'){const z=zoneOf(P.pos.x,P.pos.z);if(z!==P.zone){const up=z>(P.zone||0)&&z>=4&&P.zone!=null;P.zone=z;zoneTag(z);if(up)banner('⚠ Опасность: '+ZONES[z].name,zoneSub(z),true);}}
+  if(PLAY==='world'){const z=zoneOf(P.pos.x,P.pos.z);if(z!==P.zone){const up=z>(P.zone||0)&&z>=4&&P.zone!=null;P.zone=z;zoneTag(z);if(up)banner('⚠ Опасность: '+ZONES[z].name,zoneSub(z)+(ZONES[z].warn?' · '+ZONES[z].warn:''),true);}}
   animateHero(dt,moving);
   ambT-=dt;if(ambT<=0){ambT=.1;const c=(PLAY==='gorge'&&GZ)?GZ.ambC:FFZ[P.zone||0];emit(PUFF,P.pos.x+rand(-15,15),rand(.4,2.4),P.pos.z+rand(-15,15),rand(-.3,.3),rand(-.1,.25),rand(-.3,.3),c,rand(2,3.5),0,0);}}
 function animateHero(dt,moving){
@@ -3332,7 +3422,7 @@ function animateHero(dt,moving){
   hero.pool.material.opacity=.22+(P.castT>0?.25:0);
   if(hero.shieldM.visible){hero.shieldM.rotation.y+=dt;hero.shieldM.material.opacity=.12+.1*(P.shield/P.shieldMax)+.04*Math.sin(time*6);}}
 const FF3=new THREE.Color(0xd8643a),FF0=new THREE.Color(0x8fb84a),FF1=new THREE.Color(0x3a9a8a),FF2=new THREE.Color(0x5a60a8);
-const FFZ=[FF0,FF1,FF2,FF3,new THREE.Color(0xdff4ff),new THREE.Color(0xff7a2a),new THREE.Color(0xffe9a0),new THREE.Color(0xa06aff)];
+const FFZ=[FF0,FF1,FF2,FF3,new THREE.Color(0xdff4ff),new THREE.Color(0xff7a2a),new THREE.Color(0xffe9a0),new THREE.Color(0xff9ae8),new THREE.Color(0x8affc4),new THREE.Color(0xa06aff)];
 function updateEnemies(dt){
   const maxN=Math.min(30,5+mpLvl()*2);
   if(PLAY==='world'){if(!MPG){spawnT-=dt;if(spawnT<=0){spawnT=mpLvl()<4?3.6:2.5;if(aliveCount()<maxN+(MPH&&MP.peer?COOP.cap:0))spawnPack();}if(!BOSS&&threat>=THREAT_MAX)spawnBoss();}}else updateGorge(dt);
@@ -3851,7 +3941,7 @@ function toast(t,ms){const el=$('#toast');el.textContent=t;el.classList.add('on'
 let banT=0;
 function banner(b,s,red){$('#bannerB').textContent=b;$('#bannerS').textContent=s;const el=$('#banner');el.classList.toggle('red',!!red);el.classList.add('on');clearTimeout(banT);banT=setTimeout(()=>el.classList.remove('on'),2600);}
 let zoneT=0;
-function zoneSub(z){const H=strongLv(),lo=enemyLvR(z?REG_R[z-1]+1:0,H);if(z>=7)return 'Враги ур. '+lo+'+ и сильнее с каждым шагом';return 'Враги ур. '+lo+'–'+enemyLvR(REG_R[z],H);}
+function zoneSub(z){const H=strongLv(),lo=enemyLvR(z?REG_R[z-1]+1:0,H);if(z>=ZABYSS)return 'Враги ур. '+lo+'+ и сильнее с каждым шагом';return 'Враги ур. '+lo+'–'+enemyLvR(REG_R[z],H);}
 function zoneTag(z){$('#zoneName').textContent=ZONES[z].name;$('#zoneSub').textContent=zoneSub(z);$('#zoneTag').classList.add('on');clearTimeout(zoneT);zoneT=setTimeout(()=>$('#zoneTag').classList.remove('on'),3200);}
 
 
@@ -3861,21 +3951,21 @@ function zoneTag(z){$('#zoneName').textContent=ZONES[z].name;$('#zoneSub').textC
 // =====================================================================
 const mmEl=$('#mm'),mmC=$('#mmc'),mmX=mmC.getContext('2d'),mmL=$('#mmL');let mmBig=false,mmT=0,mmTxt='';
 mmEl.addEventListener('click',()=>{mmBig=!mmBig;mmEl.classList.toggle('big',mmBig);mmT=0;});
-const MMCOL=['#35583a','#2a4640','#4d4945','#4d302c','#a9c6da','#4a2a22','#a89c7e','#1b1033'];
+const MMCOL=['#35583a','#2a4640','#4d4945','#4d302c','#a9c6da','#4a2a22','#a89c7e','#7a4a88','#3e4a44','#1b1033'];
 function mmUpdate(dt){
   const show=mode==='game'&&PLAY==='world';if(mmEl.hidden===show)mmEl.hidden=!show;if(!show)return;
   mmT-=dt;if(mmT>0)return;mmT=.12;
   const sz=mmC.width,c=sz/2,Rw=mmBig?260:95,k=c/Rw,pl=toLocal(P.pos.x,P.pos.z),M=(x,z)=>{const l=toLocal(x,z);return [c-(l.x-pl.x)*k,c-(l.z-pl.z)*k];};/* toLocal.x смотрит влево экрана (так удобно ущельям) — на карте его зеркалим, иначе шаг вправо рисовался влево (Артём 25.11) */
   const g=mmX;g.clearRect(0,0,sz,sz);g.save();g.beginPath();g.arc(c,c,c-1,0,TAU);g.clip();
-  g.fillStyle=MMCOL[7];g.fillRect(0,0,sz,sz);const o=M(0,0);
-  for(let i=6;i>=0;i--){g.fillStyle=MMCOL[i];g.beginPath();g.arc(o[0],o[1],REG_R[i]*k,0,TAU);g.fill();}
-  for(let i=2;i<7;i++){const rr=REG_R[i]*k;if(rr<2||rr>sz*3)continue;g.strokeStyle=i>=3?'rgba(255,80,60,.95)':'rgba(255,255,255,.28)';g.lineWidth=i>=3?2:1;g.beginPath();g.arc(o[0],o[1],rr,0,TAU);g.stroke();}
+  g.fillStyle=MMCOL[ZABYSS];g.fillRect(0,0,sz,sz);const o=M(0,0);
+  for(let i=ZABYSS-1;i>=0;i--){g.fillStyle=MMCOL[i];g.beginPath();g.arc(o[0],o[1],REG_R[i]*k,0,TAU);g.fill();}
+  for(let i=2;i<ZABYSS;i++){const rr=REG_R[i]*k;if(rr<2||rr>sz*3)continue;g.strokeStyle=i>=3?'rgba(255,80,60,.95)':'rgba(255,255,255,.28)';g.lineWidth=i>=3?2:1;g.beginPath();g.arc(o[0],o[1],rr,0,TAU);g.stroke();}
   for(const e of ENEMIES){if(e.dead||!(e.boss||e.elite))continue;const p=M(e.pos.x,e.pos.z);if(Math.hypot(p[0]-c,p[1]-c)>c-3)continue;
     g.fillStyle=e.boss?'#ff4a3a':'#ffc84a';g.strokeStyle='#000';g.lineWidth=1;g.beginPath();g.arc(p[0],p[1],e.boss?4:e.guard?3.5:2.6,0,TAU);g.fill();g.stroke();}
   if(MP.peer&&MP.peer.on&&MP.peer.pos){let p=M(MP.peer.pos.x,MP.peer.pos.z);const dx=p[0]-c,dy=p[1]-c,dl=Math.hypot(dx,dy),lim=c-8;if(dl>lim){p=[c+dx/dl*lim,c+dy/dl*lim];}
     g.fillStyle='#5ae0ff';g.strokeStyle='#04202a';g.lineWidth=2;g.beginPath();g.arc(p[0],p[1],4.2,0,TAU);g.fill();g.stroke();
     const nk=(MP.peer.nick||'').slice(0,7);g.font='700 17px sans-serif';g.textAlign='center';g.strokeStyle='#000';g.lineWidth=3;g.strokeText(nk,p[0],p[1]+(p[1]>c?-8:19));g.fillStyle='#bff3ff';g.fillText(nk,p[0],p[1]+(p[1]>c?-8:19));}
-  const rp=Math.hypot(P.pos.x,P.pos.z);if(rp>1&&P.zone<7){const ld=toLocal(P.pos.x/rp,P.pos.z/rp),bx=c-ld.x*(c-9),by=c-ld.z*(c-9),ang=Math.atan2(-ld.x,ld.z);
+  const rp=Math.hypot(P.pos.x,P.pos.z);if(rp>1&&P.zone<ZABYSS){const ld=toLocal(P.pos.x/rp,P.pos.z/rp),bx=c-ld.x*(c-9),by=c-ld.z*(c-9),ang=Math.atan2(-ld.x,ld.z);
     g.save();g.translate(bx,by);g.rotate(ang);g.fillStyle='#ff5a3c';g.beginPath();g.moveTo(0,-8);g.lineTo(6,4);g.lineTo(-6,4);g.closePath();g.fill();g.restore();}
   const lf=toLocal(Math.sin(P.face),Math.cos(P.face)),fx=-lf.x,fy=-lf.z,al=Math.atan2(fx,-fy);
   g.save();g.translate(c,c);g.rotate(al);g.fillStyle='#ffd36b';g.strokeStyle='#201400';g.lineWidth=2;g.beginPath();g.moveTo(0,-9);g.lineTo(6.5,7);g.lineTo(0,4);g.lineTo(-6.5,7);g.closePath();g.fill();g.stroke();g.restore();
@@ -3883,7 +3973,7 @@ function mmUpdate(dt){
   const z=zoneOf(P.pos.x,P.pos.z),t=ZONES[z].name+'|ур. '+enemyLvAt(P.pos.x,P.pos.z)+(z>=3?' ⚠':'');if(t!==mmTxt){mmTxt=t;const [a,b]=t.split('|');mmL.innerHTML='<b>'+a+'</b>враги '+b;}}
 
 // атмосфера регионов: туман, фон и небо меняют цвет с расстоянием от центра; табличка у ближайшей границы
-const ATM=[[0,0x1c2946,0x0e1630,[1,1,1]],[131,0x1c2946,0x0e1630,[1,1,1]],[139,0x2c4a66,0x16283c,[.9,1.25,1.5]],[211,0x2c4a66,0x16283c,[.9,1.25,1.5]],[219,0x44190f,0x240a06,[3.4,.9,.5]],[306,0x44190f,0x240a06,[3.4,.9,.5]],[314,0x4a3f78,0x241e44,[1.6,1.2,1.8]],[416,0x4a3f78,0x241e44,[1.6,1.2,1.8]],[424,0x0b0516,0x05020c,[.5,.35,1.1]]];
+const ATM=[[0,0x1c2946,0x0e1630,[1,1,1]],[131,0x1c2946,0x0e1630,[1,1,1]],[139,0x2c4a66,0x16283c,[.9,1.25,1.5]],[211,0x2c4a66,0x16283c,[.9,1.25,1.5]],[219,0x44190f,0x240a06,[3.4,.9,.5]],[306,0x44190f,0x240a06,[3.4,.9,.5]],[314,0x4a3f78,0x241e44,[1.6,1.2,1.8]],[416,0x4a3f78,0x241e44,[1.6,1.2,1.8]],[424,0x642a5c,0x2c0f2c,[2.1,.95,1.6]],[526,0x642a5c,0x2c0f2c,[2.1,.95,1.6]],[534,0x24342c,0x0e1812,[.7,1.15,.85]],[646,0x24342c,0x0e1812,[.7,1.15,.85]],[654,0x0b0516,0x05020c,[.5,.35,1.1]]];
 const _fa=new THREE.Color(),_fb=new THREE.Color(),_ft=new THREE.Color(),_bt=new THREE.Color();let _skyT=[1,1,1];
 function updateAtmos(dt){
   if(PLAY!=='world'||mode!=='game')return;
