@@ -7865,6 +7865,8 @@ function mpChestOpened(){
   S.ess+=ess;gainXp(xp,xpm);learnRandom();save();
   fxPillar(c.x,c.z,1.6,9,GOLD,1.1);fxRing(c.x,c.z,.5,6,GOLD,.7);colBurst(GOLD,c.x,1.2,c.z,50,6,1,-1);
   banner('Сундук открыт','Награда обоим: +'+ess+' эссенции, +'+xp+' опыта и новая чара');}
+// кампании (campaign.js): гость дорисовывает сундук по общему состоянию уровня, если сообщение о нём потерялось
+MP.chestMk=mpChestMake;MP.chestOp=mpChestOpened;
 function mpChestVis(dt){
   const c=MP.chest;if(!c||!c.g)return;
   c.lid.rotation.x=lerp(c.lid.rotation.x,c.open?-1.2:0,1-Math.exp(-dt*6));c.gl.material.opacity=c.open?.35:.6+.25*Math.sin(time*3);
