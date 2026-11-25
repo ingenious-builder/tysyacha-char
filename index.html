@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"><script>/* iPhone с иконки «Домой»: с viewport-fit=cover iOS отдаёт окно 894 из 956 и внизу пустая полоса; «Траты» без cover открываются во весь экран — делаем так же. Отступы под «островок» и полоску «Домой» считает fitApp. */try{if(navigator.standalone===true&&/iPhone|iPod/.test(navigator.userAgent)){document.querySelector('meta[name=viewport]').setAttribute('content','width=device-width,initial-scale=1,user-scalable=no');document.documentElement.classList.add('ios-nocover');}}catch(e){}</script><meta name="theme-color" content="#0d1120"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Тысяча чар"><meta name="application-name" content="Тысяча чар"><meta name="description" content="Тысяча чар — action-RPG в браузере: 20 героев, 10 стихий, 12 ущелий и кооператив на двоих."><link rel="manifest" href="manifest.webmanifest"><link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png"><link rel="apple-touch-icon" href="icons/apple-touch-icon.png"><style>:root{color-scheme:light;box-sizing:border-box}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}.sk::after{display:none;position:absolute;right:4px;top:2px;z-index:5;font:700 11px/1 var(--f-ui);color:#fff;background:rgba(8,10,22,.8);border-radius:5px;padding:2px 4px;pointer-events:none}
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"><script>/* iPhone с иконки «Домой»: с viewport-fit=cover iOS отдаёт окно 894 из 956 и внизу пустая полоса; «Траты» без cover открываются во весь экран — делаем так же. Отступы под «островок» и полоску «Домой» считает fitApp. */try{if(navigator.standalone===true&&/iPhone|iPod/.test(navigator.userAgent)){document.querySelector('meta[name=viewport]').setAttribute('content','width=device-width,initial-scale=1,user-scalable=no');document.documentElement.classList.add('ios-nocover');}}catch(e){}</script><meta name="theme-color" content="#0d1120"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Тысяча чар"><meta name="application-name" content="Тысяча чар"><meta name="description" content="Тысяча чар — action-RPG в браузере: 21 герой, 10 стихий, 12 ущелий и кооператив на двоих."><link rel="manifest" href="manifest.webmanifest"><link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png"><link rel="apple-touch-icon" href="icons/apple-touch-icon.png"><style>:root{color-scheme:light;box-sizing:border-box}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}.sk::after{display:none;position:absolute;right:4px;top:2px;z-index:5;font:700 11px/1 var(--f-ui);color:#fff;background:rgba(8,10,22,.8);border-radius:5px;padding:2px 4px;pointer-events:none}
 html.kb .sk::after{display:block;content:attr(data-k)}html.pad .sk::after{display:block;content:attr(data-g)}
 </style></head><body>
 <title>Тысяча чар</title>
@@ -8869,8 +8869,10 @@ NFPEER.s_echpoch=(sk,m,pr)=>{tmEchFly(new THREE.Vector3(pr.pos.x,0,pr.pos.z),new
 function tmKuSpd(a,on){if(on){if(!a.sp||Math.abs(P.speed-a.sp)>1e-6){a.sp=P.speed*1.2;P.speed=a.sp;}}else if(a.sp){if(Math.abs(P.speed-a.sp)<1e-6)P.speed=a.sp/1.2;a.sp=0;}}
 function tmNotes(x,z,n,r){for(let q=0;q<n;q++){const an=rand(0,TAU),rr=rand(.3,r);emit(SPARK,x+Math.cos(an)*rr,rand(.8,2),z+Math.sin(an)*rr,Math.cos(an)*1.5,rand(1,2),Math.sin(an)*1.5,q%3?TM_GREEN:TM_GOLD,rand(.6,1),-.8,1);}}
 function tmKuraiFx(x,z,r){fxShock(x,z,r,TM_GREEN,.6);fxRing(x,z,.5,r,TM_GOLD,.55,.6);later(.12,()=>fxRing(x,z,.5,r*.75,TM_GREEN,.5,.5));fxGlow(x,z,2,TM_GREEN,.35,.6);tmNotes(x,z,HQ()?14:7,r*.8);}
+// замедление Тимура (курай, мёд, «Застолье»): у гостя враги — зеркала, поэтому хосту уходит {sl} через очередь контроля ctCtlQ (не чаще раза в 0,3 с на врага)
+function tmSlow(en,t){if(!en||en.dead)return;en.slowT=Math.max(en.slowT||0,t);if(MPG&&en.remote){const e=time+t;if(e>(en.tmSlE||0)+.3){en.tmSlE=e;ctCtlQ(en,{sl:r2(t)});}}}
 function tmKurai(a,i){const sk=a.sk,r=7*a.R*(i?.85:1),c=P.pos.clone(),d=skDmg(sk)*1.6;
-  for(const en of nfFoes(c,r)){nfHit(en,d,sk,{noKnock:true,depth:1});if(!en.dead)en.slowT=Math.max(en.slowT||0,2);}
+  for(const en of nfFoes(c,r)){nfHit(en,d,sk,{noKnock:true,depth:1});tmSlow(en,2);}
   tmKuraiFx(c.x,c.z,r);
   if(!i){heal(P.maxHp*.02);a.spT=2;tmKuSpd(a,true);tmPeerHeal(c.x,c.z,r+1,.02,'');}}
 NFP.s_kurai={build(a){a.t=1.5;a.sp=0;a.spT=0;},drop(a){tmKuSpd(a,false);},
@@ -8893,9 +8895,11 @@ function tmSaban(sk,o){const r=sk.F.range*(o.R||1),home=o.home||(()=>P.pos),fix=
       tk-=dt;if(tk<=0&&t<dur){tk+=1;this.pulse(c);}
       return t<dur&&!(o.pr&&o.pr.on===false);},
     pulse(c){const p=new THREE.Vector3(c.x,0,c.z);fxShock(p.x,p.z,r,TM_GOLD,.5);fxRing(p.x,p.z,.5,r,TM_RED,.45,.5);colBurst(TM_GOLD,p.x,2.5,p.z,10,4,.7,4);
-      if(o.gh)return;let n=0;
-      for(const en of nfFoes(p,r)){nfHit(en,(o.dmg||0)*this.k,sk,{noKnock:true});if(en.dead)continue;
-        if(!en.boss&&!en.elite&&!en.champ&&!en.remote&&!en.hop){hop(en,en.pos.x,en.pos.z,.55,1.3+rand(0,.6));stunEn(en,.65);}else stunEn(en,.4);
+      // Сабантуй гостя у хоста: урон и оглушение гость шлёт сам (в ударах, sx), а подлёт хост делает своим врагам — у гостя враги-зеркала не прыгают
+      if(o.gh){if(MPH&&mode==='game')for(const en of nfFoes(p,r)){if(en.boss||en.elite||en.champ||en.hop)continue;hop(en,en.pos.x,en.pos.z,.55,1.3+rand(0,.6));stunEn(en,.65);}return;}
+      let n=0;
+      for(const en of nfFoes(p,r)){const big=en.boss||en.elite||en.champ;nfHit(en,(o.dmg||0)*this.k,sk,{noKnock:true,stunX:big?.4:.65});if(en.dead)continue;   // оглушение — в ударе: у гостя уходит хосту (sx)
+        if(!big&&!en.remote&&!en.hop)hop(en,en.pos.x,en.pos.z,.55,1.3+rand(0,.6));
         if(n++<6)colBurst([TM_RED,TM_GREEN,TM_GOLD][n%3],en.pos.x,en.hy||1.5,en.pos.z,5,3,.5,6);
         if(n===1&&Math.random()<.5)float({x:en.pos.x,y:(en.hy||2)+.8,z:en.pos.z},TM_SHOUT[(Math.random()*TM_SHOUT.length)|0],'#ffe08a',15);}
       shk(.15,p.x,p.z);},
@@ -8906,7 +8910,7 @@ function tmCheer(){NFS.tmBuffT=time+6;if(NFS.tmBuffE)return;NFS.tmBuffE=nfEnt({u
 NFRUN.s_sabantuy=(sk,A,i,dmg,R,col,cl)=>{if(!cl&&sg1Merge(sk,'saban',e=>{e.k++;}))return;tmSaban(sk,{dmg,R,cl,fix:cl?P.pos.clone():null});
   if(!cl&&!i){heal(P.maxHp*.12);tmCheer();fxPillar(P.pos.x,P.pos.z,1.2,7,TM_GOLD,.7);float(P.pos,'Сабантуй!','#ffe08a',20);}};
 NFCAN.s_sabantuy=sk=>{const L=nfFoes(P.pos,sk.F.range*skR(sk)*.8);return L.length>=3||L.some(e=>e.boss||e.elite||e.champ)||P.hp<P.maxHp*.5&&L.length?'ok':'target';};
-NFPEER.s_sabantuy=(sk,m,pr)=>{tmSaban(sk,{gh:1,pr,home:sg1Peer(pr)});
+NFPEER.s_sabantuy=(sk,m,pr)=>{tmSaban(sk,{gh:1,pr,home:sg1Peer(pr),R:sk.M.radius||1});
   if(!P.dead&&mode==='game'&&Math.hypot(P.pos.x-pr.pos.x,P.pos.z-pr.pos.z)<sk.F.range+2){heal(P.maxHp*.12);tmCheer();float(P.pos,'Угощают на Сабантуе!','#ffe08a',15);}};
 // ===== /Тимур Галиев =====
 // ----- /A-фирменные-3 -----
@@ -9187,8 +9191,9 @@ function ctUnstable(sk,A){const t=CT.tier;let p;if(A)p=P.pos.clone().addScaledVe
 // (25.11: у других магов особенность — 40–50% их урона; чак-чак от «удара уровня» давал Тимуру 1–6% и он отставал на 60-м вдвое)
 // TM_POW (в cfDmgOut0, растёт с 1-го до 60-го уровня, как CT_KDMG у слабых наборов) и TM_POT — подгонка «чуть сильнее обычного мага» по бою
 // (_check/timur/live.js, 30 с волн, враги ×30 здоровья, против Пироманта, Криоманта, Громовержца, Геоманта, Арканиста; среднее геометрическое):
-// без надбавки Тимур на 20-м ×0,87, на 60-м ×0,6–0,8; с 1,5 — 20-й ×1,10, 60-й ×1,05 (1-й без надбавки ×0,88 — там у всех разброс в разы)
-let TM_POW=1.5,TM_POT=.35;
+// без надбавки Тимур на 20-м ×0,87, на 60-м ×0,6–0,8; с 1,5 — 20-й ×1,10, 60-й ×1,05 (1-й без надбавки ×0,88 — там у всех разброс в разы).
+// Перемер после рецензии (курай и Сабантуй теперь в «Авто», враги ×6 и ×30, 3 сида, против 15–25 боёв магов): с 1,5 на 60-м ×0,72–0,92 — 1,65
+let TM_POW=1.65,TM_POT=.35;
 const ctTmNeed=()=>12-2*ctv('ti_fast'),ctTmPotK=()=>TM_POT*Math.min(1,.3+.7*((S?S.lvl:1)-1)/19);
 function ctTmAdd(n){CT.tmN=(CT.tmN|0)+n;if(CT.tmN<ctTmNeed())return;CT.tmN=0;const pot=CT.tmPot||0;CT.tmPot=0;ctTmFeast(1,pot);if(CT.tier>=4)later(.5,()=>{if(mode==='game'&&!P.dead)ctTmFeast(.6,pot);});}
 function ctTmFeast(k,pot){const t=CT.tier,nb=(t>=2?7:5)+ctv('ti_balls'),L=nearestN(P.pos,11,nb),src=V3(P.pos.x,2.6,P.pos.z),
@@ -9201,14 +9206,14 @@ function ctTmBall(src,en,v){if(!en||en.dead)return;const b=nfMesh('sphere',TM_HO
   nfEnt({up(dt){t+=dt;const q=Math.min(1,t/fl);if(!en.dead){to.x=en.pos.x;to.z=en.pos.z;}b.position.set(lerp(from.x,to.x,q),lerp(from.y,to.y,q)+Math.sin(q*Math.PI)*1.6,lerp(from.z,to.z,q));
       if(Math.random()<.5)emit(SPARK,b.position.x,b.position.y,b.position.z,0,-.5,0,TM_GOLD,.3,2,1);
       if(q<1)return true;
-      if(!en.dead){dealDamage(en,v,-1,{ctx:1,depth:1,noReact:true,noProc:true,col:'#ffc23a',knockFrom:from});if(!en.dead){en.slowT=Math.max(en.slowT||0,2);if(CT.tier>=3)en.ctHnT=time+3;}}
+      if(!en.dead){dealDamage(en,v,-1,{ctx:1,depth:1,noReact:true,noProc:true,col:'#ffc23a',knockFrom:from});if(!en.dead){tmSlow(en,2);if(CT.tier>=3)en.ctHnT=time+3;}}
       colBurst(TM_HONEY,to.x,.7,to.z,6,2.5,.45,8);fxGlow(to.x,to.z,.9,TM_HONEY,.3,.7);return false;},
     end(){dropMesh(b);}});}
 function ctTmTable(L){let c=L[0],bn=-1;for(const e of L){let n=0;for(const m of L)if(Math.hypot(m.pos.x-e.pos.x,m.pos.z-e.pos.z)<3)n++;if(n>bn){bn=n;c=e;}}
   const p=V3(c.pos.x,0,c.pos.z),r=3,dur=4,d=nfMesh('disc',TM_HONEY,0),rg=nfMesh('ring',TM_RED,0),rn=nfMesh('rune',TM_GOLD,0);let t=0,tk=0;
   d.position.set(p.x,.06,p.z);d.scale.set(r,1,r);rg.position.set(p.x,.08,p.z);rg.scale.set(r,1,r);rn.position.set(p.x,.09,p.z);rn.scale.set(r*.6,1,r*.6);
   nfEnt({up(dt){t+=dt;const k=Math.min(1,t*4,(dur-t)*2);d.material.opacity=.32*k;rg.material.opacity=.6*k;rn.material.opacity=.45*k;rn.rotation.y+=dt*.6;
-      tk-=dt;if(tk<=0){tk=.25;for(const en of nfFoes(p,r)){en.slowT=Math.max(en.slowT||0,.4);en.ctTblT=time+.4;}}
+      tk-=dt;if(tk<=0){tk=.25;for(const en of nfFoes(p,r)){tmSlow(en,.6);en.ctTblT=time+.4;}}
       if(Math.random()<.4){const an=rand(0,TAU),rr=Math.sqrt(Math.random())*r;emit(SPARK,p.x+Math.cos(an)*rr,.15,p.z+Math.sin(an)*rr,0,rand(.6,1.4),0,TM_GOLD,.6,-.5,1);}
       return t<dur;},end(){dropMesh(d);dropMesh(rg);dropMesh(rn);}});
   ctProc(p,'Застолье!','#ffd36b',r);}
@@ -9219,7 +9224,7 @@ const CT_AFF={pyro:{e:{fire:1.2}},cryo:{e:{ice:1.2}},storm:{e:{storm:1.1},f:{cha
  paladin:{e:{light:1.05},f:{strike:1.12,leap:1.12}},geo:{e:{earth:1.2}},windr:{e:{wind:1.1},f:{bolt:1.08,boomer:1.08,fan:1.08}},hemo:{e:{blood:1.12}},arcan:{e:{arcane:1.12},f:{s_missiles:1.1}},
  bers:{e:{blood:1.05},f:{strike:1.12,whirl:1.12,rush:1.1,leap:1.1}},dk:{f:{strike:1.15}},druid:{c:{sum:1.2}},hunter:{e:{ice:1.08},f:{bolt:1.15,trap:1.1}},
  assassin:{e:{shadow:1.05},f:{strike:1.15,rush:1.15,s_heartstrike:1.5}},shaman:{c:{sum:1.15},f:{totem:1.15,s_stormtotem:1.15}},monk:{e:{wind:1.1}},lock:{e:{fire:1.15,shadow:1.15}},
- inq:{e:{light:1.1},f:{bolt:1.05}},alch:{e:{poison:1.05,arcane:1.05}},timur:{f:{s_echpoch:1.08}}};
+ inq:{e:{light:1.1},f:{bolt:1.05}},alch:{e:{poison:1.05,arcane:1.05}},timur:{f:{s_echpoch:1.08,s_kurai:1.25,s_sabantuy:1.2}}};   // Тимур: курай и Сабантуй — как фирменные пассивки/ульты других магов в «Авто» (×1,2–1,27 к прочим)
 function ctAff(sk){const D=CLS&&CT_AFF[CLS.id];if(!D)return 1;let m=1;const fp=FP[sk.F.id];if(D.e&&D.e[sk.E.id])m*=D.e[sk.E.id];
   if(D.f&&D.f[sk.F.id])m*=D.f[sk.F.id];else if(D.c&&fp&&D.c[fp.cat])m*=D.c[fp.cat];return m;}
 {const f0=skPower;skPower=function(sk,cnt,intr){const v=f0.apply(this,arguments);return intr?v:v*ctAff(sk);};}
@@ -9247,6 +9252,8 @@ function ctCtlQ(en,m){m.u=en.uid;m.c=1;MP.hitQ.push(m);}
   freezeEn=function(en,t){inF=1;try{f0(en,t);}finally{inF=0;}if(MPG&&en&&en.remote&&t>0){const e=time+t;if(e>(en.ctFE||0)+.15){en.ctFE=e;ctCtlQ(en,{f:r2(t)});}}};}
 {const h0=mpHostHit;mpHostHit=function(m){if(!m.c)return h0.apply(this,arguments);const en=ENEMIES.find(e=>e.uid===m.u);if(!en||en.dead)return;
   if(m.f)freezeEn(en,m.f);else if(m.s)stunEn(en,m.s);if(m.am!=null&&en.marks&&!en.marks[m.am]){en.marks[m.am]=4;(en.mkOwn||(en.mkOwn={}))[m.am]=1;}};}
+// Тимур-гость (25.11): замедление мёдом и кураем {sl} (tmSlow) — хост замедляет своего врага
+{const h0=mpHostHit;mpHostHit=function(m){if(m.c&&m.sl>0){const en=ENEMIES.find(e=>e.uid===m.u);if(en&&!en.dead)en.slowT=Math.max(en.slowT||0,Math.min(3,+m.sl));}return h0.apply(this,arguments);};}
 
 // ---------- хуки каркаса cf* (DESIGN-obraz 8.1) ----------
 // мана: Гемомант тратит вдвое меньше, в приливе Арканиста чары бесплатны
@@ -9469,7 +9476,9 @@ function cfTick(dt){if(!CT_ON||!CLS||P.dead||mode!=='game')return;
     for(const en of [...CT.her.keys()])if(en.dead||ENEMIES.indexOf(en)<0)ctHerDrop(en);
     txt='Святой суд · еретиков '+n;f=Math.min(1,n/4);break;}
   case 'alch':{const need=ctAlNeed();txt=CT.alN+1>=need?'Следующая чара нестабильна':'Нестабильная через '+(need-CT.alN);f=CT.alN/(need-1);break;}
-  case 'timur':{const need=ctTmNeed(),n=CT.tmN|0;if(n>=need-3&&Math.random()<.3){const a=rand(0,TAU);emit(SPARK,P.pos.x+Math.cos(a)*.6,2.2+rand(0,.4),P.pos.z+Math.sin(a)*.6,0,.4,0,TM_HONEY,.45,-.3,1);}
+  case 'timur':{// автобой: у Тимура в наборе щит, поэтому он не отходит всегда, как Пиромант (KITE), а только когда его побили — ниже 55% здоровья, до 85%
+    if(P.hp<P.maxHp*.55)KITE.add('timur');else if(P.hp>P.maxHp*.85)KITE.delete('timur');
+    const need=ctTmNeed(),n=CT.tmN|0;if(n>=need-3&&Math.random()<.3){const a=rand(0,TAU);emit(SPARK,P.pos.x+Math.cos(a)*.6,2.2+rand(0,.4),P.pos.z+Math.sin(a)*.6,0,.4,0,TM_HONEY,.45,-.3,1);}
     txt='Угощение '+n+'/'+need+(time<(NFS.tmBuffT||0)?' · праздник!':'');f=n/need;break;}}
   if(id==='assassin'||id==='monk'){const v=CT.spd0*spd;if(P.speed!==v)P.speed=v;}
   if((CT.hudT-=dt)<=0){CT.hudT=.1;ctHud(txt,f);}}
