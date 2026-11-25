@@ -1,0 +1,846 @@
+{
+ "20": {
+  "pyro": {
+   "same": 6,
+   "cross": 6,
+   "np": 6,
+   "minM": 0.764,
+   "poolK": 1.901,
+   "buildK": null,
+   "spread": 2.46,
+   "tal": 73
+  },
+  "cryo": {
+   "same": 6,
+   "cross": 6,
+   "np": 6,
+   "minM": 0.405,
+   "poolK": 2.155,
+   "buildK": null,
+   "spread": 3.67,
+   "tal": 74
+  },
+  "storm": {
+   "same": 0,
+   "cross": 0,
+   "np": 6,
+   "minM": 1.481,
+   "poolK": 1.806,
+   "buildK": null,
+   "spread": 1.25,
+   "tal": 73
+  },
+  "plague": {
+   "same": 6,
+   "cross": 6,
+   "np": 6,
+   "minM": 0.646,
+   "poolK": 1.961,
+   "buildK": null,
+   "spread": 2.31,
+   "tal": 74
+  },
+  "necro": {
+   "same": 6,
+   "cross": 6,
+   "np": 6,
+   "minM": 0.722,
+   "poolK": 2.479,
+   "buildK": null,
+   "spread": 3.07,
+   "tal": 74
+  },
+  "paladin": {
+   "same": 3,
+   "cross": 3,
+   "np": 6,
+   "minM": 0.929,
+   "poolK": 2.049,
+   "buildK": null,
+   "spread": 2.04,
+   "tal": 76
+  },
+  "geo": {
+   "same": 0,
+   "cross": 6,
+   "np": 6,
+   "minM": 1.022,
+   "poolK": 2.578,
+   "buildK": null,
+   "spread": 1.81,
+   "tal": 74
+  },
+  "windr": {
+   "same": 3,
+   "cross": 6,
+   "np": 6,
+   "minM": 0.928,
+   "poolK": 2.442,
+   "buildK": null,
+   "spread": 2,
+   "tal": 76
+  },
+  "hemo": {
+   "same": 3,
+   "cross": 3,
+   "np": 6,
+   "minM": 0.883,
+   "poolK": 1.737,
+   "buildK": null,
+   "spread": 2,
+   "tal": 74
+  },
+  "arcan": {
+   "same": 6,
+   "cross": 6,
+   "np": 6,
+   "minM": 0.723,
+   "poolK": 2.148,
+   "buildK": null,
+   "spread": 2.08,
+   "tal": 76
+  },
+  "bers": {
+   "same": 6,
+   "cross": 6,
+   "np": 6,
+   "minM": 0.74,
+   "poolK": 2.333,
+   "buildK": null,
+   "spread": 2.06,
+   "tal": 74
+  },
+  "dk": {
+   "same": 6,
+   "cross": 6,
+   "np": 6,
+   "minM": 0.874,
+   "poolK": 1.948,
+   "buildK": null,
+   "spread": 2.04,
+   "tal": 76
+  },
+  "druid": {
+   "same": 6,
+   "cross": 6,
+   "np": 6,
+   "minM": 0.576,
+   "poolK": 1.901,
+   "buildK": null,
+   "spread": 2.6,
+   "tal": 76
+  },
+  "hunter": {
+   "same": 3,
+   "cross": 3,
+   "np": 6,
+   "minM": 0.929,
+   "poolK": 2.433,
+   "buildK": null,
+   "spread": 2,
+   "tal": 74
+  },
+  "assassin": {
+   "same": 3,
+   "cross": 3,
+   "np": 6,
+   "minM": 0.927,
+   "poolK": 2.4,
+   "buildK": null,
+   "spread": 2,
+   "tal": 74
+  },
+  "shaman": {
+   "same": 0,
+   "cross": 3,
+   "np": 6,
+   "minM": 1.023,
+   "poolK": 2.211,
+   "buildK": null,
+   "spread": 1.81,
+   "tal": 74
+  },
+  "monk": {
+   "same": 3,
+   "cross": 6,
+   "np": 6,
+   "minM": 0.926,
+   "poolK": 3.34,
+   "buildK": null,
+   "spread": 2,
+   "tal": 76
+  },
+  "lock": {
+   "same": 3,
+   "cross": 3,
+   "np": 6,
+   "minM": 0.926,
+   "poolK": 2.523,
+   "buildK": null,
+   "spread": 2,
+   "tal": 73
+  },
+  "inq": {
+   "same": 3,
+   "cross": 3,
+   "np": 6,
+   "minM": 0.932,
+   "poolK": 2.506,
+   "buildK": null,
+   "spread": 2,
+   "tal": 74
+  },
+  "alch": {
+   "same": 2,
+   "cross": 6,
+   "np": 6,
+   "minM": 0.795,
+   "poolK": 2.152,
+   "buildK": null,
+   "spread": 1.89,
+   "tal": 74
+  },
+  "_tot": {
+   "same": 74,
+   "cross": 93,
+   "pairs": 120,
+   "minM": 0.405,
+   "poolK": 2.224,
+   "buildK": null,
+   "spreadMax": 3.67
+  }
+ },
+ "50": {
+  "pyro": {
+   "same": 6,
+   "cross": 6,
+   "np": 6,
+   "minM": 0.798,
+   "poolK": 1.9,
+   "buildK": null,
+   "spread": 2.32,
+   "tal": 73
+  },
+  "cryo": {
+   "same": 6,
+   "cross": 6,
+   "np": 6,
+   "minM": 0.405,
+   "poolK": 2.155,
+   "buildK": null,
+   "spread": 3.67,
+   "tal": 74
+  },
+  "storm": {
+   "same": 0,
+   "cross": 0,
+   "np": 6,
+   "minM": 1.481,
+   "poolK": 1.806,
+   "buildK": null,
+   "spread": 1.25,
+   "tal": 73
+  },
+  "plague": {
+   "same": 6,
+   "cross": 6,
+   "np": 6,
+   "minM": 0.646,
+   "poolK": 1.961,
+   "buildK": null,
+   "spread": 2.31,
+   "tal": 74
+  },
+  "necro": {
+   "same": 6,
+   "cross": 6,
+   "np": 6,
+   "minM": 0.722,
+   "poolK": 2.479,
+   "buildK": null,
+   "spread": 3.07,
+   "tal": 74
+  },
+  "paladin": {
+   "same": 3,
+   "cross": 3,
+   "np": 6,
+   "minM": 0.929,
+   "poolK": 2.049,
+   "buildK": null,
+   "spread": 2,
+   "tal": 76
+  },
+  "geo": {
+   "same": 0,
+   "cross": 6,
+   "np": 6,
+   "minM": 1.022,
+   "poolK": 2.578,
+   "buildK": null,
+   "spread": 1.81,
+   "tal": 74
+  },
+  "windr": {
+   "same": 3,
+   "cross": 6,
+   "np": 6,
+   "minM": 0.927,
+   "poolK": 2.432,
+   "buildK": null,
+   "spread": 2,
+   "tal": 76
+  },
+  "hemo": {
+   "same": 3,
+   "cross": 3,
+   "np": 6,
+   "minM": 0.883,
+   "poolK": 1.737,
+   "buildK": null,
+   "spread": 2,
+   "tal": 74
+  },
+  "arcan": {
+   "same": 6,
+   "cross": 6,
+   "np": 6,
+   "minM": 0.723,
+   "poolK": 2.148,
+   "buildK": null,
+   "spread": 2.08,
+   "tal": 76
+  },
+  "bers": {
+   "same": 6,
+   "cross": 6,
+   "np": 6,
+   "minM": 0.742,
+   "poolK": 2.331,
+   "buildK": null,
+   "spread": 2.02,
+   "tal": 74
+  },
+  "dk": {
+   "same": 6,
+   "cross": 6,
+   "np": 6,
+   "minM": 0.874,
+   "poolK": 1.947,
+   "buildK": null,
+   "spread": 2,
+   "tal": 76
+  },
+  "druid": {
+   "same": 6,
+   "cross": 6,
+   "np": 6,
+   "minM": 0.576,
+   "poolK": 1.901,
+   "buildK": null,
+   "spread": 2.6,
+   "tal": 76
+  },
+  "hunter": {
+   "same": 3,
+   "cross": 3,
+   "np": 6,
+   "minM": 0.928,
+   "poolK": 2.423,
+   "buildK": null,
+   "spread": 2,
+   "tal": 74
+  },
+  "assassin": {
+   "same": 3,
+   "cross": 3,
+   "np": 6,
+   "minM": 0.927,
+   "poolK": 2.4,
+   "buildK": null,
+   "spread": 2,
+   "tal": 74
+  },
+  "shaman": {
+   "same": 0,
+   "cross": 3,
+   "np": 6,
+   "minM": 1.023,
+   "poolK": 2.211,
+   "buildK": null,
+   "spread": 1.81,
+   "tal": 74
+  },
+  "monk": {
+   "same": 3,
+   "cross": 6,
+   "np": 6,
+   "minM": 0.926,
+   "poolK": 3.34,
+   "buildK": null,
+   "spread": 2,
+   "tal": 76
+  },
+  "lock": {
+   "same": 3,
+   "cross": 3,
+   "np": 6,
+   "minM": 0.926,
+   "poolK": 2.523,
+   "buildK": null,
+   "spread": 2,
+   "tal": 73
+  },
+  "inq": {
+   "same": 3,
+   "cross": 3,
+   "np": 6,
+   "minM": 0.932,
+   "poolK": 2.496,
+   "buildK": null,
+   "spread": 2,
+   "tal": 74
+  },
+  "alch": {
+   "same": 2,
+   "cross": 6,
+   "np": 6,
+   "minM": 0.795,
+   "poolK": 2.148,
+   "buildK": null,
+   "spread": 1.89,
+   "tal": 74
+  },
+  "_tot": {
+   "same": 74,
+   "cross": 93,
+   "pairs": 120,
+   "minM": 0.405,
+   "poolK": 2.222,
+   "buildK": null,
+   "spreadMax": 3.67
+  }
+ },
+ "100": {
+  "pyro": {
+   "same": 6,
+   "cross": 6,
+   "np": 6,
+   "minM": 0.798,
+   "poolK": 1.9,
+   "buildK": null,
+   "spread": 2.32,
+   "tal": 73
+  },
+  "cryo": {
+   "same": 6,
+   "cross": 6,
+   "np": 6,
+   "minM": 0.405,
+   "poolK": 2.155,
+   "buildK": null,
+   "spread": 3.67,
+   "tal": 74
+  },
+  "storm": {
+   "same": 0,
+   "cross": 0,
+   "np": 6,
+   "minM": 1.481,
+   "poolK": 1.806,
+   "buildK": null,
+   "spread": 1.25,
+   "tal": 73
+  },
+  "plague": {
+   "same": 6,
+   "cross": 6,
+   "np": 6,
+   "minM": 0.646,
+   "poolK": 1.961,
+   "buildK": null,
+   "spread": 2.31,
+   "tal": 74
+  },
+  "necro": {
+   "same": 6,
+   "cross": 6,
+   "np": 6,
+   "minM": 0.722,
+   "poolK": 2.479,
+   "buildK": null,
+   "spread": 3.07,
+   "tal": 74
+  },
+  "paladin": {
+   "same": 3,
+   "cross": 3,
+   "np": 6,
+   "minM": 0.929,
+   "poolK": 2.049,
+   "buildK": null,
+   "spread": 2,
+   "tal": 76
+  },
+  "geo": {
+   "same": 0,
+   "cross": 6,
+   "np": 6,
+   "minM": 1.022,
+   "poolK": 2.578,
+   "buildK": null,
+   "spread": 1.81,
+   "tal": 74
+  },
+  "windr": {
+   "same": 3,
+   "cross": 6,
+   "np": 6,
+   "minM": 0.927,
+   "poolK": 2.432,
+   "buildK": null,
+   "spread": 2,
+   "tal": 76
+  },
+  "hemo": {
+   "same": 3,
+   "cross": 3,
+   "np": 6,
+   "minM": 0.883,
+   "poolK": 1.737,
+   "buildK": null,
+   "spread": 2,
+   "tal": 74
+  },
+  "arcan": {
+   "same": 6,
+   "cross": 6,
+   "np": 6,
+   "minM": 0.723,
+   "poolK": 2.148,
+   "buildK": null,
+   "spread": 2.08,
+   "tal": 76
+  },
+  "bers": {
+   "same": 6,
+   "cross": 6,
+   "np": 6,
+   "minM": 0.742,
+   "poolK": 2.331,
+   "buildK": null,
+   "spread": 2.02,
+   "tal": 74
+  },
+  "dk": {
+   "same": 6,
+   "cross": 6,
+   "np": 6,
+   "minM": 0.874,
+   "poolK": 1.947,
+   "buildK": null,
+   "spread": 2,
+   "tal": 76
+  },
+  "druid": {
+   "same": 6,
+   "cross": 6,
+   "np": 6,
+   "minM": 0.576,
+   "poolK": 1.901,
+   "buildK": null,
+   "spread": 2.6,
+   "tal": 76
+  },
+  "hunter": {
+   "same": 3,
+   "cross": 3,
+   "np": 6,
+   "minM": 0.928,
+   "poolK": 2.423,
+   "buildK": null,
+   "spread": 2,
+   "tal": 74
+  },
+  "assassin": {
+   "same": 3,
+   "cross": 3,
+   "np": 6,
+   "minM": 0.927,
+   "poolK": 2.4,
+   "buildK": null,
+   "spread": 2,
+   "tal": 74
+  },
+  "shaman": {
+   "same": 0,
+   "cross": 3,
+   "np": 6,
+   "minM": 1.023,
+   "poolK": 2.211,
+   "buildK": null,
+   "spread": 1.81,
+   "tal": 74
+  },
+  "monk": {
+   "same": 3,
+   "cross": 6,
+   "np": 6,
+   "minM": 0.926,
+   "poolK": 3.34,
+   "buildK": null,
+   "spread": 2,
+   "tal": 76
+  },
+  "lock": {
+   "same": 3,
+   "cross": 3,
+   "np": 6,
+   "minM": 0.926,
+   "poolK": 2.523,
+   "buildK": null,
+   "spread": 2,
+   "tal": 73
+  },
+  "inq": {
+   "same": 3,
+   "cross": 3,
+   "np": 6,
+   "minM": 0.932,
+   "poolK": 2.496,
+   "buildK": null,
+   "spread": 2,
+   "tal": 74
+  },
+  "alch": {
+   "same": 2,
+   "cross": 6,
+   "np": 6,
+   "minM": 0.795,
+   "poolK": 2.148,
+   "buildK": null,
+   "spread": 1.89,
+   "tal": 74
+  },
+  "_tot": {
+   "same": 74,
+   "cross": 93,
+   "pairs": 120,
+   "minM": 0.405,
+   "poolK": 2.223,
+   "buildK": null,
+   "spreadMax": 3.67
+  }
+ },
+ "160": {
+  "pyro": {
+   "same": 6,
+   "cross": 6,
+   "np": 6,
+   "minM": 0.798,
+   "poolK": 1.9,
+   "buildK": null,
+   "spread": 2.32,
+   "tal": 73
+  },
+  "cryo": {
+   "same": 6,
+   "cross": 6,
+   "np": 6,
+   "minM": 0.405,
+   "poolK": 2.155,
+   "buildK": null,
+   "spread": 3.67,
+   "tal": 74
+  },
+  "storm": {
+   "same": 0,
+   "cross": 0,
+   "np": 6,
+   "minM": 1.481,
+   "poolK": 1.806,
+   "buildK": null,
+   "spread": 1.25,
+   "tal": 73
+  },
+  "plague": {
+   "same": 6,
+   "cross": 6,
+   "np": 6,
+   "minM": 0.646,
+   "poolK": 1.961,
+   "buildK": null,
+   "spread": 2.31,
+   "tal": 74
+  },
+  "necro": {
+   "same": 6,
+   "cross": 6,
+   "np": 6,
+   "minM": 0.722,
+   "poolK": 2.479,
+   "buildK": null,
+   "spread": 3.07,
+   "tal": 74
+  },
+  "paladin": {
+   "same": 3,
+   "cross": 3,
+   "np": 6,
+   "minM": 0.929,
+   "poolK": 2.049,
+   "buildK": null,
+   "spread": 2,
+   "tal": 76
+  },
+  "geo": {
+   "same": 0,
+   "cross": 6,
+   "np": 6,
+   "minM": 1.022,
+   "poolK": 2.579,
+   "buildK": null,
+   "spread": 1.81,
+   "tal": 74
+  },
+  "windr": {
+   "same": 3,
+   "cross": 6,
+   "np": 6,
+   "minM": 0.927,
+   "poolK": 2.432,
+   "buildK": null,
+   "spread": 2,
+   "tal": 76
+  },
+  "hemo": {
+   "same": 3,
+   "cross": 3,
+   "np": 6,
+   "minM": 0.883,
+   "poolK": 1.737,
+   "buildK": null,
+   "spread": 2,
+   "tal": 74
+  },
+  "arcan": {
+   "same": 6,
+   "cross": 6,
+   "np": 6,
+   "minM": 0.723,
+   "poolK": 2.148,
+   "buildK": null,
+   "spread": 2.08,
+   "tal": 76
+  },
+  "bers": {
+   "same": 6,
+   "cross": 6,
+   "np": 6,
+   "minM": 0.743,
+   "poolK": 2.332,
+   "buildK": null,
+   "spread": 2.02,
+   "tal": 74
+  },
+  "dk": {
+   "same": 6,
+   "cross": 6,
+   "np": 6,
+   "minM": 0.874,
+   "poolK": 1.948,
+   "buildK": null,
+   "spread": 2,
+   "tal": 76
+  },
+  "druid": {
+   "same": 6,
+   "cross": 6,
+   "np": 6,
+   "minM": 0.576,
+   "poolK": 1.901,
+   "buildK": null,
+   "spread": 2.6,
+   "tal": 76
+  },
+  "hunter": {
+   "same": 3,
+   "cross": 3,
+   "np": 6,
+   "minM": 0.928,
+   "poolK": 2.423,
+   "buildK": null,
+   "spread": 2,
+   "tal": 74
+  },
+  "assassin": {
+   "same": 3,
+   "cross": 3,
+   "np": 6,
+   "minM": 0.927,
+   "poolK": 2.4,
+   "buildK": null,
+   "spread": 2,
+   "tal": 74
+  },
+  "shaman": {
+   "same": 0,
+   "cross": 3,
+   "np": 6,
+   "minM": 1.023,
+   "poolK": 2.211,
+   "buildK": null,
+   "spread": 1.81,
+   "tal": 74
+  },
+  "monk": {
+   "same": 3,
+   "cross": 6,
+   "np": 6,
+   "minM": 0.926,
+   "poolK": 3.34,
+   "buildK": null,
+   "spread": 2,
+   "tal": 76
+  },
+  "lock": {
+   "same": 3,
+   "cross": 3,
+   "np": 6,
+   "minM": 0.926,
+   "poolK": 2.523,
+   "buildK": null,
+   "spread": 2,
+   "tal": 73
+  },
+  "inq": {
+   "same": 3,
+   "cross": 3,
+   "np": 6,
+   "minM": 0.932,
+   "poolK": 2.496,
+   "buildK": null,
+   "spread": 2,
+   "tal": 74
+  },
+  "alch": {
+   "same": 2,
+   "cross": 6,
+   "np": 6,
+   "minM": 0.795,
+   "poolK": 2.148,
+   "buildK": null,
+   "spread": 1.89,
+   "tal": 74
+  },
+  "_tot": {
+   "same": 74,
+   "cross": 93,
+   "pairs": 120,
+   "minM": 0.405,
+   "poolK": 2.223,
+   "buildK": null,
+   "spreadMax": 3.67
+  }
+ }
+}
