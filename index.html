@@ -298,7 +298,7 @@ html[data-ui=tab] #mm{top:calc(var(--m) + var(--sat) + 70px);width:calc(92px * v
 .row.locked{opacity:.5}
 .ico{flex:none;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;border:2px solid var(--c);background:radial-gradient(circle at 40% 35%,color-mix(in srgb,var(--c) 78%,#0e1222),color-mix(in srgb,var(--c) 38%,#0e1222) 85%)}
 .ico svg{width:22px;height:22px}
-.ico.p{border-radius:11px}
+
 .ico,.slot,.sk{isolation:isolate}
 .ico,.slot{position:relative}
 .eb{position:absolute;left:-3px;top:-3px;width:17px;height:17px;border-radius:50%;background:#0b0e1c;border:1px solid var(--c);display:grid;place-items:center;z-index:4;pointer-events:none}
@@ -340,7 +340,6 @@ html[data-ui=tab] #mm{top:calc(var(--m) + var(--sat) + 70px);width:calc(92px * v
 .slots{display:grid;gap:6px;grid-template-columns:repeat(auto-fill,minmax(44px,1fr))}
 .slot{aspect-ratio:1;max-width:100%;border-radius:50%;border:2px solid var(--c,rgba(255,255,255,.18));display:grid;place-items:center;padding:0;
   background:radial-gradient(circle at 40% 35%,color-mix(in srgb,var(--c,#000) 45%,transparent),#0e1222 75%)}
-.slots.pas .slot{border-radius:11px}
 .slot svg{width:55%;height:55%}
 .slot.empty{border-style:dashed;color:rgba(255,255,255,.45);font-size:20px;background:rgba(255,255,255,.03)}
 .slot.lock{border-style:solid;border-color:rgba(255,255,255,.07);color:#8087a8;font-size:12px;background:rgba(255,255,255,.02);font-variant-numeric:tabular-nums}
@@ -810,6 +809,28 @@ html[data-ui=tab] .sh-act .btn{min-width:150px}
 .sk>.rf{inset:0;padding:3px}.slot>.rf{inset:-6px;padding:4px}
 .rf::before{content:'';position:absolute;inset:-30%;background:linear-gradient(100deg,transparent 40%,rgba(255,255,255,.95) 50%,transparent 60%);transform:translateX(-100%);animation:rarGlint 4.2s ease-in-out infinite}
 @keyframes rarGlint{0%{transform:translateX(-100%)}55%,100%{transform:translateX(100%)}}
+
+/* тип чары: активная (кнопка, круг, оранжевая) / пассивная (работает сама, ромб, бирюзовая) */
+:root{--ca:#ff7a45;--cp:#2fd4b0}
+.aptag{display:inline-flex;align-items:center;gap:5px;padding:2px 9px 2px 6px;font:800 11px/1.25 var(--f-ui);letter-spacing:.04em;text-transform:uppercase;border:1.5px solid;white-space:nowrap;max-width:100%}
+.aptag svg{width:13px;height:13px;flex:none}
+.aptag.a{color:#ffd2bd;border-color:var(--ca);background:rgba(255,122,69,.2);border-radius:999px}
+.aptag.p{color:#bff5e8;border-color:var(--cp);background:rgba(47,212,176,.17);border-radius:5px;clip-path:polygon(7px 0,calc(100% - 7px) 0,100% 50%,calc(100% - 7px) 100%,7px 100%,0 50%);padding:2px 13px 2px 11px}
+.aptag.big{font-size:13px;padding:4px 12px 4px 8px}.aptag.p.big{padding:4px 17px 4px 14px}.aptag.big svg{width:16px;height:16px}
+html[data-ui=tab] .aptag{font-size:13px}html[data-ui=tab] .aptag.big{font-size:15px}
+.where{display:block;font-size:12px;font-weight:600;line-height:1.35}.where.a{color:var(--ca)}.where.p{color:var(--cp)}
+#luCards{grid-auto-rows:max-content}.card .aptag{justify-self:start;margin:2px 0}.card .ct{gap:3px}.row .rt .aptag{margin:1px 0 2px;display:flex;width:max-content;max-width:100%}
+.aph{display:flex;align-items:center;gap:8px;margin:10px 2px 2px;padding:6px 10px;border-radius:10px;font:800 14px/1.2 var(--f-ui);letter-spacing:.03em;border-left:4px solid}
+.aph small{font:500 12px var(--f-ui);color:var(--muted);margin-left:auto}.aph svg{width:18px;height:18px;flex:none}
+.aph.a{color:var(--ca);border-color:var(--ca);background:rgba(255,122,69,.1)}.aph.p{color:var(--cp);border-color:var(--cp);background:rgba(47,212,176,.09)}
+.sh-top .aptag{display:flex;width:max-content;max-width:100%;margin-top:6px}.aph:first-child{margin-top:2px}
+.bd h3.ha{color:var(--ca)}.bd h3.hp{color:var(--cp)}.bd h3 svg{width:18px;height:18px;align-self:center;flex:none}
+/* форма: активная — круглая кнопка, пассивная — ромб */
+.ico.p,.slots.pas .slot{border-radius:9px;rotate:45deg;scale:.8}
+.ico.p>*,.slots.pas .slot>*{rotate:-45deg;scale:1.25}
+.ico.p>.rg{left:100%;top:0;transform:translate(-50%,-50%)}
+.ico.p[data-r="3"]>.rg{top:0}
+.ico.p>.rf{border-radius:15px}
 /* камни редкости: на значке — сверху по центру, в тексте — строкой */
 /* над значком «короной» — выше значка стихии (он слева сверху), у легендарной — над узорным кольцом; на кнопке в бою — внутри, мельче, между значком стихии и подсказкой клавиши */
 .rg{position:absolute;left:50%;top:-3px;z-index:5;height:var(--gh,10px);width:calc(var(--gh,10px) * var(--ga));transform:translate(-50%,-100%);background:var(--gi) center/100% 100% no-repeat;pointer-events:none;filter:drop-shadow(0 0 1px rgba(0,0,0,.95)) drop-shadow(0 1px 1px rgba(0,0,0,.8))}
@@ -1082,8 +1103,8 @@ html[data-ui=tab] #layPan{width:min(460px,calc(100% - 40px));padding:16px 18px;g
         <div class="rankmsg" id="rankMsg" aria-live="polite"><span class="rm-t" id="rankMsgT"></span><span class="rm-e">Эссенция: <b id="rankEss">0</b></span></div>
         <div class="bd-grid">
           <div>
-            <section><h3>Активные <small id="actN"></small></h3><p class="hint">Кнопки справа на экране. Новые слоты открываются с уровнем.</p><div class="slots act" id="slotsA"></div></section>
-            <section><h3>Пассивные <small id="pasN"></small></h3><p class="hint">Работают сами: ауры, клейма, спутники, следы и ответные удары.</p><div class="slots pas" id="slotsP"></div></section>
+            <section><h3 class="ha"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 1 4 13.5h6L8.5 23 20 9.5h-6.5z"/></svg>Активные — кнопки в бою <small id="actN"></small></h3><p class="hint">Нажимаешь сам: кнопки справа на экране. Новые слоты открываются с уровнем.</p><div class="slots act" id="slotsA"></div></section>
+            <section><h3 class="hp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>Пассивные — работают сами <small id="pasN"></small></h3><p class="hint">Ничего нажимать не надо: ауры, клейма, спутники, следы и ответные удары.</p><div class="slots pas" id="slotsP"></div></section>
           </div>
           <div>
             <section><h3>Резонанс стихий</h3><p class="hint" id="resoHint"></p><div class="reso" id="reso"></div></section>
@@ -4074,9 +4095,9 @@ let toastT=0;
 // изучена эпическая/легендарная — своя всплывашка (фиолетовая/золотая) вместо обычной строки
 let rarPopT=0;
 function rarPop(sk,sub){const r=rarOf(sk);let el=$('#rarPop');if(!el){el=document.createElement('div');el.id='rarPop';el.setAttribute('role','status');$('#toast').after(el);}
-  el.dataset.r=r;el.innerHTML='<span class="ico'+(sk.active?'':' p')+'" data-r="'+r+'" style="--c:'+sk.E.hex+'">'+svg(sk.F.id)+modBadge(sk)+rarDeco(r)+'</span><span class="rph">'+rarGem(r)+(r>=3?'Легендарная чара!':'Эпическая чара!')+'</span><b>'+skName(sk)+'</b><small>'+sub+'</small>';
+  el.dataset.r=r;el.innerHTML='<span class="ico'+(sk.active?'':' p')+'" data-r="'+r+'" style="--c:'+sk.E.hex+'">'+svg(sk.F.id)+modBadge(sk)+rarDeco(r)+'</span><span class="rph">'+rarGem(r)+(r>=3?'Легендарная чара!':'Эпическая чара!')+'</span><b>'+skName(sk)+'</b><small>'+apTag(sk)+'<br>'+sub+'</small>';
   $('#toast').classList.remove('on');el.classList.remove('on');void el.offsetWidth;el.classList.add('on');clearTimeout(rarPopT);rarPopT=setTimeout(()=>el.classList.remove('on'),3100);}
-function toastSk(sk,t,sub){if(rarOf(sk)>=2)rarPop(sk,sub);else toast(t);}
+function toastSk(sk,t,sub){if(rarOf(sk)>=2)rarPop(sk,sub);else toast(t+(sk.active?' · активная':' · пассивная'));}
 function toast(t,ms){const el=$('#toast');el.textContent=t;el.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('on'),ms||1900);}
 let banT=0;
 function banner(b,s,red){$('#bannerB').textContent=b;$('#bannerS').textContent=s;const el=$('#banner');el.classList.toggle('red',!!red);el.classList.add('on');clearTimeout(banT);banT=setTimeout(()=>el.classList.remove('on'),2600);}
@@ -4239,10 +4260,13 @@ function rollChoices(){const pool=rollPool();if(!pool.length)return[];const res=
   const take=f=>{const c=pool.filter(s=>f(s)&&!res.some(r=>r.bk===s.bk));if(c.length)res.push(wpick(c));};
   take(s=>s.active);take(s=>!s.active);take(s=>s.E.id===CLS.s);let g=0;while(res.length<3&&g++<9)take(()=>true);return res;}
 const knownBase=sk=>{for(const id of LEARNED)if(SKILLS[id].bk===sk.bk)return true;return false;};
-function cardStat(sk){return sk.active?`${fmt(skDmg(sk))} урона · ${skMana(sk)} маны · ${fmt(skCd(sk))} с`:`${fmt(skDmg(sk))} урона · пассивная`;}
+const IC_A='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 1 4 13.5h6L8.5 23 20 9.5h-6.5z"/></svg>',IC_P='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>';
+const apTag=(sk,big)=>`<span class="aptag ${sk.active?'a':'p'}${big?' big':''}">${sk.active?IC_A+'Активная · нажимаешь сам':IC_P+'Пассивная · работает сама'}</span>`;
+const apWhere=sk=>sk.active?'<span class="where a">Куда встанет: в активный слот (кнопка в бою)</span>':'<span class="where p">Куда встанет: в пассивный слот (работает сама)</span>';
+function cardStat(sk){return sk.active?`${fmt(skDmg(sk))} урона · ${skMana(sk)} маны · ${fmt(skCd(sk))} с`:`${fmt(skDmg(sk))} урона`;}
 function cardPow(sk){const r=rarOf(sk),u=upgradeFor(sk,true),arr=sk.active?S.active:S.passive,n=sk.active?activeSlots():passiveSlots();
   const free=baseSlot(sk)==null&&arr.findIndex((v,i)=>i<n&&v==null)>=0&&formSlot(sk)==null;
-  return `<small class="pw" data-r="${r}">${RARITY[r].n} ${sk.active?'актив.':'пассив.'} · сила ${Math.round(pwr(sk))}${free?' · встанет в свободный слот':u?' · ↑ сильнее «'+skName(SKILLS[u.tgt])+'» на '+pct(u.gain)+'%':''}</small>`;}
+  return `<small class="pw" data-r="${r}">${RARITY[r].n} · сила ${Math.round(pwr(sk))}${free?' · встанет в свободный слот':u?' · ↑ сильнее «'+skName(SKILLS[u.tgt])+'» на '+pct(u.gain)+'%':''}</small>`;}
 function luScore(sk){const u=upgradeFor(sk,true),arr=sk.active?S.active:S.passive,n=sk.active?activeSlots():passiveSlots();
   const free=baseSlot(sk)==null&&arr.findIndex((v,i)=>i<n&&v==null)>=0&&formSlot(sk)==null;
   return (free?2e6:0)+(u?1e6*(1+u.gain):0)+pwr(sk);}
@@ -4256,7 +4280,7 @@ function luSync(){const a=$('#luAuto');if(a)a.textContent='Авто-выбор: 
 function setAutoLu(v){S.autoLu=!!v;if(S.autoLu)S.autoBest=true;saveSoon();const c=$('#autoLu');if(c)c.checked=S.autoLu;const b=$('#autoBest');if(b)b.checked=!!S.autoBest;}
 function openLevelUp(){if(S.autoLu){luAutoRun(luQueue);return;}const ch=rollChoices();if(!ch.length){luQueue=0;return;}luOpen=true;hideUpg();syncPause();
   $('#luTitle').textContent='Уровень '+S.lvl+(luQueue>1?' · ещё '+(luQueue-1):'');$('#luSub').textContent='Выбери новые чары. Если есть свободный слот, они сразу встанут в билд.'+(talFreeUse()?' Очков талантов: '+tpFree()+'.':'');luSync();
-  $('#luCards').innerHTML=ch.map(sk=>{const r=rarOf(sk);return `<button type="button" class="card" data-id="${sk.id}" data-r="${r}"><span class="rbn">${rarGem(r)}<span>${RARITY[r].n}</span>${rarGem(r)}</span><span class="ico${sk.active?'':' p'}" data-r="${r}" style="--c:${sk.E.hex}">${svg(sk.F.id)}${modBadge(sk)}${rarDeco(r)}</span><span class="ct"><span class="tag">${sk.F.role} · ${sk.E.name}${knownBase(sk)?'<i class="nv">вариант известной</i>':'<i class="nv">новая чара</i>'}${bookOn()&&BOOK.has(sk.id)?'<i class="nv">из Книги чар</i>':''}</span><b>${sk.base}</b><span class="var">${sk.M.name}: ${sk.M.desc}</span><small>${cap(skLead(sk))}</small><small>${cardStat(sk)}</small>${cardPow(sk)}</span></button>`;}).join('');
+  $('#luCards').innerHTML=ch.map(sk=>{const r=rarOf(sk);return `<button type="button" class="card" data-id="${sk.id}" data-r="${r}"><span class="rbn">${rarGem(r)}<span>${RARITY[r].n}</span>${rarGem(r)}</span><span class="ico${sk.active?'':' p'}" data-r="${r}" style="--c:${sk.E.hex}">${svg(sk.F.id)}${modBadge(sk)}${rarDeco(r)}</span><span class="ct">${apTag(sk)}<span class="tag">${sk.F.role} · ${sk.E.name}${knownBase(sk)?'<i class="nv">вариант известной</i>':'<i class="nv">новая чара</i>'}${bookOn()&&BOOK.has(sk.id)?'<i class="nv">из Книги чар</i>':''}</span><b>${sk.base}</b><span class="var">${sk.M.name}: ${sk.M.desc}</span><small>${cap(skLead(sk))}</small><small>${cardStat(sk)}</small>${cardPow(sk)}${apWhere(sk)}</span></button>`;}).join('');
   $('#luSkip').textContent='Пропустить: +'+(20+S.lvl*5)+' эссенции';$('#lvlup').hidden=false;}
 function closeLevelUp(){luOpen=false;$('#lvlup').hidden=true;luQueue=Math.max(0,luQueue-1);luDelay=1.2;syncPause();}
 $('#luCards').addEventListener('click',e=>{const b=e.target.closest('.card');if(!b)return;const sk=SKILLS[+b.dataset.id];learn(sk.id,true);toastSk(sk,'Изучено: '+skName(sk)+(EQUIPPED.has(sk.id)?' — в билде':' — в книге'),'Изучена'+(EQUIPPED.has(sk.id)?' — сразу в билде':' — в книге'));closeLevelUp();});
@@ -4319,7 +4343,7 @@ function rankLine(sk,lv){const r=rk(sk.id),mx=r>=5,can=!mx&&S.ess>=rankCost(r);
 function rowHtml(sk,nv){const eq=EQUIPPED.has(sk.id),ln=isLearned(sk.id),lv=learnedVars(sk.bk),r=rarOf(sk),u=ln&&!eq?upgradeFor(sk):null;
   const other=!eq&&ln?[...EQUIPPED].find(id=>SKILLS[id].bk===sk.bk):null;
   return `<button type="button" class="row${eq?' eq':''}${ln?'':' locked'}" data-id="${sk.id}" data-r="${r}"><span class="ico${sk.active?'':' p'}" data-r="${r}" style="--c:${sk.E.hex}">${svg(sk.F.id)}${modBadge(sk)}${rarDeco(r)}</span>
-  <span class="rt"><span class="nm">${sk.base} <i>· ${sk.M.name}</i></span><span class="meta"><b class="pw" data-r="${r}">сила ${Math.round(pwr(sk))}</b> · ${sk.F.role} · <b class="rn">${rarGem(r)}${RARITY[r].n}</b> ${sk.active?'актив.':'пассив.'}${ln?'':' · не изучено'}</span>${ln?rankLine(sk,lv):''}</span>${eq?'<span class="badge">в билде · р.'+rk(sk.id)+'</span>':u?`<span class="badge rec">↑ +${pct(u.gain)}%</span>`:other!=null?'<span class="badge">есть вариант в билде</span>':''}</button>`;}
+  <span class="rt"><span class="nm">${sk.base} <i>· ${sk.M.name}</i></span>${apTag(sk)}<span class="meta"><b class="pw" data-r="${r}">сила ${Math.round(pwr(sk))}</b> · ${sk.F.role} · <b class="rn">${rarGem(r)}${RARITY[r].n}</b>${ln?'':' · не изучено'}</span>${ln?rankLine(sk,lv):''}</span>${eq?'<span class="badge">в билде · р.'+rk(sk.id)+'</span>':u?`<span class="badge rec">↑ +${pct(u.gain)}%</span>`:other!=null?'<span class="badge">есть вариант в билде</span>':''}</button>`;}
 function classSkills(){const a=[];CLS.pool.forEach(id=>a.push(SKILLS[id]));const er=e=>e===CLS.p?0:e===CLS.s?1:2;a.sort((x,y)=>er(x.E.id)-er(y.E.id)||x.f-y.f||x.m-y.m);return a;}
 const F2_={sort:'power',weak:false};let WEAKN=0,WEAKE=0;
 function renderSort(){$('#fSort').innerHTML=chip('По силе',F2_.sort==='power','data-sort="power"')+chip('По редкости',F2_.sort==='rar','data-sort="rar"')+chip('По стихии',F2_.sort==='el','data-sort="el"')+
@@ -4333,12 +4357,12 @@ function renderList(keep){
     if(q)return q.split(/\s+/).every(w=>sk.key.includes(w));return true;});
   {const gr=new Map(),sc=x=>(isLearned(x.id)?1e6:0)+pwr(x);for(const sk of L){const o=gr.get(sk.bk);if(!o||sc(sk)>sc(o))gr.set(sk.bk,sk);}L=[...gr.values()];}
   const ln=x=>isLearned(x.id)?1:0;
-  if(F2_.sort==='power')L.sort((x,y)=>ln(y)-ln(x)||(+y.active)-(+x.active)||pwr(y)-pwr(x));
-  else if(F2_.sort==='rar')L.sort((x,y)=>ln(y)-ln(x)||rarOf(y)-rarOf(x)||(+y.active)-(+x.active)||pwr(y)-pwr(x));
-  else if(pending&&pending.type)L.sort((a,b)=>ln(b)-ln(a));
+  if(F2_.sort==='power')L.sort((x,y)=>(+y.active)-(+x.active)||ln(y)-ln(x)||pwr(y)-pwr(x));
+  else if(F2_.sort==='rar')L.sort((x,y)=>(+y.active)-(+x.active)||ln(y)-ln(x)||rarOf(y)-rarOf(x)||pwr(y)-pwr(x));
+  else L.sort((a,b)=>(+b.active)-(+a.active)||(pending&&pending.type?ln(b)-ln(a):0));
   WEAKN=0;WEAKE=0;{const wk=F_.type==='learned'&&!q&&!S.sandbox?L.filter(isWeak):[];WEAKN=wk.length;wk.forEach(x=>WEAKE+=dustValue(x));
     if(!F2_.weak&&WEAKN){const ws=new Set(wk);L=L.filter(x=>!ws.has(x));}}
-  LIST=L;renderSort();
+  LIST=L;lastAct=null;renderSort();
   $('#found').textContent=LIST.length?('Найдено: '+LIST.length+' · редкость — среди своего типа (активные и пассивные отдельно)'+(WEAKN&&!F2_.weak?' · слабых свёрнуто: '+WEAKN:'')):'';
   listEl.scrollTop=0;shown=0;listEl.innerHTML=LIST.length?'':'<p class="hint" style="padding:12px 0">'+(F_.type==='learned'?'Среди изученных таких нет. Новые чары выпадают в свитках и даются за уровень.':'Ничего не нашлось. Сбрось фильтры или поищи по-другому.')+'</p>';
   more();if(keep){while(shown<LIST.length&&listEl.scrollHeight<st+listEl.clientHeight+50)more();listEl.scrollTop=st;}}
@@ -4348,8 +4372,9 @@ $('#fSort').addEventListener('click',e=>{const b=e.target.closest('button');if(!
   else if(b.dataset.dust){if(!dustArm){b.textContent='Точно? Распылить '+WEAKN+' чар';dustArm=setTimeout(()=>{dustArm=0;renderSort();},3000);return;}
     clearTimeout(dustArm);dustArm=0;let v=0,n=0;for(const sk of classSkills()){if(isWeak(sk)){v+=dustSkill(sk.id);n++;}}onBuildChanged();saveSoon();toast('Распылено чар: '+n+', +'+v+' эссенции');}});
 let dustArm=0;
+let lastAct=null;const apHead=(a,n)=>`<div class="aph ${a?'a':'p'}">${a?IC_A+'Активные — кнопки в бою':IC_P+'Пассивные — работают сами'}<small>${n}</small></div>`;
 const more=()=>{if(shown>=LIST.length)return;const old=$('#more');if(old)old.remove();
-  const chunk=LIST.slice(shown,shown+50);shown+=chunk.length;listEl.insertAdjacentHTML('beforeend',chunk.map(rowHtml).join('')+(shown<LIST.length?'<div id="more"></div>':''));
+  const chunk=LIST.slice(shown,shown+50);shown+=chunk.length;listEl.insertAdjacentHTML('beforeend',chunk.map(sk=>{let h='';if(lastAct!==sk.active){lastAct=sk.active;h=apHead(sk.active,LIST.filter(x=>x.active===sk.active).length);}return h+rowHtml(sk);}).join('')+(shown<LIST.length?'<div id="more"></div>':''));
   const m=$('#more');if(m)io.observe(m);};
 const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){io.unobserve(e.target);more();}});},{root:listEl,rootMargin:'300px'});
 listEl.addEventListener('click',e=>{const r=e.target.closest('.row');if(r)openSheet(+r.dataset.id);});
@@ -4519,8 +4544,8 @@ function sheetHtml(sk){const eq=EQUIPPED.has(sk.id),ln=isLearned(sk.id),r=rk(sk.
     (r<5?`<button type="button" class="btn ess" data-act="rank" ${S.ess<cost?'disabled':''}>Ранг ${r+1} · ${cost} эсс.</button>`:'')+(dv?`<button type="button" class="btn" data-act="dust">Распылить · +${dv} эсс.</button>`:'')+`<button type="button" class="btn" data-act="close">Закрыть</button></div>`+
     (r<5&&S.ess<cost?`<p class="note">Нужно ${cost} эссенции, есть ${S.ess}. Эссенция падает со всех врагов.</p>`:'');}
   const vars=`<div class="vars" role="group" aria-label="Варианты чары">${MODS.map((M,mi)=>{const v=SKILLS[sk.bk*NM+mi];return `<button type="button" class="vchip${v.id===sk.id?' on':''}${isLearned(v.id)?'':' lk'}" data-v="${v.id}">${MODG[mi]} ${M.name}${EQUIPPED.has(v.id)?' ●':''}</button>`;}).join('')}</div>`;
-  return `<div class="sh-body"><div class="sh-top"><span class="ico${sk.active?'':' p'}" data-r="${rr}" style="--c:${sk.E.hex}">${svg(sk.F.id)}${modBadge(sk)}${rarDeco(rr)}</span><div><h2>${sk.F.id==='summon'&&CLS?summInfo(sk).name:sk.base}</h2><p><span class="tagc rar" data-r="${rr}">${rarGem(rr)}${RARITY[rr].n}</span><span class="tagc v">${sk.M.name}</span><span class="tagc">${sk.F.role}</span><span class="tagc" style="border-color:${sk.E.hex}">${sk.E.name}</span></p></div></div>
-  ${vars}<p class="lead">${cap(skLead(sk))}</p><p class="note"><b style="color:var(--ess);font-weight:500">${sk.M.name}:</b> ${sk.M.desc}.</p>
+  return `<div class="sh-body"><div class="sh-top"><span class="ico${sk.active?'':' p'}" data-r="${rr}" style="--c:${sk.E.hex}">${svg(sk.F.id)}${modBadge(sk)}${rarDeco(rr)}</span><div><h2>${sk.F.id==='summon'&&CLS?summInfo(sk).name:sk.base}</h2><p><span class="tagc rar" data-r="${rr}">${rarGem(rr)}${RARITY[rr].n}</span><span class="tagc v">${sk.M.name}</span><span class="tagc">${sk.F.role}</span><span class="tagc" style="border-color:${sk.E.hex}">${sk.E.name}</span></p>${apTag(sk,1)}</div></div>
+  ${vars}<p class="note" style="margin-top:0">${apWhere(sk)}</p><p class="lead">${cap(skLead(sk))}</p><p class="note"><b style="color:var(--ess);font-weight:500">${sk.M.name}:</b> ${sk.M.desc}.</p>
   ${sk.F.id==='summon'?`<p class="note"><b style="color:var(--ess);font-weight:500">Призыв:</b> одновременно до ${ST.summMax} призывов (талант «Повелитель духов» добавляет места). У существа своя полоска здоровья; с уровнем оно крупнее и крепче. Напарник по коопу видит твоих существ, а их удары засчитываются.</p>`:''}
   ${rankRow}<div class="stats">${st.map(([k,v])=>`<div>${k}<b>${v}</b></div>`).join('')}</div></div>${acts}`;}
 let sheetId=null;
