@@ -903,6 +903,44 @@ html[data-ui=tab] .rn .gm{--gh:12px}html[data-ui=tab] .row .ico>.rg,html[data-ui
 .tagc.rar .gm{--gh:11px}
 .tagc.rar[data-r="3"]{color:#2a1600;border-color:#ffe39a;background:linear-gradient(90deg,#ffc13a,#ffeaa0 50%,#ffc13a)}
 .tagc.rar[data-r="2"]{color:#fff;border-color:#c99bff;background:linear-gradient(90deg,#6a2cb0,#9b52e8)}
+/* Невозможная (4) — выше легендарной: чёрное ядро, тонкий светло-фиолетовый ободок и живое чёрное пламя по краю (.rx: языки двумя слоями
+   крутятся навстречу и мерцают поверх фиолетового свечения — только transform/opacity, легко для телефона); корона — чёрные камни и чёрный язык пламени с фиолетовым контуром */
+[data-r="4"]{--rc:#d4bcff;--gi:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 16'%3E%3Cpath d='M5 4.8 9.2 10 5 15.2 0.8 10z' fill='%2307020d' stroke='%23d9c6ff' stroke-width='1.3' stroke-linejoin='round'/%3E%3Cpath d='M5 6.4 2.4 10H5z' fill='%23b48cff' fill-opacity='.6'/%3E%3Cpath d='M35 4.8 39.2 10 35 15.2 30.8 10z' fill='%2307020d' stroke='%23d9c6ff' stroke-width='1.3' stroke-linejoin='round'/%3E%3Cpath d='M35 6.4 32.4 10H35z' fill='%23b48cff' fill-opacity='.6'/%3E%3Cpath d='M20 .7C21.6 3.9 25 5.3 25 9.6 25 13 22.7 15.3 20 15.3S15 13 15 9.6C15 7.1 16.4 6 17.2 3.9 18.1 5.4 18.4 6.6 19.4 7.3 19.3 4.6 19.1 2.6 20 .7z' fill='%23050009' stroke='%23ecdfff' stroke-width='1.3' stroke-linejoin='round'/%3E%3Cpath d='M20 8.6C21.5 10 21.8 12.3 20 13.7 18.2 12.3 18.5 10 20 8.6z' fill='%23a070ff'/%3E%3C/svg%3E");--ga:2.5}
+:is(.ico,.slot,.sk)[data-r="4"]{border-color:#efe6ff;background:radial-gradient(circle at 50% 46%,#000 0 44%,#0c0416 62%,color-mix(in srgb,var(--c,#9a5cff) 22%,#1c0a33) 100%);
+  box-shadow:0 0 0 1px #000,0 0 0 2.5px #a77bff,0 0 0 4px rgba(0,0,0,.85),0 0 16px 5px rgba(130,60,255,.55)}
+:is(.ico,.slot,.sk)[data-r="4"]::before{background:radial-gradient(circle,transparent 50%,rgba(160,100,255,.45) 80%,rgba(225,205,255,.38) 96%)}
+:is(.ico,.slot,.sk)[data-r="4"] svg{filter:drop-shadow(0 0 2px #b48cff) drop-shadow(0 1px 1px #000)}
+.sk[data-r="4"]{box-shadow:0 0 0 1.5px #000,0 0 0 3px #b48cff,0 0 12px 3px rgba(140,70,255,.7)}
+.rx{position:absolute;inset:-11px;border-radius:50%;z-index:-1;pointer-events:none;background:radial-gradient(circle,transparent 54%,rgba(200,160,255,.95) 60%,rgba(130,60,240,.55) 72%,transparent 86%)}
+.rx::before,.rx::after{content:'';position:absolute;inset:0;border-radius:50%;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-50 -50 100 100'%3E%3Cpath fill='%232b0b50' d='M-5.2 -29.0Q-1.8 -39.1 2.8 -47.4Q2.9 -36.3 5.2 -29.0ZM12.2 -26.9Q19.8 -31.8 29.4 -33.5Q22.4 -27.2 20.9 -20.8ZM22.9 -18.8Q32.3 -19.1 41.5 -16.3Q32.8 -13.1 28.6 -7.8ZM29.1 -4.9Q36.1 -1.3 41.8 5.6Q34.1 3.6 28.9 5.9ZM28.6 7.9Q32.3 14.4 34.1 22.1Q28.2 18.5 22.8 18.9ZM19.7 21.8Q22.2 31.6 21.6 41.3Q17.2 31.7 11.6 27.0ZM8.6 28.4Q5.4 37.8 -0.4 45.7Q-0.3 35.8 -3.6 29.4ZM-6.2 28.9Q-13.3 36.8 -21.3 42.3Q-16.8 32.3 -16.2 24.7ZM-18.9 22.5Q-26.7 24.9 -34.6 25.2Q-28.0 20.3 -25.3 15.1ZM-25.8 14.9Q-34.1 12.7 -41.8 8.1Q-34.0 6.2 -29.7 1.7ZM-29.3 -2.5Q-38.2 -7.8 -44.9 -14.4Q-34.5 -11.2 -27.0 -11.5ZM-25.8 -14.4Q-29.8 -22.5 -32.0 -30.5Q-24.8 -24.9 -18.6 -22.9ZM-14.5 -25.7Q-13.2 -32.8 -9.9 -39.4Q-8.0 -32.7 -4.3 -29.2Z'/%3E%3C/svg%3E") center/100% 100% no-repeat;animation:impSpin 9s linear infinite}
+.rx::after{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-50 -50 100 100'%3E%3Cpath fill='%23000' d='M-1.5 -29.2Q1.7 -36.4 5.6 -42.1Q5.2 -34.0 6.5 -28.5ZM8.5 -28.0Q12.6 -31.1 17.8 -32.9Q15.1 -28.6 15.3 -24.9ZM17.4 -23.6Q23.4 -25.6 29.2 -26.3Q25.0 -21.8 23.4 -17.6ZM25.7 -14.2Q31.7 -13.2 37.5 -9.9Q31.8 -8.7 28.9 -5.4ZM29.0 -4.3Q34.6 -1.8 39.2 3.2Q33.1 1.9 29.0 3.7ZM28.4 7.2Q32.0 11.8 34.3 16.9Q29.2 14.9 25.0 15.3ZM24.2 16.4Q26.2 21.4 26.6 27.0Q23.1 23.0 19.3 21.9ZM15.6 24.7Q16.8 32.0 14.8 39.5Q13.3 31.6 9.8 27.5ZM8.3 28.0Q7.1 33.4 4.9 38.0Q3.9 32.5 1.8 29.1ZM-4.9 28.9Q-8.8 32.1 -13.2 34.4Q-12.1 29.8 -13.0 26.3ZM-14.0 25.6Q-19.2 29.2 -26.4 30.0Q-20.6 26.2 -19.4 21.8ZM-22.6 18.8Q-30.4 19.8 -38.4 17.7Q-30.8 15.1 -27.4 10.6ZM-28.0 8.1Q-32.8 7.0 -37.0 4.4Q-32.1 4.1 -29.1 2.2ZM-29.3 1.3Q-32.3 -1.8 -34.6 -5.8Q-31.0 -5.5 -28.4 -7.2ZM-26.9 -11.6Q-30.0 -16.9 -31.8 -22.5Q-26.7 -19.5 -22.3 -19.1ZM-20.0 -21.3Q-20.6 -26.3 -18.2 -32.4Q-17.1 -27.3 -13.9 -25.7ZM-12.9 -26.2Q-12.9 -31.9 -9.5 -38.0Q-9.9 -31.5 -7.2 -28.2Z'/%3E%3C/svg%3E");animation:impSpin 6s linear infinite reverse,impFlick 1.1s ease-in-out infinite alternate}
+@keyframes impSpin{to{rotate:1turn}}
+@keyframes impFlick{0%{scale:.95;opacity:.65}45%{scale:1.05;opacity:1}100%{scale:.98;opacity:.75}}
+.sk>.rx{inset:0}.slot>.rx{inset:-8px}
+.sk>.rx::before,.sk>.rx::after{inset:-8%}
+[data-r="4"]>.rg{top:-7px;animation:rarTw 2.2s ease-in-out infinite}.sk[data-r="4"]>.rg{top:2px}
+.card[data-r="4"]{border:2px solid #a77bff;background:radial-gradient(120% 70% at 50% 0%,rgba(150,90,255,.34),transparent 70%),radial-gradient(80% 38% at 50% 100%,rgba(150,80,255,.55),transparent 75%),linear-gradient(170deg,#0c0714,#040207 75%);
+  box-shadow:0 0 0 1px #000,0 0 28px rgba(140,70,255,.5),inset 0 0 0 1px rgba(210,180,255,.25)}
+.card[data-r="4"] .rbn{color:#f3ecff;background:linear-gradient(90deg,#000,#1e0a36 30%,#3a1868 50%,#1e0a36 70%,#000);border-color:#b48cff;font-size:16px;padding:8px 10px 7px;letter-spacing:.2em;text-shadow:0 0 6px rgba(190,140,255,.95),0 1px 2px #000}
+.card[data-r="4"]::before,#rarPop[data-r="4"]::before,.card[data-r="4"]::after,#rarPop[data-r="4"]::after{content:'';position:absolute;top:auto;left:-4px;right:-4px;bottom:-2px;height:46px;z-index:-1;pointer-events:none;transform-origin:50% 100%;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 40' preserveAspectRatio='none'%3E%3Cpath fill='%232a0c4a' d='M0 40Q8.5 21.4 10 9Q13 26 20 40ZM18 40Q28.2 16.6 30 1Q33.6 22.4 42 40ZM40 40Q48.5 23.8 50 13Q53 27.9 60 40ZM60 40Q68.5 21.4 70 9Q73 26 80 40ZM-20 40Q-11.5 23.8 -10 13Q-7 27.9 0 40ZM0 40V37H60V40Z'/%3E%3C/svg%3E") 0 100%/60px 100% repeat-x;transform:none;animation:impLick 1.5s ease-in-out infinite alternate}
+.card[data-r="4"]::after,#rarPop[data-r="4"]::after{height:34px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 40' preserveAspectRatio='none'%3E%3Cpath fill='%23000' d='M-9 40Q-1.3 26.8 0 18Q2.7 30.1 9 40ZM10 40Q18.5 22 20 10Q23 26.5 30 40ZM31 40Q38.6 25.6 40 16Q42.7 29.2 49 40ZM51 40Q58.6 26.8 60 18Q62.7 30.1 69 40ZM0 40V37H60V40Z'/%3E%3C/svg%3E") 14px 100%/60px 100% repeat-x;animation:impLick 1.05s ease-in-out -.4s infinite alternate-reverse}
+@keyframes impLick{0%{transform:scaleY(.82) skewX(-4deg)}50%{transform:scaleY(1.08) skewX(0)}100%{transform:scaleY(.94) skewX(4deg)}}
+html[data-ui=tab] .card[data-r="4"] .rbn{font-size:18px}
+.row[data-r="4"]{background-image:linear-gradient(90deg,rgba(0,0,0,.75),rgba(70,30,130,.3) 55%,transparent);box-shadow:inset 4px 0 0 #b48cff,inset 0 0 0 1px rgba(170,120,255,.4)}
+.row[data-r="4"] .rn,.pw[data-r="4"]{color:#ecdfff;text-shadow:0 0 6px rgba(170,110,255,.9)}
+.tagc.rar[data-r="4"]{color:#f3ecff;border-color:#b48cff;background:linear-gradient(90deg,#000,#24103e 50%,#000);box-shadow:0 0 8px rgba(150,90,255,.6);text-shadow:0 0 5px rgba(190,140,255,.9)}
+.chip[data-rar="4"]{color:#d9c6ff;border-color:rgba(180,140,255,.5);background:linear-gradient(90deg,#000,#170828)}
+.chip[data-rar="4"].on{color:#fff;border-color:#c9a6ff;box-shadow:0 0 10px rgba(150,90,255,.55);background:linear-gradient(90deg,#000,#2a1048 50%,#000)}
+.note.impn{color:#e6d9ff;padding:8px 10px;border-radius:10px;border:1px solid rgba(180,140,255,.45);background:linear-gradient(90deg,#000,rgba(40,16,72,.85))}.note.impn b{color:#fff;text-shadow:0 0 6px rgba(190,140,255,.95)}
+.impw{color:#e6d9ff;text-shadow:0 0 6px rgba(170,110,255,.95)}
+#upg[data-r="4"]{--rc:#b48cff;background:linear-gradient(90deg,#050208,#1a0a2e);box-shadow:0 0 0 1px #000,0 0 18px rgba(140,70,255,.55)}
+#rarPop[data-r="4"]{background:radial-gradient(110% 90% at 18% 0%,rgba(150,80,255,.42),transparent 70%),radial-gradient(80% 50% at 50% 100%,rgba(150,80,255,.6),transparent 75%),linear-gradient(135deg,#0e0618,#020104 70%);border:2px solid #b48cff;box-shadow:0 0 0 1px #000,0 0 22px rgba(150,80,255,.75),0 0 60px rgba(90,30,200,.5);padding:14px 20px 26px 18px}
+#rarPop[data-r="4"] .rph{color:#f3ecff;font-size:16px;letter-spacing:.18em;text-shadow:0 0 8px rgba(190,140,255,.95)}
+#rarPop[data-r="4"] b{font-size:20px;text-shadow:0 0 10px rgba(150,90,255,.8)}
+#rarPop[data-r="4"] .ico{width:60px;height:60px;margin:18px 8px 4px}
+#rarPop[data-r="4"].on{animation-duration:4.5s}
+#rarPop .imps{color:#d2b8ff;font-weight:700}
 /* всплывашка при изучении эпической и легендарной */
 #rarPop{position:absolute;left:50%;top:calc(var(--m) + var(--sat) + 116px);z-index:8;transform:translateX(-50%);display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 14px;align-items:center;
   width:max-content;min-width:min(290px,calc(100% - 32px));max-width:calc(100% - var(--sal) - var(--sar) - 32px);padding:12px 18px 12px 16px;border-radius:16px;pointer-events:none;opacity:0;overflow:hidden;isolation:isolate;text-align:left}
@@ -920,7 +958,7 @@ html[data-ui=tab] .rn .gm{--gh:12px}html[data-ui=tab] .row .ico>.rg,html[data-ui
 @media (orientation:portrait){#rarPop{top:calc(var(--sat) + var(--m) + 180px)}}
 html[data-ui=tab] #rarPop{top:calc(var(--m) + var(--sat) + 146px);padding:16px 24px 16px 20px}html[data-ui=tab] #rarPop b{font-size:22px}html[data-ui=tab] #rarPop .rph{font-size:15px}html[data-ui=tab] #rarPop small{font-size:15px}html[data-ui=tab] #rarPop .ico{width:64px;height:64px}
 @media (orientation:portrait){html[data-ui=tab] #rarPop{top:calc(var(--sat) + 262px)}}
-@media (prefers-reduced-motion:reduce){.rf::before,[data-r="3"]>.rg,.card[data-r="3"]::before,.card[data-r="3"]::after,#rarPop::after{animation:none}#rarPop.on{animation-name:rarPopFade}}
+@media (prefers-reduced-motion:reduce){.rf::before,[data-r="3"]>.rg,.card[data-r="3"]::before,.card[data-r="3"]::after,#rarPop::after,.rx::before,.rx::after,[data-r="4"]>.rg,.card[data-r="4"]::before,.card[data-r="4"]::after,#rarPop[data-r="4"]::before,#rarPop[data-r="4"]::after{animation:none}#rarPop.on{animation-name:rarPopFade}}
 .pw{color:var(--rc,var(--muted))}
 .note.up{color:#7dff8a}
 #fSort{align-items:center}
@@ -1488,6 +1526,7 @@ function validChar(d,c){if(!d||!Array.isArray(d.active)||!Array.isArray(d.passiv
   for(let i=0;i<42;i++){const v=d.passive[i];s.passive[i]=(v!=null&&c.pool.has(v)&&!SKILLS[v].active)?v:null;}
   const seenB=new Set();for(const a of [s.active,s.passive])for(let i=0;i<a.length;i++){if(a[i]==null)continue;const b=SKILLS[a[i]].bk;if(seenB.has(b))a[i]=null;else seenB.add(b);}
   s.mx=Math.max(0,+d.mx||0);s.runs=d.runs|0;s.mig=d.mig|0;
+  s.imp=Array.isArray(d.imp)?[...new Set(d.imp.filter(v=>c.poolAll.has(v)))]:[];s.impAcc=Math.max(0,+d.impAcc||0);s.impPend=d.impPend?1:0;s.impN=d.impN|0; // невозможные чары — навсегда у героя
   if(d.mx==null){ // старое сохранение: уровень и опыт переходят в мастерство, изученное - в Книгу чар
     const L0=clamp(d.lvl|0,1,999);let tot=Math.max(0,+d.xp||0);for(let l=1;l<L0;l++)tot+=xpBase(l);
     s.mx=Math.round(tot*.5+(Math.max(0,d.ess|0))/10);s.book=[...s.learned];s.mig=L0>1?L0:0;
@@ -1542,17 +1581,18 @@ function computeStats(){
   ST.mana=1+.1*T('mana');ST.summDmg=1+.2*T('summ');ST.summMax=3+T('summ');ST.luck=.03*T('luck');ST.cascade=1+.15*T('cascade');ST.orbitN=T('orbit');ST.orbitDmg=1+.15*T('orbit');}
 const WRATH=new Set(['strike','blink','revenge','whirl']),CASC=new Set(['doom','aura','trail','trap']);
 function skDmg(sk){const f=sk.F.id;let m=1;if(WRATH.has(f))m=ST.wrath;else if(CASC.has(f))m=ST.cascade;else if(f==='summon')m=ST.summDmg;else if(f==='orbit')m=ST.orbitDmg;
-  return sk.F.power*(sk.M.dmg||1)*(sk.E.dmg||1)*lvlScale()*ST.dmg*(1+.2*(rk(sk.id)-1))*m;}
-const skCd=sk=>(sk.F.cd||1)*(sk.M.cd||1)*ST.cdr*(1-.04*(rk(sk.id)-1));
-const skMana=sk=>Math.round((sk.F.mana||0)*(sk.M.mana||1));
+  return sk.F.power*(sk.M.dmg||1)*(sk.E.dmg||1)*lvlScale()*ST.dmg*(1+.2*(rk(sk.id)-1))*m*(isImp(sk.id)?IMP.dmg:1);}
+const skCd=sk=>(sk.F.cd||1)*(sk.M.cd||1)*ST.cdr*(1-.04*(rk(sk.id)-1))*(isImp(sk.id)?IMP.cd:1);
+const skMana=sk=>Math.round((sk.F.mana||0)*(sk.M.mana||1)*(isImp(sk.id)?IMP.mana:1));
 const skR=sk=>(sk.M.radius||1)*(CASC.has(sk.F.id)?ST.cascade:1);
 let RESO=new Array(10).fill(1),RESO_N=new Array(10).fill(0);
 // =====================================================================
 // СИЛА ЧАРЫ · РЕДКОСТЬ · РЕКОМЕНДАЦИИ · ЛУЧШИЙ БИЛД
 // =====================================================================
-const RARITY=[{n:'Обычная',c:'#9aa3b8'},{n:'Редкая',c:'#4aa3ff'},{n:'Эпическая',c:'#b66bff'},{n:'Легендарная',c:'#ffb02e'}];
-// значки редкости внутри иконки чары (вид — CSS по data-r хозяина): узорное кольцо легендарной и камни сверху (1 — редкая, 2 — эпическая, корона — легендарная)
-const rarDeco=r=>(r>=3?'<i class="rf"></i>':'')+(r>=1?'<i class="rg"></i>':'');
+const RARITY=[{n:'Обычная',c:'#9aa3b8'},{n:'Редкая',c:'#4aa3ff'},{n:'Эпическая',c:'#b66bff'},{n:'Легендарная',c:'#ffb02e'},{n:'Невозможная',c:'#b98cff'}];
+// значки редкости внутри иконки чары (вид — CSS по data-r хозяина): узорное кольцо легендарной и камни сверху (1 — редкая, 2 — эпическая, корона — легендарная);
+// у невозможной (4) вместо узорного кольца — чёрное пламя .rx и чёрная корона
+const rarDeco=r=>(r>=4?'<i class="rx"></i>':r>=3?'<i class="rf"></i>':'')+(r>=1?'<i class="rg"></i>':'');
 const rarGem=r=>'<i class="gm" data-r="'+r+'"></i>';
 const CATN={atk:'атака',area:'площадь',ctl:'контроль',def:'защита',mov:'движение',sum:'призыв',pas:'пассивная'};
 // ph — сколько «ударов по целям» даёт одно срабатывание; u — польза сверх урона; cat — категория для разнообразия билда
@@ -1601,7 +1641,7 @@ function rarMap(){const k=CLS.id;if(RAR_CACHE[k])return RAR_CACHE[k];const out=n
     const th=q=>arr[Math.min(n-1,Math.floor(n*q))][1];const t1=th(.5),t2=th(.8),t3=th(.94);
     for(const [id,p] of arr)out.set(id,p>=t3?3:p>=t2?2:p>=t1?1:0);}
   return RAR_CACHE[k]=out;}
-const rarOf=sk=>rarMap().get(sk.id)|0;
+const rarOf=sk=>isImp(sk.id)?4:rarMap().get(sk.id)|0;
 const slotNm=(act,i)=>(act?'слоте ':'пассивном слоте ')+(i+1);
 function weakest(act,oc){const key=(act?'a':'p')+(oc||'');if(WKC&&WKC[key]!==undefined)return WKC[key];if(!WKC)WKC={};
   const arr=act?S.active:S.passive,n=act?activeSlots():passiveSlots();let b=null,bp=1e18;
@@ -1651,11 +1691,59 @@ function applyBestBuild(){const before=buildPower().all,pl=bestBuildPlan();snapB
   for(let i=0;i<8;i++)S.active[i]=i<pl.a.length?pl.a[i]:null;for(let i=0;i<42;i++)S.passive[i]=i<pl.p.length?pl.p[i]:null;
   onBuildChanged();const after=buildPower().all;return {before,after,n:pl.a.length+pl.p.length};}
 // распыление в эссенцию
-const DUST=[12,24,45,75];
+const DUST=[12,24,45,75,220];
 function dustValue(sk){const r=rk(sk.id);let ref=0;for(let i=1;i<r;i++)ref+=rankCost(i);return DUST[rarOf(sk)]+Math.round(ref*.5);}
 function dustSkill(id){if(S.sandbox||EQUIPPED.has(id)||!LEARNED.has(id))return 0;const sk=SKILLS[id],v=dustValue(sk);
   LEARNED.delete(id);S.learned=S.learned.filter(x=>x!==id);delete S.ranks[id];S.ess+=v;return v;}
 const isWeak=sk=>isLearned(sk.id)&&!EQUIPPED.has(sk.id)&&rarOf(sk)===0&&!upgradeFor(sk);
+// =====================================================================
+// НЕВОЗМОЖНАЯ ЧАРА — пятая редкость, выше легендарной (Артём 25.11: «ещё один ранг чар выше, чем легендарная… невозможное…
+// горит чёрным цветом… выпадает очень редко… прям прилично сильнее»). Отдельный слой поверх процентильной редкости rarMap:
+// - это особая версия ЛЕГЕНДАРНОЙ чары: легендарная, выпавшая в выборе уровня, из свитка или со свитка босса, может выпасть невозможной;
+// - шанс копится от времени боя: S.impAcc += dt × вес края (опушка .5 … Бездна 1.8, ущелья — по уровню) и целиком тратится на каждое
+//   выпадение легендарной: p = 1 − e^(−накоплено·k/τ), k = 2,2 со свитка босса. Сколько бы легендарных ни выпадало, в сумме выходит
+//   «одна невозможная за τ взвешенного времени»: τ = 3,6 ч → в средних краях ~3 ч игры, в дальних ~2,5 ч, в Бездне ~2 ч, на опушке ~7 ч;
+//   по модели забега (уровень ~230 за 4 ч, пул класса кончается к ~2 ч) — в среднем одна за ~2–2,5 ч;
+// - невозможность — навсегда у героя (S.imp, как Книга чар): чара невозможная в любом забеге. Повтор — не дубль: легендарная из S.imp
+//   выпадает уже невозможной и шанс не тратит; свиток при пустом пуле зажигает изученную легендарную, а если все уже горят — «отголосок» (эссенция);
+// - предложенная, но не взятая невозможная (пропуск, авто-выбор другой карты) не сгорает: следующая легендарная выпадет невозможной (S.impPend);
+// - сила: урон ×1,7, перезарядка и мана −15 % (skDmg/skCd/skMana → сила, бой, автозамена, лучший билд); распыление — 220 эссенции.
+// =====================================================================
+const IMP={dmg:1.7,cd:.85,mana:.85,tau:12960,cap:1.6,boss:2.2,echo:300};
+const IMP_ZW=[.5,.6,.7,.8,.9,1,1.15,1.3,1.5,1.8];
+const IMP_OFFER=new Set();let IMP_OFF=false;
+const isImp=id=>!IMP_OFF&&!!S&&(IMP_OFFER.has(id)||!!S.imp&&S.imp.includes(id));
+const rarBase=sk=>rarMap().get(sk.id)|0;
+const impList=()=>S.imp||(S.imp=[]);
+const impDirty=()=>{PWC=new Map();WKC=null;};
+// сила той же чары без невозможности — для «во сколько раз сильнее легендарной»
+function impBasePwr(sk){IMP_OFF=true;try{return skPower(sk);}finally{IMP_OFF=false;}}
+function impW(){if(PLAY==='gorge'&&GZ)return IMP_ZW[clamp(Math.round((GZ.lv||1)/3),0,8)];return IMP_ZW[clamp(zoneOf(P.pos.x,P.pos.z),0,IMP_ZW.length-1)];}
+function impTick(dt){if(!S||S.sandbox||mode!=='game'||P.dead)return;const a=S.impAcc||0,c=IMP.tau*IMP.cap;if(a<c)S.impAcc=Math.min(c,a+dt*impW());}
+const impP=(acc,src)=>1-Math.exp(-Math.max(0,acc||0)*(src==='boss'?IMP.boss:1)/IMP.tau);
+// бросок на одну выпавшую легендарную: тратит накопленный шанс; удача — чара предложена невозможной (IMP_OFFER), выучится — станет ей навсегда
+// удача: отложенная невозможная срабатывает без траты шанса, иначе бросок тратит всё накопленное
+function impLuck(src){if(S.impPend){S.impPend=0;return true;}const ok=Math.random()<impP(S.impAcc,src);S.impAcc=0;return ok;}
+function impRoll(sk,src){if(!S||S.sandbox||isImp(sk.id)||rarBase(sk)<3||!impLuck(src))return false;
+  IMP_OFFER.add(sk.id);impDirty();return true;}
+// окно выбора уровня: новая выдача заменяет прежнюю; невзятая невозможная переходит на следующую легендарную
+function impDiscard(){if(!IMP_OFFER.size)return;IMP_OFFER.clear();if(S)S.impPend=1;impDirty();}
+function impOffer(ch){impDiscard();for(const sk of ch)if(impRoll(sk,'lvl'))break;return ch;}
+function impGrant(id){const L=impList();if(!L.includes(id))L.push(id);S.impN=(S.impN|0)+1;IMP_OFFER.delete(id);impDirty();saveSoon();if(mode==='game')impFx(P.pos.x,P.pos.z,1);}
+// learn(): предложенная невозможной чара становится невозможной навсегда; выбрали другую карту — предложение переходит дальше
+function impLearn(id){if(!IMP_OFFER.size)return;if(IMP_OFFER.has(id))impGrant(id);impDiscard();}
+// свиток при пустом пуле (всё изучено): с тем же шансом зажигает изученную легендарную (сначала из билда), а если все уже горят — «отголосок»
+function impIgnite(src){if(!S||S.sandbox||!impLuck(src))return false;
+  const c=[...LEARNED].filter(id=>CLS.pool.has(id)&&!isImp(id)&&rarBase(SKILLS[id])>=3);
+  if(!c.length){S.ess+=IMP.echo;saveSoon();impFx(P.pos.x,P.pos.z,1);toast('Отголосок Невозможного: +'+IMP.echo+' эссенции — все легендарные уже горят чёрным');return true;}
+  const e=c.filter(id=>EQUIPPED.has(id)),L=e.length?e:c,sk=SKILLS[L[Math.random()*L.length|0]];
+  impGrant(sk.id);onBuildChanged();checkUpgrade(sk.id);rarPop(sk,'Свиток вспыхнул чёрным пламенем'+(EQUIPPED.has(sk.id)?' — чара в билде':' — в книге'));return true;}
+// строка для листа чары
+function impNote(sk){const b=rarBase(sk);
+  if(rarOf(sk)>=4){const k=pwr(sk)/Math.max(1e-6,impBasePwr(sk));return `<p class="note impn"><b>Невозможная · сила ${Math.round(pwr(sk))}</b> — в ${fmtK(k)} раза сильнее той же легендарной: ${impPerk()}. Горит чёрным пламенем во всех забегах героя.</p>`;}
+  return b>=3?`<p class="note">Очень редко легендарная выпадает <b class="impw">Невозможной</b> — чёрное пламя, ${impPerk()}. В дальних краях и с боссов чаще.</p>`:'';}
+const fmtK=k=>k.toFixed(1).replace('.',',');
+const impPerk=()=>'урон ×'+fmtK(IMP.dmg)+', перезарядка и мана −'+Math.round((1-IMP.cd)*100)+' %';
 
 
 // =====================================================================
@@ -2069,6 +2157,43 @@ function elBurst(el,x,y,z,n,sc){sc=sc||1;if(n>=8)elSig(el,x,y,z,n);const c=elCol
 function colBurst(c,x,y,z,n,spd,life,grav){for(let i=0;i<n;i++){const a=rand(0,TAU),u=rand(0,1),s=rand(.3,1)*spd;emit(SPARK,x,y,z,Math.cos(a)*s,u*spd+1,Math.sin(a)*s,c,life*rand(.6,1.2),grav==null?8:grav,1);}}
 function puffs(x,y,z,c,n,spd,life){spd=spd||1.2;life=life||.8;for(let i=0;i<n;i++)emit(PUFF,x+rand(-.4,.4),y+rand(0,.4),z+rand(-.4,.4),rand(-1,1)*spd,rand(.3,1.2)*spd,rand(-1,1)*spd,c,life*rand(.7,1.2),-.4,2);}
 function ringBurst(el,x,z,r,n){const c=elCol(el);for(let i=0;i<n;i++){const a=i/n*TAU+rand(-.1,.1);emit(SPARK,x+Math.cos(a)*r*.25,.35,z+Math.sin(a)*r*.25,Math.cos(a)*r*2.6,rand(.5,2),Math.sin(a)*r*2.6,c,.42,3,2.2);}}
+// ---- чёрное пламя невозможных чар: тёмные языки обычным смешиванием (сложением чёрное не видно) поверх фиолетового ореола искр ----
+// своя маленькая система точек с прозрачностью (рисуется после светящихся — тёмное ядро поверх ореола); общий бюджет pBudget, fk()/FRK и HQ(); без новых источников света
+function mkDark(n,size){const g=new THREE.BufferGeometry(),pos=new Float32Array(n*3);for(let i=0;i<n;i++)pos[i*3+1]=-999;
+  g.setAttribute('position',new THREE.BufferAttribute(pos,3));g.setAttribute('color',new THREE.BufferAttribute(new Float32Array(n*4),4));
+  const pts=new THREE.Points(g,new THREE.PointsMaterial({size,map:softTex,vertexColors:true,transparent:true,depthWrite:false}));
+  pts.frustumCulled=false;pts.renderOrder=3;scene.add(pts);
+  return {n,pos,col:g.attributes.color.array,g,vel:new Float32Array(n*3),life:new Float32Array(n),max:new Float32Array(n),grav:new Float32Array(n),next:0,dirty:false};}
+// DARK — языки пламени и след, DARKB — крупные клубы чёрного ядра вспышки
+const DARK=mkDark(420,1.15),DARKB=mkDark(90,2.8);
+const IMPC=new THREE.Color(0x9a5cff),IMPW=new THREE.Color(0xe2d2ff),IMPD=new THREE.Color(0x5a1fc0);
+let impHitN=0,impAoeN=0,impFxT=-9;
+function darkEmit(x,y,z,vx,vy,vz,life,grav,sys){if(pBudget<=0)return;pBudget--;const s=sys||DARK,i=s.next;s.next=(i+1)%s.n;const k=i*3,c=i*4,t=Math.random()*.05;
+  s.pos[k]=x;s.pos[k+1]=y;s.pos[k+2]=z;s.vel[k]=vx;s.vel[k+1]=vy;s.vel[k+2]=vz;s.col[c]=.035+t;s.col[c+1]=t*.25;s.col[c+2]=.08+t*1.6;s.col[c+3]=0;s.life[i]=life;s.max[i]=life;s.grav[i]=grav||0;}
+function updateDarkSys(S_,dt){const {pos,vel,col,life,max,grav}=S_,d=Math.max(0,1-1.6*dt);let any=false;
+  for(let i=0;i<S_.n;i++){if(life[i]<=0)continue;life[i]-=dt;const k=i*3,c=i*4;if(life[i]<=0){pos[k+1]=-999;col[c+3]=0;continue;}any=true;
+    vel[k]*=d;vel[k+1]=vel[k+1]*d-grav[i]*dt;vel[k+2]*=d;pos[k]+=vel[k]*dt;pos[k+1]+=vel[k+1]*dt;pos[k+2]+=vel[k+2]*dt;
+    const f=life[i]/max[i];col[c+3]=(f>.8?(1-f)/.2:f<.45?f/.45:1)*.96;}
+  if(any||S_.dirty){S_.g.attributes.position.needsUpdate=true;S_.g.attributes.color.needsUpdate=true;S_.dirty=any;}}
+function updateDark(dt){impHitN=0;impAoeN=0;updateDarkSys(DARK,dt);updateDarkSys(DARKB,dt);}
+// языки чёрного пламени (n штук в круге радиуса r на высоте y) и фиолетовые искры-ореол вокруг
+function impFlame(x,y,z,n,r){if(!HQ())n=Math.ceil(n*.6);for(let i=0;i<n;i++){const a=rand(0,TAU),q=rand(0,r);
+    darkEmit(x+Math.cos(a)*q,y+rand(-.2,.3),z+Math.sin(a)*q,Math.cos(a)*rand(.2,.9),rand(1.2,2.8),Math.sin(a)*rand(.2,.9),rand(.45,.85),-1.2);
+    if(i&1)emit(SPARK,x+Math.cos(a)*q*1.2,y+rand(0,.4),z+Math.sin(a)*q*1.2,Math.cos(a)*rand(.6,1.6),rand(1,2.6),Math.sin(a)*rand(.6,1.6),i%4===1?IMPW:IMPC,rand(.35,.6),-1,1.5);}}
+// выпадение невозможной: столб и кольцо фиолетового света, фонтан чёрного пламени (вместо золотого столба свитка)
+function impFx(x,z,big){if(time-impFxT<.5)return;impFxT=time;
+  fxPillar(x,z,1,8,IMPD,1.2,.4);fxRing(x,z,.4,6,IMPC,.8,.7);fxGlow(x,z,2.6,IMPD,.8,.55);colBurst(IMPC,x,1.2,z,22,5,.8,-2);colBurst(IMPW,x,1.2,z,6,3,.5,-1);
+  for(let k=0;k<(big?4:1);k++)impFlame(x,.3+k*.55,z,16,.8+k*.15);for(let i=0;i<6;i++)darkEmit(x+rand(-.6,.6),rand(.5,2.5),z+rand(-.6,.6),rand(-.6,.6),rand(1.5,3),rand(-.6,.6),rand(.7,1.1),-.8,DARKB);}
+function impCastFx(){impFlame(P.pos.x,1.1,P.pos.z,HQ()?12:7,.6);fxGlow(P.pos.x,P.pos.z,1.5,IMPC,.32,.6);}
+function impHitFx(en){if(impHitN>=6||!fk())return;impHitN++;const r=Math.min(1.2,(en.r||.5)*.8);impFlame(en.pos.x,(en.hy||1.6)*.55,en.pos.z,4,r);}
+// площадь (нова, взрыв, удар сверху): чёрное ядро вспышки — тёмные языки кольцом поверх светящегося взрыва
+function impBurst(pos,r){if(impAoeN>=2||!fk())return;impAoeN++;const n=Math.round(clamp(r*3,6,HQ()?18:10));
+  for(let i=0;i<n;i++){const a=i/n*TAU+rand(-.2,.2),q=r*rand(.25,.75);darkEmit(pos.x+Math.cos(a)*q,rand(.3,1),pos.z+Math.sin(a)*q,Math.cos(a)*rand(1,2.5),rand(1.5,3),Math.sin(a)*rand(1,2.5),rand(.5,.8),-1);}
+  const m=HQ()?7:4;for(let i=0;i<m;i++){const a=rand(0,TAU),q=r*rand(0,.4);darkEmit(pos.x+Math.cos(a)*q,rand(.4,1.2),pos.z+Math.sin(a)*q,Math.cos(a)*rand(.5,1.5),rand(.8,1.8),Math.sin(a)*rand(.5,1.5),rand(.55,.8),-.6,DARKB);}
+  impFlame(pos.x,.6,pos.z,HQ()?8:5,Math.min(1,r*.3));}
+// снаряд: тёмное ядро (тёмная точка поверх светящегося шара) и чёрный дымный след
+function impTrail(p){if(!fk())return;darkEmit(p.x,p.y,p.z,rand(-.3,.3),rand(0,.4),rand(-.3,.3),.32,-.6);if(Math.random()<.5)darkEmit(p.x+rand(-.15,.15),p.y+rand(-.1,.1),p.z+rand(-.15,.15),rand(-.6,.6),rand(.3,1),rand(-.6,.6),.5,-1);
+  if(Math.random()<.45)emit(SPARK,p.x,p.y,p.z,rand(-1,1),rand(-.2,.8),rand(-1,1),IMPC,.3,0,1);}
 
 // =====================================================================
 // FX POOL, TELEGRAPHS, HAZARDS
@@ -2673,18 +2798,18 @@ function updateLoot(dt){for(let i=LOOT.length-1;i>=0;i--){const l=LOOT[i],p=l.g.
   if(d<.75&&(!l.fl||l.t>.6)){scene.remove(l.g);LOOT.splice(i,1);
     if(l.kind==='ess'){S.ess+=l.val;essAcc+=l.val;}
     else if(l.kind==='hp'){heal(P.maxHp*.2);float(P.pos,'+'+Math.round(P.maxHp*.2),'#7dff8a',14);colBurst(HPC_,P.pos.x,1,P.pos.z,10,2,.5,-2);}
-    else learnRandom();}}
+    else learnRandom(l.val);}}
   essAccT-=dt;if(essAcc>0&&essAccT<=0){float(P.pos,'+'+essAcc+' эссенции','#d4b0ff',13);essAcc=0;essAccT=.5;}}
 function dropLoot(en){const tot=Math.max(1,Math.round(en.xp*.55));const n=en.boss?12:en.elite?5:tot>6?2:1,rw=en.rw||1;
   for(let i=0;i<n;i++)dropItem('ess',en.pos.x,en.pos.z,Math.max(1,Math.round(tot/n)));
-  let sc=en.boss?3:en.champ?2:Math.random()<Math.min(.9,(en.elite?.45:.04)*Math.min(3,rw))?1:0;if(rw>=1.6&&(en.boss||en.elite)&&Math.random()<Math.min(.9,.3*rw))sc++;if(en.guard)sc+=2;for(let i=0;i<sc;i++)dropItem('scroll',en.pos.x,en.pos.z);
+  let sc=en.boss?3:en.champ?2:Math.random()<Math.min(.9,(en.elite?.45:.04)*Math.min(3,rw))?1:0;if(rw>=1.6&&(en.boss||en.elite)&&Math.random()<Math.min(.9,.3*rw))sc++;if(en.guard)sc+=2;for(let i=0;i<sc;i++)dropItem('scroll',en.pos.x,en.pos.z,en.boss?'boss':'');
   if(en.boss||en.elite||Math.random()<.1)dropItem('hp',en.pos.x,en.pos.z);}
 const formSlot=sk=>{if(!sk.active)return null;for(const v of S.active)if(v!=null&&v!==sk.id&&SKILLS[v].f===sk.f)return v;return null;};
 function pickDistinct(ids,n,usedF,usedB){const c=ids.slice(),r=[];for(let i=c.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[c[i],c[j]]=[c[j],c[i]];}
   usedF=usedF||new Set();usedB=usedB||new Set();for(const id of c){if(r.length>=n)break;const k=SKILLS[id];if(usedF.has(k.f)||usedB.has(k.bk))continue;usedF.add(k.f);usedB.add(k.bk);r.push(id);}
   for(const id of c){if(r.length>=n)break;const k=SKILLS[id];if(usedB.has(k.bk))continue;usedB.add(k.bk);r.push(id);}return r;}
 const baseSlot=sk=>{for(const a of [S.active,S.passive])for(const v of a)if(v!=null&&v!==sk.id&&SKILLS[v].bk===sk.bk)return v;return null;};
-function learn(id,autoEquip){if(!LEARNED.has(id)){LEARNED.add(id);S.learned.push(id);}if(!BOOK.has(id)){BOOK.add(id);S.book.push(id);}
+function learn(id,autoEquip){impLearn(id);if(!LEARNED.has(id)){LEARNED.add(id);S.learned.push(id);}if(!BOOK.has(id)){BOOK.add(id);S.book.push(id);}
   if(autoEquip&&!EQUIPPED.has(id)&&baseSlot(SKILLS[id])==null&&formSlot(SKILLS[id])==null){const sk=SKILLS[id],arr=sk.active?S.active:S.passive,n=sk.active?activeSlots():passiveSlots();const idx=arr.findIndex((v,i)=>i<n&&v==null);if(idx>=0)arr[idx]=id;}
   onBuildChanged();saveSoon();if(autoEquip)checkUpgrade(id);}
 // плашка «новая чара сильнее»
@@ -2711,9 +2836,9 @@ function unlearnedPool(){const a=[];CLS.pool.forEach(id=>{if(!LEARNED.has(id))a.
 // свитки и выбор уровня: сначала новые базы чар (а не ещё один вариант уже известной), чары ядра класса втрое чаще
 function rollPool(){const all=unlearnedPool(),lb=new Set();LEARNED.forEach(id=>lb.add(SKILLS[id].bk));const nb=all.filter(s=>!lb.has(s.bk));return nb.length&&Math.random()<.9?nb:all;}
 function wpick(c){let t=0;const bk=bookOn(),w=c.map(s=>(CLS.core.has(s.bk)?3:1)*(bk&&BOOK.has(s.id)?2.5:1));for(const x of w)t+=x;let r=Math.random()*t;for(let i=0;i<c.length;i++){r-=w[i];if(r<=0)return c[i];}return c[0];}
-function learnRandom(){const pool=rollPool();
-  if(!pool.length||S.sandbox){S.ess+=60;toast('Свиток рассыпался в 60 эссенции');return;}
-  const sk=wpick(pool);learn(sk.id,true);fxPillar(P.pos.x,P.pos.z,.8,5,GOLD,.7);colBurst(GOLD,P.pos.x,1.2,P.pos.z,20,4,.7,-2);
+function learnRandom(src){const pool=rollPool();
+  if(!pool.length||S.sandbox){if(!S.sandbox&&impIgnite(src))return;S.ess+=60;toast('Свиток рассыпался в 60 эссенции');return;}
+  const sk=wpick(pool);impRoll(sk,src==='boss'?'boss':'scroll');learn(sk.id,true);if(isImp(sk.id))impFx(P.pos.x,P.pos.z,1);else{fxPillar(P.pos.x,P.pos.z,.8,5,GOLD,.7);colBurst(GOLD,P.pos.x,1.2,P.pos.z,20,4,.7,-2);}
   toastSk(sk,'Свиток: «'+skName(sk)+'»'+(EQUIPPED.has(sk.id)?' — сразу в билде':' — в книге'),'Из свитка'+(EQUIPPED.has(sk.id)?' — сразу в билде':' — в книге'));}
 
 // =====================================================================
@@ -2740,6 +2865,7 @@ function dealDamage(en,base,el,o){
   if(en.dead)return;
   if(en.remote)return mpGuestHit(en,base,el,o);
   const depth=o.depth||0,sk=o.sk,M=sk?sk.M:null;
+  if(sk&&isImp(sk.id))impHitFx(en);
   let dmg=base,crit=false,R=null;
   const pid=o.fromG?1:0,rcK=o.fromG?(o.rc||1):ST.react;
   if(!o.dot){
@@ -2774,7 +2900,7 @@ function dealDamage(en,base,el,o){
   }
   if(en.hp<=0)kill(en,depth,el,o.fromG?{fromG:true}:undefined);
 }
-function aoe(pos,r,dmg,el,o,exclude){let n=0;
+function aoe(pos,r,dmg,el,o,exclude){let n=0;if(o&&o.sk&&isImp(o.sk.id))impBurst(pos,r);
   for(const en of ENEMIES){if(en.dead||en===exclude)continue;const dx=en.pos.x-pos.x,dz=en.pos.z-pos.z,rr=r+en.r;
     if(dx*dx+dz*dz<=rr*rr){dealDamage(en,dmg,el,o.knockFrom?o:Object.assign({},o,{knockFrom:pos}));n++;}}
   return n;}
@@ -2867,7 +2993,7 @@ function updateProj(dt){
     if(o.spin)o.core.rotation.z+=o.spin*dt;if(o.key==='storm')o.gl.scale.setScalar(rand(3.4,5.2));
     if(fk())emit(SPARK,g.position.x,g.position.y,g.position.z,rand(-.5,.5),rand(-.3,.5),rand(-.5,.5),p.c,.3,p.el>=0?EP[ELEMENTS[p.el].id][0]*.4:0,1);
     if((p.el===EL.shadow||p.el===EL.poison)&&fk())emit(PUFF,g.position.x,g.position.y,g.position.z,0,.3,0,p.c.clone().multiplyScalar(.5),.4,0,1);
-    projFx(p,g);
+    projFx(p,g);if(p.sk&&isImp(p.sk.id))impTrail(g.position);
     let hit=null;for(const en of ENEMIES){if(en.dead||p.hit.has(en))continue;const dx=en.pos.x-g.position.x,dz=en.pos.z-g.position.z,rr=en.r+.35;if(dx*dx+dz*dz<rr*rr){hit=en;break;}}
     if(hit){if(projHit(p,hit)){dropProjVis(o);PROJ.splice(i,1);}continue;}
     if(p.dist>p.range){dropProjVis(o);PROJ.splice(i,1);}}}
@@ -3355,7 +3481,7 @@ function cast(sk,A,cl){
   const pick=r=>A?coneTarget(A.dir,r,.8):getTarget(r);
   if(!cl){if(A)P.face=Math.atan2(A.dir.x,A.dir.z);else{const tg=getTarget(sk.F.range+2);if(tg)faceTo(tg.pos);}}
   const dmg=skDmg(sk)*(cl?.5:1),R=skR(sk),col=sk.E.color,F=sk.F.id;
-  colBurst(col,P.pos.x+Math.sin(P.face)*.4,1.8,P.pos.z+Math.cos(P.face)*.4,7,2,.35,-1);fxGlow(P.pos.x,P.pos.z,1.6,col,.3,.6);
+  colBurst(col,P.pos.x+Math.sin(P.face)*.4,1.8,P.pos.z+Math.cos(P.face)*.4,7,2,.35,-1);fxGlow(P.pos.x,P.pos.z,1.6,col,.3,.6);if(isImp(sk.id))impCastFx();
   const run={
     bolt:()=>{const c=sk.M.count||1;const t2=pick(sk.F.range+2);const base=A?A.dir.clone():t2?v1.set(t2.pos.x-P.pos.x,0,t2.pos.z-P.pos.z).normalize().clone():fwd();
       for(let i=0;i<c;i++){const a=(i-(c-1)/2)*.35;const d=base.clone().applyAxisAngle(v2.set(0,1,0),a);makeBolt(sk,new THREE.Vector3(P.pos.x,1.25,P.pos.z).addScaledVector(d,.6),d,t2,dmg,R);
@@ -4468,7 +4594,7 @@ function updateHudSlots(){const n=activeSlots();
   SKB.forEach((s,i)=>{const id=i<n?S.active[i]:null;s.b.hidden=i>=n;if(i>=n)return;
     if(id==null){s.b.className='sk empty';delete s.b.dataset.r;s.b.textContent='+';s.b.dataset.tip='Пустой слот|'+(i+1);s.b.style.removeProperty('--c');s.id=-1;s.b.setAttribute('aria-label','Пустой слот '+(i+1));return;}
     const sk=SKILLS[id];s.b.className='sk';s.b.dataset.r=rarOf(sk);s.b.style.setProperty('--c',sk.E.hex);s.b.innerHTML=svg(sk.F.id)+modBadge(sk)+rankBadge(id)+rarDeco(rarOf(sk))+'<span class="cd"></span><span class="t"></span>';
-    s.b.setAttribute('aria-label',skName(sk)+', ранг '+rk(id)+' из 5');s.b.dataset.tip=skName(sk)+'|'+(i+1);s.id=id;s.p=-1;s.t='';s.low=null;s.cdEl=s.b.querySelector('.cd');s.tEl=s.b.querySelector('.t');});
+    s.b.setAttribute('aria-label',skName(sk)+(rarOf(sk)>=4?', невозможная':'')+', ранг '+rk(id)+' из 5');s.b.dataset.tip=skName(sk)+'|'+(i+1);s.id=id;s.p=-1;s.t='';s.low=null;s.cdEl=s.b.querySelector('.cd');s.tEl=s.b.querySelector('.t');});
   const tot=EQUIPPED.size,cap_=activeSlots()+passiveSlots();
   $('#bookCount').textContent=tot+'/'+cap_;$('#tabBuildN').textContent=tot+'/'+cap_;
   $('#tabLibN').textContent=(S.sandbox?CLS.pool.size:[...LEARNED].filter(id=>CLS.pool.has(id)).length)+'/'+CLS.pool.size;
@@ -4495,8 +4621,9 @@ let toastT=0;
 // изучена эпическая/легендарная — своя всплывашка (фиолетовая/золотая) вместо обычной строки
 let rarPopT=0;
 function rarPop(sk,sub){const r=rarOf(sk);let el=$('#rarPop');if(!el){el=document.createElement('div');el.id='rarPop';el.setAttribute('role','status');$('#toast').after(el);}
-  el.dataset.r=r;el.innerHTML='<span class="ico'+(sk.active?'':' p')+'" data-r="'+r+'" style="--c:'+sk.E.hex+'">'+svg(sk.F.id)+modBadge(sk)+rarDeco(r)+'</span><span class="rph">'+rarGem(r)+(r>=3?'Легендарная чара!':'Эпическая чара!')+'</span><b>'+skName(sk)+'</b><small>'+apTag(sk)+'<br>'+sub+'</small>';
-  $('#toast').classList.remove('on');el.classList.remove('on');void el.offsetWidth;el.classList.add('on');clearTimeout(rarPopT);rarPopT=setTimeout(()=>el.classList.remove('on'),3100);}
+  el.dataset.r=r;el.innerHTML='<span class="ico'+(sk.active?'':' p')+'" data-r="'+r+'" style="--c:'+sk.E.hex+'">'+svg(sk.F.id)+modBadge(sk)+rarDeco(r)+'</span><span class="rph">'+rarGem(r)+(r>=4?'Невозможное!':r>=3?'Легендарная чара!':'Эпическая чара!')+'</span><b>'+skName(sk)+'</b><small>'+apTag(sk)+'<br>'+sub+(r>=4?'<br><span class="imps">Невозможная чара: '+impPerk()+'</span>':'')+'</small>';
+  if(r>=4&&mode==='game')bFlash('rgba(40,0,80,.5)');
+  $('#toast').classList.remove('on');el.classList.remove('on');void el.offsetWidth;el.classList.add('on');clearTimeout(rarPopT);rarPopT=setTimeout(()=>el.classList.remove('on'),r>=4?4600:3100);}
 function toastSk(sk,t,sub){if(rarOf(sk)>=2)rarPop(sk,sub);else toast(t+(sk.active?' · активная':' · пассивная'));}
 function toast(t,ms){const el=$('#toast');el.textContent=t;el.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('on'),ms||1900);}
 let banT=0;
@@ -4672,7 +4799,7 @@ let NEWVER=false;window.addEventListener('tc-newversion',async()=>{try{const t=a
 let luOpen=false;
 function rollChoices(){const pool=rollPool();if(!pool.length)return[];const res=[];
   const take=f=>{const c=pool.filter(s=>f(s)&&!res.some(r=>r.bk===s.bk));if(c.length)res.push(wpick(c));};
-  take(s=>s.active);take(s=>!s.active);take(s=>s.E.id===CLS.s);let g=0;while(res.length<3&&g++<9)take(()=>true);return res;}
+  take(s=>s.active);take(s=>!s.active);take(s=>s.E.id===CLS.s);let g=0;while(res.length<3&&g++<9)take(()=>true);return impOffer(res);}
 const knownBase=sk=>{for(const id of LEARNED)if(SKILLS[id].bk===sk.bk)return true;return false;};
 const IC_A='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 1 4 13.5h6L8.5 23 20 9.5h-6.5z"/></svg>',IC_P='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>';
 const apTag=(sk,big)=>`<span class="aptag ${sk.active?'a':'p'}${big?' big':''}">${sk.active?IC_A+'Активная · нажимаешь сам':IC_P+'Пассивная · работает сама'}</span>`;
@@ -4696,7 +4823,7 @@ function openLevelUp(){if(S.autoLu){luAutoRun(luQueue);return;}const ch=rollChoi
   $('#luTitle').textContent='Уровень '+S.lvl+(luQueue>1?' · ещё '+(luQueue-1):'');$('#luSub').textContent='Выбери новые чары. Если есть свободный слот, они сразу встанут в билд.'+(talFreeUse()?' Очков талантов: '+tpFree()+'.':'');luSync();
   $('#luCards').innerHTML=ch.map(sk=>{const r=rarOf(sk);return `<button type="button" class="card" data-id="${sk.id}" data-r="${r}"><span class="rbn">${rarGem(r)}<span>${RARITY[r].n}</span>${rarGem(r)}</span><span class="ico${sk.active?'':' p'}" data-r="${r}" style="--c:${sk.E.hex}">${svg(sk.F.id)}${modBadge(sk)}${rarDeco(r)}</span><span class="ct">${apTag(sk)}<span class="tag">${sk.F.role} · ${sk.E.name}${knownBase(sk)?'<i class="nv">вариант известной</i>':'<i class="nv">новая чара</i>'}${bookOn()&&BOOK.has(sk.id)?'<i class="nv">из Книги чар</i>':''}</span><b>${sk.base}</b><span class="var">${sk.M.name}: ${sk.M.desc}</span><small>${cap(skLead(sk))}</small><small>${cardStat(sk)}</small>${cardPow(sk)}${apWhere(sk)}</span></button>`;}).join('');
   $('#luSkip').textContent='Пропустить: +'+(20+S.lvl*5)+' эссенции';$('#lvlup').hidden=false;}
-function closeLevelUp(){luOpen=false;$('#lvlup').hidden=true;luQueue=Math.max(0,luQueue-1);luDelay=1.2;syncPause();}
+function closeLevelUp(){impDiscard();luOpen=false;$('#lvlup').hidden=true;luQueue=Math.max(0,luQueue-1);luDelay=1.2;syncPause();}
 $('#luCards').addEventListener('click',e=>{const b=e.target.closest('.card');if(!b)return;const sk=SKILLS[+b.dataset.id];learn(sk.id,true);toastSk(sk,'Изучено: '+skName(sk)+(EQUIPPED.has(sk.id)?' — в билде':' — в книге'),'Изучена'+(EQUIPPED.has(sk.id)?' — сразу в билде':' — в книге'));closeLevelUp();});
 $('#luAuto').addEventListener('click',()=>{setAutoLu(!S.autoLu);if(S.autoLu){luOpen=false;$('#lvlup').hidden=true;luAutoRun(luQueue);syncPause();toast('Авто-выбор чар включён (и автозамена в билде)');}else luSync();});
 $('#luAll').addEventListener('click',()=>{luOpen=false;$('#lvlup').hidden=true;luAutoRun(luQueue);syncPause();});
@@ -5063,7 +5190,7 @@ function sheetHtml(sk){const eq=EQUIPPED.has(sk.id),ln=isLearned(sk.id),r=rk(sk.
     (r<5&&S.ess<cost?`<p class="note">Нужно ${cost} эссенции, есть ${S.ess}. Эссенция падает со всех врагов.</p>`:'');}
   const vars=`<div class="vars" role="group" aria-label="Варианты чары">${MODS.map((M,mi)=>{const v=SKILLS[sk.bk*NM+mi];return `<button type="button" class="vchip${v.id===sk.id?' on':''}${isLearned(v.id)?'':' lk'}" data-v="${v.id}">${MODG[mi]} ${M.name}${EQUIPPED.has(v.id)?' ●':''}</button>`;}).join('')}</div>`;
   return `<div class="sh-body"><div class="sh-top"><span class="ico${sk.active?'':' p'}" data-r="${rr}" style="--c:${sk.E.hex}">${svg(sk.F.id)}${modBadge(sk)}${rarDeco(rr)}</span><div><h2>${sk.F.id==='summon'&&CLS?summInfo(sk).name:sk.base}</h2><p><span class="tagc rar" data-r="${rr}">${rarGem(rr)}${RARITY[rr].n}</span><span class="tagc v">${sk.M.name}</span><span class="tagc">${sk.F.role}</span><span class="tagc" style="border-color:${sk.E.hex}">${sk.E.name}</span></p>${apTag(sk,1)}</div></div>
-  ${vars}<p class="note" style="margin-top:0">${apWhere(sk)}</p><p class="lead">${cap(skLead(sk))}</p><p class="note"><b style="color:var(--ess);font-weight:500">${sk.M.name}:</b> ${sk.M.desc}.</p>
+  ${vars}<p class="note" style="margin-top:0">${apWhere(sk)}</p><p class="lead">${cap(skLead(sk))}</p>${impNote(sk)}<p class="note"><b style="color:var(--ess);font-weight:500">${sk.M.name}:</b> ${sk.M.desc}.</p>
   ${sk.F.id==='summon'?`<p class="note"><b style="color:var(--ess);font-weight:500">Призыв:</b> одновременно до ${ST.summMax} призывов (талант «Повелитель духов» добавляет места). У существа своя полоска здоровья; с уровнем оно крупнее и крепче. Напарник по коопу видит твоих существ, а их удары засчитываются.</p>`:''}
   ${rankRow}<div class="stats">${st.map(([k,v])=>`<div>${k}<b>${v}</b></div>`).join('')}</div></div>${acts}`;}
 let sheetId=null;
@@ -5168,7 +5295,7 @@ function loop(now){
     updateLater(dt);updatePlayer(dt);updateEnemies(dt);updateBoss(dt);updatePassives(dt);updateProj(dt);updateEProj(dt);updateMeteors(dt);updateSummons(dt);updateWhirls(dt);updateRains(dt);updateTraps(dt);
     updateTele(dt);updateEZ(dt);updateZones(dt);updateLoot(dt);updateFx(dt);updateAim();updateTargetRing();
     if(luQueue>0&&!luOpen&&!P.dead){luDelay-=dt;if(luDelay<=0)openLevelUp();}
-    saveClock+=dt;if(saveClock>15){saveClock=0;save();}
+    saveClock+=dt;if(saveClock>15){saveClock=0;save();}impTick(dt);
   } else if(mode==='select'){time+=dt;updateFx(dt);updateLater(dt);P.face=LOB.on?LOB.myFace:camYaw;animateHero(dt,false);
     selFx-=dt;if(selFx<=0){selFx=1.6;const lx=LOB.on?LOB.myX:0,e=Math.random()<.65?EL[CLS.p]:EL[CLS.s];heroColor(ELEMENTS[e].color);P.castT=.35;ringBurst(e,lx,0,2.6,22);fxGlow(lx,0,2.2,ELEMENTS[e].color,.6,.8);elBurst(e,lx+Math.sin(P.face)*.4,1.8,Math.cos(P.face)*.4,14);}
     P.castT-=dt;if(Math.random()<.5*FRK){const c=CLS.color;const a=rand(0,TAU);emit(SPARK,(LOB.on?LOB.myX:0)+Math.cos(a)*1.2,rand(0,.3),Math.sin(a)*1.2,0,rand(.6,1.6),0,c,1,-.5,.5);}}
@@ -5178,7 +5305,7 @@ function loop(now){
   if(MPon)mpUpdate(dt);
   for(const f of WORLD_ANIM)f();
   updateGfx(paused&&mode!=='select'?0:dt);
-  updatePoints(SPARK,paused&&mode!=='select'?0:dt);updatePoints(PUFF,paused&&mode!=='select'?0:dt);
+  updatePoints(SPARK,paused&&mode!=='select'?0:dt);updatePoints(PUFF,paused&&mode!=='select'?0:dt);updateDark(paused&&mode!=='select'?0:dt);
   streamWorld();updateAtmos(paused?0:dt);mmUpdate(dt);
   updateCamera(dt);updateFloats(paused?0:dt,W,H);if(mode==='game'){updateHud();if(MPon)mpHud();}
   render();}
@@ -6192,6 +6319,16 @@ function start(hot){
   requestAnimationFrame(loop);}
 if(/[?&]debug\b/.test(location.search))window.__ev=c=>eval(c);
 window.__tc={lu:()=>({open:luOpen,q:luQueue,auto:!!S.autoLu,paused,all:!$('#luAll').hidden,allTxt:$('#luAll').textContent,title:$('#luTitle').textContent}),lvlAt:(x,z)=>enemyLvAt(x,z),zoneAt:(x,z)=>zoneOf(x,z),stats:(tid,lv,H)=>{const t=MOBS[tid],h=H===undefined?foeH():H,k=foeScale(lv,h),wb=t.boss&&h!=null;return {hp:Math.round(t.hp*k.hp*(t.boss?1.3:2.2)*(wb?FOE_BOSS.hp:1)),dmg:Math.round(t.dmg*k.dmg*(t.boss?1:.9)*(wb?FOE_BOSS.dmg:1))};},chunks:()=>CH.size,inst:()=>PK.reduce((a,k)=>a+k.im.count,0),halfNear:()=>ENEMIES.forEach((e,i)=>{if(e.dead)return;e.hp=Math.round(e.maxHp*(.25+.25*(i%3)));e.pos.set(P.pos.x+2.5*Math.cos(i*1.3),0,P.pos.z+2.5*Math.sin(i*1.3));e.stun=3;}),bars:()=>ENEMIES.filter(e=>!e.dead).map(e=>[e.tid,Math.round(e.hp),e.maxHp,e.bar.visible,+e.fill.scale.x.toFixed(2)]),gorge:g=>startGorge(g),gstate:()=>GZ&&{g:GZ.g,prog:GZ.prog,boss:GZ.bossSpawned,open:GZ.open,won:GZ.won,L:GZ.L},tpLocal:z=>{const w=toWorld(gcx(z),z);P.pos.set(w.x,0,w.z);P.prev.copy(P.pos);},boss:()=>{threat=THREAT_MAX;},bossSpawn:t=>{spawnBoss(t);return BOSS&&BOSS.tid;},bossInfo:()=>BOSS&&{tid:BOSS.tid,hp:Math.round(BOSS.hp),max:BOSS.maxHp,ph:BOSS.bph|0,sc:+BOSS.sc.toFixed(2),r:+BOSS.r.toFixed(2)},xp:n=>gainXp(n),ess:n=>{S.ess+=n;},state:()=>({cls:CLS.id,mode,lvl:S.lvl,ess:S.ess,kills:S.kills,hp:P.hp,learned:LEARNED.size,enemies:aliveCount(),boss:!!BOSS,fx:FX.length,proj:PROJ.length,lu:luOpen,pp:Q.pp,shadow:Q.shadow,pr}),tp:(x,z)=>{P.pos.set(x,0,z);P.prev.set(x,0,z);},sel:id=>selectClass(id),cast:i=>trySlot(i,true)};
+// отладка невозможных чар: __tc.imp(id) — сделать чару невозможной (без id — лучшую изученную легендарную), __tc.impChance() — шанс сейчас,
+// __tc.impAcc(сек) — задать накопленное время боя, __tc.impNext() — следующая легендарная выпадет невозможной, __tc.impLegs() — легендарные класса
+Object.assign(window.__tc,{
+ imp:id=>{if(id==null){const L=[...LEARNED].filter(i=>CLS.pool.has(i)&&!isImp(i)&&rarBase(SKILLS[i])>=3).sort((a,b)=>(EQUIPPED.has(b)-EQUIPPED.has(a))||pwr(SKILLS[b])-pwr(SKILLS[a]));id=L[0];}
+   if(id==null||!SKILLS[id])return null;const sk=SKILLS[id],b=impBasePwr(sk);impGrant(id);onBuildChanged();rarPop(sk,'Отладка');return {id,name:skName(sk),base:Math.round(b),imp:Math.round(pwr(sk)),k:+(pwr(sk)/b).toFixed(2)};},
+ impChance:()=>{const a=S.impAcc||0;return {acc:Math.round(a),w:impW(),pLvl:+impP(a,'lvl').toFixed(4),pBoss:+impP(a,'boss').toFixed(4),pend:!!S.impPend,list:(S.imp||[]).slice(),meanH:+(IMP.tau/3600/impW()).toFixed(2)};},
+ impAcc:v=>{S.impAcc=Math.max(0,+v||0);return S.impAcc;},
+ impNext:()=>{S.impPend=1;return true;},
+ impLegs:()=>CLS?[...CLS.pool].filter(i=>rarBase(SKILLS[i])>=3):[],
+ rar:id=>rarOf(SKILLS[id])});
 try{window.claude&&window.claude.hot&&window.claude.hot.snapshot&&window.claude.hot.snapshot(()=>{save();return {SAVE:JSON.parse(JSON.stringify(SAVE))};});}catch(e){}
 const H_=window.claude&&window.claude.hot;
 if(H_&&H_.ready)H_.ready(start);else start((H_&&H_.data)||{});
