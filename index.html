@@ -1985,7 +1985,9 @@ function validChar(d,c){if(!d||!Array.isArray(d.active)||!Array.isArray(d.passiv
   for(let i=0;i<42;i++){const v=d.passive[i];s.passive[i]=(v!=null&&c.pool.has(v)&&!SKILLS[v].active)?v:null;}
   const seenB=new Set();for(const a of [s.active,s.passive])for(let i=0;i<a.length;i++){if(a[i]==null)continue;const b=SKILLS[a[i]].bk;if(seenB.has(b))a[i]=null;else seenB.add(b);}
   s.mx=Math.max(0,+d.mx||0);s.runs=d.runs|0;s.mig=d.mig|0;
-  s.imp=Array.isArray(d.imp)?[...new Set(d.imp.filter(v=>c.poolAll.has(v)))]:[];s.impAcc=Math.max(0,+d.impAcc||0);s.impPend=d.impPend?1:0;s.impN=d.impN|0; // невозможные чары — навсегда у героя
+  s.imp=Array.isArray(d.imp)?[...new Set(d.imp.filter(v=>c.poolAll.has(v)))]:[];s.impAcc=Math.max(0,+d.impAcc||0);s.impPend=d.impPend?1:0;s.impN=d.impN|0; // невозможные чары этого забега
+  // 25.11: память Невозможного — легендарные, горевшие в прошлых забегах (старое S.imp переходит сюда со следующего забега)
+  s.impBook=Array.isArray(d.impBook)?[...new Set(d.impBook.filter(v=>c.poolAll.has(v)))]:[];
   if(d.mx==null){ // старое сохранение: уровень и опыт переходят в мастерство, изученное - в Книгу чар
     const LV0=clamp(d.lvl|0,1,999);let tot=Math.max(0,+d.xp||0);for(let l=1;l<LV0;l++)tot+=xpBase(l);
     s.mx=Math.round(tot*.5+(Math.max(0,d.ess|0))/10);s.book=[...L0];s.mig=LV0>1?LV0:0;
@@ -2048,7 +2050,14 @@ const WRATH=new Set(['strike','blink','revenge','whirl']),CASC=new Set(['doom','
 const PASS_K=1.9,SLOT_BOOST=[[1,1],[5,1.89],[10,2.09],[15,2.21],[20,1.93],[25,1.8],[30,1.8],[40,1.61],[50,1.52],[60,1.52],[70,1.41],[80,1.41],[90,1.35],[100,1.26],[999,1.26]];
 // SLOT_BOOST подобран под «Лучший билд» v13.27 (build_bp.js: сила A / v13.27 ≈ 0,97 на 5–100 уровне; механики классов B — сверху)
 let SB_OFF=false;   // стенд замера силы выключает надбавку
-const slotBoost=()=>{if(!S||S.sandbox||SB_OFF)return 1;const L=S.lvl;for(let i=1;i<SLOT_BOOST.length;i++){const a=SLOT_BOOST[i-1],b=SLOT_BOOST[i];if(L<=b[0])return a[1]+(b[1]-a[1])*(L-a[0])/(b[0]-a[0]);}return SLOT_BOOST[SLOT_BOOST.length-1][1];};
+// RAR_LVK (25.11): редкость теперь выпадает по уровню (RAR_DROP) — к 30-му в билде редкие и эпические, а не легендарные, и шаг редкости
+// круче (×1,75). Чтобы враги по уровню (FOE_K) остались по силам, обычный для уровня билд держит прежнюю силу: множитель = сила билда
+// прежней выдачи / новой (_check/rf/drop_sim.js --best, медиана 160 забегов без талантов). С 60-го — 1: дальше легендарные и невозможные
+// приходят по уровню, и полный легендарный билд уже сильнее прежнего (×1,3–1,5 к 70–100-му) — герой «перевышает» уровень.
+// Ступени редкости множитель не трогает: удачная легендарная на 30-м — тот же ×1,75 к эпической.
+const RAR_LVK=[[1,1],[2,1.07],[3,1.25],[5,1.55],[7,1.74],[10,1.87],[15,1.92],[20,1.78],[25,1.72],[30,1.72],[35,1.66],[40,1.53],[45,1.43],[50,1.28],[55,1.1],[60,1]];
+const lvTab=(T,L)=>{if(L<=T[0][0])return T[0][1];for(let i=1;i<T.length;i++){const a=T[i-1],b=T[i];if(L<=b[0])return a[1]+(b[1]-a[1])*(L-a[0])/(b[0]-a[0]);}return T[T.length-1][1];};
+const slotBoost=()=>{if(!S||S.sandbox||SB_OFF)return 1;const L=S.lvl;return lvTab(SLOT_BOOST,L)*lvTab(RAR_LVK,L);};
 function skDmg(sk){const f=sk.F.id;let m=1;if(WRATH.has(f))m=ST.wrath;else if(CASC.has(f))m=ST.cascade;else if(f==='summon')m=ST.summDmg;else if(f==='orbit')m=ST.orbitDmg;
   return sk.F.power*(sk.M.dmg||1)*(sk.E.dmg||1)*lvlScale()*ST.dmg*skK(sk)*m*(isImp(sk.id)?IMP.dmg:1);}   // skK — редкость × ранг; невозможная — свой слой
 const skCd=sk=>(sk.F.cd||1)*(sk.M.cd||1)*ST.cdr*(isImp(sk.id)?IMP.cd:1);
@@ -2244,8 +2253,9 @@ Object.assign(ICON,{
 // ----- /A сила и значки -----
 let CR_OVR=null;
 const lvlS=L=>1+.12*(L-1);   // как lvlScale, для уровня L
+// внутренняя сила (intr) — без «Невозможной»: rarK делит на неё, и скидка маны невозможной уходила в множитель редкости (25.11)
 function skCycle(sk,intr,L){const cd=intr?(sk.F.cd||1)*(sk.M.cd||1):skCd(sk),regen=intr?(8+.4*((L||1)-1))*CLS.mp:(P.mpRegen||8);
-  return Math.max(cd,(intr?skMana(sk):cfMana(sk))/(regen*.38)*.8);}
+  return Math.max(cd,(intr?Math.round((sk.F.mana||0)*(sk.M.mana||1)):cfMana(sk))/(regen*.38)*.8);}
 function castRate(){if(CR_OVR!=null)return CR_OVR;let r=0;const n=activeSlots();for(let i=0;i<n;i++){const id=S.active[i];if(id!=null)r+=1/skCycle(SKILLS[id]);}return Math.max(.6,r);}
 function reactVal(e,c){let best=0;for(let e2=0;e2<10;e2++){if(e2===e||!c[e2])continue;const R=REACT[rkey(e,e2)];if(!R)continue;
   const w=R.type==='mult'?(R.k-1)*.16:R.type==='aoe'?R.k*.07:R.type==='freeze'?R.k*.06:R.type==='heal'?R.k*.2:.03;if(w>best)best=w;}
@@ -2277,6 +2287,7 @@ function skParts(sk,intr,L){L=L||1;
   // (_check/rar, поток толпы, 3/3): урон этих чар растёт ×2,0–2,2 при ×1,45 от одного урона — радиус добавляет ×1,37–1,5.
   // У глифа, стены и тотема (тоже «Каскад») радиус урона не прибавил — им только урон.
   if(!intr&&CASC_R.has(f)&&ST.cascade>1)dps*=1+(ST.cascade-1)*(sk.active?.8:1);
+  if(!intr&&isImp(sk.id))dps*=IMP.fl;   // чёрное пламя невозможной (поджог и прыжки) — сверх урона ×IMP.dmg
   return {dps,u,ext,pw:dps*u+ext};}
 // стихия у призыва; скелет-маг стреляет снарядами — его стихия работает почти как у снаряда (яд копится, тьма раскалывает)
 const summE=(sk,kn)=>kn==='skelmage'?Math.pow((FP.bolt.e||[])[sk.e]||1,.75):fpE(sk);
@@ -2295,8 +2306,10 @@ const pwr=sk=>{let v=PWC.get(sk.id);if(v===undefined){v=skPower(sk);PWC.set(sk.i
 // Доли пула: 50% обычных, 30% редких, 14% эпических, 6% легендарных. База силы ступени — RAR_POW × RAR_B0 × медиана
 // внутренней силы группы, внутри ступени +0…8% по месту. Настоящий урон чары подгоняется к базе множителем rarK
 // (урон, щит, лечение тотема, сила клона), поэтому редкость и есть сила: при одинаковом билде чара следующей редкости
-// 1-го ранга сильнее чары предыдущей даже на 5-м ранге (1,6 > 1,08 × 1,44).
-const RAR_POW=[1,1.6,2.56,4.096];   // ступени силы; пятая «Невозможная» — отдельным слоем, ×1,6–1,8 к легендарной
+// 1-го ранга сильнее чары предыдущей даже на 5-м ранге (1,75 > 1,08 × 1,44).
+// 25.11 (Артём: «нет сильной разницы между обычным и легендарным — не чувствуется ни по силе, ни по анимации»): шаг ×1,6 → ×1,75,
+// легендарная = ×5,36 обычной (было ×4,1). Средний билд по уровню не стал сильнее — общую силу по уровню держит RAR_LVK (ниже).
+const RAR_POW=[1,1.75,3.0625,5.359375];   // ступени силы; пятая «Невозможная» — отдельным слоем, ×2–2,5 к легендарной
 const RAR_Q=[.5,.8,.94];            // границы ступеней по месту в пуле
 const RAR_W=.08,RAR_B0=[.75,.6];    // разброс внутри ступени; база обычной — доля медианы внутренней силы группы (активные, пассивные):
                                     // случайная чара 1-го ранга бьёт на ~10% сильнее прежнего, 8 лучших баз 5-го ранга — как прежде
@@ -2341,11 +2354,11 @@ const skK=sk=>rarK(sk)*rkMul(sk.id)*slotBoost()*talQ(sk);
 // ---- ПОТОЛОК ТАЛАНТОВ (25.11, после проверки v13.29) ----
 // Таланты своего вида (Ярость, Каскад, Духи, Свита), ветка класса (стихия и виды особенности — ctTalPw) и даже общие (перезарядка,
 // мана, здоровье у щитов) усиливают одни чары героя сильнее других: до ×2–3,7 между самой усиленной и самой неусиленной. Шаг редкости —
-// ×1,6, разброс внутри ступени — ×1,08: эпическая чара «своего вида» обгоняла легендарную того же ранга.
+// ×1,6 (с 25.11 — ×1,75), разброс внутри ступени — ×1,08: эпическая чара «своего вида» обгоняла легендарную того же ранга.
 // Потолок: t — множитель талантов чары (сила с талантами / без них в стандартном бою: 1 каст/с, мана и здоровье по уровню, без
 // особенности класса). t зажимается в окно [W; W×TAL_CAP]; W выбрано так, что средний (геометрический) t по пулу класса не меняется:
 // срезанное у самых усиленных чар достаётся самым неусиленным, общий прирост силы от талантов остаётся тем же. Итог: таланты меняют силу
-// двух чар одного героя друг против друга не больше чем в TAL_CAP раз (1,45 < 1,6/1,08), поэтому чара следующей редкости того же ранга
+// двух чар одного героя друг против друга не больше чем в TAL_CAP раз (1,45 < 1,75/1,08), поэтому чара следующей редкости того же ранга
 // всегда сильнее, а «Невозможная» (×1,7) — сильнее легендарной. Поправка q = t'/t входит в skK — в настоящий урон, щиты, лечение и
 // призывы, а не только в цифру книги. Пока очков в талантах нет, q = 1.
 const TAL_CAP=1.45;
@@ -2384,8 +2397,10 @@ function talQ(sk){if(TQ.raw||!TQ.sig||!S||!CLS)return 1;
 // разбивка силы для листа чары и книги: база × ранг × уровень × таланты × резонанс × реакции
 function powerBreak(sk){const I=rarInfo();rarK(sk);const base=I.B[sk.id],rm=rkMul(sk.id),cur=skParts(sk,false).pw;
   const kt=S.talents;let lv=cur;S.talents={};computeStats();try{lv=skParts(sk,false).pw;}finally{S.talents=kt;computeStats();}
-  const re=resoMul(sk),rv=reactVal(sk.e,RESO_N),n=RESO_N[sk.e]+(EQUIPPED.has(sk.id)?0:1),im=isImp(sk.id)?(sk.active?IMP.dmg/IMP.cd:IMP.dmg):1,sb=slotBoost();
-  return {r:rarOf(sk),base,rank:rm,imp:im,slot:sb,lvl:lv/(base*rm*im*sb),tal:cur/lv,cap:talQ(sk),reso:re,react:rv,total:cur*re*rv,same:n};}
+  const re=resoMul(sk),rv=reactVal(sk.e,RESO_N),n=RESO_N[sk.e]+(EQUIPPED.has(sk.id)?0:1),im=isImp(sk.id)?(sk.active?IMP.dmg/IMP.cd:IMP.dmg)*IMP.fl:1,sb=slotBoost();
+  // особенность класса (CT_AFF: «Пиромант — огонь ×1,2») входит в силу чары (обёртка skPower) — и в разбор, иначе «Сила» разбора была меньше книги
+  const af=typeof ctAff==='function'?ctAff(sk):1;
+  return {r:rarOf(sk),base,rank:rm,imp:im,slot:sb,lvl:lv/(base*rm*im*sb),tal:cur/lv,cap:talQ(sk),aff:af,reso:re,react:rv,total:cur*re*rv*af,same:n};}
 const slotNm=(act,i)=>(act?'слоте ':'пассивном слоте ')+(i+1);
 function weakest(act,oc){const key=(act?'a':'p')+(oc||'');if(WKC&&WKC[key]!==undefined)return WKC[key];if(!WKC)WKC={};
   const arr=act?S.active:S.passive,n=act?activeSlots():passiveSlots();let b=null,bp=1e18;
@@ -2461,8 +2476,21 @@ const isWeak=sk=>isLearned(sk.id)&&!EQUIPPED.has(sk.id)&&rarOf(sk)===0&&!upgrade
 //   выпадает уже невозможной и шанс не тратит; свиток при пустом пуле зажигает изученную легендарную, а если все уже горят — «отголосок» (эссенция);
 // - предложенная, но не взятая невозможная (пропуск, авто-выбор другой карты) не сгорает: следующая легендарная выпадет невозможной (S.impPend);
 // - сила: урон ×1,7, перезарядка и мана −15 % (skDmg/skCd/skMana → сила, бой, автозамена, лучший билд); распыление — 220 эссенции.
+// 25.11 (Артём: «невозможную тоже легко повыбивать… взял — и она чуть-чуть сильнее, ты даже не замечаешь»):
+// - Невозможное ПРОСЫПАЕТСЯ с IMP_L0 = 45-го уровня забега: раньше шанс не копится и не тратится, свиток не зажигает;
+// - невозможная горит до конца ЗАБЕГА (S.imp — забег, как ранги и билд): «навсегда у героя» давало к третьему-четвёртому забегу
+//   невозможными почти все легендарные (drop_sim --vet=5: 7 невозможных к 100-му). Память осталась: S.impBook — легендарные, горевшие
+//   в прошлых забегах; такая легендарная выпадает Невозможной втрое чаще (IMP.mem) — шанс всё так же тратится;
+// - τ = 40 мин взвешенного боя после 45-го: до 100-го уровня свежий герой собирает 1–4 невозможные (drop_sim: первая — медиана ~60-го);
+// - легендарные сами выпадают реже (RAR_DROP), поэтому каждая невозможная — событие.
 // =====================================================================
-const IMP={dmg:1.7,cd:.85,mana:.85,tau:12960,cap:1.6,boss:2.2,echo:300};
+// сила (25.11, Артём: «после легендарной берёшь невозможную — она чуть-чуть сильнее, ты даже не замечаешь»): урон ×1,65, перезарядка и
+// мана −20 % и ЧЁРНОЕ ПЛАМЯ: удар невозможной поджигает врага (burn — доля удара в секунду, 3 с), враг умирает горящим — пламя
+// перекидывается на двух ближайших в 6 м (не дальше 3-го прыжка). Пламя в потоке толпы — +21 % урона (fl, стенд _check/rf/rf_browser.js dps).
+// Итог к той же легендарной: активные ×2,5, пассивные ×2,0 (было ×2,0/×1,7 по числу и ×1,7 в бою) + прыжки пламени по толпе.
+const IMP={dmg:1.65,cd:.8,mana:.8,burn:.15,burnT:3,jump:2,jumpR:6,fl:1.2,tau:2400,cap:1.6,boss:2.2,mem:3,echo:300};
+const IMP_L0=45;   // с этого уровня забега Невозможное просыпается
+const impAwake=()=>!!S&&(S.sandbox||S.lvl>=IMP_L0);
 const IMP_ZW=[.5,.6,.7,.8,.9,1,1.15,1.3,1.5,1.8];
 const IMP_OFFER=new Set();let IMP_OFF=false;
 const isImp=id=>!IMP_OFF&&!!S&&(IMP_OFFER.has(id)||!!S.imp&&S.imp.includes(id));
@@ -2472,16 +2500,19 @@ const impDirty=()=>{PWC=new Map();WKC=null;TQ.key=null;TQ.p0k='';};   // нев�
 // сила той же чары без невозможности — для «во сколько раз сильнее легендарной»
 function impBasePwr(sk){IMP_OFF=true;try{return skPower(sk);}finally{IMP_OFF=false;}}
 function impW(){if(PLAY==='gorge'&&GZ)return IMP_ZW[clamp(Math.round((GZ.lv||1)/3),0,8)];return IMP_ZW[clamp(zoneOf(P.pos.x,P.pos.z),0,IMP_ZW.length-1)];}
-function impTick(dt){if(!S||S.sandbox||mode!=='game'||P.dead)return;const a=S.impAcc||0,c=IMP.tau*IMP.cap;if(a<c)S.impAcc=Math.min(c,a+dt*impW());}
-const impP=(acc,src)=>1-Math.exp(-Math.max(0,acc||0)*(src==='boss'?IMP.boss:1)/IMP.tau);
+function impTick(dt){if(!S||S.sandbox||mode!=='game'||P.dead||!impAwake())return;const a=S.impAcc||0,c=IMP.tau*IMP.cap;if(a<c)S.impAcc=Math.min(c,a+dt*impW());}
+const impP=(acc,src,mem)=>1-Math.exp(-Math.max(0,acc||0)*(src==='boss'?IMP.boss:1)*(mem?IMP.mem:1)/IMP.tau);
 // бросок на одну выпавшую легендарную: тратит накопленный шанс; удача — чара предложена невозможной (IMP_OFFER), выучится — станет ей навсегда
 // удача: отложенная невозможная срабатывает без траты шанса, иначе бросок тратит всё накопленное
-function impLuck(src){if(S.impPend){S.impPend=0;return true;}const ok=Math.random()<impP(S.impAcc,src);S.impAcc=0;return ok;}
-function impRoll(sk,src){if(!S||S.sandbox||isImp(sk.id)||rarBase(sk)<3||!impLuck(src))return false;
+function impLuck(src,mem){if(!impAwake())return false;if(S.impPend){S.impPend=0;return true;}const ok=Math.random()<impP(S.impAcc,src,mem);S.impAcc=0;return ok;}
+function impRoll(sk,src){if(!S||S.sandbox||isImp(sk.id)||rarBase(sk)<3||!impLuck(src,!!S.impBook&&S.impBook.includes(sk.id)))return false;
   IMP_OFFER.add(sk.id);impDirty();return true;}
 // окно выбора уровня: новая выдача заменяет прежнюю; невзятая невозможная переходит на следующую легендарную
 function impDiscard(){if(!IMP_OFFER.size)return;IMP_OFFER.clear();if(S)S.impPend=1;impDirty();}
 function impOffer(ch){impDiscard();for(const sk of ch)if(impRoll(sk,'lvl'))break;return ch;}
+// 45-й уровень забега: Невозможное просыпается — с этого уровня копится шанс
+function impWake(){impDirty();if(!S||S.sandbox)return;if(mode==='game')impFx(P.pos.x,P.pos.z,1);
+  toast('Невозможное пробуждается: с этого уровня легендарная может выпасть Невозможной'+((S.impBook||[]).length?' — горевшие в прошлых забегах втрое чаще':''));}
 function impGrant(id){const L=impList();if(!L.includes(id))L.push(id);S.impN=(S.impN|0)+1;IMP_OFFER.delete(id);impDirty();saveSoon();if(mode==='game')impFx(P.pos.x,P.pos.z,1);}
 // learn(): предложенная невозможной чара становится невозможной навсегда; выбрали другую карту — предложение переходит дальше
 function impLearn(id){if(!IMP_OFFER.size)return;if(IMP_OFFER.has(id))impGrant(id);impDiscard();}
@@ -2493,20 +2524,20 @@ function impIgnite(src){if(!S||S.sandbox||!impLuck(src))return false;
   impGrant(sk.id);onBuildChanged();checkUpgrade(sk.id);rarPop(sk,'Свиток вспыхнул чёрным пламенем'+(EQUIPPED.has(sk.id)?' — чара в билде':' — в книге'));return true;}
 // строка для листа чары
 function impNote(sk){const b=rarBase(sk);
-  if(rarOf(sk)>=4){const k=pwr(sk)/Math.max(1e-6,impBasePwr(sk));return `<p class="note impn"><b>Невозможная · сила ${Math.round(pwr(sk))}</b> — в ${fmtK(k)} раза сильнее той же легендарной: ${impPerk()}. Горит чёрным пламенем во всех забегах героя.</p>`;}
-  return b>=3?`<p class="note">Очень редко легендарная выпадает <b class="impw">Невозможной</b> — чёрное пламя, ${impPerk()}. В дальних краях и с боссов чаще.</p>`:'';}
+  if(rarOf(sk)>=4){const k=pwr(sk)/Math.max(1e-6,impBasePwr(sk));return `<p class="note impn"><b>Невозможная · сила ${Math.round(pwr(sk))}</b> — в ${fmtK(k)} раза сильнее той же легендарной: ${impPerk()}. Горит чёрным пламенем до конца забега; в следующих забегах эта легендарная втрое чаще выпадает Невозможной.</p>`;}
+  return b>=3?`<p class="note">Очень редко легендарная выпадает <b class="impw">Невозможной</b> — чёрное пламя, ${impPerk()}. С ${IMP_L0}-го уровня забега, в дальних краях и с боссов чаще${S&&S.impBook&&S.impBook.includes(sk.id)?', а эта уже горела у героя — втрое чаще':''}.</p>`:'';}
 const fmtK=k=>k.toFixed(1).replace('.',',');
 // эссенция на поздних уровнях (25.11): когда билд на максимуме, её можно сжечь в шанс Невозможной — +¼ «среднего пути» к ней
 // (S.impAcc, как от боя), до того же предела; шанс тратится на ближайшую выпавшую легендарную или свиток при пустом пуле
 const IMP_ESS=3000;
 function impBuyInfo(){const a=(S&&S.impAcc)||0,c=IMP.tau*IMP.cap,a2=Math.min(c,a+IMP.tau*.25);return {full:a>=c-1,p:Math.round(impP(a,'lvl')*100),p2:Math.round(impP(a2,'lvl')*100),a2};}
-function impBuy(){if(!S||S.sandbox){rankSay('В песочнице Невозможное не разжечь.');return;}const q=impBuyInfo();
+function impBuy(){if(!S||S.sandbox){rankSay('В песочнице Невозможное не разжечь.');return;}if(!impAwake()){rankSay('Невозможное спит до '+IMP_L0+'-го уровня забега.');toast('Невозможное просыпается с '+IMP_L0+'-го уровня');return;}const q=impBuyInfo();
   if(q.full){rankSay('Невозможное уже горит в полную силу — шанс на пределе.');toast('Шанс Невозможной уже на пределе');return;}
   if(S.ess<IMP_ESS){rankSay('Не хватает эссенции: нужно '+IMP_ESS+', есть '+S.ess+'.');toast('Не хватает эссенции: нужно '+IMP_ESS);return;}
   S.ess-=IMP_ESS;S.impAcc=q.a2;saveSoon();if(mode==='game')impFx(P.pos.x,P.pos.z,1);
   rankSay('Невозможное разгорается: шанс, что ближайшая легендарная станет Невозможной, — '+q.p2+'%. −'+IMP_ESS+' эссенции',true);updateRankBtn();
   toast('Невозможное разгорается: шанс ближайшей легендарной — '+q.p2+'%');}
-const impPerk=()=>'урон ×'+fmtK(IMP.dmg)+', перезарядка и мана −'+Math.round((1-IMP.cd)*100)+' %';
+const impPerk=()=>'урон ×'+fmtK(IMP.dmg)+', перезарядка и мана −'+Math.round((1-IMP.cd)*100)+' %, чёрное пламя жжёт врага и перекидывается на соседей, когда он гибнет';
 
 
 // =====================================================================
@@ -2942,7 +2973,7 @@ function updateDarkSys(S_,dt){const {pos,vel,col,life,max,grav}=S_,d=Math.max(0,
     vel[k]*=d;vel[k+1]=vel[k+1]*d-grav[i]*dt;vel[k+2]*=d;pos[k]+=vel[k]*dt;pos[k+1]+=vel[k+1]*dt;pos[k+2]+=vel[k+2]*dt;
     const f=life[i]/max[i];col[c+3]=(f>.8?(1-f)/.2:f<.45?f/.45:1)*.96;}
   if(any||S_.dirty){S_.g.attributes.position.needsUpdate=true;S_.g.attributes.color.needsUpdate=true;S_.dirty=any;}}
-function updateDark(dt){impHitN=0;impAoeN=0;updateDarkSys(DARK,dt);updateDarkSys(DARKB,dt);}
+function updateDark(dt){impHitN=0;impAoeN=0;rarAoeN=0;rarHitN=0;updateDarkSys(DARK,dt);updateDarkSys(DARKB,dt);}
 // языки чёрного пламени (n штук в круге радиуса r на высоте y) и фиолетовые искры-ореол вокруг
 function impFlame(x,y,z,n,r){if(!HQ())n=Math.ceil(n*.6);for(let i=0;i<n;i++){const a=rand(0,TAU),q=rand(0,r);
     darkEmit(x+Math.cos(a)*q,y+rand(-.2,.3),z+Math.sin(a)*q,Math.cos(a)*rand(.2,.9),rand(1.2,2.8),Math.sin(a)*rand(.2,.9),rand(.45,.85),-1.2);
@@ -2958,6 +2989,42 @@ function impBurst(pos,r){if(impAoeN>=2||!fk())return;impAoeN++;const n=Math.roun
   for(let i=0;i<n;i++){const a=i/n*TAU+rand(-.2,.2),q=r*rand(.25,.75);darkEmit(pos.x+Math.cos(a)*q,rand(.3,1),pos.z+Math.sin(a)*q,Math.cos(a)*rand(1,2.5),rand(1.5,3),Math.sin(a)*rand(1,2.5),rand(.5,.8),-1);}
   const m=HQ()?7:4;for(let i=0;i<m;i++){const a=rand(0,TAU),q=r*rand(0,.4);darkEmit(pos.x+Math.cos(a)*q,rand(.4,1.2),pos.z+Math.sin(a)*q,Math.cos(a)*rand(.5,1.5),rand(.8,1.8),Math.sin(a)*rand(.5,1.5),rand(.55,.8),-.6,DARKB);}
   impFlame(pos.x,.6,pos.z,HQ()?8:5,Math.min(1,r*.3));}
+// чёрное пламя невозможной перекидывается с погибшего на двух ближайших (6 м): тёмная дуга и язык пламени на новом; не дальше 3-го прыжка
+function impJump(en){if((en.ibJ|0)>=3||procBudget<=0)return;procBudget--;const near=[];
+  for(const e of ENEMIES){if(e.dead||e===en||e.remote)continue;const d=Math.hypot(e.pos.x-en.pos.x,e.pos.z-en.pos.z);if(d<IMP.jumpR)near.push([d,e]);}
+  near.sort((a,b)=>a[0]-b[0]);const a=new THREE.Vector3(en.pos.x,1,en.pos.z);
+  for(let i=0;i<Math.min(IMP.jump,near.length);i++){const e=near[i][1];e.ibT=IMP.burnT;e.ibDps=Math.max(e.ibDps||0,en.ibDps);e.ibJ=(en.ibJ|0)+1;
+    if(fk()){fxBeam(a,v3.set(e.pos.x,1,e.pos.z),IMPD,.3,.16);impFlame(e.pos.x,(e.hy||1.6)*.5,e.pos.z,HQ()?5:3,.5);}}}
+// ---- облик по редкости (25.11, Артём: «разница между обычным и легендарным не чувствуется ни по анимации, ни по силе») ----
+// Одна и та же форма с редкостью выглядит богаче — качеством, а не количеством (Артём жаловался на месиво эффектов): вместо новых
+// частиц на каждом ударе — крупнее и ярче то, что уже есть, плюс одна вспышка своего цвета на касте и на площади. Ступени копятся:
+//   обычная — как раньше;  редкая — свечение: ореол на касте и под площадью, снаряд ×1,07, ореол снаряда ×1,15 с голубым отливом;
+//   эпическая — + искристый белёсый след снаряда, фиолетовый отлив ореола и следа, кольцо и отсвет по краю площади;
+//   легендарная — снаряд ×1,25, золотая вспышка и столб света на касте, золотая ударная волна на площади, лёгкая тряска, золотые искры удара;
+//   невозможная — чёрное пламя (impCastFx/impTrail/impBurst/impHitFx) + тёмная вспышка с фиолетово-золотыми искрами, тёмная волна и удар.
+// Бюджеты: не больше 2 площадей и 4 ударов на кадр с облик-эффектами, всё через fx()/emit() (общие лимиты FX 170 и pBudget), без новых
+// источников света; без HQ() (телефон, «экономный» режим) — только ореол/вспышка, без лишних искр.
+const RARC=[WHITE,new THREE.Color(0x6ab8ff),new THREE.Color(0xc58bff),new THREE.Color(0xffb02e),IMPC],RSZ=[1,1.07,1.13,1.25,1.3],GLK=[1,1.15,1.25,1.45],RTK=[0,.3,.35,.5];
+let rarAoeN=0,rarHitN=0;
+const rarV=sk=>sk&&sk.F?rarOf(sk):0;
+const RTMP=new THREE.Color();
+function rarCastFx(sk,col){const r=rarV(sk);if(!r)return;const x=P.pos.x,z=P.pos.z,rc=r>=4?IMPC:RARC[r];
+  fxGlow(x,z,1.6+.35*r,r>=3?rc:RTMP.copy(col).lerp(rc,.55),.32+.04*r,.35+.1*Math.min(r,3));
+  if(r>=2)fxRing(x,z,.4,1.7+.2*r,rc,.38,.6);
+  if(r===2&&HQ())colBurst(RARC[2],x,1.4,z,5,2.2,.4,-1);
+  if(r>=3){fxPillar(x,z,.45,3.2,r>=4?IMPD:RARC[3],.4,.4);if(HQ())colBurst(r>=4?IMPW:RARC[3],x,1.6,z,8,3,.5,-1);}
+  if(r>=4){for(let i=0;i<(HQ()?5:3);i++)darkEmit(x+rand(-.5,.5),rand(.6,1.8),z+rand(-.5,.5),rand(-.8,.8),rand(1.2,2.4),rand(-.8,.8),rand(.5,.8),-.8,DARKB);
+    if(HQ())colBurst(RARC[3],x,1.3,z,4,3.5,.45,-1);shk(.08,x,z);}}
+// след снаряда: эпическая — белёсые искры, легендарная — золотые, невозможная — своё (impTrail)
+function rarTrail(p,g){const r=rarV(p.sk);if(r<2||r>=4||!fk())return;const q=g.position;
+  if(Math.random()<(r>=3?.55:.4))emit(SPARK,q.x+rand(-.12,.12),q.y+rand(-.1,.1),q.z+rand(-.12,.12),rand(-.6,.6),rand(0,.8),rand(-.6,.6),r>=3?RARC[3]:WHITE,r>=3?.4:.28,0,1.4);}
+// площадь (нова, взрыв, удар сверху, клеймо, рок): эпическая — кольцо по краю, легендарная — золотая ударная волна и тряска, невозможная — тёмная волна
+function rarAoeFx(sk,pos,R,depth){const r=rarV(sk);if(r<1||depth>1||rarAoeN>=2||!fk())return;rarAoeN++;
+  if(r===1){fxGlow(pos.x,pos.z,R*1.15,RARC[1],.35,.4);return;}
+  if(r===2){fxGlow(pos.x,pos.z,R*1.15,RARC[2],.4,.4);fxRing(pos.x,pos.z,R*.7,R*1.05,RARC[2],.35,.5);return;}
+  fxShock(pos.x,pos.z,R*1.25,r>=4?IMPD:RARC[3],.5);if(r>=4)fxRing(pos.x,pos.z,R*.5,R*1.15,IMPC,.45,.6);shk(r>=4?.12:.06,pos.x,pos.z);}
+// удар: легендарная — горсть золотых искр, невозможная — своё (impHitFx)
+function rarHitFx(sk,en){if(rarHitN>=4||!HQ()||!fk())return;const r=rarV(sk);if(r!==3)return;rarHitN++;colBurst(RARC[3],en.pos.x,(en.hy||1.6)*.6,en.pos.z,4,2.6,.35,2);}
 // снаряд: тёмное ядро (тёмная точка поверх светящегося шара) и чёрный дымный след
 function impTrail(p){if(!fk())return;darkEmit(p.x,p.y,p.z,rand(-.3,.3),rand(0,.4),rand(-.3,.3),.32,-.6);if(Math.random()<.5)darkEmit(p.x+rand(-.15,.15),p.y+rand(-.1,.1),p.z+rand(-.15,.15),rand(-.6,.6),rand(.3,1),rand(-.6,.6),.5,-1);
   if(Math.random()<.45)emit(SPARK,p.x,p.y,p.z,rand(-1,1),rand(-.2,.8),rand(-1,1),IMPC,.3,0,1);}
@@ -3599,7 +3666,7 @@ function makeProjVis(key){const g=new THREE.Group();let core,spin=0,tint=false;c
     default:core=new THREE.Mesh(FXG.sphere,B(0xffffff));core.scale.setScalar(.55);tint=true;}
   const gl=glowSprite(0xffffff,4.2);g.add(core,gl);return {g,core,gl,key,spin,tint};}
 function takeProjVis(key,color,size){const p=PVPOOL[key]||(PVPOOL[key]=[]);const o=p.pop()||makeProjVis(key);o.tr=trailStart(o,color,.1+(size||.3)*.45);
-  if(o.tint)o.core.material.color.copy(color).lerp(WHITE,.55);o.gl.material.color.copy(color);o.g.scale.setScalar(size);o.g.rotation.set(0,0,0);scene.add(o.g);return o;}
+  if(o.tint)o.core.material.color.copy(color).lerp(WHITE,.55);o.gl.material.color.copy(color);o.gl.scale.setScalar(4.2);o.g.scale.setScalar(size);o.g.rotation.set(0,0,0);scene.add(o.g);return o;}
 function dropProjVis(o){trailEnd(o.tr);o.tr=null;scene.remove(o.g);PVPOOL[o.key].push(o);}
 const EPROJ=[];
 function shootAt(en,kind){const from=new THREE.Vector3(en.pos.x,1.2*en.sc,en.pos.z);const lead=kind==='arrow'?.35:0;
@@ -3728,6 +3795,31 @@ function dropW(sk){const k=(DROPK&&DROPK.get(sk.id))||[0,0];let w=(k[0]===0?1:k[
   if(CLS.core.has(sk.bk))w*=k[0]?1.3:2;if(bookOn()&&BOOK.has(sk.id))w*=1.8;return w*dropPen(sk);}
 // только полезные: новые базы и сильные варианты известных (пусто — значит, нового стоящего не осталось)
 function rollPool(){return dropScan().u;}
+const DROPS_SIDE=()=>dropScan().side;   // варианты известных баз (почти как твой) — запас свитка, когда своей ступени нет
+// ---- редкость выпадения по уровню (Артём 25.11: «на 30-м уровне весь билд из легендарок — такого не должно быть; невозможную тоже легко
+// выбить»). Было: каждая полезная чара выпадала с одним весом, у известной базы вариант выше редкостью шёл как «сильнее» — за ~120 изученных
+// (выбор уровня + свитки, к ~30-му) пул полезных кончался, и в билде оставались одни легендарные (симуляция _check/rf/drop_sim.js:
+// легендарная в билде с 3-го уровня, 86% билда — легендарные к 20-му). Теперь каждая карта выбора уровня и каждый свиток сначала бросает
+// СТУПЕНЬ редкости по уровню героя (RAR_DROP — доля «ступень ≥ r» на уровне L), потом берёт чару этой ступени из полезных (новая база
+// или сильнее твоей). Полезных этой ступени нет — ступень ниже; нет и ниже — ранг чаре из билда, вариант известной или эссенция:
+// опустевший низ не выталкивает наверх легендарные. Сверху — график RAR_PLAN: изучено чар ступени ≥ r больше положенного к уровню —
+// шанс этой ступени ×0,35 за каждую лишнюю (много свитков, удачная серия — легендарки не приходят пачкой).
+// Итог (drop_sim, 160 забегов): легендарная — праздник до ~40-го, полный легендарный билд — к ~75–90-му, обычные и редкие — начало забега.
+const RAR_DROP=[[1,.15,.008,0],[10,.22,.02,0],[20,.28,.045,.0015],[30,.34,.07,.004],[40,.4,.1,.013],[50,.45,.14,.035],[60,.5,.18,.06],
+  [70,.55,.22,.08],[80,.6,.26,.1],[90,.64,.3,.12],[100,.68,.33,.14]];
+// график: сколько чар ступени ≥ редкой, ≥ эпической и легендарных изучено к уровню при обычной игре. Обогнал график на n чар — шанс
+// ступени ×0,35ⁿ, отстал — ×(1 + 0,6·n), не больше ×3 (мало врагов и свитков — легендарки всё равно приходят к своим уровням)
+const RAR_PLAN=[[1,0,0,0],[10,5,.6,0],[20,9,2.5,.3],[30,13,5,.6],[40,17,8,1.6],[50,21,11,4.5],[60,25,14,8],[70,29,17,11],[80,33,20,14],[90,37,23,16],[100,41,26,17]];
+const rarTab=(T,L)=>{if(L<=T[0][0])return T[0].slice(1);for(let i=1;i<T.length;i++)if(L<=T[i][0]){const a=T[i-1],b=T[i],k=(L-a[0])/(b[0]-a[0]);return a.slice(1).map((v,j)=>v+(b[j+1]-v)*k);}return T[T.length-1].slice(1);};
+// изучено чар класса ступени ≥ r (невозможные — как легендарные)
+function rarHave(){const h=[0,0,0,0];for(const id of LEARNED){if(!CLS.pool.has(id))continue;const r=Math.min(3,rarBase(SKILLS[id]));for(let k=0;k<=r;k++)h[k]++;}return h;}
+// ступень этой карты/свитка: 0 обычная … 3 легендарная
+function rarRoll(L){L=L||S.lvl;const q=rarTab(RAR_DROP,L),pl=rarTab(RAR_PLAN,L),h=rarHave();
+  for(let r=1;r<=3;r++){const d=h[r]-pl[r-1];q[r-1]*=d>0?Math.pow(.35,d):Math.min(3,1-.6*d);}
+  if(q[2]>q[1])q[1]=q[2];if(q[1]>q[0])q[0]=q[1];
+  const u=Math.random();return u<q[2]?3:u<q[1]?2:u<q[0]?1:0;}
+// из полезных — чары ступени t, нет таких — ступени ниже (пусто — ничего этой ступени и ниже не осталось)
+function rarPick(list,t){for(let r=t;r>=0;r--){const c=list.filter(s=>Math.min(3,rarBase(s))===r);if(c.length)return c;}return [];}
 function wpick(c,mul){let t=0;const w=c.map(s=>{const v=dropW(s)*(mul?mul(s):1);t+=v;return v;});let r=Math.random()*t;for(let i=0;i<c.length;i++){r-=w[i];if(r<=0)return c[i];}return c[c.length-1];}
 const rankOffers=()=>{const a=[];for(const id of EQUIPPED)if(rk(id)<5)a.push(SKILLS[id]);return a;};
 const rankCard=sk=>{const o=Object.create(sk);o.rankUp=true;return o;};
@@ -3736,7 +3828,12 @@ function learnRandom(src){const pool=S.sandbox?[]:rollPool();
   if(!pool.length&&!S.sandbox){if(impIgnite(src))return;const ro=rankOffers();if(ro.length){const sk=pickW(ro.map(s=>[s,dropPen(s)]));dropSeen([sk]);rankUp(sk);
     fxPillar(P.pos.x,P.pos.z,.8,5,GOLD,.7);toast('Свиток: новых сильных чар нет — ранг «'+skName(sk)+'» → '+rk(sk.id));return;}}
   if(!pool.length){S.ess+=60;toast('Свиток рассыпался в 60 эссенции');return;}
-  const sk=wpick(pool);dropSeen([sk]);impRoll(sk,src==='boss'?'boss':'scroll');learn(sk.id,true);if(isImp(sk.id))impFx(P.pos.x,P.pos.z,1);else{fxPillar(P.pos.x,P.pos.z,.8,5,GOLD,.7);colBurst(GOLD,P.pos.x,1.2,P.pos.z,20,4,.7,-2);}
+  let c=S.sandbox?pool:rarPick(pool,rarRoll());
+  // ступень не по уровню: полезные есть, но все — выше выпавшей ступени. Ранг чаре из билда, иначе вариант известной базы, иначе эссенция
+  if(!c.length){const ro=rankOffers();if(ro.length){const sk=pickW(ro.map(s=>[s,dropPen(s)]));dropSeen([sk]);rankUp(sk);
+      fxPillar(P.pos.x,P.pos.z,.8,5,GOLD,.7);toast('Свиток: ранг «'+skName(sk)+'» → '+rk(sk.id));return;}
+    c=DROPS_SIDE().filter(s=>dropPen(s)>=.3);if(!c.length){const e=40+S.lvl*3;S.ess+=e;toast('Свиток: чары этой силы ещё не по уровню — +'+e+' эссенции');return;}}
+  const sk=wpick(c);dropSeen([sk]);impRoll(sk,src==='boss'?'boss':'scroll');learn(sk.id,true);if(isImp(sk.id))impFx(P.pos.x,P.pos.z,1);else{fxPillar(P.pos.x,P.pos.z,.8,5,GOLD,.7);colBurst(GOLD,P.pos.x,1.2,P.pos.z,20,4,.7,-2);}
   toastSk(sk,'Свиток: «'+skName(sk)+'»'+(EQUIPPED.has(sk.id)?' — сразу в билде':' — в книге'),'Из свитка'+(EQUIPPED.has(sk.id)?' — сразу в билде':' — в книге'));}
 
 // =====================================================================
@@ -3763,7 +3860,7 @@ function dealDamage(en,base,el,o){
   if(en.dead)return;
   if(en.remote)return mpGuestHit(en,base,el,o);
   const depth=o.depth||0,sk=o.sk,M=sk?sk.M:null;
-  if(sk&&isImp(sk.id))impHitFx(en);
+  if(sk){if(isImp(sk.id))impHitFx(en);else if(!o.dot)rarHitFx(sk,en);}
   let dmg=base,crit=false,R=null;
   const pid=o.fromG?1:0,rcK=o.fromG?(o.rc||1):ST.react;
   if(!o.dot){
@@ -3779,6 +3876,7 @@ function dealDamage(en,base,el,o){
   if(en.affix.has('armor'))dmg*=.6;
   dmg=Math.max(1,Math.round(dmg));
   en.hp-=dmg;en.flash=.1;en.aggro=true;
+  if(sk&&!o.dot&&!o.fromG&&isImp(sk.id)){en.ibT=IMP.burnT;en.ibDps=Math.max(en.ibDps||0,dmg*IMP.burn);en.ibJ=0;}
   cfOnHit(en,dmg,el,o,crit,R);nfOnHit(en,dmg,el,o,crit,R);
   const fp={x:en.pos.x,y:en.hy-1.7,z:en.pos.z};
   float(fp,crit?dmg+'!':String(dmg),o.dot?o.dotCol:el>=0?ELEMENTS[el].hex:(o.col||'#ffffff'),o.dot?11:crit?19:14);
@@ -3800,7 +3898,7 @@ function dealDamage(en,base,el,o){
   }
   if(en.hp<=0)kill(en,depth,el,o.fromG?{fromG:true}:undefined);
 }
-function aoe(pos,r,dmg,el,o,exclude){let n=0;if(o&&o.sk&&isImp(o.sk.id))impBurst(pos,r);
+function aoe(pos,r,dmg,el,o,exclude){let n=0;if(o&&o.sk){if(isImp(o.sk.id))impBurst(pos,r);if(!o.splash&&!o.fromG)rarAoeFx(o.sk,pos,r,o.depth||0);}
   for(const en of ENEMIES){if(en.dead||en===exclude)continue;const dx=en.pos.x-pos.x,dz=en.pos.z-pos.z,rr=r+en.r;
     if(dx*dx+dz*dz<=rr*rr){dealDamage(en,dmg,el,o.knockFrom?o:Object.assign({},o,{knockFrom:pos}));n++;}}
   return n;}
@@ -3812,6 +3910,7 @@ function kill(en,depth,el,o){o=o||{};if(en.dead)return;
   if(MPH)mpOnKill(en,o);
   cfOnKill(en,el,o);nfOnKill(en,el,o);
   en.dead=true;en.deathT=0;en.bar.visible=false;if(en.label)en.label.visible=false;if(en.tele)en.tele.cancel=true;if(target===en)target=null;if(en.ice)en.ice.visible=false;
+  if(en.ibT>0&&!o.fromG)impJump(en);
   const c=new THREE.Color(en.t.col);colBurst(c,en.pos.x,.8*en.sc,en.pos.z,en.boss?70:en.elite?26:12,en.boss?7:4,.7,9);puffs(en.pos.x,.5,en.pos.z,c.clone().multiplyScalar(.45),en.boss?24:4);
   if(!o.noReward){S.kills++;gainXp(en.xp);if(en.boss)bossLoot(en);else dropLoot(en);if(!en.boss)threat+=en.elite?6:1;if(el===EL.blood&&!o.fromG)heal(P.maxHp*.02);}
   if(en.tid==='slime'&&!en.mini&&!MPG){for(let k=0;k<2;k++)spawnEnemy('slime',en.pos.x+rand(-.7,.7),en.pos.z+rand(-.7,.7),en.lv,{mini:true,aggro:true});}
@@ -3836,6 +3935,7 @@ function shieldBurst(){const sk=P.shieldSk;P.shield=0;hero.shieldM.visible=false
   xq(()=>fxShock(P.pos.x,P.pos.z,4.8*R,sk.E.color,.6));shards(sk.e,P.pos.x,1.2,P.pos.z,10,7);shk(.16,P.pos.x,P.pos.z);}
 let luQueue=0,luDelay=0;
 function gainXp(x,mx){mastAdd((mx==null?x:mx)*.5);S.xp+=x;let up=0;while(S.xp>=xpNeed(S.lvl)){if(S.lvl>=999){S.xp=0;break;}S.xp-=xpNeed(S.lvl);S.lvl++;up++;}
+  if(up&&S.lvl>=IMP_L0&&S.lvl-up<IMP_L0)impWake();
   if(up){recalcStats();P.hp=P.maxHp;P.mp=P.maxMp;onBuildChanged();
     banner('Уровень '+S.lvl,'+'+up+' очк'+(up===1?'о':'а')+' талантов · слотов: '+activeSlots()+' + '+passiveSlots());
     fxPillar(P.pos.x,P.pos.z,1.2,7,GOLD,.9);fxRing(P.pos.x,P.pos.z,.5,5,GOLD,.7);colBurst(GOLD,P.pos.x,1,P.pos.z,40,5,1,-1);
@@ -3844,17 +3944,18 @@ function gainXp(x,mx){mastAdd((mx==null?x:mx)*.5);S.xp+=x;let up=0;while(S.xp>=x
 // ЗАБЕГ: уровень, таланты, ранги и билд живут только в забеге
 // =====================================================================
 let RUN={on:false,kind:'',key:0,won:false,snap:null,keep:false};
-const RUNF=['lvl','xp','ess','ranks','talents','active','passive','learned'];
+const RUNF=['lvl','xp','ess','ranks','talents','active','passive','learned','imp','impAcc'];
 const startLvlFor=el=>Math.max(1,el-2);
-function runSnap(fresh){const o={fresh:!!fresh};for(const k of RUNF)o[k]=JSON.parse(JSON.stringify(S[k]));return JSON.stringify(o);}
-function runRestore(js){const o=JSON.parse(js);for(const k of RUNF)S[k]=o[k];LEARNED=new Set(S.learned);return o;}
+function runSnap(fresh){const o={fresh:!!fresh};for(const k of RUNF)if(S[k]!==undefined)o[k]=JSON.parse(JSON.stringify(S[k]));return JSON.stringify(o);}
+function runRestore(js){const o=JSON.parse(js);for(const k of RUNF)if(o[k]!==undefined)S[k]=o[k];LEARNED=new Set(S.learned);if(o.imp)impDirty();return o;}
 // таланты на старте забега — умным «Авто» (как кнопка) против врагов уровня забега; очки мастерства остаются игроку
 function autoTalents(foe){const n=tpTotal()-tpSpent()-mastTp();if(n>0)talSmart(n,foe);}
 function runFresh(l0){const f=newChar(CLS);S.lvl=1;S.xp=0;S.ess=0;S.ranks={};S.talents={};
+  if(!S.sandbox){S.impBook=[...new Set([...(S.impBook||[]),...(S.imp||[])])];S.imp=[];S.impAcc=0;S.impPend=0;IMP_OFFER.clear();impDirty();}
   if(!S.sandbox){S.active=f.active;S.passive=f.passive;S.learned=f.learned;}
   LEARNED=new Set(S.learned);for(const id of S.learned)if(!BOOK.has(id)){BOOK.add(id);S.book.push(id);}
   computeStats();EQUIPPED=new Set(equippedIds());
-  if(!S.sandbox)for(let l=2;l<=l0;l++){S.lvl=l;const pool=rollPool();if(pool.length)learn(wpick(pool).id,true);}
+  if(!S.sandbox)for(let l=2;l<=l0;l++){S.lvl=l;const pool=rarPick(rollPool(),rarRoll(l));if(pool.length)learn(wpick(pool).id,true);}
   S.lvl=Math.max(1,l0);if(!S.sandbox)autoTalents(S.lvl+2);S.ess=40*(S.lvl-1);}
 function runApply(){computeStats();recalcStats();P.hp=P.maxHp;P.mp=P.maxMp;onBuildChanged();luQueue=0;luOpen=false;$('#lvlup').hidden=true;cfReset();nfReset();}
 function runPicks(fresh){if(fresh&&!S.sandbox){const n=startPicks();if(n){luQueue+=n;luDelay=1.6;}}}
@@ -3885,10 +3986,12 @@ function spawnBoss(tid0){if(BOSS)return;const C=mpSpawnCenter(),zb=WBOSS[zoneOf(
 // PLAYER EFFECT ENTITIES
 // =====================================================================
 const PROJ=[];
-function spawnProj(o){if(PROJ.length>90)return;const col=o.col||elCol(o.el);o.c=col;o.vis=takeProjVis(projKey(o.el),col,o.size);o.vis.g.position.copy(o.pos);o.dist=0;PROJ.push(o);}
+function spawnProj(o){if(PROJ.length>90)return;const col=o.col||elCol(o.el);o.c=col;o.vis=takeProjVis(projKey(o.el),col,o.size);o.vis.g.position.copy(o.pos);o.dist=0;PROJ.push(o);
+  // облик по редкости: ореол снаряда крупнее и с отливом своего цвета (редкая — голубовато-белый, эпическая — фиолетовый, легендарная — золото), след — тоже
+  const r=o.sk?Math.min(3,rarV(o.sk)):0;o.vis.gl.scale.setScalar(4.2*GLK[r]);if(r){o.vis.gl.material.color.lerp(RARC[r],RTK[r]);if(o.vis.tr)o.vis.tr.col.lerp(RARC[r],RTK[r]);}}
 function makeBolt(sk,from,dir,target,dmg,R,o){o=o||{};const id=sk?sk.E.id:'';
   spawnProj({pos:from,dir,speed:(o.speed||21)*(id==='wind'?1.5:id==='earth'?.8:1),dmg,el:sk?sk.e:-1,sk,depth:o.depth||0,target,
-    size:(o.size||.26)*(id==='earth'?1.35:1)*Math.sqrt(R),range:o.range||22,aoeR:R>1?1.7*R:0,
+    size:(o.size||.26)*(id==='earth'?1.35:1)*Math.sqrt(R)*(sk?RSZ[rarV(sk)]:1),range:o.range||22,aoeR:R>1?1.7*R:0,
     pierce:id==='ice'?1:0,ric:id==='arcane'?1:0,split:id==='shadow'&&!o.mini,zap:id==='storm',puddle:id==='poison'&&!o.mini,boom:id==='fire'&&!o.mini,mini:!!o.mini,hit:new Set()});}
 function updateProj(dt){
   for(let i=PROJ.length-1;i>=0;i--){const p=PROJ[i],o=p.vis,g=o.g;
@@ -3897,7 +4000,7 @@ function updateProj(dt){
     if(o.spin)o.core.rotation.z+=o.spin*dt;if(o.key==='storm')o.gl.scale.setScalar(rand(3.4,5.2));
     if(fk())emit(SPARK,g.position.x,g.position.y,g.position.z,rand(-.5,.5),rand(-.3,.5),rand(-.5,.5),p.c,.3,p.el>=0?EP[ELEMENTS[p.el].id][0]*.4:0,1);
     if((p.el===EL.shadow||p.el===EL.poison)&&fk())emit(PUFF,g.position.x,g.position.y,g.position.z,0,.3,0,p.c.clone().multiplyScalar(.5),.4,0,1);
-    projFx(p,g);if(p.sk&&isImp(p.sk.id))impTrail(g.position);
+    projFx(p,g);if(p.sk){if(isImp(p.sk.id))impTrail(g.position);else rarTrail(p,g);}
     let hit=null;for(const en of ENEMIES){if(en.dead||p.hit.has(en))continue;const dx=en.pos.x-g.position.x,dz=en.pos.z-g.position.z,rr=en.r+.35;if(dx*dx+dz*dz<rr*rr){hit=en;break;}}
     if(hit){if(projHit(p,hit)){dropProjVis(o);PROJ.splice(i,1);}continue;}
     if(p.dist>p.range){dropProjVis(o);PROJ.splice(i,1);}}}
@@ -4405,7 +4508,7 @@ function cast(sk,A,cl){
   const pick=r=>A?coneTarget(A.dir,r,.8):getTarget(r);
   if(!cl){if(A)P.face=Math.atan2(A.dir.x,A.dir.z);else{const tg=getTarget(sk.F.range+2);if(tg)faceTo(tg.pos);}}
   const dmg=skDmg(sk)*(cl?(typeof cl==='number'?cl:.5):1)*cfCastMul(sk,cl),R=skR(sk),col=sk.E.color,F=sk.F.id;
-  colBurst(col,P.pos.x+Math.sin(P.face)*.4,1.8,P.pos.z+Math.cos(P.face)*.4,7,2,.35,-1);fxGlow(P.pos.x,P.pos.z,1.6,col,.3,.6);if(isImp(sk.id))impCastFx();
+  colBurst(col,P.pos.x+Math.sin(P.face)*.4,1.8,P.pos.z+Math.cos(P.face)*.4,7,2,.35,-1);fxGlow(P.pos.x,P.pos.z,1.6,col,.3,.6);if(isImp(sk.id))impCastFx();if(!cl)rarCastFx(sk,col);
   const run={
     bolt:()=>{const c=sk.M.count||1;const t2=pick(sk.F.range+2);const base=A?A.dir.clone():t2?v1.set(t2.pos.x-P.pos.x,0,t2.pos.z-P.pos.z).normalize().clone():fwd();
       for(let i=0;i<c;i++){const a=(i-(c-1)/2)*.35;const d=base.clone().applyAxisAngle(v2.set(0,1,0),a);makeBolt(sk,new THREE.Vector3(P.pos.x,1.25,P.pos.z).addScaledVector(d,.6),d,t2,dmg,R);
@@ -5052,8 +5155,9 @@ function updateEnemies(dt){
     if(en.stun>0&&en.frozenT<=0&&Math.random()<.2*FRK)emit(SPARK,en.pos.x+rand(-.3,.3),en.hy+.1,en.pos.z+rand(-.3,.3),rand(-1,1),.5,rand(-1,1),ELEMENTS[EL.storm].color,.3,0,1);
     if(en.frozenT>0){if(!en.ice){en.ice=new THREE.Mesh(G.box,iceBlockM);en.ice.scale.set(en.t.r*2.2,en.t.h*1.02,en.t.r*2.2);en.ice.position.y=en.t.h*.5;en.ice.rotation.y=.4;en.g.add(en.ice);}en.ice.visible=true;}else if(en.ice)en.ice.visible=false;
     if(en.affix.has('regen'))en.hp=Math.min(en.maxHp,en.hp+en.maxHp*.015*dt);
-    en.dotT-=dt;if(en.dotT<=0){en.dotT=.5;let d=0;if(en.burnT>0)d+=en.burnDps*.5;if(en.poisT>0)d+=en.poisN*en.poisDps*.5;
-      if(d>=.5){dealDamage(en,d,-1,{dot:true,depth:3,dotCol:en.burnT>0?'#ffa366':'#b5f07a'});if(en.dead)continue;}}
+    if(en.ibT>0){en.ibT-=dt;if(en.ibT<=0)en.ibDps=0;else if(Math.random()<.3*FRK)darkEmit(en.pos.x+rand(-.3,.3),en.hy*.45,en.pos.z+rand(-.3,.3),rand(-.3,.3),rand(1,2),rand(-.3,.3),rand(.35,.6),-1);}
+    en.dotT-=dt;if(en.dotT<=0){en.dotT=.5;let d=0;if(en.burnT>0)d+=en.burnDps*.5;if(en.poisT>0)d+=en.poisN*en.poisDps*.5;if(en.ibT>0)d+=en.ibDps*.5;
+      if(d>=.5){dealDamage(en,d,-1,{dot:true,depth:3,dotCol:en.ibT>0?'#b98cff':en.burnT>0?'#ffa366':'#b5f07a'});if(en.dead)continue;}}
     if(en.boss)bossPhaseTick(en);
     const tp=(GZ&&GZ.camp&&en.cg&&TCC.goal(en))||(en.tauntS&&tauntTarget(en))||mpTarget(en),dx=(tp?tp.pos.x:P.pos.x)-en.pos.x,dz=(tp?tp.pos.z:P.pos.z)-en.pos.z,dist=Math.hypot(dx,dz)||.001,TD=tp?false:P.dead;
     // отставший уходит и освобождает лимит (без агро — уже с 40 м); новая стая встаёт на его место впереди через ~0,6 с
@@ -5741,13 +5845,14 @@ let luOpen=false;
 let LU_LAST=[];
 function rollChoices(){const D=dropScan(),ro=rankOffers(),res=[];
   const div=s=>{let m=1;for(const r of res){if(r.e===s.e)m*=.45;if(r.f===s.f)m*=.15;else if(r.F.role===s.F.role)m*=.5;}return m;};
-  const take=f=>{const free=s=>f(s)&&!res.some(r=>r.bk===s.bk),opts=[];for(const s of D.u)if(free(s))opts.push([s,dropW(s)*div(s)]);
+  const take=f=>{const free=s=>f(s)&&!res.some(r=>r.bk===s.bk),opts=[];for(const s of rarPick(D.u.filter(free),rarRoll()))opts.push([s,dropW(s)*div(s)]);
     const bucket=(list,W,mk)=>{const c=list.filter(s=>free(s)&&(mk||dropPen(s)>=.3));if(!c.length)return;const s=pickW(c.map(x=>[x,(mk?dropPen(x):dropW(x))*div(x)]));opts.push([mk?mk(s):s,W*dropPen(s)*div(s)]);};
     bucket(ro,.6,rankCard);bucket(D.side,.25);if(opts.length)res.push(pickW(opts));};
   // фирменная (A): открывшаяся и ещё не изученная — третьей картой (первые две тогда — общие), раньше — с меньшим уровнем открытия
   const sg=S.sandbox?[]:D.u.filter(s=>s.F.sig&&!knownBase(s)),ns=sg.length?(s=>!s.F.sig):(()=>true);
   take(s=>s.active&&ns(s));take(s=>!s.active&&ns(s));
-  if(sg.length){const c0=sg.filter(s=>!res.some(r=>r.bk===s.bk));if(c0.length){const lo=Math.min(...c0.map(s=>s.F.lvl||1)),c=c0.filter(s=>(s.F.lvl||1)===lo);res.push(c[Math.random()*c.length|0]);}}
+  if(sg.length){const c0=sg.filter(s=>!res.some(r=>r.bk===s.bk));if(c0.length){const lo=Math.min(...c0.map(s=>s.F.lvl||1)),c1=c0.filter(s=>(s.F.lvl||1)===lo);let c=rarPick(c1,rarRoll());
+    if(!c.length){const m=Math.min(...c1.map(s=>Math.min(3,rarBase(s))));c=c1.filter(s=>Math.min(3,rarBase(s))===m);}res.push(c[Math.random()*c.length|0]);}}
   let g=0;while(res.length<3&&g++<9)take(()=>true);
   dropSeen(res);LU_LAST=res;impOffer(res.filter(s=>!s.rankUp));return res;}
 // выбранная карточка: изучить чару или поднять ранг чаре из билда
@@ -6187,7 +6292,7 @@ function reactName(e,c){let best=null,bw=0;for(let e2=0;e2<10;e2++){if(e2===e||!
 function pwBreakHtml(sk){const b=powerBreak(sk),x=(v,t,c)=>`<span${c?' class="'+c+'"':''}>×${fmt2(v)}<i>${t}</i></span>`,on=v=>Math.abs(v-1)>.005;
   const rn=reactName(sk.e,RESO_N),parts=[`<span class="bd">${Math.round(b.base)}<i>${RARITY[Math.min(b.r,3)].n.toLowerCase()}</i></span>`,x(b.rank,'ранг '+rk(sk.id))];if(on(b.imp))parts.push(x(b.imp,'невозможная'));
   if(on(b.lvl))parts.push(x(b.lvl,'уровень '+S.lvl));if(on(b.slot))parts.push(x(b.slot,'мало слотов'));if(on(b.tal))parts.push(x(b.tal,'таланты'));
-  if(on(b.reso))parts.push(x(b.reso,'резонанс','bl'));if(on(b.react))parts.push(x(b.react,'реакция','bl'));
+  if(on(b.aff))parts.push(x(b.aff,'особенность'));if(on(b.reso))parts.push(x(b.reso,'резонанс','bl'));if(on(b.react))parts.push(x(b.react,'реакция','bl'));
   const tn=!on(b.cap)?'':b.cap<1?' В «таланты» входит потолок ×'+fmt2(b.cap)+': эту чару таланты усиливают сильнее других чар героя, а разница между чарами от талантов — не больше ×'+fmt2(TAL_CAP)+', излишек уходит слабее усиленным.':
     ' В «таланты» входит +'+pct(b.cap-1)+'% от потолка: эту чару таланты усиливают слабее других, ей досталась часть их излишка.';
   const notes=[];if(on(b.reso))notes.push('+'+Math.round((b.reso-1)*100)+'% от резонанса '+GENE[sk.E.id]+': '+plCh(b.same)+' '+GENE[sk.E.id]+' в билде вместе с этой');
