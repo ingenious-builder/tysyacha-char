@@ -336,7 +336,7 @@ function winLocal(m){
   if(X.runWon)X.runWon();
   const k=CS.k,c=LV[k-1],first=!!m.fs;
   const xp=Math.round(X.xpNeed(Math.max(1,X.S.lvl))*(first?.55:.25)*(1+.08*k)),ess=Math.round(40*k+(first?55*k:0)),sc=(first?2:1)+(first&&k===8?1:0);
-  X.gainXp(xp);X.S.ess+=ess;for(let i=0;i<sc;i++)X.learnRandom();X.save();
+  X.gainXp(xp,Math.round(xp*X.xpNeed.base(Math.max(1,X.S.lvl))/X.xpNeed(Math.max(1,X.S.lvl))));X.S.ess+=ess;for(let i=0;i<sc;i++)X.learnRandom();X.save();
   $('#winTitle').textContent=k===8?'Кампания пройдена!':'Уровень '+k+' «'+c.name+'» пройден';
   let tx='Оценка '+stars(m.st)+' · время '+fmtT(m.el)+' · падений: '+m.dn+(m.st<3?(m.dn?' (★★ — без падений)':' (★★★ — быстрее '+fmtT(c.par)+')'):'')+'. Награда каждому: +'+xp+' опыта, +'+ess+' эссенции, свитков чар: '+sc+(first?' (за первое прохождение)':'')+'.';
   const host=X.MPH||!X.MPon;
