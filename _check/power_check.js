@@ -7,6 +7,8 @@
 //   node _check/power_check.js --real --k — только проверка множителя редкости в бою (дописывает в real_dps.json)
 //   node _check/power_check.js --fit      — по real_dps.json печатает подогнанные таблицы FP (ph/e/m, k у призыва) —
 //                                            для новых видов чар и после правок механик
+//   node _check/power_check.js --pairs    — ещё и реальный урон критических пар редкостей с талантами (_check/pairs_check.js, браузер ~2 мин):
+//                                            с талантами явно перевёрнутых пар не больше, чем без них
 //   ключи: --root=<папка игры> (по умолчанию — родитель _check), --md=<файл отчёта> (таблицы в markdown)
 // Выход: код 1, если правило редкости нарушено или оценка расходится с замером больше допуска.
 const fs = require('fs'), path = require('path'), vm = require('vm');
@@ -90,6 +92,18 @@ function nodeChecks(G, out) {
   G.get('S').ranks = {};
   out.push('', '## Справка: таланты своего вида', '', `Все таланты взяты (40-й уровень): соседних пар, где чара низшей редкости на 5-м ранге сильнее высшей на 1-м: ${(ti / tp * 100).toFixed(1)}% (${ti} из ${tp}). Это таланты одного вида — в разбивке силы видны как «таланты».`, '',
     'Наибольший множитель талантов у вида (при всех талантах): ' + Object.entries(tf).sort((a, b) => b[1] - a[1]).map(([f, k]) => f + ' ×' + k.toFixed(2)).join(', ') + '.');
+  // правило с талантами (25.11, потолок талантов talQ): на ОДНОМ ранге чара следующей редкости сильнее — при всех общих талантах
+  // и полной ветке класса. Нарушение — ошибка.
+  let sp = 0, sb = 0, sm = 9; const sw = [];
+  let CTT = {}; try { CTT = G.get('CT_TAL'); } catch (e) {}
+  for (const L of [40, 160]) for (const C of CLASSES) {
+    const tal = Object.assign({}, TAL, { vit: 5, armor: 5, regen: 3, leech: 3 }); for (const t of CTT[C.id] || []) tal[t.id] = t.max;
+    useClass(G, C.id, { lvl: L, talents: tal }); const I = G.get('rarInfo')();
+    for (const act of [true, false]) { const tier = Array.from({ length: NR }, () => ({ min: Infinity, max: 0, n: 0 }));
+      for (const id of [...C.pool]) { if (SKILLS[id].active !== act) continue; const p = G.get('skParts')(SKILLS[id], false).pw, t = tier[I.map.get(id) | 0]; t.n++; t.min = Math.min(t.min, p); t.max = Math.max(t.max, p); }
+      for (let r = 0; r + 1 < NR; r++) { const lo = tier[r], hi = tier[r + 1]; if (!lo.n || !hi.n) continue; sp++; const m = hi.min / lo.max; sm = Math.min(sm, m); if (m < 1 - 1e-9) { sb++; sw.push(C.id + ' ур.' + L + ' ' + (act ? 'акт' : 'пас') + ' ' + RARITY[r].n + '→' + RARITY[r + 1].n + ' ×' + m.toFixed(3)); } } } }
+  out.push('', '## Правило «редкость = сила» с талантами', '', `Все общие таланты и полная ветка класса (уровни 40, 160), один ранг: проверено ${sp} пар соседних редкостей, нарушений: **${sb}**, наименьший запас ×${sm.toFixed(3)} (потолок талантов ×${G.get('TAL_CAP')}).` + (sb ? ' Нарушены: ' + sw.slice(0, 5).join('; ') : ''));
+  bad += sb;
   return bad;
 }
 
@@ -187,6 +201,7 @@ if (require.main === module) (async () => {
   }
   if (flag('fit')) { fit(G); return; }
   let bad = nodeChecks(G, out); bad += compare(G, out); bad += checkK(G, out);
+  if (flag('pairs')) { try { const t = require('child_process').execFileSync(process.execPath, [path.join(__dirname, 'pairs_check.js'), '--root=' + ROOT], { timeout: 1500e3 }).toString(); out.push('', '## Реальный урон пар с талантами', '', ...t.trim().split('\n')); } catch (e) { bad++; out.push('', '## Реальный урон пар с талантами — НАРУШЕНИЕ', '', String(e.stdout || e.message).trim()); } }
   const md = opt('md', null); if (md) fs.writeFileSync(md, out.join('\n') + '\n');
   console.log(out.join('\n')); console.log(bad ? `\nИТОГ: есть нарушения (${bad})` : '\nИТОГ: всё в порядке');
   if (bad) process.exitCode = 1;

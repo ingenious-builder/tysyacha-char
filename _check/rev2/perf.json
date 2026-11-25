@@ -1,0 +1,56 @@
+{
+ "ПК": {
+  "pyro": {
+   "lvlUp": 0,
+   "talent": 1,
+   "warm": 0
+  },
+  "necro": {
+   "lvlUp": 1,
+   "talent": 0,
+   "warm": 0
+  },
+  "monk": {
+   "lvlUp": 0,
+   "talent": 1,
+   "warm": 0.1
+  },
+  "alch": {
+   "lvlUp": 1,
+   "talent": 0,
+   "warm": 0
+  },
+  "shaman": {
+   "lvlUp": 0,
+   "talent": 0,
+   "warm": 0
+  }
+ },
+ "×4": {
+  "pyro": {
+   "lvlUp": 2,
+   "talent": 1,
+   "warm": 0.2
+  },
+  "necro": {
+   "lvlUp": 2,
+   "talent": 0,
+   "warm": 0.1
+  },
+  "monk": {
+   "lvlUp": 2,
+   "talent": 0,
+   "warm": 0
+  },
+  "alch": {
+   "lvlUp": 2,
+   "talent": 1,
+   "warm": 0
+  },
+  "shaman": {
+   "lvlUp": 2,
+   "talent": 1,
+   "warm": 0
+  }
+ }
+}

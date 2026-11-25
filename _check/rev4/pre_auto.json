@@ -1,0 +1,3078 @@
+{
+ "pyro": {
+  "20": {
+   "tal": {
+    "vit": 5,
+    "py_fuse": 2,
+    "mana": 3,
+    "py_blast": 2,
+    "py_wide": 2,
+    "armor": 5
+   },
+   "a": [
+    15,
+    4240,
+    20,
+    1840,
+    1082
+   ],
+   "p": [
+    151,
+    4143,
+    4132,
+    4325
+   ],
+   "ranks": {},
+   "ms": 21,
+   "same": true
+  },
+  "50": {
+   "tal": {
+    "vit": 5,
+    "py_fuse": 2,
+    "armor": 5,
+    "regen": 2,
+    "py_blast": 5,
+    "leech": 3,
+    "py_wide": 3,
+    "mana": 5,
+    "py_chain": 1,
+    "power": 5,
+    "py_ember": 3,
+    "crit": 5,
+    "reso": 3,
+    "react": 2
+   },
+   "a": [
+    1847,
+    4240,
+    991,
+    23,
+    3,
+    2695,
+    4407
+   ],
+   "p": [
+    151,
+    3975,
+    4320,
+    1215,
+    3896,
+    3927
+   ],
+   "ranks": {},
+   "ms": 69,
+   "same": true
+  },
+  "100": {
+   "tal": {
+    "vit": 5,
+    "py_fuse": 2,
+    "armor": 5,
+    "regen": 3,
+    "py_blast": 5,
+    "leech": 3,
+    "py_wide": 3,
+    "mana": 5,
+    "py_chain": 1,
+    "power": 5,
+    "py_ember": 3,
+    "crit": 5,
+    "reso": 3,
+    "react": 3,
+    "summ": 3,
+    "luck": 5,
+    "cascade": 3,
+    "wrath": 3,
+    "orbit": 3,
+    "cdr": 5
+   },
+   "a": [
+    3,
+    4241,
+    4407,
+    19,
+    991,
+    15,
+    1847
+   ],
+   "p": [
+    151,
+    4135,
+    1056,
+    3888,
+    4320,
+    3975
+   ],
+   "ranks": {},
+   "ms": 75,
+   "same": true
+  },
+  "160": {
+   "tal": {
+    "vit": 5,
+    "py_fuse": 2,
+    "armor": 5,
+    "py_blast": 5,
+    "leech": 3,
+    "py_wide": 3,
+    "mana": 5,
+    "py_chain": 1,
+    "power": 5,
+    "crit": 5,
+    "py_ember": 3,
+    "reso": 3,
+    "react": 3,
+    "summ": 3,
+    "regen": 3,
+    "luck": 5,
+    "cascade": 3,
+    "wrath": 3,
+    "orbit": 3,
+    "cdr": 5
+   },
+   "a": [
+    19,
+    4241,
+    3,
+    991,
+    1840,
+    4407,
+    15
+   ],
+   "p": [
+    151,
+    1063,
+    3888,
+    4128,
+    4327,
+    3975
+   ],
+   "ranks": {},
+   "ms": 74,
+   "same": true
+  }
+ },
+ "cryo": {
+  "20": {
+   "tal": {
+    "vit": 5,
+    "cr_shard": 1,
+    "cr_crack": 2,
+    "mana": 3,
+    "armor": 5,
+    "cr_deep": 3
+   },
+   "a": [
+    1415,
+    4488,
+    2250,
+    247,
+    2650
+   ],
+   "p": [
+    2888,
+    287,
+    1498,
+    4073
+   ],
+   "ranks": {},
+   "ms": 19,
+   "same": true
+  },
+  "50": {
+   "tal": {
+    "vit": 5,
+    "cr_shard": 1,
+    "cr_crack": 5,
+    "armor": 5,
+    "cr_deep": 3,
+    "leech": 3,
+    "mana": 5,
+    "cr_snap": 1,
+    "power": 5,
+    "cr_boss": 3,
+    "crit": 5,
+    "reso": 3,
+    "react": 3,
+    "summ": 1,
+    "cascade": 1
+   },
+   "a": [
+    247,
+    4488,
+    2089,
+    2216,
+    2303,
+    2719
+   ],
+   "p": [
+    2888,
+    4072,
+    4056,
+    285,
+    4568,
+    2952
+   ],
+   "ranks": {},
+   "ms": 64,
+   "same": true
+  },
+  "100": {
+   "tal": {
+    "vit": 5,
+    "cr_shard": 1,
+    "cr_crack": 5,
+    "armor": 5,
+    "cr_deep": 3,
+    "mana": 5,
+    "leech": 3,
+    "power": 5,
+    "cr_snap": 1,
+    "cr_boss": 3,
+    "crit": 5,
+    "reso": 3,
+    "react": 3,
+    "summ": 3,
+    "cascade": 3,
+    "orbit": 3,
+    "regen": 3,
+    "luck": 5,
+    "wrath": 3,
+    "cdr": 5
+   },
+   "a": [
+    199,
+    4488,
+    2089,
+    2232,
+    1463,
+    247,
+    2712
+   ],
+   "p": [
+    2888,
+    3839,
+    2952,
+    4072,
+    1498,
+    282
+   ],
+   "ranks": {},
+   "ms": 78,
+   "same": true
+  },
+  "160": {
+   "tal": {
+    "vit": 5,
+    "cr_shard": 1,
+    "cr_crack": 5,
+    "armor": 5,
+    "cr_deep": 3,
+    "leech": 3,
+    "mana": 5,
+    "power": 5,
+    "cr_snap": 1,
+    "cr_boss": 3,
+    "crit": 5,
+    "reso": 3,
+    "react": 3,
+    "summ": 3,
+    "cascade": 3,
+    "orbit": 3,
+    "regen": 3,
+    "luck": 5,
+    "wrath": 3,
+    "cdr": 5
+   },
+   "a": [
+    199,
+    4488,
+    2232,
+    2712,
+    247,
+    1463,
+    2089
+   ],
+   "p": [
+    282,
+    3839,
+    2952,
+    4072,
+    4575,
+    2888,
+    4056
+   ],
+   "ranks": {},
+   "ms": 86,
+   "same": true
+  }
+ },
+ "storm": {
+  "20": {
+   "tal": {
+    "vit": 5,
+    "st_volt": 5,
+    "mana": 3,
+    "armor": 5,
+    "st_stun": 1
+   },
+   "a": [
+    791,
+    4736,
+    348,
+    1647,
+    1139
+   ],
+   "p": [
+    2740,
+    408,
+    1208,
+    4821
+   ],
+   "ranks": {},
+   "ms": 18,
+   "same": true
+  },
+  "50": {
+   "tal": {
+    "vit": 5,
+    "st_volt": 5,
+    "armor": 5,
+    "mana": 5,
+    "st_stun": 3,
+    "leech": 3,
+    "st_arc": 1,
+    "power": 5,
+    "st_more": 3,
+    "crit": 5,
+    "reso": 3,
+    "st_cap": 2,
+    "react": 3,
+    "summ": 1
+   },
+   "a": [
+    791,
+    4743,
+    1623,
+    383,
+    1863,
+    351,
+    4896
+   ],
+   "p": [
+    411,
+    4823,
+    1208,
+    2760,
+    2736,
+    3298
+   ],
+   "ranks": {},
+   "ms": 56,
+   "same": true
+  },
+  "100": {
+   "tal": {
+    "vit": 5,
+    "st_volt": 5,
+    "armor": 5,
+    "mana": 5,
+    "st_stun": 3,
+    "leech": 3,
+    "power": 5,
+    "st_arc": 1,
+    "st_more": 3,
+    "crit": 5,
+    "reso": 3,
+    "st_cap": 2,
+    "react": 3,
+    "summ": 3,
+    "regen": 3,
+    "luck": 5,
+    "cascade": 3,
+    "wrath": 3,
+    "orbit": 3,
+    "cdr": 5
+   },
+   "a": [
+    791,
+    4741,
+    839,
+    335,
+    327,
+    349,
+    1863
+   ],
+   "p": [
+    411,
+    455,
+    4823,
+    2760,
+    867,
+    1208
+   ],
+   "ranks": {},
+   "ms": 70,
+   "same": true
+  },
+  "160": {
+   "tal": {
+    "vit": 5,
+    "st_volt": 5,
+    "armor": 5,
+    "leech": 3,
+    "st_stun": 3,
+    "mana": 5,
+    "power": 5,
+    "st_arc": 1,
+    "st_more": 3,
+    "crit": 5,
+    "reso": 3,
+    "st_cap": 2,
+    "react": 3,
+    "summ": 3,
+    "regen": 3,
+    "luck": 5,
+    "cascade": 3,
+    "wrath": 3,
+    "orbit": 3,
+    "cdr": 5
+   },
+   "a": [
+    335,
+    4743,
+    791,
+    327,
+    4897,
+    1863,
+    349
+   ],
+   "p": [
+    1208,
+    455,
+    2760,
+    411,
+    4823,
+    867,
+    2783
+   ],
+   "ranks": {},
+   "ms": 71,
+   "same": true
+  }
+ },
+ "plague": {
+  "20": {
+   "tal": {
+    "vit": 5,
+    "pl_tox": 5,
+    "mana": 3,
+    "armor": 5,
+    "pl_heal": 1
+   },
+   "a": [
+    639,
+    5224,
+    1247,
+    2311,
+    471
+   ],
+   "p": [
+    1317,
+    4191,
+    4224,
+    5309
+   ],
+   "ranks": {},
+   "ms": 19,
+   "same": true
+  },
+  "50": {
+   "tal": {
+    "vit": 5,
+    "pl_tox": 5,
+    "armor": 5,
+    "mana": 5,
+    "pl_cap": 3,
+    "leech": 2,
+    "pl_burst": 1,
+    "summ": 1,
+    "cascade": 3,
+    "pl_spread": 3,
+    "power": 5,
+    "pl_heal": 3,
+    "crit": 5,
+    "reso": 3
+   },
+   "a": [
+    1664,
+    5224,
+    2306,
+    1231,
+    1295,
+    487,
+    5385
+   ],
+   "p": [
+    1319,
+    4224,
+    1355,
+    595,
+    5308,
+    568
+   ],
+   "ranks": {},
+   "ms": 57,
+   "same": true
+  },
+  "100": {
+   "tal": {
+    "vit": 5,
+    "pl_tox": 5,
+    "armor": 5,
+    "leech": 3,
+    "pl_cap": 3,
+    "mana": 5,
+    "pl_burst": 1,
+    "summ": 3,
+    "cascade": 3,
+    "pl_spread": 3,
+    "power": 5,
+    "pl_heal": 3,
+    "crit": 5,
+    "reso": 3,
+    "react": 3,
+    "regen": 3,
+    "luck": 5,
+    "wrath": 3,
+    "orbit": 3,
+    "cdr": 5
+   },
+   "a": [
+    487,
+    5224,
+    2306,
+    1247,
+    1231,
+    5385,
+    1664
+   ],
+   "p": [
+    1355,
+    4231,
+    568,
+    1328,
+    5304,
+    1319
+   ],
+   "ranks": {},
+   "ms": 78,
+   "same": true
+  },
+  "160": {
+   "tal": {
+    "vit": 5,
+    "pl_tox": 5,
+    "armor": 5,
+    "leech": 3,
+    "pl_cap": 3,
+    "mana": 5,
+    "pl_burst": 1,
+    "summ": 3,
+    "cascade": 3,
+    "pl_spread": 3,
+    "power": 5,
+    "pl_heal": 3,
+    "crit": 5,
+    "reso": 3,
+    "react": 3,
+    "regen": 3,
+    "luck": 5,
+    "wrath": 3,
+    "orbit": 3,
+    "cdr": 5
+   },
+   "a": [
+    487,
+    5224,
+    1247,
+    1671,
+    1295,
+    1231,
+    5385
+   ],
+   "p": [
+    4224,
+    568,
+    1328,
+    1319,
+    5304,
+    1355
+   ],
+   "ranks": {},
+   "ms": 74,
+   "same": true
+  }
+ },
+ "necro": {
+  "20": {
+   "tal": {
+    "vit": 5,
+    "ne_bone": 3,
+    "mana": 5,
+    "ne_lord": 2,
+    "armor": 3,
+    "ne_ward": 1
+   },
+   "a": [
+    657,
+    6192,
+    1231,
+    2385,
+    2151
+   ],
+   "p": [
+    723,
+    3909,
+    3105,
+    6277
+   ],
+   "ranks": {},
+   "ms": 21,
+   "same": true
+  },
+  "50": {
+   "tal": {
+    "vit": 5,
+    "ne_bone": 3,
+    "mana": 5,
+    "ne_lord": 3,
+    "armor": 5,
+    "ne_ward": 3,
+    "power": 5,
+    "ne_horde": 1,
+    "crit": 5,
+    "ne_raise": 5,
+    "reso": 3,
+    "summ": 1,
+    "cascade": 2,
+    "react": 3
+   },
+   "a": [
+    657,
+    6199,
+    1265,
+    1247,
+    6353,
+    2584,
+    2385
+   ],
+   "p": [
+    3079,
+    3864,
+    3104,
+    1328,
+    6272,
+    568
+   ],
+   "ranks": {},
+   "ms": 62,
+   "same": true
+  },
+  "100": {
+   "tal": {
+    "vit": 5,
+    "ne_bone": 3,
+    "armor": 5,
+    "ne_lord": 3,
+    "ne_ward": 3,
+    "mana": 5,
+    "power": 5,
+    "ne_horde": 1,
+    "crit": 5,
+    "ne_raise": 5,
+    "reso": 3,
+    "react": 3,
+    "summ": 3,
+    "cascade": 3,
+    "orbit": 3,
+    "wrath": 3,
+    "luck": 5,
+    "regen": 3,
+    "leech": 3,
+    "cdr": 5
+   },
+   "a": [
+    1265,
+    6193,
+    2345,
+    505,
+    6353,
+    2385,
+    2591
+   ],
+   "p": [
+    3872,
+    3111,
+    1346,
+    3904,
+    6272,
+    1328
+   ],
+   "ranks": {},
+   "ms": 69,
+   "same": true
+  },
+  "160": {
+   "tal": {
+    "vit": 5,
+    "ne_bone": 3,
+    "armor": 5,
+    "ne_lord": 3,
+    "ne_ward": 3,
+    "mana": 5,
+    "power": 5,
+    "ne_horde": 1,
+    "crit": 5,
+    "ne_raise": 5,
+    "reso": 3,
+    "react": 3,
+    "summ": 3,
+    "cascade": 3,
+    "orbit": 3,
+    "wrath": 3,
+    "luck": 5,
+    "regen": 3,
+    "leech": 3,
+    "cdr": 5
+   },
+   "a": [
+    505,
+    6193,
+    2591,
+    1265,
+    2345,
+    2145,
+    6353
+   ],
+   "p": [
+    1328,
+    3904,
+    3111,
+    3872,
+    6272,
+    1346,
+    3079
+   ],
+   "ranks": {},
+   "ms": 70,
+   "same": true
+  }
+ },
+ "paladin": {
+  "20": {
+   "tal": {
+    "vit": 5,
+    "pa_out": 5,
+    "mana": 3,
+    "armor": 5,
+    "pa_store": 1
+   },
+   "a": [
+    37,
+    8600,
+    1800,
+    2523,
+    855
+   ],
+   "p": [
+    3723,
+    4045,
+    3881,
+    8685
+   ],
+   "ranks": {},
+   "ms": 19,
+   "same": true
+  },
+  "50": {
+   "tal": {
+    "vit": 5,
+    "pa_out": 5,
+    "armor": 5,
+    "mana": 5,
+    "pa_store": 5,
+    "leech": 3,
+    "pa_ring": 1,
+    "power": 5,
+    "pa_cup": 3,
+    "crit": 5,
+    "reso": 3,
+    "pa_mercy": 2,
+    "wrath": 2
+   },
+   "a": [
+    95,
+    8600,
+    2483,
+    1813,
+    2535,
+    2209,
+    1895
+   ],
+   "p": [
+    4040,
+    4048,
+    8680,
+    3735,
+    3888,
+    3687
+   ],
+   "ranks": {},
+   "ms": 52,
+   "same": true
+  },
+  "100": {
+   "tal": {
+    "vit": 5,
+    "pa_out": 5,
+    "armor": 5,
+    "leech": 3,
+    "pa_store": 5,
+    "mana": 5,
+    "pa_ring": 1,
+    "power": 5,
+    "pa_cup": 3,
+    "crit": 5,
+    "reso": 3,
+    "pa_mercy": 3,
+    "wrath": 3,
+    "react": 3,
+    "summ": 3,
+    "cascade": 3,
+    "regen": 3,
+    "luck": 5,
+    "orbit": 3,
+    "cdr": 5
+   },
+   "a": [
+    951,
+    8607,
+    2208,
+    1813,
+    2483,
+    8767,
+    1847
+   ],
+   "p": [
+    8680,
+    3880,
+    3888,
+    2775,
+    3735,
+    4048
+   ],
+   "ranks": {},
+   "ms": 65,
+   "same": true
+  },
+  "160": {
+   "tal": {
+    "vit": 5,
+    "pa_out": 5,
+    "armor": 5,
+    "leech": 3,
+    "pa_store": 5,
+    "mana": 5,
+    "power": 5,
+    "pa_ring": 1,
+    "pa_cup": 3,
+    "crit": 5,
+    "reso": 3,
+    "pa_mercy": 3,
+    "wrath": 3,
+    "react": 3,
+    "summ": 3,
+    "cascade": 3,
+    "regen": 3,
+    "luck": 5,
+    "orbit": 3,
+    "cdr": 5
+   },
+   "a": [
+    2483,
+    8607,
+    8767,
+    951,
+    1813,
+    2208,
+    1845
+   ],
+   "p": [
+    4048,
+    3888,
+    3728,
+    2775,
+    8680,
+    3880,
+    3687
+   ],
+   "ranks": {},
+   "ms": 64,
+   "same": true
+  }
+ },
+ "geo": {
+  "20": {
+   "tal": {
+    "vit": 5,
+    "ge_deep": 3,
+    "armor": 5,
+    "leech": 1,
+    "ge_jolt": 3,
+    "mana": 2
+   },
+   "a": [
+    15,
+    5008,
+    2133,
+    1003,
+    2081
+   ],
+   "p": [
+    4051,
+    3974,
+    3280,
+    5093
+   ],
+   "ranks": {},
+   "ms": 18,
+   "same": true
+  },
+  "50": {
+   "tal": {
+    "vit": 5,
+    "ge_deep": 5,
+    "armor": 5,
+    "ge_jolt": 3,
+    "mana": 5,
+    "ge_quake": 3,
+    "leech": 2,
+    "ge_fault": 1,
+    "power": 5,
+    "crit": 5,
+    "reso": 3,
+    "ge_split": 3,
+    "summ": 1,
+    "cascade": 3
+   },
+   "a": [
+    23,
+    5015,
+    2401,
+    95,
+    2129,
+    5168,
+    1000
+   ],
+   "p": [
+    4048,
+    4016,
+    5088,
+    3335,
+    1015,
+    101
+   ],
+   "ranks": {},
+   "ms": 53,
+   "same": true
+  },
+  "100": {
+   "tal": {
+    "vit": 5,
+    "ge_deep": 5,
+    "armor": 5,
+    "ge_jolt": 3,
+    "leech": 3,
+    "mana": 5,
+    "ge_quake": 3,
+    "ge_fault": 1,
+    "power": 5,
+    "crit": 5,
+    "reso": 3,
+    "ge_split": 3,
+    "summ": 3,
+    "cascade": 3,
+    "react": 3,
+    "regen": 3,
+    "luck": 5,
+    "wrath": 3,
+    "orbit": 3,
+    "cdr": 5
+   },
+   "a": [
+    2400,
+    5009,
+    2129,
+    15,
+    1007,
+    5168,
+    95
+   ],
+   "p": [
+    1015,
+    4048,
+    3968,
+    3335,
+    5095,
+    4016
+   ],
+   "ranks": {},
+   "ms": 67,
+   "same": true
+  },
+  "160": {
+   "tal": {
+    "vit": 5,
+    "ge_deep": 5,
+    "armor": 5,
+    "leech": 3,
+    "ge_jolt": 3,
+    "mana": 5,
+    "ge_quake": 3,
+    "ge_fault": 1,
+    "power": 5,
+    "crit": 5,
+    "reso": 3,
+    "ge_split": 3,
+    "summ": 3,
+    "cascade": 3,
+    "react": 3,
+    "regen": 3,
+    "luck": 5,
+    "wrath": 3,
+    "orbit": 3,
+    "cdr": 5
+   },
+   "a": [
+    5168,
+    5009,
+    2129,
+    2400,
+    1007,
+    23,
+    15
+   ],
+   "p": [
+    3335,
+    5095,
+    4016,
+    1015,
+    4048,
+    3968
+   ],
+   "ranks": {},
+   "ms": 66,
+   "same": true
+  }
+ },
+ "windr": {
+  "20": {
+   "tal": {
+    "vit": 3,
+    "wi_edge": 5,
+    "mana": 5,
+    "armor": 4,
+    "leech": 1,
+    "wi_step": 1
+   },
+   "a": [
+    1538,
+    7176,
+    2335,
+    213,
+    155
+   ],
+   "p": [
+    2859,
+    1205,
+    3212,
+    7261
+   ],
+   "ranks": {},
+   "ms": 17,
+   "same": true
+  },
+  "50": {
+   "tal": {
+    "vit": 5,
+    "wi_edge": 5,
+    "armor": 5,
+    "regen": 2,
+    "leech": 2,
+    "mana": 5,
+    "wi_step": 3,
+    "wi_gale": 1,
+    "wi_gain": 5,
+    "power": 5,
+    "crit": 5,
+    "reso": 3,
+    "wi_pierce": 2,
+    "react": 1
+   },
+   "a": [
+    2661,
+    7179,
+    2329,
+    1543,
+    367,
+    7337,
+    335
+   ],
+   "p": [
+    2811,
+    7256,
+    2819,
+    443,
+    3656,
+    291
+   ],
+   "ranks": {},
+   "ms": 51,
+   "same": true
+  },
+  "100": {
+   "tal": {
+    "vit": 5,
+    "wi_edge": 5,
+    "armor": 5,
+    "regen": 3,
+    "leech": 3,
+    "wi_step": 3,
+    "mana": 5,
+    "wi_gale": 1,
+    "wi_gain": 5,
+    "power": 5,
+    "crit": 5,
+    "reso": 3,
+    "wi_pierce": 3,
+    "react": 3,
+    "wrath": 3,
+    "summ": 3,
+    "cascade": 3,
+    "luck": 5,
+    "orbit": 3,
+    "cdr": 5
+   },
+   "a": [
+    2377,
+    7179,
+    367,
+    7337,
+    2663,
+    1543,
+    215
+   ],
+   "p": [
+    2819,
+    3616,
+    3263,
+    291,
+    3656,
+    2811
+   ],
+   "ranks": {},
+   "ms": 63,
+   "same": true
+  },
+  "160": {
+   "tal": {
+    "vit": 5,
+    "wi_edge": 5,
+    "armor": 5,
+    "leech": 3,
+    "wi_step": 3,
+    "mana": 5,
+    "wi_gale": 1,
+    "power": 5,
+    "wi_gain": 5,
+    "crit": 5,
+    "reso": 3,
+    "wi_pierce": 3,
+    "react": 3,
+    "wrath": 3,
+    "summ": 3,
+    "cascade": 3,
+    "regen": 3,
+    "luck": 5,
+    "orbit": 3,
+    "cdr": 5
+   },
+   "a": [
+    1543,
+    7179,
+    2663,
+    367,
+    2377,
+    215,
+    7337
+   ],
+   "p": [
+    3656,
+    3263,
+    291,
+    2819,
+    7256,
+    3616,
+    2811
+   ],
+   "ranks": {},
+   "ms": 68,
+   "same": true
+  }
+ },
+ "hemo": {
+  "20": {
+   "tal": {
+    "vit": 5,
+    "he_thin": 3,
+    "he_leech": 1,
+    "armor": 5,
+    "he_edge": 1,
+    "mana": 3,
+    "he_feast": 1
+   },
+   "a": [
+    63,
+    5504,
+    1311,
+    1664,
+    1229
+   ],
+   "p": [
+    2787,
+    3761,
+    3795,
+    5589
+   ],
+   "ranks": {},
+   "ms": 17,
+   "same": true
+  },
+  "50": {
+   "tal": {
+    "vit": 5,
+    "he_leech": 5,
+    "he_thin": 3,
+    "armor": 5,
+    "mana": 5,
+    "he_feast": 3,
+    "power": 5,
+    "he_undying": 1,
+    "he_edge": 3,
+    "crit": 5,
+    "reso": 3,
+    "react": 3,
+    "wrath": 3
+   },
+   "a": [
+    1671,
+    5511,
+    1279,
+    1311,
+    2321,
+    5664,
+    655
+   ],
+   "p": [
+    2727,
+    3105,
+    5590,
+    2791,
+    3505,
+    3072
+   ],
+   "ranks": {},
+   "ms": 55,
+   "same": true
+  },
+  "100": {
+   "tal": {
+    "vit": 5,
+    "he_leech": 5,
+    "he_thin": 3,
+    "armor": 5,
+    "mana": 5,
+    "he_feast": 3,
+    "power": 5,
+    "he_undying": 1,
+    "he_edge": 3,
+    "crit": 5,
+    "reso": 3,
+    "react": 3,
+    "wrath": 3,
+    "summ": 3,
+    "regen": 3,
+    "luck": 5,
+    "leech": 3,
+    "cascade": 3,
+    "orbit": 3,
+    "cdr": 5
+   },
+   "a": [
+    1231,
+    5511,
+    2385,
+    1279,
+    1664,
+    1263,
+    1311
+   ],
+   "p": [
+    3072,
+    5584,
+    3111,
+    3504,
+    3831,
+    2784
+   ],
+   "ranks": {},
+   "ms": 67,
+   "same": true
+  },
+  "160": {
+   "tal": {
+    "vit": 5,
+    "he_leech": 5,
+    "he_thin": 3,
+    "armor": 5,
+    "power": 5,
+    "he_feast": 3,
+    "mana": 5,
+    "crit": 5,
+    "he_undying": 1,
+    "reso": 3,
+    "he_edge": 3,
+    "react": 3,
+    "wrath": 3,
+    "summ": 3,
+    "regen": 3,
+    "luck": 5,
+    "leech": 3,
+    "cascade": 3,
+    "orbit": 3,
+    "cdr": 5
+   },
+   "a": [
+    1263,
+    5511,
+    1231,
+    1279,
+    1311,
+    2385
+   ],
+   "p": [
+    2791,
+    3111,
+    3504,
+    3824,
+    5584,
+    3079
+   ],
+   "ranks": {},
+   "ms": 70,
+   "same": true
+  }
+ },
+ "arcan": {
+  "20": {
+   "tal": {
+    "vit": 5,
+    "ar_flow": 5,
+    "armor": 5,
+    "mana": 2,
+    "ar_tide": 1,
+    "leech": 1
+   },
+   "a": [
+    1833,
+    5752,
+    1855,
+    2236,
+    1424
+   ],
+   "p": [
+    890,
+    3359,
+    3288,
+    5837
+   ],
+   "ranks": {},
+   "ms": 21,
+   "same": true
+  },
+  "50": {
+   "tal": {
+    "vit": 5,
+    "ar_flow": 5,
+    "armor": 5,
+    "mana": 5,
+    "ar_tide": 3,
+    "leech": 2,
+    "ar_flood": 1,
+    "power": 5,
+    "ar_mind": 5,
+    "crit": 5,
+    "reso": 3,
+    "ar_bounce": 2,
+    "react": 2,
+    "wrath": 1
+   },
+   "a": [
+    2232,
+    5752,
+    215,
+    1801,
+    823,
+    2200,
+    1887
+   ],
+   "p": [
+    890,
+    3039,
+    282,
+    3279,
+    5832,
+    3359
+   ],
+   "ranks": {},
+   "ms": 64,
+   "same": true
+  },
+  "100": {
+   "tal": {
+    "vit": 5,
+    "ar_mind": 5,
+    "armor": 5,
+    "ar_flow": 5,
+    "leech": 3,
+    "mana": 5,
+    "ar_flood": 1,
+    "power": 5,
+    "ar_tide": 3,
+    "crit": 5,
+    "reso": 3,
+    "ar_bounce": 3,
+    "react": 3,
+    "summ": 3,
+    "cascade": 3,
+    "orbit": 3,
+    "wrath": 3,
+    "regen": 3,
+    "luck": 5,
+    "cdr": 5
+   },
+   "a": [
+    1769,
+    5752,
+    1727,
+    823,
+    2287,
+    1855,
+    2232
+   ],
+   "p": [
+    3359,
+    282,
+    3039,
+    890,
+    5832,
+    3279
+   ],
+   "ranks": {},
+   "ms": 73,
+   "same": true
+  },
+  "160": {
+   "tal": {
+    "vit": 5,
+    "ar_mind": 5,
+    "armor": 5,
+    "leech": 3,
+    "ar_flow": 5,
+    "power": 5,
+    "ar_tide": 3,
+    "ar_flood": 1,
+    "mana": 5,
+    "crit": 5,
+    "reso": 3,
+    "ar_bounce": 3,
+    "react": 3,
+    "summ": 3,
+    "cascade": 3,
+    "orbit": 3,
+    "wrath": 3,
+    "cdr": 5,
+    "regen": 3,
+    "luck": 5
+   },
+   "a": [
+    2287,
+    5752,
+    1727,
+    2232,
+    215,
+    1769,
+    5913
+   ],
+   "p": [
+    890,
+    3039,
+    3352,
+    3247,
+    5832,
+    3279,
+    282
+   ],
+   "ranks": {},
+   "ms": 75,
+   "same": true
+  }
+ },
+ "bers": {
+  "20": {
+   "tal": {
+    "vit": 5,
+    "be_fury": 3,
+    "armor": 5,
+    "leech": 1,
+    "be_long": 2,
+    "mana": 2,
+    "be_drink": 1
+   },
+   "a": [
+    951,
+    7904,
+    1991,
+    2466,
+    978
+   ],
+   "p": [
+    1339,
+    4071,
+    4000,
+    7989
+   ],
+   "ranks": {},
+   "ms": 14,
+   "same": true
+  },
+  "50": {
+   "tal": {
+    "vit": 5,
+    "be_fury": 3,
+    "armor": 5,
+    "leech": 2,
+    "be_long": 3,
+    "be_drink": 3,
+    "mana": 5,
+    "be_end": 1,
+    "wrath": 3,
+    "power": 5,
+    "be_boil": 5,
+    "crit": 3,
+    "reso": 3,
+    "react": 3
+   },
+   "a": [
+    1287,
+    7904,
+    2535,
+    983,
+    2471,
+    1586,
+    951
+   ],
+   "p": [
+    1339,
+    3568,
+    1033,
+    4215,
+    4224,
+    4064
+   ],
+   "ranks": {},
+   "ms": 45,
+   "same": true
+  },
+  "100": {
+   "tal": {
+    "vit": 5,
+    "be_fury": 3,
+    "armor": 5,
+    "leech": 3,
+    "be_long": 3,
+    "be_drink": 3,
+    "mana": 5,
+    "be_end": 1,
+    "wrath": 3,
+    "power": 5,
+    "be_boil": 5,
+    "crit": 5,
+    "reso": 3,
+    "react": 3,
+    "regen": 3,
+    "summ": 3,
+    "luck": 5,
+    "cascade": 3,
+    "orbit": 3,
+    "cdr": 5
+   },
+   "a": [
+    2551,
+    7904,
+    1287,
+    1255,
+    1991,
+    2471,
+    8065
+   ],
+   "p": [
+    1339,
+    7987,
+    4048,
+    3591,
+    4064,
+    4231
+   ],
+   "ranks": {},
+   "ms": 62,
+   "same": true
+  },
+  "160": {
+   "tal": {
+    "vit": 5,
+    "be_fury": 3,
+    "armor": 5,
+    "leech": 3,
+    "be_long": 3,
+    "be_drink": 3,
+    "mana": 5,
+    "be_end": 1,
+    "wrath": 3,
+    "power": 5,
+    "be_boil": 5,
+    "crit": 5,
+    "reso": 3,
+    "react": 3,
+    "regen": 3,
+    "summ": 3,
+    "luck": 5,
+    "cascade": 3,
+    "orbit": 3,
+    "cdr": 5
+   },
+   "a": [
+    1255,
+    7904,
+    2551,
+    2487,
+    2471,
+    1287,
+    8065
+   ],
+   "p": [
+    1339,
+    4231,
+    4064,
+    3584,
+    7987,
+    4048
+   ],
+   "ranks": {},
+   "ms": 61,
+   "same": true
+  }
+ },
+ "dk": {
+  "20": {
+   "tal": {
+    "vit": 5,
+    "dk_drain": 3,
+    "mana": 3,
+    "armor": 5,
+    "dk_rune": 3
+   },
+   "a": [
+    677,
+    8832,
+    1255,
+    702,
+    1669
+   ],
+   "p": [
+    731,
+    3369,
+    3190,
+    8893
+   ],
+   "ranks": {},
+   "ms": 19,
+   "same": true
+  },
+  "50": {
+   "tal": {
+    "vit": 5,
+    "dk_drain": 5,
+    "armor": 5,
+    "dk_rune": 5,
+    "mana": 5,
+    "wrath": 3,
+    "dk_grip": 1,
+    "power": 5,
+    "dk_frost": 3,
+    "crit": 5,
+    "reso": 3,
+    "dk_bone": 2,
+    "react": 2
+   },
+   "a": [
+    2466,
+    8839,
+    2624,
+    1255,
+    8992,
+    1287,
+    1671
+   ],
+   "p": [
+    731,
+    1337,
+    3184,
+    1319,
+    3425,
+    8888
+   ],
+   "ranks": {},
+   "ms": 60,
+   "same": true
+  },
+  "100": {
+   "tal": {
+    "vit": 5,
+    "dk_drain": 5,
+    "armor": 5,
+    "dk_rune": 5,
+    "mana": 5,
+    "wrath": 3,
+    "dk_grip": 1,
+    "power": 5,
+    "dk_frost": 3,
+    "crit": 5,
+    "reso": 3,
+    "dk_bone": 3,
+    "react": 3,
+    "summ": 3,
+    "cascade": 3,
+    "regen": 3,
+    "leech": 3,
+    "luck": 5,
+    "orbit": 3,
+    "cdr": 5
+   },
+   "a": [
+    1255,
+    8833,
+    1285,
+    1669,
+    2624,
+    8992,
+    1311
+   ],
+   "p": [
+    731,
+    3424,
+    1319,
+    1339,
+    8888,
+    3184
+   ],
+   "ranks": {},
+   "ms": 71,
+   "same": true
+  },
+  "160": {
+   "tal": {
+    "vit": 5,
+    "dk_drain": 5,
+    "armor": 5,
+    "dk_rune": 5,
+    "mana": 5,
+    "wrath": 3,
+    "dk_grip": 1,
+    "power": 5,
+    "dk_frost": 3,
+    "crit": 5,
+    "reso": 3,
+    "dk_bone": 3,
+    "react": 3,
+    "summ": 3,
+    "cascade": 3,
+    "regen": 3,
+    "leech": 3,
+    "luck": 5,
+    "orbit": 3,
+    "cdr": 5
+   },
+   "a": [
+    8993,
+    8833,
+    2631,
+    1311,
+    1285,
+    1669,
+    1255
+   ],
+   "p": [
+    731,
+    3424,
+    1319,
+    1339,
+    8888,
+    3184
+   ],
+   "ranks": {},
+   "ms": 74,
+   "same": true
+  }
+ },
+ "druid": {
+  "20": {
+   "tal": {
+    "vit": 5,
+    "dr_bark": 5,
+    "mana": 5,
+    "armor": 2,
+    "dr_pack": 1,
+    "leech": 1
+   },
+   "a": [
+    961,
+    6449,
+    2026,
+    2429,
+    996
+   ],
+   "p": [
+    4131,
+    2856,
+    6509,
+    3492
+   ],
+   "ranks": {},
+   "ms": 22,
+   "same": true
+  },
+  "50": {
+   "tal": {
+    "dr_calm": 3,
+    "dr_bark": 5,
+    "dr_heart": 1,
+    "vit": 5,
+    "armor": 5,
+    "leech": 2,
+    "mana": 5,
+    "summ": 3,
+    "dr_pack": 5,
+    "power": 5,
+    "crit": 5,
+    "reso": 3,
+    "dr_wolf": 2
+   },
+   "a": [
+    961,
+    6449,
+    6609,
+    505,
+    2129,
+    2026,
+    2295
+   ],
+   "p": [
+    3495,
+    1042,
+    4135,
+    3503,
+    6504,
+    2853
+   ],
+   "ranks": {},
+   "ms": 66,
+   "same": true
+  },
+  "100": {
+   "tal": {
+    "dr_calm": 3,
+    "dr_bark": 5,
+    "dr_heart": 1,
+    "vit": 5,
+    "armor": 5,
+    "leech": 3,
+    "mana": 5,
+    "dr_pack": 5,
+    "summ": 3,
+    "power": 5,
+    "crit": 5,
+    "reso": 3,
+    "dr_wolf": 3,
+    "cascade": 3,
+    "orbit": 3,
+    "react": 3,
+    "luck": 5,
+    "regen": 3,
+    "wrath": 3,
+    "cdr": 5
+   },
+   "a": [
+    961,
+    6449,
+    992,
+    2129,
+    2025,
+    2295,
+    505
+   ],
+   "p": [
+    2827,
+    3488,
+    2851,
+    6511,
+    4128,
+    1042
+   ],
+   "ranks": {},
+   "ms": 73,
+   "same": true
+  },
+  "160": {
+   "tal": {
+    "dr_calm": 3,
+    "dr_bark": 5,
+    "dr_heart": 1,
+    "vit": 5,
+    "armor": 5,
+    "leech": 3,
+    "mana": 5,
+    "dr_pack": 5,
+    "power": 5,
+    "crit": 5,
+    "reso": 3,
+    "dr_wolf": 3,
+    "summ": 3,
+    "cascade": 3,
+    "orbit": 3,
+    "react": 3,
+    "luck": 5,
+    "regen": 3,
+    "wrath": 3,
+    "cdr": 5
+   },
+   "a": [
+    961,
+    6449,
+    2129,
+    2295,
+    2026,
+    992,
+    6609
+   ],
+   "p": [
+    4135,
+    2851,
+    2827,
+    1042,
+    6511,
+    3495
+   ],
+   "ranks": {},
+   "ms": 76,
+   "same": true
+  }
+ },
+ "hunter": {
+  "20": {
+   "tal": {
+    "vit": 4,
+    "hu_prey": 5,
+    "armor": 5,
+    "leech": 1,
+    "mana": 3,
+    "hu_rhythm": 1
+   },
+   "a": [
+    1689,
+    7368,
+    2049,
+    1743,
+    232
+   ],
+   "p": [
+    3531,
+    3932,
+    3013,
+    7453
+   ],
+   "ranks": {},
+   "ms": 17,
+   "same": true
+  },
+  "50": {
+   "tal": {
+    "vit": 5,
+    "hu_prey": 5,
+    "armor": 5,
+    "regen": 2,
+    "leech": 3,
+    "mana": 5,
+    "hu_rhythm": 1,
+    "hu_chill": 3,
+    "hu_fan": 1,
+    "power": 5,
+    "hu_bolt": 5,
+    "crit": 5,
+    "reso": 3,
+    "react": 1
+   },
+   "a": [
+    1743,
+    7368,
+    2568,
+    1695,
+    232,
+    7535,
+    915
+   ],
+   "p": [
+    3935,
+    3975,
+    3568,
+    3535,
+    7448,
+    3015
+   ],
+   "ranks": {},
+   "ms": 48,
+   "same": true
+  },
+  "100": {
+   "tal": {
+    "vit": 5,
+    "hu_prey": 5,
+    "armor": 5,
+    "regen": 3,
+    "leech": 3,
+    "hu_rhythm": 1,
+    "hu_chill": 3,
+    "mana": 5,
+    "hu_fan": 1,
+    "power": 5,
+    "hu_bolt": 5,
+    "crit": 5,
+    "reso": 3,
+    "react": 3,
+    "summ": 3,
+    "cascade": 3,
+    "wrath": 3,
+    "luck": 5,
+    "orbit": 3,
+    "cdr": 5
+   },
+   "a": [
+    2010,
+    7373,
+    2050,
+    7535,
+    999,
+    1743,
+    2608
+   ],
+   "p": [
+    3975,
+    3648,
+    3015,
+    3568,
+    7448,
+    3656
+   ],
+   "ranks": {},
+   "ms": 58,
+   "same": true
+  },
+  "160": {
+   "tal": {
+    "vit": 5,
+    "hu_prey": 5,
+    "armor": 5,
+    "leech": 3,
+    "hu_rhythm": 1,
+    "mana": 5,
+    "hu_chill": 3,
+    "power": 5,
+    "hu_fan": 1,
+    "hu_bolt": 5,
+    "crit": 5,
+    "reso": 3,
+    "react": 3,
+    "summ": 3,
+    "cascade": 3,
+    "wrath": 3,
+    "regen": 3,
+    "luck": 5,
+    "orbit": 3,
+    "cdr": 5
+   },
+   "a": [
+    2608,
+    7373,
+    1743,
+    992,
+    7535,
+    2050,
+    1575
+   ],
+   "p": [
+    3648,
+    3975,
+    3008,
+    3568,
+    7455,
+    3656
+   ],
+   "ranks": {},
+   "ms": 54,
+   "same": true
+  }
+ },
+ "assassin": {
+  "20": {
+   "tal": {
+    "vit": 5,
+    "as_back": 3,
+    "mana": 3,
+    "as_shade": 3,
+    "armor": 5
+   },
+   "a": [
+    1704,
+    7632,
+    1255,
+    671,
+    2665
+   ],
+   "p": [
+    3188,
+    3799,
+    3824,
+    7709
+   ],
+   "ranks": {},
+   "ms": 18,
+   "same": true
+  },
+  "50": {
+   "tal": {
+    "vit": 5,
+    "as_back": 5,
+    "armor": 5,
+    "as_shade": 3,
+    "mana": 5,
+    "leech": 2,
+    "as_ghost": 1,
+    "power": 5,
+    "as_dark": 3,
+    "crit": 5,
+    "reso": 3,
+    "as_combo": 3,
+    "react": 3,
+    "wrath": 1
+   },
+   "a": [
+    1255,
+    7632,
+    1279,
+    1711,
+    2711,
+    7793
+   ],
+   "p": [
+    4199,
+    3624,
+    3191,
+    3831,
+    7707,
+    3632
+   ],
+   "ranks": {},
+   "ms": 43,
+   "same": true
+  },
+  "100": {
+   "tal": {
+    "vit": 5,
+    "as_back": 5,
+    "armor": 5,
+    "as_shade": 3,
+    "leech": 3,
+    "mana": 5,
+    "as_ghost": 1,
+    "power": 5,
+    "as_dark": 3,
+    "crit": 5,
+    "reso": 3,
+    "as_combo": 3,
+    "react": 3,
+    "wrath": 3,
+    "regen": 3,
+    "summ": 3,
+    "luck": 5,
+    "cascade": 3,
+    "orbit": 3,
+    "cdr": 5
+   },
+   "a": [
+    1551,
+    7632,
+    1255,
+    1705,
+    1279,
+    7793,
+    2709
+   ],
+   "p": [
+    3831,
+    3664,
+    7707,
+    4231,
+    3632,
+    3184
+   ],
+   "ranks": {},
+   "ms": 55,
+   "same": true
+  },
+  "160": {
+   "tal": {
+    "vit": 5,
+    "as_back": 5,
+    "armor": 5,
+    "as_shade": 3,
+    "leech": 3,
+    "mana": 5,
+    "as_ghost": 1,
+    "power": 5,
+    "as_dark": 3,
+    "crit": 5,
+    "reso": 3,
+    "as_combo": 3,
+    "react": 3,
+    "wrath": 3,
+    "regen": 3,
+    "summ": 3,
+    "luck": 5,
+    "cascade": 3,
+    "orbit": 3,
+    "cdr": 5
+   },
+   "a": [
+    7793,
+    7632,
+    1551,
+    493,
+    2709,
+    1711,
+    1255
+   ],
+   "p": [
+    3831,
+    3632,
+    3191,
+    4231,
+    7707,
+    3664
+   ],
+   "ranks": {},
+   "ms": 51,
+   "same": true
+  }
+ },
+ "shaman": {
+  "20": {
+   "tal": {
+    "vit": 5,
+    "sh_power": 3,
+    "mana": 4,
+    "armor": 3,
+    "sh_bond": 3,
+    "leech": 1
+   },
+   "a": [
+    1777,
+    6656,
+    989,
+    1119,
+    2018
+   ],
+   "p": [
+    1170,
+    3892,
+    3902,
+    6741
+   ],
+   "ranks": {},
+   "ms": 29,
+   "same": true
+  },
+  "50": {
+   "tal": {
+    "vit": 5,
+    "sh_power": 5,
+    "armor": 5,
+    "regen": 2,
+    "leech": 2,
+    "sh_bond": 3,
+    "mana": 5,
+    "sh_host": 1,
+    "sh_long": 3,
+    "power": 5,
+    "crit": 5,
+    "sh_storm": 3,
+    "reso": 3,
+    "summ": 1,
+    "cascade": 1
+   },
+   "a": [
+    1813,
+    6657,
+    6823,
+    2049,
+    2448,
+    2017,
+    967
+   ],
+   "p": [
+    4103,
+    4135,
+    1056,
+    6736,
+    3888,
+    1019
+   ],
+   "ranks": {},
+   "ms": 52,
+   "same": true
+  },
+  "100": {
+   "tal": {
+    "vit": 5,
+    "sh_power": 5,
+    "armor": 5,
+    "regen": 3,
+    "leech": 3,
+    "sh_bond": 3,
+    "mana": 5,
+    "sh_host": 1,
+    "sh_long": 3,
+    "power": 5,
+    "crit": 5,
+    "sh_storm": 3,
+    "reso": 3,
+    "summ": 3,
+    "cascade": 3,
+    "react": 3,
+    "luck": 5,
+    "orbit": 3,
+    "wrath": 3,
+    "cdr": 5
+   },
+   "a": [
+    1813,
+    6657,
+    2018,
+    967,
+    6817,
+    2448,
+    991
+   ],
+   "p": [
+    1056,
+    411,
+    1019,
+    3896,
+    3888,
+    4135
+   ],
+   "ranks": {},
+   "ms": 63,
+   "same": true
+  },
+  "160": {
+   "tal": {
+    "vit": 5,
+    "sh_power": 5,
+    "armor": 5,
+    "leech": 3,
+    "sh_bond": 3,
+    "mana": 5,
+    "power": 5,
+    "sh_host": 1,
+    "sh_long": 3,
+    "crit": 5,
+    "reso": 3,
+    "sh_storm": 3,
+    "summ": 3,
+    "cascade": 3,
+    "react": 3,
+    "luck": 5,
+    "orbit": 3,
+    "regen": 3,
+    "wrath": 3,
+    "cdr": 5
+   },
+   "a": [
+    967,
+    6657,
+    2050,
+    943,
+    2018,
+    1809,
+    6817
+   ],
+   "p": [
+    1019,
+    3888,
+    411,
+    1063,
+    6741,
+    4135
+   ],
+   "ranks": {},
+   "ms": 57,
+   "same": true
+  }
+ },
+ "monk": {
+  "20": {
+   "tal": {
+    "vit": 5,
+    "mo_flow": 5,
+    "armor": 3,
+    "regen": 2,
+    "leech": 2,
+    "mana": 1,
+    "mo_peak": 1
+   },
+   "a": [
+    39,
+    8136,
+    63,
+    1131,
+    1976
+   ],
+   "p": [
+    3179,
+    3018,
+    141,
+    8221
+   ],
+   "ranks": {},
+   "ms": 15,
+   "same": true
+  },
+  "50": {
+   "tal": {
+    "vit": 5,
+    "mo_flow": 5,
+    "armor": 5,
+    "leech": 3,
+    "mo_peak": 3,
+    "mana": 5,
+    "mo_chain": 1,
+    "power": 5,
+    "mo_palm": 5,
+    "wrath": 3,
+    "crit": 4,
+    "reso": 3,
+    "mo_breath": 2
+   },
+   "a": [
+    2160,
+    8143,
+    2539,
+    39,
+    1920,
+    71
+   ],
+   "p": [
+    3183,
+    8216,
+    3127,
+    3023,
+    901,
+    3687
+   ],
+   "ranks": {},
+   "ms": 45,
+   "same": true
+  },
+  "100": {
+   "tal": {
+    "vit": 5,
+    "mo_flow": 5,
+    "armor": 5,
+    "leech": 3,
+    "mo_peak": 3,
+    "mana": 5,
+    "mo_chain": 1,
+    "power": 5,
+    "mo_palm": 5,
+    "crit": 5,
+    "reso": 3,
+    "mo_breath": 3,
+    "summ": 3,
+    "cascade": 3,
+    "wrath": 3,
+    "react": 3,
+    "regen": 3,
+    "luck": 5,
+    "orbit": 3,
+    "cdr": 5
+   },
+   "a": [
+    39,
+    8137,
+    2487,
+    8296,
+    71,
+    2216,
+    2200
+   ],
+   "p": [
+    3183,
+    899,
+    3736,
+    3023,
+    8216,
+    1203
+   ],
+   "ranks": {},
+   "ms": 57,
+   "same": true
+  },
+  "160": {
+   "tal": {
+    "vit": 5,
+    "mo_flow": 5,
+    "armor": 5,
+    "leech": 3,
+    "mo_peak": 3,
+    "mana": 5,
+    "mo_chain": 1,
+    "power": 5,
+    "mo_palm": 5,
+    "wrath": 3,
+    "crit": 5,
+    "reso": 3,
+    "mo_breath": 3,
+    "summ": 3,
+    "cascade": 3,
+    "react": 3,
+    "regen": 3,
+    "luck": 5,
+    "orbit": 3,
+    "cdr": 5
+   },
+   "a": [
+    1927,
+    8143,
+    2216,
+    71,
+    63,
+    39,
+    2487
+   ],
+   "p": [
+    3736,
+    3023,
+    1203,
+    899,
+    8216,
+    3183
+   ],
+   "ranks": {},
+   "ms": 53,
+   "same": true
+  }
+ },
+ "lock": {
+  "20": {
+   "tal": {
+    "vit": 5,
+    "lo_hex": 4,
+    "mana": 5,
+    "lo_seal": 1,
+    "armor": 3,
+    "lo_toll": 1
+   },
+   "a": [
+    49,
+    6880,
+    1265,
+    2149,
+    23
+   ],
+   "p": [
+    3363,
+    3280,
+    3348,
+    6965
+   ],
+   "ranks": {},
+   "ms": 17,
+   "same": true
+  },
+  "50": {
+   "tal": {
+    "vit": 5,
+    "lo_hex": 5,
+    "armor": 5,
+    "mana": 5,
+    "lo_seal": 2,
+    "lo_toll": 3,
+    "leech": 2,
+    "lo_blight": 1,
+    "power": 5,
+    "crit": 5,
+    "lo_imp": 3,
+    "reso": 3,
+    "react": 3,
+    "summ": 2
+   },
+   "a": [
+    48,
+    6880,
+    2321,
+    23,
+    2385,
+    2145,
+    1295
+   ],
+   "p": [
+    2803,
+    6960,
+    3351,
+    2869,
+    3424,
+    3105
+   ],
+   "ranks": {},
+   "ms": 47,
+   "same": true
+  },
+  "100": {
+   "tal": {
+    "vit": 5,
+    "lo_hex": 5,
+    "armor": 5,
+    "leech": 3,
+    "lo_seal": 2,
+    "lo_toll": 3,
+    "mana": 5,
+    "summ": 3,
+    "lo_blight": 1,
+    "power": 5,
+    "lo_imp": 3,
+    "crit": 5,
+    "reso": 3,
+    "react": 3,
+    "cascade": 3,
+    "luck": 5,
+    "orbit": 3,
+    "regen": 3,
+    "wrath": 3,
+    "cdr": 5
+   },
+   "a": [
+    1264,
+    6881,
+    23,
+    7041,
+    2321,
+    2385,
+    48
+   ],
+   "p": [
+    2803,
+    3351,
+    2867,
+    3111,
+    6960,
+    3424
+   ],
+   "ranks": {},
+   "ms": 65,
+   "same": true
+  },
+  "160": {
+   "tal": {
+    "vit": 5,
+    "lo_hex": 5,
+    "armor": 5,
+    "leech": 3,
+    "lo_seal": 2,
+    "mana": 5,
+    "summ": 3,
+    "lo_toll": 3,
+    "lo_blight": 1,
+    "power": 5,
+    "lo_imp": 3,
+    "crit": 5,
+    "reso": 3,
+    "react": 3,
+    "cascade": 3,
+    "luck": 5,
+    "orbit": 3,
+    "regen": 3,
+    "wrath": 3,
+    "cdr": 5
+   },
+   "a": [
+    19,
+    6881,
+    2321,
+    7040,
+    48,
+    1264,
+    2385
+   ],
+   "p": [
+    3111,
+    3344,
+    2803,
+    3424,
+    6960,
+    2867
+   ],
+   "ranks": {},
+   "ms": 59,
+   "same": true
+  }
+ },
+ "inq": {
+  "20": {
+   "tal": {
+    "vit": 5,
+    "in_judge": 5,
+    "armor": 5,
+    "mana": 3,
+    "in_blast": 1
+   },
+   "a": [
+    2200,
+    8360,
+    1801,
+    999,
+    2567
+   ],
+   "p": [
+    867,
+    2927,
+    3572,
+    8445
+   ],
+   "ranks": {},
+   "ms": 18,
+   "same": true
+  },
+  "50": {
+   "tal": {
+    "vit": 5,
+    "in_judge": 5,
+    "armor": 5,
+    "leech": 3,
+    "in_blast": 3,
+    "mana": 5,
+    "in_crusade": 1,
+    "power": 5,
+    "in_pyre": 3,
+    "crit": 5,
+    "reso": 3,
+    "in_hunt": 3,
+    "react": 3
+   },
+   "a": [
+    2209,
+    8360,
+    1813,
+    2321,
+    999,
+    1801,
+    2200
+   ],
+   "p": [
+    1019,
+    107,
+    3575,
+    3735,
+    8440,
+    2928
+   ],
+   "ranks": {},
+   "ms": 48,
+   "same": true
+  },
+  "100": {
+   "tal": {
+    "vit": 5,
+    "in_judge": 5,
+    "armor": 5,
+    "leech": 3,
+    "in_blast": 3,
+    "mana": 5,
+    "in_crusade": 1,
+    "power": 5,
+    "in_pyre": 3,
+    "crit": 5,
+    "reso": 3,
+    "in_hunt": 3,
+    "react": 3,
+    "summ": 3,
+    "cascade": 3,
+    "wrath": 3,
+    "regen": 3,
+    "luck": 5,
+    "orbit": 3,
+    "cdr": 5
+   },
+   "a": [
+    2321,
+    8361,
+    1809,
+    8520,
+    2567,
+    2209,
+    999
+   ],
+   "p": [
+    107,
+    3575,
+    2928,
+    3735,
+    8440,
+    1019
+   ],
+   "ranks": {},
+   "ms": 60,
+   "same": true
+  },
+  "160": {
+   "tal": {
+    "vit": 5,
+    "in_judge": 5,
+    "armor": 5,
+    "leech": 3,
+    "in_blast": 3,
+    "mana": 5,
+    "in_crusade": 1,
+    "power": 5,
+    "in_pyre": 3,
+    "crit": 5,
+    "reso": 3,
+    "in_hunt": 3,
+    "react": 3,
+    "summ": 3,
+    "cascade": 3,
+    "wrath": 3,
+    "regen": 3,
+    "luck": 5,
+    "orbit": 3,
+    "cdr": 5
+   },
+   "a": [
+    2567,
+    8361,
+    2208,
+    8520,
+    1809,
+    999,
+    2321
+   ],
+   "p": [
+    1019,
+    3728,
+    107,
+    2928,
+    8440,
+    3575
+   ],
+   "ranks": {},
+   "ms": 56,
+   "same": true
+  }
+ },
+ "alch": {
+  "20": {
+   "tal": {
+    "vit": 5,
+    "al_vol": 5,
+    "armor": 5,
+    "leech": 1,
+    "al_brew": 1,
+    "mana": 2
+   },
+   "a": [
+    2247,
+    5944,
+    536,
+    476,
+    2075
+   ],
+   "p": [
+    595,
+    3277,
+    3207,
+    6029
+   ],
+   "ranks": {},
+   "ms": 18,
+   "same": true
+  },
+  "50": {
+   "tal": {
+    "vit": 5,
+    "al_vol": 5,
+    "armor": 5,
+    "regen": 2,
+    "leech": 2,
+    "al_brew": 1,
+    "al_surp": 3,
+    "mana": 5,
+    "al_twin": 1,
+    "power": 5,
+    "al_cat": 5,
+    "summ": 1,
+    "cascade": 3,
+    "crit": 3,
+    "reso": 3
+   },
+   "a": [
+    2271,
+    5945,
+    2026,
+    6105,
+    536,
+    475
+   ],
+   "p": [
+    595,
+    112,
+    4111,
+    6024,
+    4159,
+    3279
+   ],
+   "ranks": {},
+   "ms": 43,
+   "same": true
+  },
+  "100": {
+   "tal": {
+    "vit": 5,
+    "al_vol": 5,
+    "armor": 5,
+    "regen": 3,
+    "leech": 3,
+    "al_brew": 1,
+    "al_surp": 3,
+    "mana": 5,
+    "al_twin": 1,
+    "power": 5,
+    "al_cat": 5,
+    "summ": 3,
+    "cascade": 3,
+    "crit": 5,
+    "reso": 3,
+    "react": 3,
+    "luck": 5,
+    "wrath": 3,
+    "orbit": 3,
+    "cdr": 5
+   },
+   "a": [
+    2026,
+    5945,
+    6105,
+    536,
+    2664,
+    2271,
+    475
+   ],
+   "p": [
+    595,
+    6024,
+    4159,
+    3279,
+    4111,
+    112
+   ],
+   "ranks": {},
+   "ms": 63,
+   "same": true
+  },
+  "160": {
+   "tal": {
+    "vit": 5,
+    "al_vol": 5,
+    "armor": 5,
+    "leech": 3,
+    "al_brew": 1,
+    "mana": 5,
+    "al_surp": 3,
+    "al_twin": 1,
+    "power": 5,
+    "summ": 3,
+    "al_cat": 5,
+    "cascade": 3,
+    "crit": 5,
+    "reso": 3,
+    "react": 3,
+    "regen": 3,
+    "luck": 5,
+    "wrath": 3,
+    "orbit": 3,
+    "cdr": 5
+   },
+   "a": [
+    6105,
+    5945,
+    2271,
+    2664,
+    536,
+    475,
+    2025
+   ],
+   "p": [
+    595,
+    3224,
+    112,
+    4159,
+    6024,
+    3272
+   ],
+   "ranks": {},
+   "ms": 55,
+   "same": true
+  }
+ },
+ "_errs": []
+}
