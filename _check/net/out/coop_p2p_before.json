@@ -1,0 +1,75 @@
+{
+ "mode": "p2p",
+ "linkMs": 1864,
+ "fps": [
+  236,
+  237
+ ],
+ "via": [
+  "p2p",
+  "p2p"
+ ],
+ "hudHost": "● напрямую · 1 мс",
+ "hudGuest": "● напрямую · 1 мс",
+ "pingHost": {
+  "n": 40,
+  "min": 1,
+  "med": 1,
+  "p90": 4,
+  "max": 4
+ },
+ "pingGuest": {
+  "n": 40,
+  "min": 1,
+  "med": 1,
+  "p90": 1,
+  "max": 6
+ },
+ "peerLag": {
+  "lagMs": 100,
+  "err": 0.018,
+  "n": 996
+ },
+ "enemyLagMs": {
+  "n": 6,
+  "min": 110,
+  "med": 110,
+  "p90": 115,
+  "max": 115
+ },
+ "relayHost": {
+  "envPerSec": 0.5,
+  "bytesPerSec": 21,
+  "rxPerSec": 0.5,
+  "maxBytes": 602
+ },
+ "relayGuest": {
+  "envPerSec": 0.5,
+  "bytesPerSec": 21,
+  "rxPerSec": 0.5,
+  "maxBytes": 601
+ },
+ "dcHost": {
+  "state": "open",
+  "peer": "W1ntGq7N628DknvyWPAn",
+  "pair": "host / host (udp)",
+  "rtt": 0,
+  "fails": 0,
+  "reason": "",
+  "openMs": 448,
+  "summary": "ICE connected; свои кандидаты: host 1, srflx 0, relay 0 — STUN не ответил или сеть режет UDP; чужие: host 1, srflx 0, relay 0"
+ },
+ "dcGuest": {
+  "state": "open",
+  "peer": "ArDRFVal3I4mmKBiXc7F",
+  "pair": "host / host (udp)",
+  "rtt": 0,
+  "fails": 0,
+  "reason": "",
+  "openMs": 230,
+  "summary": "ICE connected; свои кандидаты: host 1, srflx 0, relay 0 — STUN не ответил или сеть режет UDP; чужие: host 1, srflx 0, relay 0"
+ },
+ "netHost": "Канал: P2P\nСервер связи (Supabase): подключён, отклик 437 мс, игроков в канале: 1, принято 21, отправлено 34\nПинг туда-обратно: 1 мс (медиана из 5), в одну сторону примерно 1 мс\nРеле nostr (поиск P2P): 5 из 5 отвечают\nПрямое соединение (свой WebRTC): открыто; пара ICE: host / host (udp); поднялось за 0.4 с\nP2P Trystero / ICE: connected, ice: connected, сбор: complete\nКод комнаты: NWQ7W, роль: хозяин",
+ "netGuest": "Канал: P2P\nСервер связи (Supabase): подключён, отклик 488 мс, игроков в канале: 1, принято 20, отправлено 21\nПинг туда-обратно: 1 мс (медиана из 5), в одну сторону примерно 1 мс\nРеле nostr (поиск P2P): 5 из 5 отвечают\nПрямое соединение (свой WebRTC): открыто; пара ICE: host / host (udp); поднялось за 0.2 с\nP2P Trystero / ICE: connected, ice: connected, сбор: complete\nКод комнаты: NWQ7W, роль: гость",
+ "errs": []
+}

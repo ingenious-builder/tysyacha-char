@@ -1,0 +1,83 @@
+{
+ "mode": "p2p",
+ "linkMs": 1917,
+ "fps": [
+  71,
+  71
+ ],
+ "via": [
+  "p2p",
+  "p2p"
+ ],
+ "hudHost": "● напрямую · 1 мс",
+ "hudGuest": "● напрямую · 1 мс",
+ "pingHost": {
+  "n": 40,
+  "min": 1,
+  "med": 1,
+  "p90": 2,
+  "max": 6
+ },
+ "pingGuest": {
+  "n": 40,
+  "min": 1,
+  "med": 1,
+  "p90": 1,
+  "max": 6
+ },
+ "peerLag": {
+  "lagMs": 75,
+  "err": 0.035,
+  "n": 998
+ },
+ "enemyLagMs": {
+  "n": 6,
+  "min": 85,
+  "med": 90,
+  "p90": 90,
+  "max": 90
+ },
+ "relayHost": {
+  "envPerSec": 0.5,
+  "bytesPerSec": 21,
+  "rxPerSec": 0.5,
+  "maxBytes": 602,
+  "qWait": 5
+ },
+ "relayGuest": {
+  "envPerSec": 0.5,
+  "bytesPerSec": 21,
+  "rxPerSec": 0.5,
+  "maxBytes": 601,
+  "qWait": 3
+ },
+ "dcHost": {
+  "state": "open",
+  "peer": "iwarXqXFBGXqtZucmv73",
+  "pair": "host / host (udp)",
+  "rtt": 0.7999999821186066,
+  "rttNet": 1,
+  "dropU": 0,
+  "buf": 0,
+  "fails": 0,
+  "reason": "",
+  "openMs": 447,
+  "summary": "ICE connected; свои кандидаты: host 1, srflx 0, relay 0 — STUN не ответил или сеть режет UDP; чужие: host 1, srflx 0, relay 0"
+ },
+ "dcGuest": {
+  "state": "open",
+  "peer": "8LLbQfZeKoSh409XHhQf",
+  "pair": "host / host (udp)",
+  "rtt": 0.800000011920929,
+  "rttNet": 1,
+  "dropU": 0,
+  "buf": 0,
+  "fails": 0,
+  "reason": "",
+  "openMs": 233,
+  "summary": "ICE connected; свои кандидаты: host 1, srflx 0, relay 0 — STUN не ответил или сеть режет UDP; чужие: host 1, srflx 0, relay 0"
+ },
+ "netHost": "Канал: P2P\nСервер связи (Supabase, Франкфурт): подключён, до сервера и обратно 212 мс, игроков в канале: 1, принято 19, отправлено 32\nПинг до напарника туда-обратно: 1 мс (медиана из 5), в одну сторону примерно 1 мс\nСеть напрямую (WebRTC): 1 мс туда-обратно; остальное в пинге — обработка сообщения в кадре у обоих телефонов\nБуфер плавности: напарник 68 мс, враги 110 мс (подстраивается под сеть, не больше 95/110)\nРеле nostr (поиск P2P): 5 из 5 отвечают\nПрямое соединение (свой WebRTC): открыто; пара ICE: host / host (udp); поднялось за 0.4 с\nP2P Trystero / ICE: connected, ice: connected, сбор: complete\nКод комнаты: VVGKW, роль: хозяин",
+ "netGuest": "Канал: P2P\nСервер связи (Supabase, Франкфурт): подключён, до сервера и обратно 206 мс, игроков в канале: 1, принято 19, отправлено 19\nПинг до напарника туда-обратно: 1 мс (медиана из 5), в одну сторону примерно 1 мс\nСеть напрямую (WebRTC): 1 мс туда-обратно; остальное в пинге — обработка сообщения в кадре у обоих телефонов\nБуфер плавности: напарник 68 мс, враги 68 мс (подстраивается под сеть, не больше 95/110)\nРеле nostr (поиск P2P): 4 из 5 отвечают\nПрямое соединение (свой WebRTC): открыто; пара ICE: host / host (udp); поднялось за 0.2 с\nP2P Trystero / ICE: connected, ice: connected, сбор: complete\nКод комнаты: VVGKW, роль: гость",
+ "errs": []
+}

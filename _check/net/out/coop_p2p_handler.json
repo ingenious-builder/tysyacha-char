@@ -1,0 +1,101 @@
+{
+ "mode": "p2p",
+ "linkMs": 1900,
+ "fps": [
+  117,
+  121
+ ],
+ "via": [
+  "p2p",
+  "p2p"
+ ],
+ "hudHost": "● напрямую · 1 мс",
+ "hudGuest": "● напрямую · 1 мс",
+ "pingHost": {
+  "n": 28,
+  "min": 1,
+  "med": 1,
+  "p90": 3,
+  "max": 3
+ },
+ "pingGuest": {
+  "n": 28,
+  "min": 1,
+  "med": 2,
+  "p90": 4,
+  "max": 4
+ },
+ "peerLag": {
+  "lagMs": 75,
+  "err": 0.028,
+  "n": 699
+ },
+ "enemyLagMs": {
+  "n": 6,
+  "min": 75,
+  "med": 80,
+  "p90": 85,
+  "max": 85
+ },
+ "relayHost": {
+  "envPerSec": 0.5,
+  "bytesPerSec": 21,
+  "rxPerSec": 0.5,
+  "maxBytes": 601,
+  "qWait": 6,
+  "srvRtt": 208,
+  "held": 0
+ },
+ "relayGuest": {
+  "envPerSec": 0.5,
+  "bytesPerSec": 21,
+  "rxPerSec": 0.5,
+  "maxBytes": 601,
+  "qWait": 2,
+  "srvRtt": 205,
+  "held": 0
+ },
+ "dcHost": {
+  "state": "open",
+  "peer": "x1B0wVTr7BA5G75RlPhk",
+  "pair": "host / host (udp)",
+  "rtt": 1.199999988079071,
+  "rttNet": 1,
+  "dropU": 0,
+  "buf": 0,
+  "fails": 0,
+  "reason": "",
+  "openMs": 420,
+  "summary": "ICE connected; свои кандидаты: host 1, srflx 0, relay 0 — STUN не ответил или сеть режет UDP; чужие: host 1, srflx 0, relay 0"
+ },
+ "dcGuest": {
+  "state": "open",
+  "peer": "GI0Za5HwjHvLsTkT7pTo",
+  "pair": "host / host (udp)",
+  "rtt": 0.7000000178813934,
+  "rttNet": 1,
+  "dropU": 0,
+  "buf": 0,
+  "fails": 0,
+  "reason": "",
+  "openMs": 213,
+  "summary": "ICE connected; свои кандидаты: host 1, srflx 0, relay 0 — STUN не ответил или сеть режет UDP; чужие: host 1, srflx 0, relay 0"
+ },
+ "handlerHost": {
+  "msgs": 386,
+  "avgMs": 0.039,
+  "maxMs": 0.7
+ },
+ "handlerGuest": {
+  "msgs": 733,
+  "avgMs": 0.045,
+  "maxMs": 0.9
+ },
+ "bufferGuest": [
+  67,
+  67
+ ],
+ "netHost": "Канал: P2P\nСервер связи (Supabase, Франкфурт): подключён, до сервера и обратно 208 мс, игроков в канале: 1, принято 17, отправлено 30\nПинг до напарника туда-обратно: 1 мс (медиана из 5), в одну сторону примерно 1 мс\nСеть напрямую (WebRTC): 1 мс туда-обратно; остальное в пинге — обработка сообщения в кадре у обоих телефонов\nБуфер плавности: напарник 65 мс, враги 110 мс (подстраивается под сеть, не больше 95/110)\nРеле nostr (поиск P2P): 5 из 5 отвечают\nПрямое соединение (свой WebRTC): открыто; пара ICE: host / host (udp); поднялось за 0.4 с\nP2P Trystero / ICE: connected, ice: connected, сбор: complete\nКод комнаты: 7XFET, роль: хозяин",
+ "netGuest": "Канал: P2P\nСервер связи (Supabase, Франкфурт): подключён, до сервера и обратно 205 мс, игроков в канале: 1, принято 16, отправлено 17\nПинг до напарника туда-обратно: 1 мс (медиана из 5), в одну сторону примерно 1 мс\nСеть напрямую (WebRTC): 1 мс туда-обратно; остальное в пинге — обработка сообщения в кадре у обоих телефонов\nБуфер плавности: напарник 67 мс, враги 67 мс (подстраивается под сеть, не больше 95/110)\nРеле nostr (поиск P2P): 5 из 5 отвечают\nПрямое соединение (свой WebRTC): открыто; пара ICE: host / host (udp); поднялось за 0.2 с\nP2P Trystero / ICE: connected, ice: connected, сбор: complete\nКод комнаты: 7XFET, роль: гость",
+ "errs": []
+}
