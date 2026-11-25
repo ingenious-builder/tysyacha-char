@@ -1091,7 +1091,7 @@ html[data-ui=tab] #layPan{width:min(460px,calc(100% - 40px));padding:16px 18px;g
         <section class="set-sec"><h3>Камера</h3><div class="set-stp"><button type="button" class="chip" id="camM" aria-label="Камера ближе">−</button><span id="camV">116 %</span><button type="button" class="chip" id="camP" aria-label="Камера дальше">+</button></div><p class="hint">Дальше — видно больше мира, герой мельче. Ближе — крупнее, но обзор меньше.</p></section>
         <section class="set-sec"><h3>Отступ снизу</h3><div class="set-stp"><button type="button" class="chip" id="botM" aria-label="Меньше отступ снизу">−</button><span id="botV">0 px</span><button type="button" class="chip" id="botP" aria-label="Больше отступ снизу">+</button></div><p class="hint">Если снизу тёмная полоса и кнопки обрезаны — добавь отступ (шаг 8).</p></section>
         <section class="set-sec"><h3>Управление</h3><button class="btn" id="setLay" type="button">Расположение кнопок</button><p class="hint" id="layBtnHint">Перетащи джойстик, атаку и кнопки меню куда удобно, поменяй размер или стороны (для левшей). Отдельно для вертикального и горизонтального экрана.</p></section>
-        <section class="set-sec"><h3>Благодарности</h3><p class="hint">Модели героев — KayKit Adventurers, автор Kay Lousberg (kaylousberg.com), лицензия CC0.</p></section>
+        <section class="set-sec"><h3>Благодарности</h3><p class="hint">Модели героев — KayKit Adventurers, автор Kay Lousberg (kaylousberg.com), лицензия CC0.</p><p class="hint">Модели скелетов — KayKit Skeletons, автор Kay Lousberg (kaylousberg.com), лицензия CC0.</p><p class="hint">Модели чудищ, зверей, пауков, змей, летучих мышей и драконов — Quaternius (quaternius.com, наборы Ultimate Monsters, Animated Animals, Animated Enemies), лицензия CC0.</p></section>
       </div>
       <div class="set-foot">
         <div class="set-exit">
@@ -1756,7 +1756,7 @@ function addSway(mat,amp){mat.customProgramCacheKey=()=>'sway'+amp;mat.onBeforeC
   float hh=max(position.y,0.);float sw=(sin(uTime*1.7+ph)+.4*sin(uTime*3.1+ph*1.7))*${amp.toFixed(3)}*hh*hh;
   transformed.x+=sw;transformed.z+=sw*.6;`);};}
 // мягкий контровой свет по краю силуэта (в вершинном шейдере, почти бесплатно)
-function rimify(root,col,k){const us=[];root.traverse(o=>{const m=o.isMesh&&o.material;if(!m||!m.isMeshLambertMaterial||m.userData.rimU)return;
+function rimify(root,col,k){const us=[];root.traverse(o=>{const m=o.isMesh&&o.material;if(m&&m.userData.rimHook){us.push(m.userData.rimHook(col,k));return;}if(!m||!m.isMeshLambertMaterial||m.userData.rimU)return;
   const u={value:new THREE.Color(col)};m.userData.rimU=u;us.push(u);const kk=m.userData.rimK!=null?m.userData.rimK:k;m.customProgramCacheKey=()=>'rim'+kk;
   m.onBeforeCompile=sh=>{sh.uniforms.uRim=u;
     sh.vertexShader=sh.vertexShader.replace('void main() {','varying float vRim;\nvoid main() {').replace('#include <project_vertex>','#include <project_vertex>\nvRim=pow(1.-clamp(dot(normalize(transformedNormal),normalize(-mvPosition.xyz)),0.,1.),2.4);');
@@ -2434,6 +2434,20 @@ function hmBoot(){if(HM_OFF||hmBoot.p||HMW)return;clearTimeout(hmBoot.tm);
       for(const h of HM_PEND)if(!h.g.parent)HM_PEND.delete(h);
       if(hmBoot.n<6)hmBoot.tm=setTimeout(hmBoot,Math.min(60000,4000*2**(hmBoot.n-1)));else HM_PEND.clear();});}
 addEventListener('online',()=>{if(!HM_OFF&&!HMW&&!hmBoot.p){hmBoot.n=0;hmBoot();}});
+// ---------- модели врагов и призывов (Quaternius, KayKit Skeletons — CC0): грузятся лениво; пока нет или ошибка — прежние из примитивов ----------
+// ?nofoe=1 — без них (сравнение скорости). Анимации запечены в текстуру костей (foe-models.js) — нужен float-текстуры в вершинном шейдере.
+const FM_OFF=HM_OFF||/[?&]nofoe=1/.test(location.search);let FMW=null;
+function fmBoot(){if(FM_OFF||fmBoot.p||FMW)return;clearTimeout(fmBoot.tm);
+  if(!renderer.capabilities.floatVertexTextures)return;
+  fmBoot.p=(THREE.GLTFLoader?Promise.resolve():hmScript('vendor/GLTFLoader.js?v='+HM_V)).then(()=>window.FM?0:hmScript('foe-models.js?v='+HM_V))
+    .then(()=>{window.FM.V=HM_V;return window.FM.load('');}).then(()=>{FMW=window.FM;fmWarm();})
+    .catch(e=>{console.warn('Модели врагов не загрузились — остаются простые',e);fmBoot.p=null;fmBoot.n=(fmBoot.n||0)+1;
+      if(fmBoot.n<6)fmBoot.tm=setTimeout(fmBoot,Math.min(60000,4000*2**(fmBoot.n-1)));});}
+addEventListener('online',()=>{if(!FM_OFF&&!FMW&&!fmBoot.p){fmBoot.n=0;fmBoot();}});
+addEventListener('load',()=>setTimeout(fmBoot,1500));
+// после загрузки: шейдер собрать сразу, клипы всех моделей запечь понемногу (по одной модели за раз, без провалов кадра)
+function fmWarm(){try{const m=FMW.make({m:Object.keys(FMW.lib)[0],h:1});if(m){m.g.position.set(0,-200,0);scene.add(m.g);renderer.compile(scene,camera);scene.remove(m.g);m.dispose();}}catch(e){}
+  const ids=Object.keys(FMW.lib);let i=0;const step=()=>{if(i>=ids.length)return;try{FMW.bake(ids[i++]);}catch(e){}setTimeout(step,60);};setTimeout(step,200);}
 function hmAttach(h){
   if(h.mdl||!HMW||!HMW.has(h.cid))return;let m;
   try{m=HMW.make(h.cid,h.sil?{mat:LOB_SILMAT,matSk:LOB_SILSK}:{});}catch(e){console.warn('модель героя',h.cid,e);return;}
@@ -2465,6 +2479,7 @@ function makeLabel(l1,l2,color){const c=document.createElement('canvas');c.width
   if(l2){x.font='500 30px Rubik, system-ui, sans-serif';x.fillStyle='#ffd9a0';x.strokeText(l2,256,94);x.fillText(l2,256,94);}
   const s=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),depthWrite:false,depthTest:false,transparent:true}));s.scale.set(4.2,1.05,1);s.renderOrder=20;return s;}
 function buildMob(tid0){
+  if(FMW&&FMW.hasMob(tid0,MOBS[tid0])){const m=fmMob(tid0);if(m)return m;}
   const t=MOBS[tid0],tid=t.as||tid0,g=new THREE.Group(),mats=[],A={};
   const M=(c,o)=>{const m=lam(c);if(o){m.transparent=true;m.opacity=o;}mats.push(m);return m;};
   const skin=M(t.col);
@@ -2514,6 +2529,32 @@ function buildMob(tid0){
   addShadow(g,t.r*2.6);castAll(g);
   return {g,mats,A};
 }
+// ---- модели врагов (foe-models.js): сборка, свои мелочи, анимация по действиям ИИ ----
+function fmMob(tid0){const t=MOBS[tid0];let r=null;try{r=FMW.mob(tid0,t);}catch(e){console.warn('модель врага',tid0,e);}if(!r)return null;
+  const g=new THREE.Group(),A={};g.add(r.g);addShadow(g,t.r*2.6);const b=t.as||tid0;
+  // ледяной (огненный…) элементаль: вокруг кружат осколки, внутри свечение — как у прежнего
+  if(b==='elemental'){const dc=lam(dk(t.col,.75));r.mats.push(dc);A.shards=[];for(let i=0;i<5;i++)A.shards.push(part(G.oct,dc,.16,.4,.16,0,1.1,0,g));const gl=glowSprite(t.col,3,.45);gl.position.y=1.2;g.add(gl);r.mats.push(gl.material);}
+  if(b==='wraith'||b==='banshee'){const gl=glowSprite(t.col,b==='banshee'?5:2.6,.4);gl.position.y=t.h*.5;g.add(gl);r.mats.push(gl.material);}
+  if(b==='bomber'){A.spark=glowSprite(0xffb040,.8,1);A.spark.position.set(0,t.h*.95,-t.h*.28);g.add(A.spark);r.mats.push(A.spark.material);}
+  return {g,mats:r.mats,A,fm:r.fm};}
+// высота над землёй: летуны парят, королева прыгает (как у прежних моделей)
+const FM_FLY={bat:1.1,wraith:.25,elemental:.35};
+function fmVis(en,dt){const I=en.fm,t=en.t,b=t.as||en.tid,A=en.A;
+  let y=en.jy||0;if(t.fly)y+=1.6+Math.sin(time*2+en.uid)*.35;else if(FM_FLY[b])y+=FM_FLY[b]+Math.sin(time*2.4+en.uid)*.12;en.g.position.y=y;en.fmY=y;
+  if(A.shards)A.shards.forEach((h,i)=>{const a=time*1.4+i/A.shards.length*TAU,R=en.boss?2.1:.8;h.position.set(Math.cos(a)*R,1.1+Math.sin(time*2+i)*.2,Math.sin(a)*R);h.rotation.y=time;});
+  if(A.spark){A.spark.material.opacity=en.fuse?(Math.sin(time*30)>0?1:.2):.7+.3*Math.sin(time*12);if(en.fuse)A.spark.scale.setScalar(1.4);}
+  // действие ИИ → клип: удар (выпад), тяжёлый удар/топот (slam), выстрел (натяжение), чары (занят), прыжок
+  const f=en.fmF||(en.fmF={l:0,s:0,d:0,b:0,fl:0,j:0,px:en.pos.x,pz:en.pos.z,v:0});let act=null,actT=0;
+  if(en.lunge>f.l+.01){act=FMW.act(I,'melee');actT=.45;}
+  else if(en.slam>f.s+.01){act=FMW.act(I,'heavy');actT=clamp(en.slam,.5,1.1);}
+  else if(en.draw>f.d+.01){act=FMW.act(I,'shoot');actT=Math.max(.4,en.draw);}
+  else if(en.busy>f.b+.05&&en.busy<20&&!en.charge&&!en.fuse){act=FMW.act(I,'cast');actT=clamp(en.busy,.4,.9);}
+  if(en.jump&&!f.j)act=FMW.act(I,'jump')||act;f.j=!!en.jump;
+  const hit=en.flash>f.fl+.01;f.l=en.lunge;f.s=en.slam;f.d=en.draw;f.b=en.busy;f.fl=en.flash;
+  // скорость — по настоящему сдвигу за кадр (бег, блуждание, рывок, отброс): ноги не скользят
+  const v=Math.hypot(en.pos.x-f.px,en.pos.z-f.pz)/Math.max(1e-3,dt);f.px=en.pos.x;f.pz=en.pos.z;f.v+=(Math.min(v,40)-f.v)*Math.min(1,dt*10);
+  I.drive({move:f.v>.45&&(en.moving||!!en.charge||f.v>1.5),spd:f.v,sc:I.k*en.g.scale.x,act,actT,hit});
+  I.update(dt*(en.frozenT>0?0:en.stun>0?.25:1));}
 // ---- сила врага (v13.9; Артём: «на 70 уровне ботов 200 уровня за 2 секунды убивал») ----
 // Свободный мир: база — от уровня врага (не выше уровня сильнейшего героя): до 4-го как раньше, дальше догоняет рост силы героя
 // (таланты, ранги, слоты, мастерство), чтобы враг своего уровня жил ~1–1.5 с реального боя; сверх неё — от разницы «враг − герой»:
@@ -2546,7 +2587,7 @@ function spawnEnemy(tid,x,z,lv,o){o=o||{};const t=MOBS[tid],mdl=buildMob(tid);ri
   const fH=foeH(),fk=foeScale(lv,fH),wb=t.boss&&fH!=null&&!o.mini;
   const en={uid:++UID,tid,t,lv,sc,elite:!!o.elite,mini:!!o.mini,boss:!!t.boss,r:t.r*sc,mass:t.mass*(o.elite?2:1),
     maxHp:Math.round(t.hp*fk.hp*hpMul*(wb?FOE_BOSS.hp:1)),dmg:Math.round(t.dmg*fk.dmg*dmgMul*(wb?FOE_BOSS.dmg:1)),spd:t.spd*rand(.92,1.08),
-    xp:foeXp(t,lv,o,fH==null),rw:o.rw||1,guard:!!o.guard,pos:mdl.g.position,g:mdl.g,mats:mdl.mats,A:mdl.A,
+    xp:foeXp(t,lv,o,fH==null),rw:o.rw||1,guard:!!o.guard,pos:mdl.g.position,g:mdl.g,mats:mdl.mats,A:mdl.A,fm:mdl.fm||null,
     kb:new THREE.Vector3(),face:rand(0,TAU),stun:0,slowT:0,burnT:0,burnDps:0,poisT:0,poisN:0,poisDps:0,dotT:.5,marks:{},chill:0,chillT:0,blindT:0,shredT:0,frozenT:0,
     atkCd:rand(.6,1.5),skillCd:rand(1.5,3.5),skill2:rand(4,8),busy:0,aggro:!!t.boss||!!o.aggro,flash:0,dead:false,deathT:0,lunge:0,step:rand(0,6),slam:0,draw:0,
     home:new THREE.Vector3(x,0,z),wander:new THREE.Vector3(x,0,z),wT:rand(1,4),affix:new Set(),trailT:0,orbHit:{},moving:false,hy:t.h*sc};
@@ -3108,12 +3149,13 @@ function spawnSummon(sk,o){o=o||{};const ghost=!!o.ghost;
   let tgp=o.at||null;if(!tgp&&!ghost){const t0=getTarget(sk.F.range);if(t0)tgp=t0.pos;}
   if(tgp){const dx=tgp.x-own.pos.x,dz=tgp.z-own.pos.z,dl=Math.hypot(dx,dz)||1;fa=Math.atan2(dz,dx);
     if(k==='infernal'){bx0=tgp.x-dx/dl*2.5;bz0=tgp.z-dz/dl*2.5;}else{bx0+=dx/dl*2.2;bz0+=dz/dl*2.2;}}
+  const skey=k+'|'+el+'|'+(k==='golem'||k==='clone'?cid:'')+(FMW?'|m':'');
   for(let i=0;i<info.n;i++){
-    const m=takeModel(k+'|'+el+'|'+(k==='golem'||k==='clone'?cid:''),()=>D.b(sk,cid)),g=m.g;
+    const m=takeModel(skey,()=>fmSumB(k,sk,cid)||D.b(sk,cid)),g=m.g;if(m.fm){m.fm.reset();s0fm(m);}
     const off=(i-(info.n-1)/2)*1.3,x=bx0-Math.sin(fa)*off,z=bz0+Math.cos(fa)*off;
     g.position.set(x,0,z);g.scale.setScalar(.01);g.rotation.y=Math.atan2(Math.cos(fa),Math.sin(fa));scene.add(g);
     const bar=makeBar();scene.add(bar);
-    const s={g,m,kind:k,def:D,sk,ghost,own,gid,gi:i,gn:info.n,key:k+'|'+el+'|'+(k==='golem'||k==='clone'?cid:''),cid,hp:hpv,maxHp:hpv,life:D.life*(o.echo?.8:1),age:0,appear:0,sc,R,
+    const s={g,m,kind:k,def:D,sk,ghost,own,gid,gi:i,gn:info.n,key:skey,cid,hp:hpv,maxHp:hpv,life:D.life*(o.echo?.8:1),age:0,appear:0,sc,R,
       dmg:ghost?0:skDmg(sk),col:sk.E.color,hex:hexOf(sk.E.color),atkCd:rand(.2,.7),ab:rand(.5,1.6),ab2:rand(1,3),at:0,st:rand(0,6),mv:false,face:g.rotation.y,fa:fa+i*TAU/info.n+rand(-.3,.3),
       cdk:sk.M.cd?.75:1,spdk:sk.M.cd?1.25:1,spd:D.spd*(sk.M.cd?1.25:1),boom:!!sk.M.splash||k==='imps',tT:0,tg:null,bar,tp:{pos:g.position,vel:ZERO_V},dying:0,ph:rand(0,TAU),tau:0,slam:0,leap:null,drop:k==='infernal'?.75:0,hit:0};
     if(k==='infernal'){g.position.y=14;s.appear=1;g.scale.setScalar(sc);}
@@ -3218,7 +3260,7 @@ function cloneCast(s,sk,A){if(s.dying||s.ghost||!SUMMONS.includes(s)||!CLONE_OK.
 function updateSummons(dt){
   updBleeds(dt);
   for(let i=SUMMONS.length-1;i>=0;i--){const s=SUMMONS[i],p=s.g.position;
-    if(s.dying){s.dying-=dt;const k=Math.max(0,s.dying/.35);s.g.scale.setScalar(Math.max(.01,s.sc*k));s.bar.visible=false;if(s.dying<=0)removeSummon(i);continue;}
+    if(s.dying){if(s.m.fm){s.m.fm.drive({dead:true,dieT:.3});s.m.fm.update(dt);}s.dying-=dt;const k=Math.max(0,s.dying/.35);s.g.scale.setScalar(Math.max(.01,s.sc*k));s.bar.visible=false;if(s.dying<=0)removeSummon(i);continue;}
     if(s.ghost&&(!MPon||!MP.peer||!MP.active)){killSummon(s,true);continue;}
     s.age+=dt;s.life-=dt;s.atkCd-=dt;s.at=Math.max(0,s.at-dt*3);
     if(s.hp<=0||s.life<=0){if(s.life<=0&&s.boom&&s.kind==='imps')s.hp=0;killSummon(s);continue;}
@@ -3235,10 +3277,27 @@ function updateSummons(dt){
     if(s.def.ct||s.def.tau){for(const en of ENEMIES){if(en.dead||en.stun>0||!en.aggro)continue;const dx=en.pos.x-p.x,dz=en.pos.z-p.z,rr=en.r+.8*Math.min(1.5,s.sc)+.4;if(dx*dx+dz*dz<rr*rr)s.hp-=en.dmg*(en.tauntS===s?.32:.14)*dt;}}
     animSum(s,dt);
     const b=s.bar;b.visible=s.hp<s.maxHp*.999||s.def.tau||s.kind==='infernal';if(b.visible){b.position.set(p.x,s.m.h*s.sc*(s.kind==='infernal'?1:1)+p.y+.5,p.z);b.quaternion.copy(camera.quaternion);b.userData.fill.scale.x=Math.max(.001,s.hp/s.maxHp);}}}
+// ---- модели призывов (foe-models.js) ----
+const FM_SFLY={bonedrake:1.8,imps:1.1,elemental:1.5,stormbird:3.2};
+function fmSumB(k,sk,cid){if(!FMW)return null;const el=sk.E.id,e=hexOf(sk.E.color);let I=null;
+  try{I=FMW.sum(k,el,cid,{e,f:FURS[el]||FURS.shadow,g:GOL[el]||GOL.earth});}catch(er){console.warn('модель призыва',k,er);}if(!I)return null;
+  const g=new THREE.Group();g.add(I.g);addShadow(g,{golem:2,bear:1.8,wolves:1.1,lion:1.6,skelwar:.9,skelmage:.9,bonedrake:2.2,imps:.6,infernal:2.6,elemental:1.1,stormbird:.8}[k]||1);
+  if(k==='elemental'||k==='infernal'){const gl=zGl(e,k==='infernal'?3.2:2.8,k==='infernal'?.55:.7);gl.position.y=k==='infernal'?1.8:1;g.add(gl);}
+  return {g,fm:I,h:I.S.h||2,fly:FM_SFLY[k]||0};}
+// поднятые скелеты встают из земли
+function s0fm(m){const I=m.fm;if(I.S&&I.S.spawn&&I.has('spawn'))I.play('spawn',{fade:0,ts:1.7});}
+const FM_SRNG={skelmage:1,elemental:1,stormbird:1,bonedrake:1};
+function fmSum(s,dt){const I=s.m.fm,p=s.g.position,f=s.fmF||(s.fmF={at:0,px:p.x,pz:p.z,v:0});
+  const v=Math.hypot(p.x-f.px,p.z-f.pz)/Math.max(1e-3,dt);f.px=p.x;f.pz=p.z;f.v+=(Math.min(v,40)-f.v)*Math.min(1,dt*10);
+  let act=null;if(s.at>f.at+.05)act=FMW.act(I,FM_SRNG[s.kind]?'cast':s.kind==='golem'||s.kind==='infernal'||s.kind==='bear'?'heavy':'melee');f.at=s.at;
+  if(s.roar>0&&!f.r)act=FMW.act(I,'heavy');f.r=s.roar>0;
+  I.drive({move:f.v>.45,spd:f.v,sc:I.k*s.g.scale.x,act,actT:.42});I.update(dt);
+  if(s.kind==='elemental'&&Math.random()<.3*FRK)emit(SPARK,p.x+rand(-.5,.5),p.y+rand(-.3,.5),p.z+rand(-.5,.5),rand(-.5,.5),rand(-.2,1),rand(-.5,.5),s.col,.4,0,1);
+  if(s.kind==='skelmage'&&Math.random()<.2*FRK)emit(SPARK,p.x,1.6,p.z,rand(-.4,.4),rand(0,.6),rand(-.4,.4),s.col,.4,0,1);}
 function summTarget(s){const O=s.own.pos,p=s.g.position;let b=null,bd=1e9;
   for(const en of ENEMIES){if(en.dead)continue;const od=Math.hypot(en.pos.x-O.x,en.pos.z-O.z);if(od>16)continue;const d=Math.hypot(en.pos.x-p.x,en.pos.z-p.z)-(s.kind==='stormbird'||s.kind==='bonedrake'?0:0);if(d<bd){bd=d;b=en;}}
   return b;}
-function animSum(s,dt){const m=s.m,mv=s.mv,sp=s.kind==='wolves'||s.kind==='lion'||s.kind==='imps'?15:s.spd>6?13:10;s.st+=dt*(mv?sp:2.2);const st=s.st,sw=mv?Math.sin(st)*.8:0,at=s.at;
+function animSum(s,dt){if(s.m.fm){fmSum(s,dt);return;}const m=s.m,mv=s.mv,sp=s.kind==='wolves'||s.kind==='lion'||s.kind==='imps'?15:s.spd>6?13:10;s.st+=dt*(mv?sp:2.2);const st=s.st,sw=mv?Math.sin(st)*.8:0,at=s.at;
   if(m.legs)for(const [l,ph] of m.legs)l.rotation.x=mv?Math.sin(st+ph)*(m.quad?.8:.7):0;
   if(m.arms){const a=m.arms;if(at>0){a[0].rotation.x=-2.3*at;a[1].rotation.x=-2.3*at;}else if(s.kind==='skelmage'||s.kind==='elemental'){a[1].rotation.x=-.9+Math.sin(time*2)*.05;a[0].rotation.x=.1;}else{a[0].rotation.x=-sw*.7;a[1].rotation.x=sw*.7;}}
   if(m.body){if(m.rear&&at>0){m.legs[0][0].rotation.x=m.legs[1][0].rotation.x=-2.3*at;m.body.rotation.x=-at*.5;}
@@ -3969,7 +4028,8 @@ function updateEnemies(dt){
   if(PLAY==='world'){if(!MPG){spawnT-=dt;if(spawnT<=0){spawnT=mpLvl()<4?3.2:mpLvl()<10?1.7:1.3;if(aliveCount()<maxN+(MPH&&MP.peer?COOP.cap:0))spawnPack();}if(!BOSS&&threat>=THREAT_MAX)spawnBoss();}}else updateGorge(dt);
   if(MPH&&MP.peer)mpCountAggro();
   for(let i=ENEMIES.length-1;i>=0;i--){const en=ENEMIES[i];
-    if(en.dead){en.deathT+=dt;const k=en.deathT/(en.boss?BOSS_DIE:.4);if(en.boss)bossDying(en,dt,k);else{en.g.scale.setScalar(Math.max(.01,(1-k)*en.sc));en.g.position.y=-k*.3;}if(k>=1)removeEnemy(i);continue;}
+    if(en.dead){en.deathT+=dt;const k=en.deathT/(en.boss?BOSS_DIE:en.fm?.95:.4);if(en.fm){en.fm.drive({dead:true,dieT:en.boss?1.1:.55});en.fm.update(dt);}
+      if(en.boss)bossDying(en,dt,k);else if(en.fm){const q=Math.max(0,(k-.62)/.38);en.g.scale.setScalar(Math.max(.01,(1-q*q)*en.sc));en.g.position.y=(en.fmY||0)*Math.max(0,1-k*2.2)-q*.35;}else{en.g.scale.setScalar(Math.max(.01,(1-k)*en.sc));en.g.position.y=-k*.3;}if(k>=1)removeEnemy(i);continue;}
     if(en.remote){mpStepRemote(en,dt);enemyVisuals(en,dt);continue;}
     en.stun-=dt;en.slowT-=dt;en.flash-=dt;en.blindT-=dt;en.shredT-=dt;en.busy-=dt;en.atkCd-=dt;en.skillCd-=dt;en.frozenT-=dt;en.lunge=Math.max(0,en.lunge-dt);en.draw=Math.max(0,en.draw-dt);en.slam=Math.max(0,en.slam-dt);
     if(en.chillT>0){en.chillT-=dt;if(en.chillT<=0)en.chill=0;}
@@ -4006,7 +4066,8 @@ function enemyVisuals(en,dt){
     en.step+=dt*(en.moving?9:2);
     let a=en.face-en.g.rotation.y;a=Math.atan2(Math.sin(a),Math.cos(a));if(en.frozenT<=0)en.g.rotation.y+=a*Math.min(1,dt*10);
     const A=en.A,s=en.moving?Math.sin(en.step)*.6:0;
-    if(en.tid==='slime'){const w=Math.sin(en.step);A.body.scale.set(.62+w*.05,.5-w*.06,.62+w*.05);en.g.position.y=en.moving?Math.max(0,w)*.18*en.sc:0;}
+    if(en.fm)fmVis(en,dt);
+    else if(en.tid==='slime'){const w=Math.sin(en.step);A.body.scale.set(.62+w*.05,.5-w*.06,.62+w*.05);en.g.position.y=en.moving?Math.max(0,w)*.18*en.sc:0;}
     else if(en.tid==='queen'){const w=Math.sin(en.step*.6);A.body.scale.set(2.2+w*.12,1.7-w*.12,2.2+w*.12);en.g.position.y=en.jy||0;}
     else if((en.t.as||en.tid)==='wraith'){en.g.position.y=.25+Math.sin(time*2.5+en.uid)*.12;A.armL.rotation.x=en.lunge>0?-1.6:-.6+Math.sin(time*3)*.15;A.armR.rotation.x=en.lunge>0?-1.6:-.6-Math.sin(time*3)*.15;}
     else if(en.t.anim)ANIM[en.t.anim](en,A,s);
