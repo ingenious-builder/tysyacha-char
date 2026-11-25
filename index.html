@@ -1145,7 +1145,7 @@ html[data-ui=tab] #layPan{width:min(460px,calc(100% - 40px));padding:16px 18px;g
     </div>
     <div id="topc">
       <div id="bossbar" hidden><b id="bossName"></b><div class="bar"><i class="tr" id="bossTr"></i><i id="bossI"></i><s id="bossM1"></s><s id="bossM2"></s></div><div class="bl"><span id="bossSub"></span><em id="bossPh"></em></div></div>
-      <div id="threat"><span><em class="tp">Босс</em><em class="tt">До босса</em></span><div class="bar"><i id="threatI"></i></div></div>
+      <div id="threat"><span><em class="tp">Затишье</em><em class="tt">Затишье</em></span><div class="bar"><i id="threatI"></i></div></div>
       <div id="gprog" hidden><span id="gName"></span><div class="bar"><i id="gI"></i></div></div>
       <div id="zoneTag"><span id="zoneName"></span><small id="zoneSub"></small></div>
     </div>
@@ -2114,11 +2114,13 @@ let SAVE={cur:null,q:'auto',chars:{}};
 function loadSave(hot){let d=hot&&hot.SAVE?hot.SAVE:null;if(!d){try{const raw=localStorage.getItem(SAVE_KEY);if(raw)d=JSON.parse(raw);}catch(e){}}
   if(d&&d.chars&&typeof d.chars==='object'){SAVE.cur=CLASS_BY[d.cur]?d.cur:null;SAVE.q=['auto','high','mid','low'].includes(d.q)?d.q:'auto';SAVE.chars={};for(const id in d.chars){if(CLASS_BY[id])SAVE.chars[id]=validChar(d.chars[id],CLASS_BY[id]);}SAVE.camp=window.TCCF?(d.camp&&typeof d.camp==='object'?d.camp:null):null;}}
 let CLS=null,S=null,LEARNED=new Set(),EQUIPPED=new Set(),BOOK=new Set();
-function newChar(c){const s={abMig:1,lvl:1,xp:0,kills:0,ess:0,learned:[],ranks:{},talents:{},active:Array(8).fill(null),passive:Array(42).fill(null),sandbox:false,auto:false,autoBest:true,autoLu:false,bosses:0,gorge:0,mx:0,book:[],runs:0,mig:0,legacy:[],mig2:1,pas16:1,scrL:0,talV:TAL_VER};
+function newChar(c){const s={abMig:1,lvl:1,xp:0,kills:0,ess:0,learned:[],ranks:{},talents:{},active:Array(8).fill(null),passive:Array(42).fill(null),sandbox:false,auto:false,autoBest:true,autoLu:false,bosses:0,gorge:0,mx:0,book:[],runs:0,mig:0,legacy:[],mig2:1,pas16:1,scrL:0,talV:TAL_VER,wv:{}};
   // старт: первая общая активная (Спешка), фирменная № 1 (Мощь), первая общая пассивная (Размах)
   s.active[0]=sid(c.p,c.ca[0],'swift');s.active[1]=sid(c.p,c.sig[0],'mighty');
   s.passive[0]=sid(c.p,c.cp[0],'huge');
   s.learned=[...s.active,...s.passive].filter(v=>v!=null);return s;}
+// 25.11 ход боя по краям в сохранении: {край: {p фаза 0–3, k убито в фазе, w волн пройдено 0–10}}; старое сохранение — пусто (все края с затишья)
+function wvClean(d){const o={};if(d&&typeof d==='object'&&!Array.isArray(d))for(const k in d){const z=+k,v=d[k];if(Number.isInteger(z)&&z>=0&&z<ZONES.length&&v&&typeof v==='object')o[z]={p:clamp(v.p|0,0,3),k:Math.max(0,v.k|0),w:clamp(v.w|0,0,10)};}return o;}
 function validChar(d,c){if(!d||!Array.isArray(d.active)||!Array.isArray(d.passive)||!Array.isArray(d.learned))return newChar(c);
   const s=newChar(c);s.lvl=clamp(d.lvl|0,1,999);s.xp=Math.max(0,+d.xp||0);s.kills=d.kills|0;s.ess=Math.max(0,d.ess|0);s.sandbox=!!d.sandbox;s.auto=d.auto===true;s.autoBest=d.abMig?d.autoBest===true:true;s.abMig=1;s.autoLu=d.autoLu===true;s.autoRank=d.autoRank===true;s.bosses=d.bosses|0;s.gorge=clamp(d.gorge|0,0,12);
   const L0=d.learned.filter(v=>c.poolAll.has(v));s.learned=L0.filter(v=>c.pool.has(v));s.scrL=d.scrL|0;
@@ -2128,7 +2130,7 @@ function validChar(d,c){if(!d||!Array.isArray(d.active)||!Array.isArray(d.passiv
   for(let i=0;i<8;i++){const v=d.active[i];s.active[i]=(v!=null&&c.pool.has(v)&&SKILLS[v].active)?v:null;}
   for(let i=0;i<42;i++){const v=d.passive[i];s.passive[i]=(v!=null&&c.pool.has(v)&&!SKILLS[v].active)?v:null;}
   const seenB=new Set();for(const a of [s.active,s.passive])for(let i=0;i<a.length;i++){if(a[i]==null)continue;const b=SKILLS[a[i]].bk;if(seenB.has(b))a[i]=null;else seenB.add(b);}
-  s.mx=Math.max(0,+d.mx||0);s.runs=d.runs|0;s.mig=d.mig|0;
+  s.mx=Math.max(0,+d.mx||0);s.runs=d.runs|0;s.mig=d.mig|0;s.wv=wvClean(d.wv);
   s.imp=Array.isArray(d.imp)?[...new Set(d.imp.filter(v=>c.poolAll.has(v)))]:[];s.impAcc=Math.max(0,+d.impAcc||0);s.impPend=d.impPend?1:0;s.impN=d.impN|0; // невозможные чары — навсегда у героя
   if(d.mx==null){ // старое сохранение: уровень и опыт переходят в мастерство, изученное - в Книгу чар
     const LV0=clamp(d.lvl|0,1,999);let tot=Math.max(0,+d.xp||0);for(let l=1;l<LV0;l++)tot+=xpBase(l);
@@ -3769,11 +3771,11 @@ const foeH=()=>PLAY==='gorge'?null:strongLv();
 const ENEMIES=[];let UID=0;
 function spawnEnemy(tid,x,z,lv,o){o=o||{};const t=MOBS[tid],mdl=buildMob(tid);rimify(mdl.g,o.elite?0xffd070:t.boss?0xff7a6a:0x8fb0ff,o.elite||t.boss?.6:.42);
   const sc=(o.guard?2:o.champ?1.6:o.elite?1.3:o.mini?.6:1)*(t.boss?bossScale(t):1);mdl.g.scale.setScalar(sc);  // босс заметно крупнее (масштаб группы, модель не трогаем)
-  const hpMul=(o.guard?3:1)*(o.champ?2:1)*(o.elite?3.5:1)*(o.mini?.3:1)*(t.boss?1.3:2.2)*(o.hpMul||1)*(MPH&&MP.coop?COOP.hp:1),dmgMul=(o.elite?1.4:1)*(o.mini?.6:1)*(t.boss?1:.9);
+  const hpMul=(o.guard?3:1)*(o.champ?2:1)*(o.elite?3.5:1)*(o.mini?.3:1)*(t.boss?1.3:2.2)*(o.hpMul||1)*(MPH&&MP.coop?COOP.hp:1),dmgMul=(o.elite?1.4:1)*(o.mini?.6:1)*(t.boss?1:.9)*(o.dmgMul||1);
   const fH=foeH(),fk=foeScale(lv,fH),wb=t.boss&&fH!=null&&!o.mini;
   const en={uid:++UID,tid,t,lv,sc,elite:!!o.elite,mini:!!o.mini,boss:!!t.boss,r:t.r*sc,mass:t.mass*(o.elite?2:1),
     maxHp:Math.round(t.hp*fk.hp*hpMul*(wb?FOE_BOSS.hp:1)),dmg:Math.round(t.dmg*fk.dmg*dmgMul*(wb?FOE_BOSS.dmg:1)),spd:t.spd*rand(.92,1.08),
-    xp:foeXp(t,lv,o,fH==null),rw:o.rw||1,guard:!!o.guard,pos:mdl.g.position,g:mdl.g,mats:mdl.mats,A:mdl.A,fm:mdl.fm||null,
+    xp:Math.round(foeXp(t,lv,o,fH==null)*(o.xpMul||1)),xm:o.xpMul||1,rw:o.rw||1,guard:!!o.guard,pos:mdl.g.position,g:mdl.g,mats:mdl.mats,A:mdl.A,fm:mdl.fm||null,
     kb:new THREE.Vector3(),face:rand(0,TAU),stun:0,slowT:0,burnT:0,burnDps:0,poisT:0,poisN:0,poisDps:0,dotT:.5,marks:{},chill:0,chillT:0,blindT:0,shredT:0,frozenT:0,
     atkCd:rand(.6,1.5),skillCd:rand(1.5,3.5),skill2:rand(4,8),busy:0,aggro:!!t.boss||!!o.aggro,flash:0,dead:false,deathT:0,lunge:0,step:rand(0,6),slam:0,draw:0,
     home:new THREE.Vector3(x,0,z),wander:new THREE.Vector3(x,0,z),wT:rand(1,4),affix:new Set(),trailT:0,orbHit:{},moving:false,hy:t.h*sc};
@@ -3802,16 +3804,223 @@ function packSpot(C){const mine=C===P.pos,v=mine?P.vel:(MP.peer&&MP.peer.vel)||P
     if(Math.hypot(x-C.x,z-C.z)<12||Math.hypot(x,z)<10)continue;best={x,z};if(!mine||offScreen(x,z))break;}
   return best;}
 // стаи свободного мира — «охотники» (hunt): сами идут на героя с HUNT_R — бой не ждёт первой атаки
-const WT_HP=2.5,WT_RW=2.2;// v13.30: враги мира живучее ×2,5, награда за каждого ×2,2 (врагов втрое меньше — опыт тот же)
 function spawnPack(){const C=mpSpawnCenter(),sp=packSpot(C);if(!sp)return;const x=sp.x,z=sp.z;
-  const LV=mpLvl(),zone=zoneOf(x,z),lv=Math.max(1,enemyLvAt(x,z)+randi(-1,1)),rw=rewardMul(Math.hypot(x,z))*WT_RW,hpMul=WT_HP;
+  const LV=mpLvl(),zone=zoneOf(x,z),lv=Math.max(1,enemyLvAt(x,z)+randi(-1,1)),rw=rewardMul(Math.hypot(x,z));
   const elite=LV>=4&&Math.random()<Math.min(.3,.06+zone*.04);
-  if(zone>=4&&Math.random()<.07){const ct=CHAMP[zone][randi(0,CHAMP[zone].length-1)];spawnMob(ct,x,z,lv+2,{elite:true,champ:true,guard:true,rw,hpMul,noPack:true,hunt:true});
-    for(let k=0;k<2;k++)spawnMob(pickW(ZONE_MIX[zone]),x+rand(-4,4),z+rand(-4,4),lv,{rw,hpMul,hunt:true});return;}
-  if(LV>=6&&Math.random()<Math.min(.2,.03+zone*.015)){const ct=CHAMP[zone][randi(0,CHAMP[zone].length-1)];spawnMob(ct,x,z,lv+1,{elite:true,champ:true,rw,hpMul,hunt:true});return;}
-  const n=elite?2:LV<3?1:LV<6?randi(1,2):randi(1,3);
+  if(zone>=4&&Math.random()<.07){const ct=CHAMP[zone][randi(0,CHAMP[zone].length-1)];spawnMob(ct,x,z,lv+2,{elite:true,champ:true,guard:true,rw,noPack:true,hunt:true});
+    for(let k=0;k<3;k++)spawnMob(pickW(ZONE_MIX[zone]),x+rand(-4,4),z+rand(-4,4),lv,{rw,hunt:true});return;}
+  if(LV>=6&&Math.random()<Math.min(.2,.03+zone*.015)){const ct=CHAMP[zone][randi(0,CHAMP[zone].length-1)];spawnMob(ct,x,z,lv+1,{elite:true,champ:true,rw,hunt:true});return;}
+  const n=elite?3:LV<3?randi(1,2):LV<6?randi(2,3):randi(2,4);
   const mix=(zone===0&&LV<3)?[['slime',60],['goblin',40]]:ZONE_MIX[zone];
-  for(let k=0;k<n;k++)spawnMob(pickW(mix),x+rand(-2.5,2.5),z+rand(-2.5,2.5),lv,{elite:elite&&k===0,rw,hpMul,hunt:true});}
+  for(let k=0;k<n;k++)spawnMob(pickW(mix),x+rand(-2.5,2.5),z+rand(-2.5,2.5),lv,{elite:elite&&k===0,rw,hunt:true});}
+
+// =====================================================================
+// 25.11 ХОД БОЯ ПО КРАЯМ (Артём: «слишком много месива… нужно, чтобы их было немного, но они были живучими;
+// потом первая волна, боссы на 3-й и 6-й, на 10-й самый главный; убил — край пройден, для опыта иди в следующий»).
+// У каждого края (региона) свой ход, он в сохранении: S.wv[край] = {p, k, w}
+//   p 0 затишье — редкие живучие враги по 1–2 (их надо бить вдвоём и с умом); k — сколько убито;
+//   p 1 нарастание — врагов чуть больше и они чуть сильнее, после WV_KB убийств приходит чемпион края;
+//   p 2 волны — w пройдено из 10: сигнал за 3,5 с, передышка, волна 6–12 врагов разных ролей бежит на героев
+//       (быстрые, стрелки, крепкие), босс на 3-й и 6-й, владыка края на 10-й; на экране не больше WV_CAP врагов волны;
+//   p 3 пройден — волн нет, редкие обычные враги и стрелка «дальше».
+// За волну — опыт так, чтобы к концу 10-й герой был у потолка уровней края (LVB); перерос — награда тает.
+// В коопе ход ведёт хост, гостю шлёт 'wv' (номер волны, отсчёт, стрелка, события) — гость видит то же и сам берёт награду.
+// =====================================================================
+const WVN=10,WV_CAP=12,WV_KC=5,WV_KB=8,WV_CROWD=14;
+// фон по фазам: n/c — живых врагов соло/вдвоём, ev — раз в сколько секунд, pk — врагов за раз, hp/dm/xp — множители, lv — к уровню
+const WVA=[{n:2,c:3,ev:[6,9],pk:[1,1],hp:5,dm:1.5,xp:2.5,lv:0},{n:4,c:5,ev:[4,6],pk:[1,3],hp:4,dm:1.35,xp:2,lv:1},null,
+  {n:3,c:4,ev:[6,9],pk:[1,2],hp:3,dm:1.2,xp:1,lv:0}];
+const WV_SIZE=[8,8,5,9,10,6,11,12,12,8],WV_HP=3,WV_DM=1.3,WV_XP=1.3;
+// дальше от центра — волны крепче и больнее (герой к 20–35-му уровню растёт быстрее врагов: таланты, ранги)
+const wvZK=z=>({hp:1+.15*Math.min(z,6),dm:1+.15*Math.min(z,6)});
+// босс волны — не «губка»: прежний босс мира (×2 к здоровью) у героя 10-го уровня жил 3–4 мин; в волне он с охраной, поэтому ~12 и ~20 врагов волны по здоровью
+const WV_BHP=[.35,.5],WV_BMAIN=.75;  // первый босс (3-я волна) мягче: у Паладина 8–10-го ур. один на один он был стеной
+const WV_RNG=new Set(['ranged','caster','sniper','spitter','blinker','icer','necro']);
+// роль врага в волне: r — стрелок/колдун (держит дистанцию), t — крепкий, f — быстрый, m — обычный ближний
+function mobRole(tid){const t=MOBS[tid],ai=t.ai;if(WV_RNG.has(ai))return 'r';if(ai==='brute'||ai==='golem'||ai==='shield'||t.hp>=120)return 't';
+  if(t.spd>=4.3||ai==='wolf'||ai==='bat'||ai==='imp'||ai==='bomber')return 'f';return 'm';}
+const WV={z:-1,zT:0,st:'',cd:0,cd0:9,id:0,q:[],tot:0,spT:0,burst:0,champ:null,chT:0,dir:0,away:0,amb:2,ann:0,syncT:0,thT:0,g:null,gT:0};
+function wvReset(){Object.assign(WV,{z:-1,zT:0,st:'',cd:0,q:[],tot:0,spT:0,burst:0,champ:null,chT:0,away:0,amb:2,ann:0,syncT:0,g:null});}
+const wvOn=()=>PLAY==='world'&&!!S;
+function wvSt(z){z=clamp(z|0,0,ZONES.length-1);const all=S.wv||(S.wv={});let s=all[z];
+  if(!s||typeof s!=='object'){s=all[z]={p:0,k:0,w:0};if(z<ZABYSS&&mpLvl()>=LVB[z][1]+4)s.p=3;}  // край давно перерос (старое сохранение, ушёл назад) — сразу пройден
+  return s;}
+function wvC(){return MPH&&mpPeerUp()&&P.dead?MP.peer.pos:P.pos;}
+const wvCoop=()=>!!(MPH&&MP.peer&&MP.peer.on);
+// стрелка на экране: угол по часовой от «вверх» (камера повёрнута постоянно — зависит только от направления в мире)
+function wvAng(dx,dz){const l=Math.hypot(dx,dz);if(l<1e-3)return null;const ld=toLocal(dx/l,dz/l);return Math.round(Math.atan2(-ld.x,ld.z)*180/Math.PI);}
+let wvAE=null;
+function wvArrSet(a){if(!wvAE){wvAE=document.createElement('b');wvAE.id='wvArr';wvAE.setAttribute('aria-hidden','true');
+    wvAE.style.cssText='display:none;width:16px;height:16px;flex:none;color:#f2c46b;transition:transform .2s';
+    wvAE.innerHTML='<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 2l8 10h-5v10H9V12H4z"/></svg>';threatEl.appendChild(wvAE);}
+  const k=a==null?'':String(a);if(wvAE.dataset.k===k)return;wvAE.dataset.k=k;wvAE.style.display=a==null?'none':'block';if(a!=null)wvAE.style.transform='rotate('+a+'deg)';}
+function wvArr(dx,dz){const l=Math.hypot(dx,dz);if(l<1e-3)return '';const ld=toLocal(dx/l,dz/l);return ARR8[(Math.round(Math.atan2(-ld.x,ld.z)/(Math.PI/4))%8+8)%8];}
+function wvTag(b,s){$('#zoneName').textContent=b;$('#zoneSub').textContent=s||'';$('#zoneTag').classList.add('on');clearTimeout(zoneT);zoneT=setTimeout(()=>$('#zoneTag').classList.remove('on'),3400);}
+const wvNext=z=>z+1<ZONES.length?z+1:-1;
+function wvBegin(){wvReset();const C=wvC();WV.z=zoneOf(C.x,C.z);wvEnter(true);WV.amb=1.2;}
+function wvEnter(quiet){const s=wvSt(WV.z),c=WV.champ;if(c&&!c.dead){const i=ENEMIES.indexOf(c);if(i>=0){poof(c.pos.x,c.pos.z,new THREE.Color(c.t.col));removeEnemy(i);}}  // чемпион прошлого края уходит
+  WV.st='';WV.q=[];WV.ann=0;WV.champ=null;WV.chT=3;WV.amb=Math.min(WV.amb,2.5);
+  if(s.p===2){WV.st='break';WV.cd=WV.cd0=8;}
+  if(s.p===1&&s.k>=WV_KB)WV.chT=4;
+  wvSync('enter');}
+// ---- главный ход (только хост или один игрок) ----
+function wvTick(dt){
+  const C=wvC(),zc=zoneOf(C.x,C.z);if(WV.z<0){WV.z=zc;wvEnter(true);}
+  // во время волны край не меняется (граница — просто черта); волна сорвана, только если герои ушли от места волны дальше 50 м на 9 с
+  if(WV.st==='wave'){WV.zT=0;if(Math.hypot(C.x-WV.ax,C.z-WV.az)>50){WV.away+=dt;if(WV.away>9)wvFail('Вы ушли от волны');}else WV.away=0;}
+  else if(zc!==WV.z){WV.zT+=dt;if(WV.zT>1.2){WV.z=zc;WV.zT=0;wvEnter();}}else WV.zT=0;
+  WV.snT=(WV.snT||0)-dt;if(WV.snT<=0){WV.snT=.5;wvSane(C);}
+  const s=wvSt(WV.z);
+  if(s.p===2)wvWaves(dt,s,C);
+  else if(s.p===1&&s.k>=WV_KB)wvChamp(dt,s,C);
+  const chOn=WV.champ&&!WV.champ.dead;
+  if(s.p!==2&&!chOn)wvAmbient(dt,s,C);
+  WV.syncT-=dt;if(WV.syncT<=0){WV.syncT=WV.st==='wave'||WV.st==='break'?1:2.5;wvSync();}}
+const WV_NOHV=new Set(['brute','bomber','shroom','bat']);
+function wvMark(en,wid){if(!en)return;en.wvW=wid||0;const ai=en.t.ai;if(!en.boss&&!WV_RNG.has(ai)&&!WV_NOHV.has(ai))en.wvH=rand(2,4);}
+// уровень врагов хода боя: герой (+ надбавка фазы) в полосе края [мин, макс]; прежний «герой + lvOff(r)» на дальних краях давал +13…+20 —
+// с ×4–5 к здоровью затишья это были стены. Рано пришёл в край — враги его минимума (опасно), перерос — его максимума (опыта мало)
+function wvLv(z,C,v){const lo=z>=ZABYSS?lvBand(Math.hypot(C.x,C.z)).lo:LVB[z][0],hi=z>=ZABYSS?Infinity:LVB[z][1];return Math.max(1,Math.round(clamp(v,lo,hi)));}
+// враг с испорченным положением (NaN — редкий старый сбой) невидим и неуязвим, а волну или лимит затишья держит вечно
+function wvSane(C){for(let i=ENEMIES.length-1;i>=0;i--){const e=ENEMIES[i];if(e.dead||e.remote||(isFinite(e.pos.x)&&isFinite(e.pos.z)))continue;
+  if(e.wvW||e.boss||e===WV.champ){const a=rand(0,TAU);e.pos.set(C.x+Math.cos(a)*14,0,C.z+Math.sin(a)*14);e.kb.set(0,0,0);if(e.hop){e.hop=null;e.jy=0;}}else removeEnemy(i);}}
+function wvMix(z,LV){return (z===0&&LV<3)?[['slime',60],['goblin',40]]:ZONE_MIX[Math.min(z,ZONE_MIX.length-1)];}
+function wvAmbient(dt,s,C){const A=WVA[s.p];if(!A)return;const n0=aliveCount();if(n0===0&&WV.amb>2.5)WV.amb=2.5;
+  WV.amb-=dt;if(WV.amb>0)return;WV.amb=rand(A.ev[0],A.ev[1]);const lim=wvCoop()?A.c:A.n;if(n0>=lim)return;
+  const sp=packSpot(C);if(!sp)return;const LV=mpLvl(),z=WV.z,lv=wvLv(z,C,LV+A.lv+(Math.random()<.3?-1:0)),rw=rewardMul(Math.hypot(C.x,C.z)),mix=wvMix(z,LV);
+  const n=Math.min(lim-n0,randi(A.pk[0],A.pk[1])),zk=wvZK(z);
+  for(let k=0;k<n;k++){const el=s.p===1&&k===0&&LV>=4&&Math.random()<.18;
+    for(const e of spawnMob(pickW(mix),sp.x+rand(-2.5,2.5),sp.z+rand(-2.5,2.5),lv,{rw,hunt:true,noPack:true,elite:el,affixList:el?wvAffix(lv):undefined,hpMul:A.hp*zk.hp*(el?.5:1),dmgMul:A.dm*zk.dm,xpMul:A.xp}))wvMark(e,0);}}
+function wvChamp(dt,s,C){const c=WV.champ;
+  if(c&&!c.dead){if(!ENEMIES.includes(c)||Math.hypot(c.pos.x-C.x,c.pos.z-C.z)>60){const i=ENEMIES.indexOf(c);if(i>=0)removeEnemy(i);WV.champ=null;WV.chT=6;}else wvUnstick(c,C,wvFarT(C),dt);return;}
+  WV.champ=null;WV.chT-=dt;if(WV.chT>0)return;WV.chT=6;const sp=packSpot(C);if(!sp)return;
+  // чемпион по здоровью — как ~15 врагов волны: у крепких (голем 420, громила 210) запас урезан, иначе голем-чемпион жил у стрелка 6+ мин
+  const z=WV.z,ct=CHAMP[z][randi(0,CHAMP[z].length-1)],lv=wvLv(z,C,mpLvl()+2),zk=wvZK(z),en=spawnMob(ct,sp.x,sp.z,lv,{elite:true,champ:true,affixList:wvAffix(lv),rw:rewardMul(Math.hypot(C.x,C.z)),hunt:true,noPack:true,aggro:true,xpMul:1.5,hpMul:zk.hp*clamp(150/MOBS[ct].hp,.3,1),dmgMul:zk.dm})[0];
+  en.noDespawn=true;WV.champ=en;wvMark(en,0);puffs(sp.x,1,sp.z,new THREE.Color(0xf2c46b),14,2,1.2);
+  wvTag('Пришёл чемпион края',en.t.name+' '+wvArr(sp.x-C.x,sp.z-C.z)+' · крепкий, бейте вместе');wvSync('cs');}
+// убийство (хост/соло): счёт затишья и нарастания, чемпион открывает волны
+function wvKill(en){if(!wvOn()||MPG||en.mini||WV.z<0)return;const s=wvSt(WV.z);
+  if(en===WV.champ){WV.champ=null;s.p=2;s.w=0;s.k=0;WV.st='break';WV.cd=WV.cd0=9;WV.ann=0;
+    wvTag('Чемпион повержен','Отдышитесь — скоро первая волна');wvSync('chd');saveSoon();return;}
+  if(en.wvW||s.p>1)return;s.k++;
+  if(s.p===0&&s.k>=WV_KC){s.p=1;s.k=0;wvTag('Враги собираются','Их станет больше, потом придёт чемпион края');wvSync('ph');saveSoon();}
+  else if(s.p===1&&s.k===WV_KB){WV.chT=3;saveSoon();}}
+function wvWaves(dt,s,C){
+  if(WV.st!=='break'&&WV.st!=='wave'){WV.st='break';WV.cd=WV.cd0=8;WV.ann=0;}
+  const all=P.dead&&!(MPH&&mpPeerUp());
+  // окно уровня не держит отсчёт: один игрок и так на паузе, а вдвоём ждать открытое окно напарника нельзя
+  if(WV.st==='break'){if(all)return;WV.cd-=dt;const w=s.w+1;
+    if(!WV.ann&&WV.cd<=3.5){WV.ann=1;WV.dir=wvDir(C);
+      wvTag('Волна '+w+' из '+WVN+' — готовьтесь',(w===10?'Владыка края · ':w===3||w===6?'С боссом · ':'')+'идут '+wvArr(Math.cos(WV.dir),Math.sin(WV.dir)));wvSync('pre');}
+    if(WV.cd<=0)wvStart(s,w,C);return;}
+  if(all){wvFail('Герой пал');return;}
+  // последние враги волны не прячутся: ≤ 2 осталось 12 с — идут вплотную; застрял дальше 34 м от героев 8 с — выходит в 16 м от них
+  let n=0;const far=wvFarT(C);for(const e of ENEMIES){if(e.dead||e.wvW!==WV.id)continue;n++;wvUnstick(e,C,far,dt);
+    if(!e.boss&&Math.hypot(e.pos.x-C.x,e.pos.z-C.z)>34&&(!far||Math.hypot(e.pos.x-far.x,e.pos.z-far.z)>34)){e.wvFar=(e.wvFar||0)+dt;if(e.wvFar>8){e.wvFar=0;const a=Math.atan2(e.pos.z-C.z,e.pos.x-C.x);poof(e.pos.x,e.pos.z,new THREE.Color(e.t.col));e.pos.set(C.x+Math.cos(a)*16,0,C.z+Math.sin(a)*16);poof(e.pos.x,e.pos.z,new THREE.Color(e.t.col));}}else e.wvFar=0;}
+  WV.lastT=n<=2&&!WV.q.length?(WV.lastT||0)+dt:0;if(WV.lastT>12)for(const e of ENEMIES)if(!e.dead&&e.wvW===WV.id)e.wvLast=1;
+  WV.spT-=dt;if(WV.q.length&&WV.spT<=0&&n<WV_CAP){WV.spT=2.6;wvBurst(C,Math.min(WV.q.length,WV_CAP-n,WV.burst++?4:5));}
+  if(!WV.q.length&&n===0)wvClear(s);}
+// откуда идёт волна: с внешней стороны края или сбоку, не со стороны базы
+// застрял за камнем или деревом (дальше 16 м от героев и за 6 с сдвинулся меньше 2 м) — выходит в 12 м от ближайшего героя
+function wvUnstick(e,C,far,dt){if(e.boss)return;const d=Math.min(Math.hypot(e.pos.x-C.x,e.pos.z-C.z),far?Math.hypot(e.pos.x-far.x,e.pos.z-far.z):1e9);
+  if(d<=16||!e.wvP){e.wvS=0;(e.wvP||(e.wvP={x:0,z:0})).x=e.pos.x;e.wvP.z=e.pos.z;return;}
+  e.wvS=(e.wvS||0)+dt;if(e.wvS<6)return;e.wvS=0;
+  if(Math.hypot(e.pos.x-e.wvP.x,e.pos.z-e.wvP.z)<2){const T=far&&Math.hypot(e.pos.x-far.x,e.pos.z-far.z)<Math.hypot(e.pos.x-C.x,e.pos.z-C.z)?far:C,a=Math.atan2(e.pos.z-T.z,e.pos.x-T.x);
+    poof(e.pos.x,e.pos.z,new THREE.Color(e.t.col));e.pos.set(T.x+Math.cos(a)*12,0,T.z+Math.sin(a)*12);poof(e.pos.x,e.pos.z,new THREE.Color(e.t.col));}
+  e.wvP.x=e.pos.x;e.wvP.z=e.pos.z;}
+function wvFarT(C){return MPH&&mpPeerUp()&&MP.peer.pos!==C?MP.peer.pos:null;}
+function wvDir(C){const r=Math.hypot(C.x,C.z),out=r>3?Math.atan2(C.z,C.x):rand(0,TAU);return out+rand(-1.3,1.3);}
+// свойства элиты без «Живучего»: 1,5 % здоровья в секунду у врага с запасом ×5 лечили его быстрее, чем бьёт стрелок
+function wvAffix(lv){const p=AFFIX.map(a=>a[0]).filter(a=>a!=='regen'),o=[];const n=lv>=6?2:1;while(o.length<n)o.push(p.splice(randi(0,p.length-1),1)[0]);return o;}
+function wvPick(mix,role){const f=mix.filter(a=>mobRole(a[0])===role);return pickW(f.length?f:mix);}
+function wvStart(s,w,C){WV.id++;const z=WV.z,coop=wvCoop(),LV=mpLvl(),mix=wvMix(z,LV+3);
+  let N=WV_SIZE[w-1]||8;if(coop)N=Math.min(14,Math.round(N*1.3));
+  const nf=Math.round(N*.3),nr=Math.round(N*.3),nt=Math.max(1,Math.round(N*.2)),q=[];
+  for(let i=0;i<N;i++){const role=i<nf?'f':i<nf+nr?'r':i<nf+nr+nt?'t':'m';q.push({tid:wvPick(mix,role)});}
+  // элита волны (с 4-й — одна, с 7-й — две): крепче обычного врага волны в 1,75 раза (×3,5 элиты × 0,5), щитоносец элитой не бывает — с блоком спереди его не пробить
+  // элитой бывает только обычный или быстрый враг (крепкий с ×3,5 — «губка»)
+  const ne=w>=7?2:w>=4?1:0;for(let i=0,e=0;i<q.length&&e<ne;i++){const r=mobRole(q[i].tid);if(r==='m'||r==='f'){q[i].el=1;e++;}}
+  for(let i=q.length-1;i>0;i--){const j=randi(0,i);[q[i],q[j]]=[q[j],q[i]];}
+  const lo=z>=ZABYSS?Math.round(lvBand(Math.hypot(C.x,C.z)).lo):LVB[z][0],hi=z>=ZABYSS?Infinity:LVB[z][1];
+  WV.lv=Math.max(1,Math.round(clamp(LV+(w>7?2:w>3?1:0),lo,hi)));
+  if(w===10||w===3||w===6){const zb=WBOSS[Math.min(z,WBOSS.length-1)],tid=w===10?zb[zb.length-1]:zb[(w===3?0:1)%zb.length];q.splice(w===10?0:Math.min(3,q.length),0,{tid,boss:w===10?2:1});}
+  const ann=WV.ann;if(!ann)WV.dir=wvDir(C);
+  WV.q=q;WV.tot=q.length;WV.spT=0;WV.burst=0;WV.st='wave';WV.away=0;WV.w=w;WV.ax=C.x;WV.az=C.z;
+  if(!ann)wvTag('Волна '+w+' из '+WVN,N+' врагов'+(w===10?' и владыка края':w===3||w===6?' и босс':'')+' · идут '+wvArr(Math.cos(WV.dir),Math.sin(WV.dir)));  // сигнал уже был за 3,5 с — второй плашки нет
+  wvSync('go');}
+function wvBurst(C,k){const two=WV.w>=5&&WV.burst%2===0,a=WV.dir+(two?Math.PI*.7:0)+rand(-.25,.25),d=22;
+  let bx=C.x+Math.cos(a)*d,bz=C.z+Math.sin(a)*d;const l=Math.hypot(bx,bz);if(l>WORLD-4){bx*=(WORLD-4)/l;bz*=(WORLD-4)/l;}
+  const rw=rewardMul(Math.hypot(C.x,C.z));
+  for(let i=0;i<k&&WV.q.length;i++){const sp=WV.q[0];
+    if(sp.boss){if(BOSS)break;WV.q.shift();wvBoss(sp,bx,bz,rw);continue;}
+    WV.q.shift();const x=bx+rand(-3,3),z=bz+rand(-3,3);
+    const zk=wvZK(WV.z);for(const e of spawnMob(sp.tid,x,z,WV.lv,{rw,hunt:true,aggro:true,noPack:true,elite:!!sp.el,affixList:sp.el?wvAffix(WV.lv):undefined,hpMul:WV_HP*zk.hp*(sp.el?.5:1),dmgMul:WV_DM*zk.dm*(wvCoop()?1.1:1),xpMul:WV_XP})){e.noDespawn=true;e.aggro=true;wvMark(e,WV.id);}}
+  puffs(bx,1,bz,new THREE.Color(0x553344),10,2.5,1.2);}
+// босс волны на 1 ур. выше волны (владыка — на 2): прежний босс мира (+2 ур.) у героя 8–10-го уровня сносил хрупкого мага одним ударом
+function wvBoss(sp,x,z,rw){const main=sp.boss===2,lv=WV.lv+(main?2:1);
+  // вдвоём босс крепче (к ×1,6 кооператива ещё ×1,3) и бьёт на 10 % больнее: двое с танком проходили 3-ю волну, не опускаясь ниже 89 % здоровья
+  const zk=wvZK(WV.z),first=WV.w<=3,cp=wvCoop();BOSS=spawnEnemy(sp.tid,x,z,lv,{rw,hpMul:(main?WV_BMAIN:WV_BHP[first?0:1])*zk.hp*(cp?1.3:1),dmgMul:(main?.95:first?.75:.85)*zk.dm*(cp?1.1:1),bsub:(main?'Владыка края':'Босс '+WV.w+'-й волны')+' «'+ZONES[WV.z].name+'»'});
+  BOSS.skillCd=2.5;wvMark(BOSS,WV.id);bossIntro(BOSS);puffs(x,1,z,new THREE.Color(0x553344),20,2.5,1.4);}
+// награда за волну: до цели края T(w) = мин + (макс − мин)·(0,25 + 0,75·w/10), не больше 3 уровней за раз; перерос цель — тает
+function wvReward(z,w){const L=S.lvl,n=xpNeed(L);if(z>=ZABYSS)return Math.round(.25*n);
+  const lo=LVB[z][0],hi=LVB[z][1],T=lo+(hi-lo)*(.25+.75*w/WVN);
+  let x=.2*n*xpLow(Math.min(0,Math.floor(T)-L));
+  if(L<T){const Tf=Math.floor(T);let need;if(Tf===L)need=(T-L)*n-S.xp;else{need=n-S.xp;let l=L+1;for(;l<Tf&&l<=L+3;l++)need+=xpNeed(l);if(l===Tf&&l<=L+3)need+=(T-Tf)*xpNeed(Tf);}x=Math.max(x,need);}
+  return Math.max(0,Math.round(x));}
+function wvGive(z,w){const x=wvReward(z,w);heal(P.maxHp*.25);P.mp=Math.min(P.maxMp,P.mp+P.maxMp*.25);if(x>0)gainXp(x);return x;}
+function wvClear(s){const w=s.w+1,z=WV.z;s.w=w;WV.st='break';WV.ann=0;WV.cd=WV.cd0=w===3||w===6?13:9;const x=wvGive(z,w);
+  if(w>=WVN){s.p=3;WV.st='';later(2.6,()=>wvDone(z,x));wvSync('done');}  // после плашки уровня, а не поверх
+  else{wvTag('Волна '+w+' отбита','+'+big(x)+' опыта · следующая через '+Math.ceil(WV.cd)+' с');wvSync('clr');}
+  saveSoon();}
+function wvDone(z,x){const n=wvNext(z),C=wvC();
+  banner('«'+ZONES[z].name+'» пройден',(x?'+'+big(x)+' опыта · ':'')+'Волн больше не будет. '+(n>=0?'Дальше — «'+ZONES[n].name+'», враги ур. '+bandTxt(n)+' '+wvArr(C.x,C.z):'Ты на краю мира'),false,'win','Край пройден');}
+function wvFail(why){let n=0;for(let i=ENEMIES.length-1;i>=0;i--){const e=ENEMIES[i];if(e.dead||!e.wvW||e.wvW!==WV.id)continue;poof(e.pos.x,e.pos.z,new THREE.Color(e.t.col));if(e===BOSS)BOSS=null;removeEnemy(i);n++;}
+  WV.q=[];WV.st='break';WV.cd=WV.cd0=12;WV.ann=0;if(WV.z>=0)wvTag('Волна сорвана',why+' · она начнётся снова');wvSync('fail');}
+// ---- угроза: враги бьют того, кто опаснее; танк держит их на себе (больше угрозы от его ударов и рядом с ним) ----
+const ROLE_TH={'Танк':3,'Боец':1.3,'Ловкач':1.1,'Стрелок':.9,'Маг':.8,'Призыватель':.7};
+const thK=cid=>ROLE_TH[(CLASS_BY[cid]||{}).role]||1;
+function wvThreat(en,d,pid){if(!MP.peer||!MP.peer.on)return;if(pid)en.th1=(en.th1||0)+d*thK(MP.peer.cls);else en.th0=(en.th0||0)+d*thK(CLS.id);}
+function wvTankTick(dt){WV.thT-=dt;if(WV.thT>0||!(MPH&&mpPeerUp()))return;WV.thT=.5;
+  const ht=thK(CLS.id)>=3&&!P.dead,pt=thK(MP.peer.cls)>=3&&!MP.peer.dead,pp=MP.peer.pos;
+  for(const e of ENEMIES){if(e.dead||e.remote)continue;if(e.th0)e.th0*=.95;if(e.th1)e.th1*=.95;
+    if(ht&&Math.hypot(e.pos.x-P.pos.x,e.pos.z-P.pos.z)<7)e.th0=(e.th0||0)+e.maxHp*.03;
+    if(pt&&Math.hypot(e.pos.x-pp.x,e.pos.z-pp.z)<7)e.th1=(e.th1||0)+e.maxHp*.03;}}
+// цель по угрозе ('h' — хост, 'p' — гость) или null, если угроза ещё не набрана; держит цель, пока другой не обгонит на треть
+function wvThPick(en,dh,dp){const h=en.th0||0,p=en.th1||0,m=Math.max(h,p);if(m<en.maxHp*.04)return null;
+  let w=h>=p?'h':'p';if(en.tgW==='h'&&h>=p*.75)w='h';else if(en.tgW==='p'&&p>=h*.75)w='p';
+  if(w==='h'&&dh>24&&dp<12)w='p';else if(w==='p'&&dp>24&&dh<12)w='h';return w;}
+// тяжёлый удар живучих врагов ближнего боя: красный сектор 0,85 с — можно отойти
+function wvHeavy(en,dt,dx,dz,dist){en.wvH-=dt;if(en.wvH>0||dist>en.r+2||en.lunge>0)return false;
+  en.wvH=rand(4.5,6.5);en.busy=.95;en.slam=.95;en.face=Math.atan2(dx,dz);const d=dist||1,R=en.r+2.3,dir={x:dx/d,z:dz/d};
+  en.tele=tele('cone',{x:en.pos.x,z:en.pos.z,dir,r:R},.85,t=>{if(en.dead||en.stun>0)return;foeHurt((a,b)=>inTele(t,a,b,.2),Math.round(en.dmg*1.9),en);shake=Math.max(shake,.18);fxRing(t.x,t.z,.4,R*.8,new THREE.Color(0xffb070),.35);});return true;}
+// ---- снимок для HUD и для гостя ----
+function wvView(){if(MPG)return WV.g;const z=WV.z<0?zoneOf(P.pos.x,P.pos.z):WV.z,s=wvSt(z);let n=0;if(WV.st==='wave')for(const e of ENEMIES)if(!e.dead&&e.wvW===WV.id)n++;
+  const c=WV.champ&&!WV.champ.dead?WV.champ:null;
+  return {z,p:s.p,k:s.k,w:s.w,s:s.p===2?(WV.st==='wave'?2:1):0,cd:Math.max(0,+WV.cd.toFixed(1)),c0:WV.cd0,n:n+WV.q.length,N:WV.tot,d:+WV.dir.toFixed(2),ch:c?+(c.hp/c.maxHp).toFixed(2):-1};}
+function wvSync(ev){if(!wvCoop()||!wvOn())return;const v=wvView();if(!v)return;v.t='wv';if(ev)v.e=ev;mpSend(v);}
+// гость: то же состояние, свои подписи и своя награда за отбитую волну
+function wvOnMsg(m){if(!MPG)return;const g=WV.g,sameZ=g&&g.z===m.z;WV.g=m;WV.gT=performance.now();const s=wvSt(m.z),w0=s.w;
+  if(m.p>=s.p||m.w>s.w){s.p=m.p;s.k=m.k;s.w=m.w;}
+  const ev=m.e,a=wvArr(Math.cos(m.d),Math.sin(m.d));
+  if(ev==='pre')wvTag('Волна '+(m.w+1)+' из '+WVN+' — готовьтесь',(m.w+1===10?'Владыка края · ':m.w+1===3||m.w+1===6?'С боссом · ':'')+'идут '+a);
+  else if(ev==='cs')wvTag('Пришёл чемпион края','Крепкий — бейте вместе');
+  else if(ev==='chd')wvTag('Чемпион повержен','Отдышитесь — скоро первая волна');
+  else if(ev==='ph')wvTag('Враги собираются','Их станет больше, потом придёт чемпион края');
+  else if(ev==='fail')wvTag('Волна сорвана','Она начнётся снова');
+  if((ev==='clr'||ev==='done')&&sameZ&&m.w===w0+1){const x=wvGive(m.z,m.w);
+    if(ev==='done')later(2.6,()=>wvDone(m.z,x));else wvTag('Волна '+m.w+' отбита','+'+big(x)+' опыта · следующая через '+Math.ceil(m.cd)+' с');saveSoon();}}
+let wvHK='';
+function wvHud(){const v=wvView();if(!v){threatI.style.transform='scaleX(0)';return;}
+  const cd=MPG&&v.s===1?Math.max(0,v.cd-(performance.now()-WV.gT)/1000):v.cd;
+  const C=MPG?P.pos:wvC();let tp,tt,f,col,ang=null;
+  if(v.p===0){tp='Затишье';tt='Затишье · врагов мало, но они крепкие';f=v.k/WV_KC;col='#7fb0ff';}
+  else if(v.p===1){if(v.ch>=0){tp='Чемпион';tt='Чемпион края';f=v.ch;col='#f2c46b';const c=MPG?null:WV.champ;if(c&&Math.hypot(c.pos.x-C.x,c.pos.z-C.z)>12)ang=wvAng(c.pos.x-C.x,c.pos.z-C.z);}else{tp='Нарастание';tt='Нарастание · скоро чемпион';f=v.k/WV_KB;col='#ffb070';}}
+  else if(v.p===2){const w=v.w+1;if(v.s===2){if(v.n<=2){let b=null,bd=1e9;for(const e of ENEMIES){if(e.dead)continue;const d=Math.hypot(e.pos.x-C.x,e.pos.z-C.z);if(d<bd){bd=d;b=e;}}if(b&&bd>9)ang=wvAng(b.pos.x-C.x,b.pos.z-C.z);}
+      tp='Волна '+w+'/'+WVN+(v.n<=2?' · '+v.n:'');tt='Волна '+w+' из '+WVN+' · врагов '+v.n;f=v.N?v.n/v.N:0;col='';}
+    else{const c=Math.ceil(cd);if(cd<=3.6)ang=wvAng(Math.cos(v.d),Math.sin(v.d));tp='Волна '+w+' · '+c;tt='Волна '+w+' из '+WVN+' через '+c+' с';f=1-cd/(v.c0||9);col='#ffb070';}}
+  else{const n=wvNext(v.z);tp=n>=0?'Дальше':'Пройден';tt=n>=0?'Край пройден · дальше «'+ZONES[n].name+'»':'Край пройден';f=1;col='#f2c46b';if(n>=0)ang=wvAng(C.x,C.z);}
+  const k=tp+'|'+tt+'|'+col;if(k!==wvHK){wvHK=k;threatEl.querySelector('.tp').textContent=tp;threatEl.querySelector('.tt').textContent=tt;threatI.style.background=col;}
+  threatI.style.transform='scaleX('+clamp(f,0,1).toFixed(3)+')';wvArrSet(ang);}
 
 // projectile visuals per element
 const PVPOOL={};
@@ -4014,7 +4223,7 @@ function dealDamage(en,base,el,o){
   if(en.t.block&&!o.dot){const f=o.knockFrom||P.pos,bx=f.x-en.pos.x,bz=f.z-en.pos.z,bl=Math.hypot(bx,bz)||1;if((bx*Math.sin(en.face)+bz*Math.cos(en.face))/bl>.35){dmg*=.25;if(!en.blk||time-en.blk>.5){en.blk=time;float({x:en.pos.x,y:en.hy-1.2,z:en.pos.z},'Блок','#cfd8e8',13);}}}
   if(en.affix.has('armor'))dmg*=.6;
   dmg=Math.max(1,Math.round(dmg));
-  en.hp-=dmg;en.flash=.1;en.aggro=true;
+  en.hp-=dmg;en.flash=.1;en.aggro=true;if(MPH)wvThreat(en,dmg,pid);
   cfOnHit(en,dmg,el,o,crit,R);nfOnHit(en,dmg,el,o,crit,R);
   const fp={x:en.pos.x,y:en.hy-1.7,z:en.pos.z};
   float(fp,crit?dmg+'!':String(dmg),o.dot?o.dotCol:el>=0?ELEMENTS[el].hex:(o.col||'#ffffff'),o.dot?11:crit?19:14);
@@ -4049,8 +4258,8 @@ function kill(en,depth,el,o){o=o||{};if(en.dead)return;
   cfOnKill(en,el,o);nfOnKill(en,el,o);
   en.dead=true;en.deathT=0;en.bar.visible=false;if(en.label)en.label.visible=false;if(en.tele)en.tele.cancel=true;if(target===en)target=null;if(en.ice)en.ice.visible=false;
   const c=new THREE.Color(en.t.col);colBurst(c,en.pos.x,.8*en.sc,en.pos.z,en.boss?70:en.elite?26:12,en.boss?7:4,.7,9);puffs(en.pos.x,.5,en.pos.z,c.clone().multiplyScalar(.45),en.boss?24:4);
-  if(!o.noReward){S.kills++;gainXp(en.xp);if(en.boss)bossLoot(en);else dropLoot(en);if(!en.boss)threat+=en.elite?6:1;if(el===EL.blood&&!o.fromG)heal(P.maxHp*.02);}
-  if(en.tid==='slime'&&!en.mini&&!MPG){for(let k=0;k<2;k++)spawnEnemy('slime',en.pos.x+rand(-.7,.7),en.pos.z+rand(-.7,.7),en.lv,{mini:true,aggro:true});}
+  if(!o.noReward){S.kills++;gainXp(en.xp);if(en.boss)bossLoot(en);else dropLoot(en);if(!en.boss)threat+=en.elite?6:1;if(el===EL.blood&&!o.fromG)heal(P.maxHp*.02);if(PLAY==='world'&&!MPG)wvKill(en);}
+  if(en.tid==='slime'&&!en.mini&&!MPG&&(PLAY!=='world'||aliveCount()<WV_CROWD)){for(let k=0;k<2;k++)spawnEnemy('slime',en.pos.x+rand(-.7,.7),en.pos.z+rand(-.7,.7),en.lv,{mini:true,aggro:true});}
   if(en.affix.has('bomb')&&!MPG){const x=en.pos.x,z=en.pos.z,d=en.dmg;tele('circle',{x,z,r:3.2},1.1,t=>{foeHurt((a,b)=>inTele(t,a,b,.2),Math.round(d*1.6),null);fireBlast(x,z,3.2);});}
   if(en.boss)bossDown(en);
   if(depth<=2&&!o.noReward&&!o.fromG){for(const s of PASS.doom){if(procBudget<=0)break;procBudget--;const p=en.pos.clone(),R=skR(s),col=s.E.color;mpPE('d',s.id,p.x,p.z,3.4*R);
@@ -4086,7 +4295,7 @@ function runSnap(fresh){const o={fresh:!!fresh};for(const k of RUNF)o[k]=JSON.pa
 function runRestore(js){const o=JSON.parse(js);for(const k of RUNF)S[k]=o[k];LEARNED=new Set(S.learned);return o;}
 // таланты на старте забега — умным «Авто» (как кнопка) против врагов уровня забега; очки мастерства остаются игроку
 function autoTalents(foe){const n=tpTotal()-tpSpent()-mastTp();if(n>0)talSmart(n,foe);}
-function runFresh(l0){const f=newChar(CLS);S.lvl=1;S.xp=0;S.ess=0;S.ranks={};S.talents={};
+function runFresh(l0){const f=newChar(CLS);S.lvl=1;S.xp=0;S.ess=0;S.ranks={};S.talents={};S.wv={};
   if(!S.sandbox){delete S.teleNote;S.active=f.active;S.passive=f.passive;S.learned=f.learned;}
   LEARNED=new Set(S.learned);for(const id of S.learned)if(!BOOK.has(id)){BOOK.add(id);S.book.push(id);}
   computeStats();EQUIPPED=new Set(equippedIds());
@@ -4785,7 +4994,7 @@ function enemyAI(en,dt,dx,dz,dist){
   default:if(AIX[en.t.ai])AIX[en.t.ai](en,dt,dx,dz,dist,sp);
   }
   if(en.affix.has('fire')&&en.moving){en.trailT-=dt;if(en.trailT<=0){en.trailT=.45;addEZ(en.pos.x,en.pos.z,1.3,3.5,en.dmg*.55,FIREC);}}
-  if(en.affix.has('summ')){en.skill2-=dt;if(en.skill2<=0){en.skill2=8;for(let k=0;k<2;k++){const m=spawnEnemy(Math.random()<.5?'slime':'goblin',en.pos.x+rand(-2,2),en.pos.z+rand(-2,2),Math.max(1,en.lv-1),{aggro:true});puffs(m.pos.x,.6,m.pos.z,new THREE.Color(0x6a4a8a),6,1.5,.8);}}}}
+  if(en.affix.has('summ')){en.skill2-=dt;if(en.skill2<=0){en.skill2=8;for(let k=0;k<2&&(PLAY!=='world'||aliveCount()<WV_CROWD);k++){const m=spawnEnemy(Math.random()<.5?'slime':'goblin',en.pos.x+rand(-2,2),en.pos.z+rand(-2,2),Math.max(1,en.lv-1),{aggro:true});puffs(m.pos.x,.6,m.pos.z,new THREE.Color(0x6a4a8a),6,1.5,.8);}}}}
 function bomberBlow(en){if(en.dead)return;const x=en.pos.x,z=en.pos.z;fireBlast(x,z,2.6);
   foeHurt((a,b)=>Math.hypot(a-x,b-z)<2.9,en.dmg,en);
   for(const o of ENEMIES){if(o===en||o.dead)continue;if(Math.hypot(o.pos.x-x,o.pos.z-z)<2.6+o.r)dealDamage(o,en.dmg*1.5,-1,{depth:3,noProc:true});}
@@ -4807,7 +5016,7 @@ function bossQueen(en,dt,dx,dz,dist,sp){
       en.tele=tele('circle',{x:tx,z:tz,r:4.2},1.25,t=>{foeHurt((a_,b_)=>inTele(t,a_,b_,.3),Math.round(en.dmg*2),en);shake=.6;addEZ(tx,tz,3,4.5,en.dmg*.45,ACID);colBurst(ACID,tx,.5,tz,40,6,.8,9);puffs(tx,.5,tz,ACID.clone().multiplyScalar(.5),10,2.5,1);});}
     else if(r<.75){en.busy=.8;for(let k=0;k<5;k++){const x=P.pos.x+(k?rand(-4.5,4.5):0),z=P.pos.z+(k?rand(-4.5,4.5):0);
       tele('circle',{x,z,r:1.9},1.1+k*.08,t=>{foeHurt((a_,b_)=>inTele(t,a_,b_,.2),Math.round(en.dmg*1.2),en);addEZ(x,z,1.9,5,en.dmg*.4,ACID);colBurst(ACID,x,.5,z,12,3,.6,8);});}}
-    else{en.busy=.7;for(let k=0;k<4;k++){const a=k/4*TAU;const m=spawnEnemy('slime',en.pos.x+Math.cos(a)*3,en.pos.z+Math.sin(a)*3,Math.max(1,en.lv-1),{aggro:true});colBurst(ACID,m.pos.x,.5,m.pos.z,10,3,.5,8);}}
+    else{en.busy=.7;for(let k=0;k<4&&(PLAY!=='world'||aliveCount()<WV_CROWD);k++){const a=k/4*TAU;const m=spawnEnemy('slime',en.pos.x+Math.cos(a)*3,en.pos.z+Math.sin(a)*3,Math.max(1,en.lv-1),{aggro:true});colBurst(ACID,m.pos.x,.5,m.pos.z,10,3,.5,8);}}
     return;}
   chase(en,dx,dz,dist,sp,dt,en.r+.8);meleeTry(en,dist,1.2);}
 
@@ -4994,7 +5203,7 @@ function hitLine(en,dir,len,w,dur,mult,col,ox,oz,after){const x=ox==null?en.pos.
     for(let k=0;k<=len;k+=2.2)boom(x+dir.x*k,z+dir.z*k,w*.5,col||FIREC,0);shake=Math.max(shake,.2);if(after)after(x,z,dir);});}
 function dash(en,d,spd,t,dm,trail){en.mv={x:d.x*spd,z:d.z*spd,t,dm,hit:!dm,trail,tt:0};en.busy=Math.max(en.busy,t+.1);en.lunge=t;en.face=Math.atan2(d.x,d.z);}
 function hop(en,tx,tz,dur,h){en.hop={fx:en.pos.x,fz:en.pos.z,tx,tz,t:0,dur,h};en.busy=Math.max(en.busy,dur+.1);}
-function adds(en,tid,n,rad,cap){en.minions=(en.minions||[]).filter(m=>!m.dead);let k=0;for(let i=0;i<n&&en.minions.length<cap;i++){const a=rand(0,TAU),m=spawnEnemy(tid,en.pos.x+Math.cos(a)*rad,en.pos.z+Math.sin(a)*rad,Math.max(1,en.lv-1),{aggro:true,gorge:!!en.noDespawn});en.minions.push(m);poof(m.pos.x,m.pos.z,new THREE.Color(en.t.col));k++;}return k;}
+function adds(en,tid,n,rad,cap){en.minions=(en.minions||[]).filter(m=>!m.dead);let k=0;for(let i=0;i<n&&en.minions.length<cap&&(PLAY!=='world'||aliveCount()<WV_CROWD);i++){const a=rand(0,TAU),m=spawnEnemy(tid,en.pos.x+Math.cos(a)*rad,en.pos.z+Math.sin(a)*rad,Math.max(1,en.lv-1),{aggro:true,gorge:!!en.noDespawn});en.minions.push(m);poof(m.pos.x,m.pos.z,new THREE.Color(en.t.col));k++;}return k;}
 function mvUpdate(en,dt){if(en.hop){const j=en.hop;j.t+=dt;const k=Math.min(1,j.t/j.dur);en.pos.x=lerp(j.fx,j.tx,k);en.pos.z=lerp(j.fz,j.tz,k);en.jy=Math.sin(k*Math.PI)*j.h;if(k>=1){en.hop=null;en.jy=0;}}
   const m=en.mv;if(!m)return;if(en.stun>0){en.mv=null;return;}en.pos.x+=m.x*dt;en.pos.z+=m.z*dt;en.moving=true;m.t-=dt;
   if(m.trail){m.tt-=dt;if(m.tt<=0){m.tt=.14;addEZ(en.pos.x,en.pos.z,1.1,3,en.dmg*.5,FIREC);}}
@@ -5310,9 +5519,9 @@ function animateHero(dt,moving){
 const FF3=new THREE.Color(0xd8643a),FF0=new THREE.Color(0x8fb84a),FF1=new THREE.Color(0x3a9a8a),FF2=new THREE.Color(0x5a60a8);
 const FFZ=[FF0,FF1,FF2,FF3,new THREE.Color(0xdff4ff),new THREE.Color(0xff7a2a),new THREE.Color(0xffe9a0),new THREE.Color(0xff9ae8),new THREE.Color(0x8affc4),new THREE.Color(0xa06aff)];
 function updateEnemies(dt){
-  const maxN=Math.min(14,3+Math.floor(mpLvl()/3));// v13.30: мало, но живучие (было до 48–70 — месиво)
-  if(PLAY==='world'){if(!MPG){spawnT-=dt;if(spawnT<=0){spawnT=mpLvl()<4?6:mpLvl()<10?4.5:3.5;if(aliveCount()<maxN+(MPH&&MP.peer?COOP.cap:0))spawnPack();}if(!BOSS&&threat>=THREAT_MAX)spawnBoss();}}else updateGorge(dt);
-  if(MPH&&MP.peer)mpCountAggro();
+  // 25.11 свободный мир — ход боя по краям (wvTick): мало живучих врагов, волны и боссы волн; прежний поток стай (до 48–70 живых) и босс по «угрозе» выключены
+  if(PLAY==='world'){if(!MPG)wvTick(dt);}else updateGorge(dt);
+  if(MPH&&MP.peer){mpCountAggro();wvTankTick(dt);}
   for(let i=ENEMIES.length-1;i>=0;i--){const en=ENEMIES[i];
     if(en.dead){en.deathT+=dt;const k=en.deathT/(en.boss?BOSS_DIE:en.fm?.95:.4);if(en.fm){en.fm.drive({dead:true,dieT:en.boss?1.1:.55});en.fm.update(dt);}
       if(en.boss)bossDying(en,dt,k);else if(en.fm){const q=Math.max(0,(k-.62)/.38);en.g.scale.setScalar(Math.max(.01,(1-q*q)*en.sc));en.g.position.y=(en.fmY||0)*Math.max(0,1-k*2.2)-q*.35;}else{en.g.scale.setScalar(Math.max(.01,(1-k)*en.sc));en.g.position.y=-k*.3;}if(k>=1)removeEnemy(i);continue;}
@@ -5330,12 +5539,12 @@ function updateEnemies(dt){
     if(en.boss)bossPhaseTick(en);
     const tp=(GZ&&GZ.camp&&en.cg&&TCC.goal(en))||(en.tauntS&&tauntTarget(en))||mpTarget(en),dx=(tp?tp.pos.x:P.pos.x)-en.pos.x,dz=(tp?tp.pos.z:P.pos.z)-en.pos.z,dist=Math.hypot(dx,dz)||.001,TD=tp?false:P.dead;
     // отставший уходит и освобождает лимит (без агро — уже с 40 м); новая стая встаёт на его место впереди через ~0,6 с
-    if((dist>50||!en.aggro&&dist>40)&&!en.boss&&!en.noDespawn){removeEnemy(i);if(PLAY==='world')spawnT=Math.min(spawnT,.6);continue;}
+    if((dist>50||!en.aggro&&dist>40)&&!en.boss&&!en.noDespawn){removeEnemy(i);if(PLAY==='world')WV.amb=Math.min(WV.amb,1.5);continue;}
     if(!TD&&dist<(PLAY==='gorge'?18:en.hunt?HUNT_R:13))en.aggro=true;
     if((TD||dist>36)&&!en.boss&&!en.noDespawn)en.aggro=false;
     en.moving=false;const sv=tp?mpSwapIn(tp):null;
     if(en.stun<=0&&en.busy<=0){
-      if(en.aggro&&!TD)enemyAI(en,dt,dx,dz,dist);
+      if(en.aggro&&!TD){if(en.wvLast&&dist>7){chase(en,dx,dz,dist,en.spd*(en.slowT>0?.55:1),dt,6);if(dist>14){en.wvLT=(en.wvLT||0)+dt;if(en.wvLT>6){en.wvLT=0;const tx=tp?tp.pos:P.pos;poof(en.pos.x,en.pos.z,new THREE.Color(en.t.col));en.pos.set(tx.x-dx/dist*9,0,tx.z-dz/dist*9);}}}else if(!(en.wvH!=null&&wvHeavy(en,dt,dx,dz,dist)))enemyAI(en,dt,dx,dz,dist);}
       else{en.wT-=dt;const wx=en.wander.x-en.pos.x,wz=en.wander.z-en.pos.z,wd=Math.hypot(wx,wz);
         if(en.wT<=0||wd<.5){en.wT=rand(3,6);en.wander.set(en.home.x+rand(-7,7),0,en.home.z+rand(-7,7));}
         else{en.pos.x+=wx/wd*en.spd*.35*dt;en.pos.z+=wz/wd*en.spd*.35*dt;en.face=Math.atan2(wx,wz);en.moving=true;}}}
@@ -5346,7 +5555,7 @@ function updateEnemies(dt){
     for(let j=0;j<i;j++){const o=ENEMIES[j];if(o.dead)continue;const sx=en.pos.x-o.pos.x,sz=en.pos.z-o.pos.z,rr=en.r+o.r,d2=sx*sx+sz*sz;
       if(d2<rr*rr&&d2>1e-6){const d=Math.sqrt(d2),push=(rr-d)*.5,wa=o.mass/(en.mass+o.mass),wb=1-wa;en.pos.x+=sx/d*push*2*wa;en.pos.z+=sz/d*push*2*wa;o.pos.x-=sx/d*push*2*wb;o.pos.z-=sz/d*push*2*wb;}}
     if(!en.jump&&!en.hop){const sx=en.pos.x-P.pos.x,sz=en.pos.z-P.pos.z,rr=en.r+.4,d2=sx*sx+sz*sz;if(d2<rr*rr&&d2>1e-6){const d=Math.sqrt(d2);en.pos.x=P.pos.x+sx/d*rr;en.pos.z=P.pos.z+sz/d*rr;}}
-    if(!en.boss||PLAY==='gorge')collide(en.pos,en.r*.8);
+    if((!en.boss||PLAY==='gorge')&&!en.wvLast)collide(en.pos,en.r*.8);
     enemyVisuals(en,dt);}}
 function enemyVisuals(en,dt){
     en.step+=dt*(en.moving?9:2);
@@ -5397,7 +5606,7 @@ function revive(){if(MPon){mpReviveBtn();return;}if(PLAY==='gorge'&&GZ){startGor
   if(BOSS){const i=ENEMIES.indexOf(BOSS);if(i>=0)removeEnemy(i);BOSS=null;threat=Math.floor(THREAT_MAX*.6);}
   for(let i=EPROJ.length-1;i>=0;i--){dropProjVis(EPROJ[i].o);EPROJ.splice(i,1);}
   TELE.forEach(t=>t.cancel=true);target=null;fxPillar(0,0,1.2,6,GOLD,.9);syncPause();}
-function clearWorld(){while(ENEMIES.length)removeEnemy(0);BOSS=null;threat=0;target=null;BFORCE.length=0;BCAM.dur=0;
+function clearWorld(){while(ENEMIES.length)removeEnemy(0);BOSS=null;threat=0;wvReset();target=null;BFORCE.length=0;BCAM.dur=0;
   while(PROJ.length)dropProjVis(PROJ.pop().vis);while(EPROJ.length)dropProjVis(EPROJ.pop().o);while(METEORS.length){const m=METEORS.pop();if(m.o)dropProjVis(m.o);}
   while(SUMMONS.length)removeSummon(0);while(TRAPS.length)removeTrap(0);while(WHIRLS.length){const w=WHIRLS.pop();scene.remove(w.g);w.mats.forEach(m=>m.dispose());}
   while(RAINS.length){const r=RAINS.pop();dropMesh(r.disc);dropMesh(r.ring);}while(ZN.length)dropZone(0);while(EZ.length)dropEZ(0);
@@ -5820,7 +6029,7 @@ function updateHud(){
   setTxt(killsEl,'k',S.kills+' побед');setTxt(essT,'e',S.ess+' эссенции');
   const hb=!!BOSS,gm=PLAY==='gorge',hk=hb+'|'+gm;if(hudCache.hk!==hk){hudCache.hk=hk;bossbar.hidden=!hb;threatEl.hidden=hb||gm;gprogEl.hidden=hb||!gm;}
   if(gm&&GZ)gI.style.transform='scaleX('+GZ.prog.toFixed(3)+')';
-  if(hb)bossHud();else threatI.style.transform='scaleX('+Math.min(1,threat/THREAT_MAX).toFixed(3)+')';
+  if(hb)bossHud();else if(!gm)wvHud();
   for(const s of SKB){if(s.id<0)continue;const sk=SKILLS[s.id];const cd=Math.max(0,P.cds[sk.id]||0),full=skCd(sk);
     const p=Math.round(cd/full*50)/50;if(p!==s.p){s.p=p;s.cdEl.style.setProperty('--p',p);}
     const t=cd>0?(cd>=1?Math.ceil(cd)+'':cd.toFixed(1)):'';if(t!==s.t){s.t=t;s.tEl.textContent=t;}
@@ -5893,11 +6102,13 @@ function banner(b,s,red,k,lbl){if(!k&&!red&&mode==='game'&&BAN_MINOR.test(b)){ba
 let zoneT=0;
 // 25.11 на входе — полоса уровней региона (не зависит от героя) и короткая оценка: перерос / рано
 function zoneSub(z){const L=S.lvl,b=LVB[z];let s='Враги ур. '+bandTxt(z);if(z>=ZABYSS)s+=' и сильнее с каждым шагом';else if(L>b[1]+3)s+=' · ты сильнее — опыта почти нет';
-  if(L+5<b[0])s+=' · тебе пока опасно';return s;}
+  if(L+5<b[0])s+=' · тебе пока опасно';
+  const st=PLAY==='world'&&S.wv&&S.wv[z];if(st&&st.p===3)s+=' · пройден';else if(st&&st.p===2)s+=' · волн отбито '+st.w+' из 10';return s;}
 // подсказка «перерос»: герой сильнее врагов вокруг на 6+ ур. — раз в 3 мин плашка, куда идти, и стрелка по экрану (как красная стрелка мини-карты)
 let zhT=15;const ARR8='↑↗→↘↓↙←↖';
 function zoneHint(dt){zhT-=dt;if(zhT>0)return;zhT=2;if(P.dead||luOpen||$('#banner').classList.contains('on'))return;
   const L=S.lvl,r=Math.hypot(P.pos.x,P.pos.z),z=zoneOf(P.pos.x,P.pos.z);if(z>=ZABYSS||L<=enemyLvR(r+20,strongLv())+5)return;
+  if(S.wv&&S.wv[z]&&S.wv[z].p>=2)return; // идут волны или край пройден — куда идти, показывает строка хода боя (стрелка), без всплывашки
   let m;if(L>LVB[z][1]+3){let n=z+1;while(n<ZABYSS&&L+5>LVB[n][1])n++;/* первый регион, где есть куда расти (макс. ≥ герой + 5) */m='Здесь ты сильнее всех — опыта почти нет. Дальше: «'+ZONES[n].name+'», враги ур. '+bandTxt(n);}
   else m='Враги тут слабее тебя — опыта мало. Сильнее — дальше от центра';
   if(r>1){const ld=toLocal(P.pos.x/r,P.pos.z/r);m+=' '+ARR8[(Math.round(Math.atan2(-ld.x,ld.z)/(Math.PI/4))%8+8)%8];}
@@ -6114,7 +6325,7 @@ $('#classes').addEventListener('click',e=>{const b=e.target.closest('.cls');if(b
 function setClass(id){CLS=CLASS_BY[id];S=validChar(SAVE.chars[id],CLS);LEARNED=new Set(S.learned);BOOK=new Set(S.book);nfImpMig();computeStats();P.maxHp=0;P.maxMp=0;recalcStats();P.hp=P.maxHp;P.mp=P.maxMp;
   rebuildHero();syncAuto();onBuildChanged();}
 function startGame(){SAVE.chars[CLS.id]=S;SAVE.cur=CLS.id;beginRun('world',0,1);save();mode='game';for(const id of ['#select','#gorges','#win','#dead'])$(id).hidden=true;$('#hud').hidden=false;clearWorld();exitGorge();P.face=0;hero.g.rotation.z=0;hero.g.position.y=0;P.hp=P.maxHp;P.mp=P.maxMp;hudCache.hk=null;
-  if(MPon)mpStartPos();if(!MPG)for(let i=0;i<1;i++)spawnPack();zoneTag(0);syncPause();camT.set(P.pos.x,1.2,P.pos.z);
+  if(MPon)mpStartPos();if(!MPG)wvBegin();zoneTag(0);syncPause();camT.set(P.pos.x,1.2,P.pos.z);
   fxPillar(0,0,1.2,7,CLS.color,1);colBurst(CLS.color,0,1,0,40,5,1,-1);toast(CLS.name+': '+CLS.pool.size+' чар класса, изучено '+LEARNED.size);}
 function toSelect(){closeSettings();if(MPon)mpLeaveGame();runEnd();save();closeBook();mode='select';clearWorld();exitGorge();$('#hud').hidden=true;$('#select').hidden=false;for(const id of ['#gorges','#win','#dead'])$(id).hidden=true;hero.g.rotation.z=0;hero.g.position.y=0;selectClass(CLS.id);syncPause();if(NEWVER&&!MPon)location.reload();}
 let NEWVER=false;window.addEventListener('tc-newversion',async()=>{try{const t=await(await fetch('sw.js?'+Date.now(),{cache:'no-store'})).text();const m=t.match(/VERSION\s*=\s*['"]([^'"]+)['"]/);if(m&&m[1]===APP_BUILD)return;}catch(e){}NEWVER=true;if(mode==='select'&&!MPon)location.reload();else toast('Вышла новая версия — обновится, когда выйдешь в меню');});
@@ -7005,6 +7216,7 @@ function mpOnMsg(m,id){
     case 'ct':ctPeerFx(m);break;
     case 'xr':mpOnCross(m);break;
     case 'bn':banner(m.b,m.s,!!m.r);break;
+    case 'wv':wvOnMsg(m);break;
     case 'bph':if(MPG){const en=MP.byUid.get(m.u);if(en&&!en.dead&&(en.bph|0)<m.p){en.bph=m.p;bossPhaseFx(en,m.p);}}break;
     case 'bf':if(MPG)BFORCE.push({x:m.x,z:m.z,s:m.s,t:m.du,r:m.r,col:new THREE.Color(m.c||0xffffff)});break;
     case 'rv':mpRevived();break;
@@ -7079,13 +7291,14 @@ function mpHostResync2(){
   for(const en of ENEMIES){if(!en.dead)mpSend(mpSpawnMsg(en));}
   if(GZ)mpSend({t:'gs',o:GZ.open?1:0,bs:GZ.bossSpawned?1:0});
   if(TCC&&MP.play==='camp')TCC.resync();
-  if(MP.chest)mpSend({t:'ch',x:MP.chest.x,z:MP.chest.z});}
+  if(MP.chest)mpSend({t:'ch',x:MP.chest.x,z:MP.chest.z});if(PLAY==='world')wvSync();}
 function mpHostResync(){
   mpSend({t:'start',p:MP.play,g:MP.g,j:1});
   for(const en of ENEMIES){if(!en.dead)mpSend(mpSpawnMsg(en));}
   if(GZ)mpSend({t:'gs',o:GZ.open?1:0,bs:GZ.bossSpawned?1:0});
   if(TCC&&MP.play==='camp')TCC.resync();
   if(MP.chest)mpSend({t:'ch',x:MP.chest.x,z:MP.chest.z});
+  if(PLAY==='world')wvSync();
 }
 function mpOnStop(){ // хост вышел в меню
   MP.noEcho=true;mpEndSession();if(mode==='game')toSelect();MP.noEcho=false;
@@ -7127,12 +7340,14 @@ function mpSpawnCenter(){if(MPH&&mpPeerUp()&&(P.dead||Math.random()<.5))return M
 function mpLeadZ(z){if(MPH&&MP.peer&&MP.peer.on&&GZ){const l=toLocal(MP.peer.pos.x,MP.peer.pos.z);return Math.max(z,l.z);}return z;}
 // агро делится: враг держит цель ~2,5 с; выбирает героя по расстоянию с «штрафом» за каждого врага, уже идущего на него
 // коэффициенты кооператива: крепость врагов и добавка к лимиту живых врагов (для двоих)
-const COOP={hp:1.6,cap:2};
+const COOP={hp:1.6,cap:5};
 const MPAG={h:0,p:0,at:-9};
 function mpCountAggro(){let h=0,p=0;for(const e of ENEMIES){if(e.dead||!e.aggro||e.boss||e.remote)continue;if(e.tgW==='p')p++;else if(e.tgW==='h')h++;}MPAG.h=h;MPAG.p=p;}
 function mpTarget(en){
   if(!MPH||!mpPeerUp()){en.tgW=null;return null;}const pr=MP.peer;if(P.dead){en.tgW='p';return pr;}
   const dh=Math.hypot(P.pos.x-en.pos.x,P.pos.z-en.pos.z),dp=Math.hypot(pr.pos.x-en.pos.x,pr.pos.z-en.pos.z),near=dp<dh?'p':'h',dn=Math.min(dh,dp),df=Math.max(dh,dp);
+  // 25.11 угроза: кто опаснее (танк — втрое), того и бьют; пока угроза не набрана — прежний выбор по расстоянию и нагрузке
+  const tw=wvThPick(en,dh,dp);if(tw){if(en.aggro&&!en.boss&&en.tgW!==tw){if(en.tgW==='h')MPAG.h--;else if(en.tgW==='p')MPAG.p--;if(tw==='h')MPAG.h++;else MPAG.p++;}en.tgW=tw;en.tgUntil=time+1.5;return tw==='p'?pr:null;}
   if(en.boss||dn>17||df>dn*1.8+5||en.noDespawn&&en.t.boss){en.tgW=near;return near==='p'?pr:null;}
   if(!(en.tgUntil>time)||!en.tgW){const ch=MPAG.h-(en.tgW==='h'?1:0),cp=MPAG.p-(en.tgW==='p'?1:0);
     const old=en.tgW;en.tgW=(dp+1.4*cp<dh+1.4*ch)?'p':'h';en.tgUntil=time+2+rand(0,1.2);
@@ -7157,7 +7372,7 @@ function foeHurt(test,dmg,src,o){
   return hit;}
 
 // ---------- враги: хост → гость ----------
-function mpSpawnMsg(en){return {t:'sp',u:en.uid,id:en.tid,x:r2(en.pos.x),z:r2(en.pos.z),lv:en.lv,el:en.elite?1:0,ch:en.champ?1:0,mi:en.mini?1:0,gd:en.guard?1:0,rw:en.rw>1?r2(en.rw):0,b:en.boss?1:0,g:en.noDespawn?1:0,af:[...en.affix],mh:en.maxHp,h:Math.round(en.hp),dm:en.dmg,xp:en.xp,bs:en.boss?en.bossSub:undefined,ph:en.bph||undefined,pt:en.phT||undefined,pq:en.phQuiet?1:undefined};}
+function mpSpawnMsg(en){return {t:'sp',u:en.uid,id:en.tid,x:r2(en.pos.x),z:r2(en.pos.z),lv:en.lv,el:en.elite?1:0,ch:en.champ?1:0,mi:en.mini?1:0,gd:en.guard?1:0,rw:en.rw>1?r2(en.rw):0,b:en.boss?1:0,g:en.noDespawn?1:0,af:[...en.affix],mh:en.maxHp,h:Math.round(en.hp),dm:en.dmg,xp:en.xp,bs:en.boss?en.bossSub:undefined,ph:en.bph||undefined,pt:en.phT||undefined,pq:en.phQuiet?1:undefined,xm:en.xm!==1?en.xm:undefined};}
 function mpOnSpawn(en,o){if(MP.peerId&&MP.peer&&MP.peer.on)mpSend(mpSpawnMsg(en));}
 function mpOnKill(en,o){if(MP.peerId&&MP.peer&&MP.peer.on)mpSend({t:'k',u:en.uid,xp:o.noReward?0:en.xp,nr:o.noReward?1:0});}
 function mpOnTele(shape,o,dur){if(!(MP.peerId&&MP.peer&&MP.peer.on))return;
@@ -7176,7 +7391,7 @@ function mpSendSnap(){
   mpSend(o);}
 function mpGuestSpawn(m){
   if(!MPG||mode!=='game'||MP.byUid.has(m.u))return;
-  const en=spawnEnemy(m.id,m.x,m.z,m.lv,{elite:!!m.el,champ:!!m.ch,mini:!!m.mi,gorge:!!m.g,guard:!!m.gd,rw:m.rw||0,affixList:m.af,aggro:true});
+  const en=spawnEnemy(m.id,m.x,m.z,m.lv,{elite:!!m.el,champ:!!m.ch,mini:!!m.mi,gorge:!!m.g,guard:!!m.gd,rw:m.rw||0,affixList:m.af,aggro:true,xpMul:m.xm||1});
   en.snapAt=performance.now();en.uid=m.u;en.remote=true;en.maxHp=m.mh;en.hp=m.h;if(m.dm>0)en.dmg=m.dm;if(PLAY==='gorge')en.xp=m.xp;en.noDespawn=true;en.aggro=true;en.tg=null;MP.byUid.set(m.u,en);
   if(m.b){BOSS=en;if(GZ)GZ.bossSpawned=true;if(m.pt)en.phT=m.pt;en.phQuiet=!!m.pq;if(m.bs)en.bossSub=m.bs;else if(PLAY==='gorge'&&GZ)en.bossSub='Страж ущелья «'+GZ.th.n+'»';
     if(m.ph){en.bph=m.ph;bossTint(en,m.ph);}bossIntro(en,m.h<m.mh*.97);}}  // дослали посреди боя (переподключение) — без выхода и баннера
@@ -7818,6 +8033,7 @@ function start(hot){
   requestAnimationFrame(loop);}
 if(/[?&]debug\b/.test(location.search))window.__ev=c=>eval(c);
 window.__tc={lu:()=>({open:luOpen,q:luQueue,auto:!!S.autoLu,paused,all:!$('#luAll').hidden,allTxt:$('#luAll').textContent,title:$('#luTitle').textContent}),lvlAt:(x,z)=>enemyLvAt(x,z),zoneAt:(x,z)=>zoneOf(x,z),stats:(tid,lv,H)=>{const t=MOBS[tid],h=H===undefined?foeH():H,k=foeScale(lv,h),wb=t.boss&&h!=null;return {hp:Math.round(t.hp*k.hp*(t.boss?1.3:2.2)*(wb?FOE_BOSS.hp:1)),dmg:Math.round(t.dmg*k.dmg*(t.boss?1:.9)*(wb?FOE_BOSS.dmg:1))};},chunks:()=>CH.size,inst:()=>PK.reduce((a,k)=>a+k.im.count,0),halfNear:()=>ENEMIES.forEach((e,i)=>{if(e.dead)return;e.hp=Math.round(e.maxHp*(.25+.25*(i%3)));e.pos.set(P.pos.x+2.5*Math.cos(i*1.3),0,P.pos.z+2.5*Math.sin(i*1.3));e.stun=3;}),bars:()=>ENEMIES.filter(e=>!e.dead).map(e=>[e.tid,Math.round(e.hp),e.maxHp,e.bar.visible,+e.fill.scale.x.toFixed(2)]),gorge:g=>startGorge(g),gstate:()=>GZ&&{g:GZ.g,prog:GZ.prog,boss:GZ.bossSpawned,open:GZ.open,won:GZ.won,L:GZ.L},tpLocal:z=>{const w=toWorld(gcx(z),z);P.pos.set(w.x,0,w.z);P.prev.copy(P.pos);},boss:()=>{threat=THREAT_MAX;},bossSpawn:t=>{spawnBoss(t);return BOSS&&BOSS.tid;},bossInfo:()=>BOSS&&{tid:BOSS.tid,hp:Math.round(BOSS.hp),max:BOSS.maxHp,ph:BOSS.bph|0,sc:+BOSS.sc.toFixed(2),r:+BOSS.r.toFixed(2)},xp:n=>gainXp(n),ess:n=>{S.ess+=n;},state:()=>({cls:CLS.id,mode,lvl:S.lvl,ess:S.ess,kills:S.kills,hp:P.hp,learned:LEARNED.size,enemies:aliveCount(),boss:!!BOSS,fx:FX.length,proj:PROJ.length,lu:luOpen,pp:Q.pp,shadow:Q.shadow,pr}),tp:(x,z)=>{P.pos.set(x,0,z);P.prev.set(x,0,z);},sel:id=>selectClass(id),cast:i=>trySlot(i,true)};
+window.__tc.wv=()=>wvView();window.__tc.wvSet=(z,p,k,w)=>{const s=wvSt(z);s.p=p;s.k=k|0;s.w=w|0;WV.z=z;wvEnter();return wvView();};
 // отладка невозможных чар: __tc.imp(id) — сделать чару невозможной (без id — лучшую изученную легендарную), __tc.impChance() — шанс сейчас,
 // __tc.impAcc(сек) — задать накопленное время боя, __tc.impNext() — следующая легендарная выпадет невозможной, __tc.impLegs() — легендарные класса
 Object.assign(window.__tc,{
