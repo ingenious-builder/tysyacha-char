@@ -97,12 +97,12 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-o
 #zoneTag small{display:block;font:400 12px var(--f-ui);color:var(--muted)}
 #zoneTag.on{opacity:1}
 /* мини-карта (ui2): круг в золотой рамке с тёмным кантом, подпись — плашкой на нижнем крае круга; в портрете — в правом верхнем углу рядом с панелью героя */
-#mm{position:absolute;top:calc(var(--m) + var(--sat) + 52px);right:calc(var(--m) + var(--sar));width:calc(92px * var(--u,1));display:flex;flex-direction:column;align-items:center;pointer-events:auto;touch-action:manipulation;cursor:pointer;-webkit-tap-highlight-color:transparent}
+#mm{isolation:isolate;position:absolute;top:calc(var(--m) + var(--sat) + 52px);right:calc(var(--m) + var(--sar));width:calc(92px * var(--u,1));display:flex;flex-direction:column;align-items:center;pointer-events:auto;touch-action:manipulation;cursor:pointer;-webkit-tap-highlight-color:transparent}
 #mm.mbig{width:calc(176px * var(--u,1))}
 #mmc{display:block;width:100%;aspect-ratio:1;border-radius:50%;border:2px solid rgba(242,196,107,.85);background:#0b1020;box-shadow:0 0 0 2px rgba(6,8,18,.85),0 4px 14px rgba(0,0,0,.6)}
 #mmL{position:relative;z-index:1;margin-top:-9px;max-width:calc(100% + 16px);padding:2px 7px 3px;border-radius:9px;background:rgba(8,12,24,.9);border:1px solid rgba(242,196,107,.45);font:600 10px/1.2 var(--f-ui);color:var(--muted);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
 #mmL:empty{display:none}
-#mmL b{display:block;font:700 10.5px/1.2 var(--f-ui);color:var(--gold);overflow:hidden;text-overflow:ellipsis}
+#mmL b{display:block;font:700 10.5px/1.2 var(--f-ui);color:var(--gold);overflow:hidden;text-overflow:ellipsis;white-space:normal}
 #mmL .w{color:#ff9d8a}
 @media (orientation:portrait){#mm{top:calc(var(--m) + var(--sat));width:84px}#mm.mbig{width:min(184px,calc(100% - 2 * var(--m)))}}
 html[data-ui=tab] #mm{top:calc(var(--m) + var(--sat) + 70px);width:calc(100px * var(--u,1))}html[data-ui=tab] #mm.mbig{width:calc(190px * var(--u,1))}html[data-ui=tab] #mmL{font-size:12px}html[data-ui=tab] #mmL b{font-size:13px}
@@ -273,6 +273,8 @@ html[data-ui=tab] #toast.nt b{font-size:18px}html[data-ui=tab] #toast.nt small{f
   #select .classes{display:flex;align-items:stretch;gap:12px}
   #select .cgrp{display:grid;flex:none;grid-auto-flow:column;grid-auto-columns:84px;grid-template-rows:auto 1fr;gap:4px 6px}
   #select .cgh{grid-row:1;grid-column:1/span var(--n);margin:0 2px}
+  /* int/v1331: «Громоверж…», «Чумной лек…» — имя в плитке 84 px на две строки и чуть мельче, без многоточия */
+  html:not([data-ui=tab]) #select .cls .n{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;font-size:10.5px;line-height:1.12;letter-spacing:-.02em}
   #select .cgrp>.cls{grid-row:2}
   #select .cgrp+.cgrp{padding-left:12px;border-left:1px solid var(--line)}
   /* планшет в портрете на любой высоте — та же лента с прокруткой пальцем (на iPad 12,9″/13″ выше 1250 px раньше была сетка 7×3,
@@ -3975,7 +3977,10 @@ function wvTick(dt){
   const C=wvC(),zc=zoneOf(C.x,C.z);if(WV.z<0){WV.z=zc;wvEnter(true);}
   // во время волны край не меняется (граница — просто черта); волна сорвана, только если герои ушли от места волны дальше 50 м на 9 с
   if(WV.st==='wave'){WV.zT=0;if(Math.hypot(C.x-WV.ax,C.z-WV.az)>50){WV.away+=dt;if(WV.away>9)wvFail('Вы ушли от волны');}else WV.away=0;}
-  else if(zc!==WV.z){WV.zT+=dt;if(WV.zT>1.2){WV.z=zc;WV.zT=0;wvEnter();}}else WV.zT=0;
+  // int/v1331: в нарастании и между волнами край держится, пока герой ближе 10 м к границе, и ещё 4,5 с за ней (было 1,2 с): догоняя врагов
+  // у границы, герой заходил в соседний край — шкала прыгала «Нарастание → Затишье → Нарастание», и чемпион прошлого края уходил
+  else if(zc!==WV.z){const hp=wvSt(WV.z).p,hold=hp===1||hp===2,edge=REG_R[zc>WV.z?WV.z:zc];
+    if(hold&&edge!=null&&Math.abs(Math.hypot(C.x,C.z)-edge)<10)WV.zT=0;else{WV.zT+=dt;if(WV.zT>(hold?4.5:1.2)){WV.z=zc;WV.zT=0;wvEnter();}}}else WV.zT=0;
   WV.snT=(WV.snT||0)-dt;if(WV.snT<=0){WV.snT=.5;wvSane(C);}
   const s=wvSt(WV.z);
   if(s.p===2)wvWaves(dt,s,C);
@@ -4061,14 +4066,16 @@ function wvBurst(C,k){const two=WV.w>=5&&WV.burst%2===0,a=WV.dir+(two?Math.PI*.7
   for(let i=0;i<k&&WV.q.length;i++){const sp=WV.q[0];
     if(sp.boss){if(BOSS)break;WV.q.shift();wvBoss(sp,bx,bz,rw);continue;}
     WV.q.shift();const x=bx+rand(-3,3),z=bz+rand(-3,3);
-    const zk=wvZK(WV.z);for(const e of spawnMob(sp.tid,x,z,WV.lv,{rw,hunt:true,aggro:true,noPack:true,elite:!!sp.el,affixList:sp.el?wvAffix(WV.lv):undefined,hpMul:WV_HP*zk.hp*(sp.el?.5:1),dmgMul:WV_DM*zk.dm*(wvCoop()?1.1:1),xpMul:WV_XP})){e.noDespawn=true;e.aggro=true;wvMark(e,WV.id);}}
+    const zk=wvZK(WV.z);for(const e of spawnMob(sp.tid,x,z,WV.lv,{rw,hunt:true,aggro:true,noPack:true,elite:!!sp.el,affixList:sp.el?wvAffix(WV.lv):undefined,hpMul:WV_HP*zk.hp*(sp.el?.5:1),dmgMul:WV_DM*zk.dm*(wvCoop()?1.1:1)*(WV.z===0&&mobRole(sp.tid)==='r'?.88:1),xpMul:WV_XP})){e.noDespawn=true;e.aggro=true;wvMark(e,WV.id);}}
   puffs(bx,1,bz,new THREE.Color(0x553344),10,2.5,1.2);}
 // босс волны на 1 ур. выше волны (владыка — на 2): прежний босс мира (+2 ур.) у героя 8–10-го уровня сносил хрупкого мага одним ударом.
 // int/v1331 (16 пассивок, у мага не больше 3 защитных): удар колосса 3-й волны снимал Пироманту 8-го ур. 73% здоровья (176 из 242), бот
-// падал на 3-й и 6-й волне до 7 раз подряд — урон боссов 3-й и 6-й волн ×0,65 и ×0,75 (было ×0,75 и ×0,85), владыка края — как был
+// падал на 3-й и 6-й волне до 7 раз подряд — урон боссов 3-й и 6-й волн ×0,65 и ×0,75 (было ×0,75 и ×0,85), владыка края — как был.
+// Проверка int/v1331: Геомант, Криомант, Громовержец, Чернокнижник в автобое гибли на Короле волков (6-я) и владыке (10-я) 1-го края до 10 раз —
+// в 1-м краю Король волков ×0,68, владыка ×0,85 (было ×0,75 и ×0,95), стрелки волн 1-го края ×0,88 (wvBurst); хрупкие маги ещё и отходят (KITE_HP)
 function wvBoss(sp,x,z,rw){const main=sp.boss===2,lv=WV.lv+(main?2:1);
   // вдвоём босс крепче (к ×1,6 кооператива ещё ×1,3) и бьёт на 10 % больнее: двое с танком проходили 3-ю волну, не опускаясь ниже 89 % здоровья
-  const zk=wvZK(WV.z),first=WV.w<=3,cp=wvCoop();BOSS=spawnEnemy(sp.tid,x,z,lv,{rw,hpMul:(main?WV_BMAIN:WV_BHP[first?0:1])*zk.hp*(cp?1.3:1),dmgMul:(main?.95:first?.65:.75)*zk.dm*(cp?1.1:1),bsub:(main?'Владыка края':'Босс '+WV.w+'-й волны')+' «'+ZONES[WV.z].name+'»'});
+  const zk=wvZK(WV.z),first=WV.w<=3,cp=wvCoop();BOSS=spawnEnemy(sp.tid,x,z,lv,{rw,hpMul:(main?WV_BMAIN:WV_BHP[first?0:1])*zk.hp*(cp?1.3:1),dmgMul:(main?(WV.z===0?.85:.95):first?.65:(WV.z===0?.68:.75))*zk.dm*(cp?1.1:1),bsub:(main?'Владыка края':'Босс '+WV.w+'-й волны')+' «'+ZONES[WV.z].name+'»'});
   BOSS.skillCd=2.5;wvMark(BOSS,WV.id);bossIntro(BOSS);puffs(x,1,z,new THREE.Color(0x553344),20,2.5,1.4);}
 // награда за волну: до цели края T(w) = мин + (макс − мин)·(0,25 + 0,75·w/10), не больше 3 уровней за раз; перерос цель — тает
 function wvReward(z,w){const L=S.lvl,n=xpNeed(L);if(z>=ZABYSS)return Math.round(.25*n);
@@ -4374,7 +4381,7 @@ function dealDamage(en,base,el,o){
   const fp={x:en.pos.x,y:en.hy-1.7,z:en.pos.z};
   float(fp,crit?dmg+'!':String(dmg),o.dot?o.dotCol:el>=0?ELEMENTS[el].hex:(o.col||'#ffffff'),o.dot?11:crit?19:14);
   if(!o.dot){
-    if(R){float({x:fp.x,y:fp.y+.6,z:fp.z},R.name,'#f2c46b',17);if(MPH&&o.fromG)mpSend({t:'fl',x:fp.x,y:fp.y+.6,z:fp.z,s:R.name,c:'#f2c46b',n:17});
+    if(R){rxFloat({x:fp.x,y:fp.y+.6,z:fp.z},R.name,'#f2c46b',17);if(MPH&&o.fromG)mpSend({t:'fl',x:fp.x,y:fp.y+.6,z:fp.z,s:R.name,c:'#f2c46b',n:17});
       if(R.type==='aoe'){const p=en.pos.clone(),rr=R.r,ad=dmg*R.k*rcK;fxBurst(p.x,.8,p.z,rr,GOLD,.4,.5);fxRing(p.x,p.z,.4,rr+.5,elCol(el),.45);fxGlow(p.x,p.z,rr*1.4,GOLD,.5,.7);elBurst(R.a,p.x,.6,p.z,12);elBurst(R.b,p.x,.6,p.z,12);
         later(0,()=>aoe(p,rr,ad,el,{depth:depth+1,noReact:true,noProc:true,pre:!!o.fromG,fromG:o.fromG,rc:o.rc},en));}
       else if(R.type==='heal'){if(!o.fromG)heal(dmg*R.k);}
@@ -5576,7 +5583,8 @@ function bossTint(en,p){const c=BPH_COL[p];if(en.aura)en.aura.material.color.set
 // выход: баннер с именем и титулом, вспышка, рык (босс встаёт из земли и замирает на миг), лёгкий наезд камеры
 function bossIntro(en,quiet){if(!en)return;const D=BDEF[en.t.ai];if(!en.bossSub)en.bossSub='Босс';if(quiet)return;
   en.introT=0;en.roarT=0;en.busy=Math.max(en.busy,1.1);en.slam=1;en.skillCd=Math.max(en.skillCd,2.5);
-  const x=en.pos.x,z=en.pos.z;banner(en.t.name,(D&&D.ttl)||en.bossSub,true,'boss','Босс');
+  // int/v1331: плашка волны («Волна 3 из 10 · идут ←») стояла под баннером босса на том же месте — гасим её
+  const x=en.pos.x,z=en.pos.z;banner(en.t.name,(D&&D.ttl)||en.bossSub,true,'boss','Босс');clearTimeout(zoneT);$('#zoneTag').classList.remove('on');
   fxPillar(x,z,2.5*en.sc,12,RED,1.1);fxShock(x,z,8,RED,.8);puffs(x,1,z,DUSTC,16,2.5,1.4);bShake(.5);bFlash('rgba(255,70,50,.42)');bossCam(en,2.2,1);
   later(.45,()=>{if(en.dead)return;const px=en.pos.x,pz=en.pos.z;en.roarT=.9;fxShock(px,pz,12,BPHC[0],.7);fxRing(px,pz,.6,9,WHITE,.5,.5);colBurst(RED,px,en.hy*.7,pz,30,6,.7,2);bShake(.35);});}
 // фазы: на 50 % и 25 % (кампания задаёт свои пороги) — новый приём сразу, быстрее перезарядка и ход, другое свечение
@@ -5645,7 +5653,7 @@ function updatePlayer(dt){
   else if(CLS.melee&&(hold||auto)&&P.dashT<=0){const tg=getTarget(hold?14:10);if(tg){const dx=tg.pos.x-P.pos.x,dz=tg.pos.z-P.pos.z,d=Math.hypot(dx,dz);if(d>meleeReach(tg)-.3){const st=Math.min(d,spd*dt);P.pos.x+=dx/d*st;P.pos.z+=dz/d*st;moving=true;P.face=Math.atan2(dx,dz);}}}
   // 25.11: в автобое хрупкие стрелки и маги (без щита в наборе) не стоят в толпе — отходят от тех, кто подошёл вплотную
   // (гибли в 2–4 раза чаще, чем в v13.27; Страннику так ещё копится порыв). Гемомант, Некромант и прочие бьют вблизи — стоят
-  else if(auto&&!hold&&KITE.has(CLS.id)&&P.dashT<=0){let cx=0,cz=0,n=0;for(const en of ENEMIES){if(en.dead)continue;const ex=P.pos.x-en.pos.x,ez=P.pos.z-en.pos.z,r=2.4+en.r,d2=ex*ex+ez*ez;if(d2<r*r){const d=Math.sqrt(d2)||1;cx+=ex/d;cz+=ez/d;n++;}}
+  else if(auto&&!hold&&kiteNow()&&P.dashT<=0){let cx=0,cz=0,n=0;for(const en of ENEMIES){if(en.dead)continue;const ex=P.pos.x-en.pos.x,ez=P.pos.z-en.pos.z,r=2.4+en.r,d2=ex*ex+ez*ez;if(d2<r*r){const d=Math.sqrt(d2)||1;cx+=ex/d;cz+=ez/d;n++;}}
     const cl=Math.hypot(cx,cz);if(n&&cl>.15){const st=spd*.85*dt;P.pos.x+=cx/cl*st;P.pos.z+=cz/cl*st;moving=true;}}
   if(len>.12&&P.dashT<=0){const dx=(fx_*-my+rx*mx),dz=(fz*-my+rz*mx);const l=Math.hypot(dx,dz)||1;
     P.pos.x+=dx/l*spd*len*dt;P.pos.z+=dz/l*spd*len*dt;moving=true;if(P.castT<=0&&P.swingT<=0)P.face=Math.atan2(dx,dz);}
@@ -5661,6 +5669,12 @@ function updatePlayer(dt){
   animateHero(dt,moving);
   ambT-=dt;if(ambT<=0){ambT=.1;const c=(PLAY==='gorge'&&GZ)?GZ.ambC:FFZ[P.zone||0];emit(PUFF,P.pos.x+rand(-15,15),rand(.4,2.4),P.pos.z+rand(-15,15),rand(-.3,.3),rand(-.1,.25),rand(-.3,.3),c,rand(2,3.5),0,0);}}
 const KITE=new Set(['pyro','windr','hunter','alch']);
+// int/v1331: хрупкие маги без отхода (Геомант, Криомант, Громовержец, Чернокнижник) в автобое стояли в толпе: Геомант не проходил 1-й край
+// (до 10 смертей — колосс 86–101 и Король волков 124–197 за удар). Отходят, как Тимур, когда побили: ниже 55 % здоровья — до 85 %;
+// от босса вплотную — всегда (владыка 1-го края снимал Геоманту 18-го ур. 28 % за удар, с 55 % — два удара)
+const KITE_HP=new Set(['geo','cryo','storm','lock']);let kiteLow=0;
+function kiteNow(){if(KITE.has(CLS.id))return true;if(!KITE_HP.has(CLS.id))return false;const f=P.hp/P.maxHp;if(f<.55)kiteLow=1;else if(f>.85)kiteLow=0;
+  if(kiteLow)return true;const b=BOSS;return !!(b&&!b.dead&&Math.hypot(b.pos.x-P.pos.x,b.pos.z-P.pos.z)<b.r+3);}
 function animateHero(dt,moving){
   hero.g.position.copy(P.pos);
   let a=P.face-hero.g.rotation.y;a=Math.atan2(Math.sin(a),Math.cos(a));hero.g.rotation.y+=a*Math.min(1,dt*14);
@@ -6223,7 +6237,10 @@ function toastBusy(){try{return mode==='game'&&!bookOpen&&!setOpen;}catch(e){ret
 function toastHeld(){const now=performance.now();if(now<TST.banEnd&&$('#banner').classList.contains('on'))return TST.banEnd+250;
   if(innerHeight>=innerWidth&&!$('#mpHud').hidden&&!$('#mpHint').hidden)return now+400;return 0;}
 // уступить место (баннеру, подсказке): плашка гаснет, важная ('nt': уровень, слот) — первой в очередь и выйдет потом
-function toastYield(at){const te=$('#toast');if(!te.classList.contains('on'))return;clearTimeout(toastT);te.classList.remove('on');const c=TST.cur;TST.cur=null;if(c&&c[2]==='nt')toastQ(c,at,true);}
+// int/v1331: в коопе «Нить порвалась / снова натянута» мигает каждые 2–5 с, и плашка «Уровень 7» выходила 3 раза подряд — назад в очередь
+// только если её не успели прочесть (на экране < 1,5 с) и только один раз (c[4] — уже возвращалась)
+function toastYield(at){const te=$('#toast');if(!te.classList.contains('on'))return;clearTimeout(toastT);te.classList.remove('on');const c=TST.cur;TST.cur=null;
+  if(c&&c[2]==='nt'&&!c[4]&&performance.now()-TST.curT<1500)toastQ([c[0],c[1],c[2],c[3],1],at,true);}
 function toastQ(x,at,front){TST.q=TST.q.filter(y=>y[0]!==x[0]);if(front)TST.q.unshift(x);else TST.q.push(x);
   if(TST.q.length>2){const i=TST.q.findIndex(y=>y[2]!=='nt');TST.q.splice(i>=0?i:0,1);}
   clearTimeout(TST.qT);TST.qT=setTimeout(toastNext,Math.max(0,at-performance.now())+30);}
@@ -6234,9 +6251,9 @@ function toast(t,ms,cls,sub){if(!t)return;const now=performance.now();
     if(now<TST.minT){toastQ([t,ms,cls,sub],TST.minT);return;}}
   toastShow(t,ms,cls,sub);}
 function toastNext(){if(!TST.q.length)return;const hu=toastHeld();if(hu){clearTimeout(TST.qT);TST.qT=setTimeout(toastNext,Math.max(200,hu-performance.now()));return;}
-  const x=TST.q.shift();toastShow(x[0],x[1],x[2],x[3]);}
-function toastShow(t,ms,cls,sub){const el=$('#toast');el.className=cls||'';if(sub)el.innerHTML='<b>'+toastEsc(t)+'</b><small>'+toastEsc(sub)+'</small>';else el.textContent=t;
-  el.classList.add('on');clearTimeout(toastT);TST.minT=performance.now()+1200;TST.cur=[t,ms,cls,sub];
+  const x=TST.q.shift();toastShow(x[0],x[1],x[2],x[3],x[4]);}
+function toastShow(t,ms,cls,sub,rq){const el=$('#toast');el.className=cls||'';if(sub)el.innerHTML='<b>'+toastEsc(t)+'</b><small>'+toastEsc(sub)+'</small>';else el.textContent=t;
+  el.classList.add('on');clearTimeout(toastT);TST.minT=performance.now()+1200;TST.cur=[t,ms,cls,sub,rq|0];TST.curT=performance.now();
   // высота плашки — для подсказки напарника под ней (--th) и для стрелки «Друг упал» ниже стопки сообщений
   const h=el.offsetHeight;if(h&&h!==TST.th){TST.th=h;document.documentElement.style.setProperty('--th',h+'px');}
   toastT=setTimeout(()=>{el.classList.remove('on');TST.cur=null;if(TST.q.length){clearTimeout(TST.qT);TST.qT=setTimeout(toastNext,280);}},ms||1900);}
@@ -6278,7 +6295,11 @@ function zoneHint(dt){zhT-=dt;if(zhT>0)return;zhT=2;if(P.dead||luOpen||$('#banne
   else m='Враги тут слабее тебя — опыта мало. Сильнее — дальше от центра';
   if(r>1){const ld=toLocal(P.pos.x/r,P.pos.z/r);m+=' '+ARR8[(Math.round(Math.atan2(-ld.x,ld.z)/(Math.PI/4))%8+8)%8];}
   toast(m,6500);zhT=180;}
-function zoneTag(z){$('#zoneName').textContent=ZONES[z].name;$('#zoneSub').textContent=zoneSub(z);$('#zoneTag').classList.add('on');clearTimeout(zoneT);zoneT=setTimeout(()=>$('#zoneTag').classList.remove('on'),3200);}
+// int/v1331: у края 1-й локации бой идёт по границе, и плашка «Гнилые топи · …» выскакивала на каждом шаге туда-обратно (5 раз за минуту) —
+// плашка того же края не чаще раза в 50 с игрового времени (force — начало игры: показать и сбросить память)
+const ZTS={};
+function zoneTag(z,force){if(force)for(const k in ZTS)delete ZTS[k];else if(ZTS[z]!=null&&time-ZTS[z]<50&&time>=ZTS[z])return;ZTS[z]=time;
+  $('#zoneName').textContent=ZONES[z].name;$('#zoneSub').textContent=zoneSub(z);$('#zoneTag').classList.add('on');clearTimeout(zoneT);zoneT=setTimeout(()=>$('#zoneTag').classList.remove('on'),3200);}
 
 
 
@@ -6490,7 +6511,7 @@ $('#classes').addEventListener('click',e=>{const b=e.target.closest('.cls');if(b
 function setClass(id){CLS=CLASS_BY[id];S=validChar(SAVE.chars[id],CLS);LEARNED=new Set(S.learned);BOOK=new Set(S.book);nfImpMig();computeStats();P.maxHp=0;P.maxMp=0;recalcStats();P.hp=P.maxHp;P.mp=P.maxMp;
   rebuildHero();syncAuto();onBuildChanged();}
 function startGame(){SAVE.chars[CLS.id]=S;SAVE.cur=CLS.id;beginRun('world',0,1);save();mode='game';for(const id of ['#select','#gorges','#win','#dead'])$(id).hidden=true;$('#hud').hidden=false;clearWorld();exitGorge();P.face=0;hero.g.rotation.z=0;hero.g.position.y=0;P.hp=P.maxHp;P.mp=P.maxMp;hudCache.hk=null;
-  if(MPon)mpStartPos();if(!MPG)wvBegin();zoneTag(0);syncPause();camT.set(P.pos.x,1.2,P.pos.z);
+  if(MPon)mpStartPos();if(!MPG)wvBegin();zoneTag(0,1);syncPause();camT.set(P.pos.x,1.2,P.pos.z);
   fxPillar(0,0,1.2,7,CLS.color,1);colBurst(CLS.color,0,1,0,40,5,1,-1);toast(CLS.name+': '+CLS.pool.size+' чар класса, изучено '+LEARNED.size);}
 function toSelect(){closeSettings();if(MPon)mpLeaveGame();runEnd();save();closeBook();mode='select';clearWorld();exitGorge();$('#hud').hidden=true;$('#select').hidden=false;for(const id of ['#gorges','#win','#dead'])$(id).hidden=true;hero.g.rotation.z=0;hero.g.position.y=0;selectClass(CLS.id);syncPause();if(NEWVER&&!MPon)location.reload();}
 let NEWVER=false;window.addEventListener('tc-newversion',async()=>{try{const t=await(await fetch('sw.js?'+Date.now(),{cache:'no-store'})).text();const m=t.match(/VERSION\s*=\s*['"]([^'"]+)['"]/);if(m&&m[1]===APP_BUILD)return;}catch(e){}NEWVER=true;if(mode==='select'&&!MPon)location.reload();else toast('Вышла новая версия — обновится, когда выйдешь в меню');});
@@ -7380,7 +7401,7 @@ function mpOnMsg(m,id){
     case 'te':mpGuestTele(m);break;
     case 'ez':if(MPG)addEZ(m.x,m.z,m.r,m.du,m.dp,new THREE.Color(m.c));break;
     case 'ep':mpGuestEProj(m);break;
-    case 'fl':float({x:m.x,y:m.y,z:m.z},m.s,m.c,m.n||14);break;
+    case 'fl':rxFloat({x:m.x,y:m.y,z:m.z},m.s,m.c,m.n||14);break;
     case 'ct':ctPeerFx(m);break;
     case 'xr':mpOnCross(m);break;
     case 'bn':banner(m.b,m.s,!!m.r);break;
@@ -7642,10 +7663,16 @@ function mpHostHit(m){
   if(m.kx!=null)o.knockFrom={x:m.kx,z:m.kz};
   dealDamage(en,m.d,m.el,o);}
 
+// int/v1331: название реакции в одной точке — не чаще раза в секунду: в коопе хосту приходят и свои реакции, и реакции гостя ('fl'),
+// «Освящённая земля» висела 4–5 раз подряд
+const RXF=new Map();
+function rxFloat(p,s,c,n){const l=RXF.get(s);if(l&&time>=l.t&&time-l.t<1&&Math.hypot(l.x-p.x,l.z-p.z)<4)return false;
+  RXF.set(s,{t:time,x:p.x,z:p.z});if(RXF.size>40)for(const [k,v] of RXF)if(time-v.t>2)RXF.delete(k);float(p,s,c,n);return true;}
 // ---------- межигроковая реакция и общий счётчик ----------
 function mpCross(en,R){
   MP.combo++;MP.comboT=7;const k=1.3*(1+Math.min(.5,.05*(MP.combo-1)));
-  float({x:en.pos.x,y:en.hy-.6,z:en.pos.z},'Связка ×'+MP.combo,'#7fe7ff',20);
+  // int/v1331: счёт связки уже держит плашка «Связка ×N» в HUD — над врагом крупно только рубежи (×2, ×5, ×10, ×25, ×50, ×100, дальше каждые 100)
+  if(MP.combo===2||MP.combo===5||MP.combo===10||MP.combo===25||MP.combo===50||MP.combo%100===0)float({x:en.pos.x,y:en.hy-.6,z:en.pos.z},'Связка ×'+MP.combo,'#7fe7ff',20);
   heal(P.maxHp*.03);P.mp=Math.min(P.maxMp,P.mp+P.maxMp*.05);
   mpSend({t:'xr',n:MP.combo,x:r2(en.pos.x),z:r2(en.pos.z)});
   colBurst(GOLD,en.pos.x,1,en.pos.z,16,4,.5,2);
@@ -8652,7 +8679,9 @@ function nfTick(dt){if(!S||!CLS)return;
   if(NFS.lv!==S.lvl){if(NFS.lv!=null&&S.lvl>NFS.lv)S.scrL=0;NFS.lv=S.lvl;}
   const sa=activeSlots(),sp=passiveSlots();if(NFS.sa!=null&&(sa>NFS.sa||sp>NFS.sp)&&!S.sandbox){const two=sa>NFS.sa&&sp>NFS.sp,t=two?'Активный слот '+sa+' и пассивный слот '+sp:sa>NFS.sa?'Активный слот '+sa:'Пассивный слот '+sp;
     // слотов теперь 8 + 16 — одно окно на уровень: баннер уровня сменяется «открыт слот», без отдельного тоста о вставшей чаре (Артём 25.11: «окна вылазят постоянно»)
-    const ch=nfFillQuiet();banner('Уровень '+S.lvl+(two?' · открыты слоты':' · открыт слот'),t+(two?(ch?' — в них встали лучшие из изученных':' — можно поставить ещё чары'):ch?' — в него встала лучшая из изученных':' — можно поставить ещё одну чару'));fxPillar(P.pos.x,P.pos.z,1.3,8,GOLD,1);fxRing(P.pos.x,P.pos.z,.6,5,GOLD,.8);colBurst(GOLD,P.pos.x,1.4,P.pos.z,24,4,.8,-1);}
+    // int/v1331: «Уровень N · открыт слот» шёл баннером по центру (BAN_MINOR его не узнаёт), баннер гасил плашку «Уровень N» и ставил её в очередь заново —
+    // три окна на уровень. В бою теперь плашкой через bannerMinor: вид 'lv' заменяет «Уровень N» на «Уровень N · открыт слот» в той же плашке
+    const ch=nfFillQuiet();(mode==='game'?bannerMinor:banner)('Уровень '+S.lvl+(two?' · открыты слоты':' · открыт слот'),t+(two?(ch?' — в них встали лучшие из изученных':' — можно поставить ещё чары'):ch?' — в него встала лучшая из изученных':' — можно поставить ещё одну чару'));fxPillar(P.pos.x,P.pos.z,1.3,8,GOLD,1);fxRing(P.pos.x,P.pos.z,.6,5,GOLD,.8);colBurst(GOLD,P.pos.x,1.4,P.pos.z,24,4,.8,-1);}
   NFS.sa=sa;NFS.sp=sp;if(S.needBest){delete S.needBest;delete S.fillNew;applyBestBuild();}else if(S.fillNew){delete S.fillNew;if(!S.sandbox)nfFill2();}
   if(NFS.ents&&NFS.ents.length){const E=NFS.ents;for(let i=E.length-1;i>=0;i--){const e=E[i];let k;try{k=e.up?e.up(dt):true;}catch(err){k=false;console.error(err);}if(k===false){const j=E.indexOf(e);if(j>=0)E.splice(j,1);try{if(e.end)e.end();}catch(_){}}}}
   NFS.brinkOn=0;for(const a of NFS.pa||[]){const p=NFP[a.sk.F.id];if(p.tick)p.tick(a,dt);}
