@@ -1,0 +1,37 @@
+<!doctype html><html><head><meta charset=utf8><title>Модели героев — смотрелка</title>
+<style>html,body{margin:0;background:#1c2946;color:#fff;font:14px sans-serif}canvas{display:block}#lab{position:absolute;left:0;top:0;pointer-events:none}#lab div{position:absolute;font-weight:700;text-shadow:0 0 3px #000}</style></head>
+<body><canvas id=c></canvas><div id=lab></div>
+<script src="../vendor/three.min.js"></script>
+<script src="../vendor/GLTFLoader.js"></script>
+<script src="../hero-models.js"></script>
+<script>
+// ?ids=pyro,cryo&view=front|34|back|side&cols=5&w=260&h=360&anim=Idle&t=.3&raw=1&dist=6
+const Q=new URLSearchParams(location.search),view=Q.get('view')||'front',cols=+(Q.get('cols')||5),CW=+(Q.get('w')||260),CH=+(Q.get('h')||360);
+const r=new THREE.WebGLRenderer({canvas:document.getElementById('c'),antialias:true});
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x1c2946);
+scene.add(new THREE.HemisphereLight(0xa8bdf0,0x2a3320,.85));const moon=new THREE.DirectionalLight(0xdbe4ff,.85);moon.position.set(-30,50,20);scene.add(moon);const rim=new THREE.DirectionalLight(0xb28cff,.35);rim.position.set(30,20,-40);scene.add(rim);
+const ground=new THREE.Mesh(new THREE.CircleGeometry(1.6,32).rotateX(-Math.PI/2),new THREE.MeshLambertMaterial({color:0x3a4a3a}));scene.add(ground);
+const cam=new THREE.PerspectiveCamera(30,CW/CH,.1,100);
+window.__done=false;
+Object.assign(HM.SPEC,{raw_K:{b:'K',w:'sword',head:1,props:['Kp_1H_Sword','Kp_Badge_Shield','Kp_Helmet','Kp_Cape']},raw_K2:{b:'K',w:'sword',head:1,props:['Kp_2H_Sword']},
+raw_B:{b:'B',w:'dual',head:1,props:['Bp_1H_Axe','Bp_1H_Axe_Offhand','Bp_Hat','Bp_Cape']},raw_B2:{b:'B',w:'big',head:1,props:['Bp_2H_Axe','Bp_Round_Shield']},
+raw_M:{b:'M',w:'staff',head:1,props:['Mp_2H_Staff','Mp_Spellbook_open','Mp_Hat','Mp_Cape']},raw_M2:{b:'M',w:'book',head:1,props:['Mp_1H_Wand','Mp_Spellbook']},
+raw_R:{b:'R',w:'xbow',head:1,props:['Rp_2H_Crossbow','Rp_Cape']},raw_H:{b:'R',h:'H',w:'dual',head:1,props:['Rp_Knife','Rp_Knife_Offhand']},raw_R2:{b:'R',w:'throw',head:1,props:['Rp_Throwable','Rp_1H_Crossbow']},raw_KM:{b:'M',h:'K',w:'staff',props:['Mp_2H_Staff']},raw_K3:{b:'K',w:'sword',props:['Kp_1H_Sword','Kp_Badge_Shield','Kp_Helmet','Kp_Cape']},raw_B3:{b:'B',w:'dual',props:['Bp_1H_Axe','Bp_1H_Axe_Offhand','Bp_Cape']},raw_H3:{b:'M',h:'H',w:'staff',head:.8,props:['Mp_2H_Staff','Mp_Cape']}});
+if(Q.get('js'))eval(Q.get('js'));
+HM.load('../').then(()=>{
+  let ids=(Q.get('ids')||Object.keys(HM.SPEC).join(',')).split(',');
+  const rows=Math.ceil(ids.length/cols);r.setSize(cols*CW,rows*CH);r.setScissorTest(true);
+  const lab=document.getElementById('lab');
+  const yaw={front:0,'34':Math.PI/4,back:Math.PI,side:Math.PI/2}[view]||0,dist=+(Q.get('dist')||6.2);
+  ids.forEach((id,i)=>{
+    const raw=id.startsWith('raw_');const h=HM.make(id,{raw:raw||Q.get('raw')==='1',dbgTip:Q.get('tip')==='1'});if(!h)return;scene.add(h.root);
+    const an=(HM.SPEC[id]||{}).anim||Q.get('anim');if(an){h.play('U',an,{});h.play('Lo',an,{});}
+    h.mixer.update((HM.SPEC[id]||{}).at!=null?HM.SPEC[id].at:+(Q.get('t')||.3));h.root.updateMatrixWorld(true);
+    const x=(i%cols)*CW,y=(rows-1-Math.floor(i/cols))*CH;r.setViewport(x,y,CW,CH);r.setScissor(x,y,CW,CH);
+    cam.position.set(Math.sin(yaw)*dist,1.75,Math.cos(yaw)*dist);cam.lookAt(0,1.0,0);
+    r.render(scene,cam);scene.remove(h.root);h.dispose();
+    const d=document.createElement('div');d.style.left=(x+6)+'px';d.style.top=(Math.floor(i/cols)*CH+4)+'px';d.textContent=id;lab.appendChild(d);
+  });
+  window.__done=true;
+}).catch(e=>{document.body.append('ОШИБКА '+e);window.__done=true;window.__err=String(e);});
+</script></body></html>
