@@ -142,7 +142,7 @@
       mats.push(m); rimMats.push(m); (texMats[tex] = texMats[tex] || []).push(m); return (mcache[key] = m);
     };
     const meshes = [];
-    const parts = sp.parts || [sp.b + '_Body', sp.b + '_ArmL', sp.b + '_ArmR', sp.b + '_LegL', sp.b + '_LegR', (sp.h === 'H' ? 'H_Head_Hooded' : (sp.h || sp.b) + '_Head')];
+    const parts = sp.parts || [sp.b + '_Body', (sp.h === 'H' ? 'H_Head_Hooded' : (sp.h || sp.b) + '_Head')];
     for (const pn of parts) {
       const pd = L.parts[pn]; if (!pd) continue;
       const m = new T.SkinnedMesh(pd.geo, matFor(pd.tex, true)); m.name = pn; m.bind(skel, new T.Matrix4()); m.frustumCulled = false; inner.add(m); meshes.push(m);
@@ -159,9 +159,13 @@
       par.add(m); meshes.push(m);
     }
     // свои детали (рога, клюв, лук, молот…) — простая геометрия
-    const exM = {};
-    const exMat = (hex, em) => { const k = hex + '|' + (em || 0); if (exM[k]) return exM[k]; const m = new T.MeshLambertMaterial({ color: hex }); if (em) m.emissive = new T.Color(hex).multiplyScalar(em); mats.push(m); rimMats.push(m); return (exM[k] = m); };
-    for (const ex of (sp.ex || [])) { const o = HM.EX[ex.k](ex, exMat); if (!o) continue; (bones[ex.bone || 'head'] || inner).add(o); o.traverse(q => { if (q.isMesh) meshes.push(q); }); }
+    // запечены в 1–2 меша на деталь (цвета в вершинах): матовые — Lambert, светящиеся — без освещения
+    let litM = null, glowM = null;
+    for (const e of exGeo(cid, sp)) {
+      let mt; if (e.glow) { if (!glowM) { glowM = new T.MeshBasicMaterial({ vertexColors: true }); mats.push(glowM); } mt = glowM; }
+      else { if (!litM) { litM = new T.MeshLambertMaterial({ vertexColors: true }); mats.push(litM); rimMats.push(litM); } mt = litM; }
+      const m = new T.Mesh(e.geo, mt); m.name = 'ex'; (bones[e.bone] || inner).add(m); meshes.push(m);
+    }
     if (bones.head && sp.head !== 1) bones.head.scale.setScalar(sp.head || HM.HEAD);
     meshes.forEach(m => { m.castShadow = true; m.userData.hm = 1; });
     // кончик оружия: там висят огонёк и ореол стихии (масштаб обратный — их размеры в мировых единицах)
@@ -183,8 +187,8 @@
     staff: { idle: 'Unarmed_Idle', atk: ['Spellcast_Shoot'], cast: ['Spellcast_Raise'], castT: .55, atkT: .42 },
     book: { idle: 'Idle', atk: ['Spellcast_Shoot'], cast: ['Spellcast_Long'], castT: .6, atkT: .42 },
     bow: { idle: 'Idle', atk: ['1H_Ranged_Shoot'], cast: ['Spellcast_Shoot'], castT: .5, atkT: .42 },
-    xbow: { idle: 'Idle', atk: ['2H_Ranged_Shoot'], cast: ['Spellcast_Shoot'], castT: .5, atkT: .42 },
-    xbow1: { idle: 'Idle', atk: ['1H_Ranged_Shoot'], cast: ['Spellcast_Shoot'], castT: .5, atkT: .42 },
+    xbow: { idle: 'Unarmed_Idle', atk: ['2H_Ranged_Shoot'], cast: ['Spellcast_Shoot'], castT: .5, atkT: .42 },
+    xbow1: { idle: 'Unarmed_Idle', atk: ['1H_Ranged_Shoot'], cast: ['Spellcast_Shoot'], castT: .5, atkT: .42 },
     sword: { idle: 'Unarmed_Idle', atk: ['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal', '1H_Melee_Attack_Slice_Horizontal'], cast: ['Spellcast_Shoot'], castT: .5, atkT: .4 },
     big: { idle: '2H_Melee_Idle', atk: ['2H_Melee_Attack_Chop', '2H_Melee_Attack_Slice'], cast: ['Spellcast_Shoot'], castT: .5, atkT: .42 },
     dual: { idle: 'Idle', atk: ['Dualwield_Melee_Attack_Chop', 'Dualwield_Melee_Attack_Slice', 'Dualwield_Melee_Attack_Stab'], cast: ['Spellcast_Shoot'], castT: .5, atkT: .38 },
@@ -234,7 +238,7 @@
       }
       // ноги
       const lo = this.Ly.Lo, up = this.Ly.U;
-      const runTs = Math.min(2.4, Math.max(.65, (st.spd || 6) / (HM.runV * HM.SC * (this.sp.sc || 1))));
+      const runTs = Math.min(3, Math.max(.65, (st.spd || 6) / (HM.runV * HM.SC * (this.sp.sc || 1))));
       if (mv) { this.play('Lo', 'Running_A', { ts: runTs, fade: lo.once ? .12 : .18 }); lo.once = false; }
       else if (!lo.once || this.t >= lo.end - .1) { this.play('Lo', pk.idle, { fade: .2 }); lo.once = false; }
       // верх
@@ -274,7 +278,7 @@
     horns(e, M) {
       const g = new T.Group(), m = M(e.c || 0xe8dcc0, e.em);
       for (const s of [-1, 1]) {
-        if (e.curl) { g.add(msh(cone(.16, .58, 10), m, [s * .44, 1.0, -.04], [-.35, 0, -s * .6])); g.add(msh(cone(.1, .44, 10), m, [s * .66, 1.3, -.28], [-1.25, 0, -s * .3])); }
+        if (e.curl) { g.add(msh(cyl(.07, .12, .4, 10), m, [s * .4, .98, .02], [-.2, 0, -s * .9])); g.add(msh(cyl(.045, .07, .34, 10), m, [s * .62, 1.15, -.06], [-.9, 0, -s * .55])); g.add(msh(cone(.045, .3, 10), m, [s * .72, 1.25, -.3], [-1.9, 0, -s * .2])); }
         else { g.add(msh(cone(.14, .62, 10), m, [s * .52, .95, .02], [0, 0, -s * .8])); g.add(msh(cone(.08, .46, 10), m, [s * .8, 1.36, .02], [0, 0, -s * .12])); }
       }
       return g;
@@ -357,8 +361,9 @@
     },
     bow(e, M) {
       const g = new T.Group(), wd = M(e.c || 0x6a4a2a), gd = M(e.trim || 0x8ff5d2, .35), str = M(0xeeeeee);
-      const R = .62, arc = 2.2, inner = new T.Group();
-      inner.add(msh(tor(R, .035, arc, 20), wd, [-R, 0, 0], [0, 0, -arc / 2]));
+      const R = .78, arc = 2.3, inner = new T.Group();
+      inner.add(msh(tor(R, .05, arc, 20), wd, [-R, 0, 0], [0, 0, -arc / 2]));
+      for (const s of [-1, 1]) inner.add(msh(cone(.05, .16, 6), gd, [-R + R * Math.cos(arc / 2), s * R * Math.sin(arc / 2), 0], [0, 0, s < 0 ? Math.PI : 0]));
       inner.add(msh(cyl(.006, .006, 2 * R * Math.sin(arc / 2)), str, [-R + R * Math.cos(arc / 2), 0, 0]));
       inner.add(msh(box(.08, .2, .08), gd, [0, 0, 0]));
       inner.rotation.set(e.rx || 0, e.ry || 0, e.rz || 0); g.add(inner);
@@ -366,19 +371,43 @@
     },
     lantern(e, M) {
       const g = new T.Group(), wd = M(0x3a2a1a), fr = M(0x2a2a2a), gl = M(e.c || 0x9be84a, 1);
-      g.add(msh(cyl(.03, .035, 2.0), wd, [0, .35, 0]));
-      g.add(msh(box(.36, .04, .04), wd, [.14, 1.3, 0]));
-      g.add(msh(box(.2, .26, .2), fr, [.3, 1.08, 0]));
-      g.add(msh(box(.15, .2, .21), gl, [.3, 1.08, 0]));
-      g.add(msh(box(.21, .2, .15), gl, [.3, 1.08, 0]));
-      g.add(msh(cone(.13, .1, 4), fr, [.3, 1.26, 0], [0, Math.PI / 4, 0]));
+      g.add(msh(cyl(.03, .035, 2.5), wd, [0, .5, 0]));
+      g.add(msh(box(.42, .04, .04), wd, [.17, 1.72, 0]));
+      g.add(msh(cyl(.008, .008, .16), fr, [.36, 1.63, 0]));
+      g.add(msh(box(.2, .26, .2), fr, [.36, 1.43, 0]));
+      g.add(msh(box(.15, .2, .21), gl, [.36, 1.43, 0]));
+      g.add(msh(box(.21, .2, .15), gl, [.36, 1.43, 0]));
+      g.add(msh(cone(.13, .1, 4), fr, [.36, 1.6, 0], [0, Math.PI / 4, 0]));
       return g;
     },
   };
+  // свои детали героя → общие на всех экземпляры геометрии (кэш по герою): матовая часть и светящаяся
+  HM.exC = {};
+  function exGeo(cid, sp) {
+    if (HM.exC[cid]) return HM.exC[cid];
+    const out = [];
+    for (const ex of (sp.ex || [])) {
+      const o = HM.EX[ex.k](ex, (c, em) => ({ c, em: em || 0 })); if (!o) continue; o.updateMatrixWorld(true);
+      const lit = [], glow = [];
+      o.traverse(m => {
+        if (!m.isMesh) return; const g = m.geometry.index ? m.geometry.toNonIndexed() : m.geometry.clone(); g.applyMatrix4(m.matrixWorld);
+        const col = new T.Color(m.material.c), em = m.material.em; if (em > 0 && em < .5) col.multiplyScalar(1 + em);
+        (em >= .5 ? glow : lit).push({ g, col });
+      });
+      for (const [list, gl] of [[lit, false], [glow, true]]) {
+        if (!list.length) continue; let n = 0; list.forEach(x => n += x.g.attributes.position.count);
+        const P = new Float32Array(n * 3), N = new Float32Array(n * 3), C = new Float32Array(n * 3); let o3 = 0;
+        for (const x of list) { const c = x.g.attributes.position.count; P.set(x.g.attributes.position.array, o3); N.set(x.g.attributes.normal.array, o3); for (let i = 0; i < c; i++) { C[o3 + i * 3] = x.col.r; C[o3 + i * 3 + 1] = x.col.g; C[o3 + i * 3 + 2] = x.col.b; } o3 += c * 3; x.g.dispose(); }
+        const geo = new T.BufferGeometry(); geo.setAttribute('position', new T.BufferAttribute(P, 3)); geo.setAttribute('normal', new T.BufferAttribute(N, 3)); geo.setAttribute('color', new T.BufferAttribute(C, 3));
+        out.push({ geo, glow: gl, bone: ex.bone || 'head' });
+      }
+    }
+    return (HM.exC[cid] = out);
+  }
   // ---------- 20 героев ----------
   // b — тело, h — голова (K рыцарь, B варвар, M маг, R разбойница, H капюшон), w — набор анимаций,
   // props — детали KayKit, ex — свои детали, pal — перекраска атласа по ролям, glow — свечение клеток, tip — где огонёк чар.
-  const TIP = { staff: { bone: 'handslotr', p: [0, 1.12, 0] }, wand: { bone: 'handslotr', p: [0, .72, 0] }, xbow: { bone: 'handslotr', p: [.95, .06, 0] }, xbow1: { bone: 'handslotr', p: [.8, .05, 0] }, knife: { bone: 'handslotr', p: [0, .85, 0] }, hand: { bone: 'handslotr', p: [0, .05, 0] }, bomb: { bone: 'handslotr', p: [0, .2, 0] }, sword1: { bone: 'handslotr', p: [0, 1.25, 0] }, sword2: { bone: 'handslotr', p: [0, 1.75, 0] }, axe: { bone: 'handslotr', p: [-.3, .8, 0] }, hammer: { bone: 'handslotr', p: [0, 1.05, 0] }, scythe: { bone: 'handslotr', p: [0, 1.42, 0] }, bow: { bone: 'handslotr', p: [0, 0, 0] }, lantern: { bone: 'handslotr', p: [.3, 1.08, 0] } };
+  const TIP = { staff: { bone: 'handslotr', p: [0, 1.12, 0] }, wand: { bone: 'handslotr', p: [0, .72, 0] }, xbow: { bone: 'handslotr', p: [.95, .06, 0] }, xbow1: { bone: 'handslotr', p: [.8, .05, 0] }, knife: { bone: 'handslotr', p: [0, .85, 0] }, hand: { bone: 'handslotr', p: [0, .05, 0] }, bomb: { bone: 'handslotr', p: [0, .2, 0] }, sword1: { bone: 'handslotr', p: [0, 1.25, 0] }, sword2: { bone: 'handslotr', p: [0, 1.75, 0] }, axe: { bone: 'handslotr', p: [-.3, .8, 0] }, hammer: { bone: 'handslotr', p: [0, 1.05, 0] }, scythe: { bone: 'handslotr', p: [0, 1.42, 0] }, bow: { bone: 'handslotr', p: [0, 0, 0] }, lantern: { bone: 'handslotr', p: [.36, 1.43, 0] } };
   HM.SPEC = {
     pyro: { b: 'M', h: 'B', w: 'staff', props: ['Mp_2H_Staff', 'Mp_Hat', 'Mp_Cape'], tip: TIP.staff,
       pal: { mage: { robe: 0x9a2e1c, hat: 0x7a1f14, robe2: 0x4a1410, cape: 0x5a1a12, trim: 0xffb347, inner: 0xd8b070, teal: 0xff7a33, pants: 0x3a2418 }, barbarian: { hair: 0xe9e6f2 } },
@@ -426,7 +455,7 @@
       glow: { mage: { gem: 0xffe45c }, barbarian: { eye: 0xffe45c } } },
     monk: { b: 'B', h: 'K', w: 'fists', props: [], tip: TIP.hand, ex: [{ k: 'band', c: 0xd9822b }],
       pal: { barbarian: { cloth: 0xd9822b, leather: 0x8a5a2a, fur: 0xfff1b8, trim: 0xfff1b8, pants: 0xb86a20, dark: 0x6a4a2a }, knight: { hair: 0x1a1a1a } } },
-    lock: { b: 'M', h: 'H', w: 'book', props: ['Mp_Spellbook_open', 'Mp_1H_Wand', 'Mp_Cape'], tip: TIP.wand, ex: [{ k: 'horns', c: 0x3a2220, curl: 1 }],
+    lock: { b: 'M', h: 'H', w: 'book', props: ['Mp_Spellbook_open', 'Mp_1H_Wand', 'Mp_Cape'], tip: TIP.wand, ex: [{ k: 'horns', c: 0x6a1a12, em: .2, curl: 1 }],
       pal: { mage: { robe: 0x3a1020, hat: 0x3a1020, robe2: 0x1a0a14, cape: 0x1a0a14, trim: 0xff7a33, inner: 0x4a2030, teal: 0xff7a33, pants: 0x1a1014 }, rogue: { hood: 0x1f0a14, hair: 0x2a1a14 } },
       glow: { mage: { gem: 0xff7a33 }, rogue: { eye: 0xff7a33 } } },
     inq: { b: 'K', h: 'K', w: 'xbow1', props: ['Kp_Cape', 'Rp_1H_Crossbow'], tip: TIP.xbow1, ex: [{ k: 'widehat', c: 0x1c1c20, band: 0xf2c46b }],
