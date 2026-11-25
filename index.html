@@ -2208,6 +2208,7 @@ const GMOTE=[null,[.1,0,1,0xcfd8e8],[-.6,1.2,1,0xe8f4ff],[.15,0,1.1,0xc090ff],[0
 const WMOTE=[[.12,0,1],[.1,0,1],[.08,0,1],[.8,.2,1.1],[-.5,1.6,1.2],[.55,.3,1.1],[.06,.5,1],[.22,.15,1.25],[.04,.45,1.15],[.18,.1,1.3]];
 let sigB=6,gfxExt=true;
 function updateGfx(dt){
+  if(EMW)EMW.near(PLAY==='gorge'&&GZ?gorgeGroup:worldGroup,P.pos);/* декор из моделей: рядом с героем */
   const ext=Q.pp&&SAVE.q!=='low';if(ext!==gfxExt){gfxExt=ext;worldExtra.visible=ext;if(GZ&&GZ.fxex)GZ.fxex.forEach(m=>m.visible=ext);motes.visible=ext;if(EMW)EMW.setLite(!ext);}
   sigB=6;updateTrails(dt);updateDebris(dt);
   if(gfxExt){const g=PLAY==='gorge'&&GZ?GMOTE[GZ.g]:null;moteU.uC.value.set(P.pos.x,0,P.pos.z);
@@ -2445,11 +2446,11 @@ const EM_BUSY=()=>Object.values(EM_SET).some(v=>v===1);
 function emKinds(){const m=new Map([[GEO.pine,'pine'],[GEO.round,'round'],[GEO.swamp,'swamp'],[GEO.dead,'dead'],[GEO.tomb,'tomb'],[GEO.pillar,'pillar'],[GEO.rock,'rock']]);
   for(const k of ['stump','skull','bone','cairn','menhir','column'])if(GGEO[k])m.set(GGEO[k],k);return m;}
 function emApply(){if(!EMW)return;EMW.setLite(!gfxExt);PK.forEach(e=>e.im.emSkip=1);/* части мира — отдельно, не как неподвижный декор */
-  for(const [k,kind] of [[K.pine,'snowpine'],[K.dead,'dead'],[K.rock,'rock'],[K.pillar,'pillar'],[K.tomb,'tomb'],[K.spire,'spire'],[K.island,'island'],[K.arch,'arch'],[K.house,'house'],[K.tower,'tower'],[K.lamp,'lamp']])EMW.pk(PK[k],kind,worldGroup);
-  const km=emKinds();EMW.eye=camera.position;EMW.fog=scene.fog;EMW.swap(worldGroup,km,64,2);EMW.swap(worldExtra,km,64,2);
+  for(const [k,kind] of [[K.pine,'snowpine'],[K.dead,'dead'],[K.rock,'rock'],[K.pillar,'pillar'],[K.tomb,'tomb'],[K.spire,'spire'],[K.island,'island'],[K.arch,'arch'],[K.house,'house'],[K.tower,'tower'],[K.lamp,'lamp']])EMW.pk(PK[k],kind,2);
+  EMW.swap(worldGroup,emKinds(),2);EMW.near(worldGroup,P.pos,true);
   if(EMW.has('lamp')&&!PK[K.lglow].emK){PK[K.lglow].emK='glow';PK[K.lglow].im.geometry=EMW.lampGlow();}
   rebuildChunks();emGorge();}
-function emGorge(){if(EMW&&EM_SET.a===2&&PLAY==='gorge'&&GZ)EMW.swap(gorgeGroup,emKinds(),48,2);}
+function emGorge(){if(EMW&&EM_SET.a===2&&PLAY==='gorge'&&GZ)EMW.swap(gorgeGroup,emKinds(),2);}
 function emNeed(set){if(EM_OFF||EM_SET[set])return;EM_SET[set]=1;
   (THREE.GLTFLoader?Promise.resolve():hmScript('vendor/GLTFLoader.js?v='+HM_V)).then(()=>window.EM?0:hmScript('env-models.js?ev='+EM_V))
     .then(()=>{window.EM.V=EM_V;return window.EM.load(set,'');}).then(()=>{EMW=window.EM;EM_SET[set]=2;emApply();})
