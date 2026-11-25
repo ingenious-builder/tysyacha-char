@@ -1,0 +1,84 @@
+{
+ "mode": "perf",
+ "runs": [
+  {
+   "name": "new",
+   "frames": 2878,
+   "jsMsPerFrame": 1.694,
+   "taskMsPerFrame": 2.556,
+   "rec": 42,
+   "batRec": true,
+   "mus": "tense",
+   "voices": 13,
+   "played": 539,
+   "errs": []
+  },
+  {
+   "name": "old",
+   "frames": 2870,
+   "jsMsPerFrame": 1.784,
+   "taskMsPerFrame": 2.728,
+   "rec": 0,
+   "batRec": false,
+   "mus": "tense",
+   "voices": 18,
+   "played": 624,
+   "errs": []
+  },
+  {
+   "name": "new",
+   "frames": 2877,
+   "jsMsPerFrame": 1.531,
+   "taskMsPerFrame": 2.38,
+   "rec": 42,
+   "batRec": true,
+   "mus": "tense",
+   "voices": 15,
+   "played": 682,
+   "errs": []
+  },
+  {
+   "name": "old",
+   "frames": 2863,
+   "jsMsPerFrame": 1.722,
+   "taskMsPerFrame": 2.59,
+   "rec": 0,
+   "batRec": false,
+   "mus": "tense",
+   "voices": 18,
+   "played": 547,
+   "errs": []
+  },
+  {
+   "name": "new",
+   "frames": 2877,
+   "jsMsPerFrame": 1.599,
+   "taskMsPerFrame": 2.473,
+   "rec": 42,
+   "batRec": true,
+   "mus": "tense",
+   "voices": 18,
+   "played": 666,
+   "errs": []
+  },
+  {
+   "name": "old",
+   "frames": 2852,
+   "jsMsPerFrame": 2.023,
+   "taskMsPerFrame": 3.038,
+   "rec": 0,
+   "batRec": false,
+   "mus": "tense",
+   "voices": 18,
+   "played": 630,
+   "errs": []
+  }
+ ],
+ "summary": {
+  "newJs": 1.608,
+  "oldJs": 1.843,
+  "diffPct": -12.8,
+  "newTask": 2.47,
+  "oldTask": 2.785
+ }
+}

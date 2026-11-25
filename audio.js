@@ -1,6 +1,9 @@
-/* «Тысяча чар» — звук (25.11).
-   Всё своё: звуки, фоны регионов и музыка затишья и волн синтезируются прямо в игре (DSP на JS → AudioBuffer, WebAudio).
-   Единственная чужая запись — музыка босса «Volatile Reaction», Kevin MacLeod (incompetech.com), CC BY 4.0 → assets/audio/boss.mp3.
+/* «Тысяча чар» — звук (25.11; живые записи — 26.11).
+   Звуки, фоны регионов и музыка затишья синтезируются прямо в игре (DSP на JS → AudioBuffer, WebAudio).
+   Живые записи (26.11) поверх синтеза — assets/audio/sfx1.mp3, sfx2.mp3 (нарезка по таблице REC), музыка боя battle.mp3:
+   Kenney (kenney.nl: Impact Sounds, RPG Audio, Interface Sounds), JaggedStone, Darsycho, pauliuw (opengameart.org), «Heartfelt Battle» — request; всё CC0.
+   Пока запись не загрузилась (или её нет у ключа) — играет прежний синтез. Сборка записей — _check/audio2/tools/build.py.
+   Музыка босса — «Volatile Reaction», Kevin MacLeod (incompetech.com), CC BY 4.0 → assets/audio/boss.mp3.
    В index.html — только обёртки событий (блок «ЗВУК») и window.TCSND; настройки и строки «Благодарностей» этот файл ставит сам.
    В node (module.exports) — те же рецепты для проверки числами: D:/games/tc-wt-audio/_check/audio/check.js. */
 (function(G){'use strict';
@@ -420,7 +423,7 @@ let duckM=1,duckA=1;
 function unlock(){if(!allowed())return;try{
   if(!ctx){const C=window.AudioContext||window.webkitAudioContext;if(!C)return;setSession();try{ctx=new C({latencyHint:'interactive'});}catch(e){ctx=new C();}build();}
   if(ctx.state!=='running'&&!document.hidden){const p=ctx.resume();if(p&&p.catch)p.catch(()=>{});}
-  if(!unlocked){unlocked=true;const b=ctx.createBuffer(1,1,22050),s=ctx.createBufferSource();s.buffer=b;s.connect(ctx.destination);s.start(0);warm();if(!tickT)tickT=setInterval(tick,100);}
+  if(!unlocked){unlocked=true;const b=ctx.createBuffer(1,1,22050),s=ctx.createBufferSource();s.buffer=b;s.connect(ctx.destination);s.start(0);warm();recLoad(0);if(!tickT)tickT=setInterval(tick,100);}
   }catch(e){STAT.errs++;}}
 for(const ev of ['touchend','pointerup','mousedown','keydown','click'])addEventListener(ev,unlock,{capture:true,passive:true});
 document.addEventListener('visibilitychange',()=>{if(!ctx)return;try{if(document.hidden)ctx.suspend();else if(allowed())ctx.resume().catch(()=>{});}catch(e){}});
@@ -452,6 +455,31 @@ function warm(){const first=['ui_click','sw_light','sw_blade','sw_heavy','bow','
    'c_bolt','c_nova','c_meteor','c_chain','c_strike','c_beam','c_summon','c_blink','c_whirl','c_rain','c_trap','c_barrier','boom','d_flesh','d_slime','d_bat','d_ghost','d_stone','d_bone','d_beast','d_big',
    'e_arrow','e_orb','tw','th','ess','m_pad','m_pluck','m_bell','m_bass','r_epic','r_leg','r_imp','imp_hit','shield_hit','heal','ui_book','ui_bookc','ui_lu','ui_pick','ui_lvl','m_taiko','m_tom','m_stick','m_shk','m_obass','m_stab','m_brass'];
   wkInit();for(const n of first)reqBuf(n);for(const n in L)if(!first.includes(n)&&!/^a_/.test(n))reqBuf(n);}
+// ---------- живые записи (26.11): sfx1/sfx2.mp3 — нарезка по таблице REC (сборка: _check/audio2/tools/build.py, gen_table.js) ----------
+// Ключ: [спрайт, смещение, длина, множитель, …] — варианты одного звука (play() берёт случайный и чуть меняет высоту).
+// Спрайт начинается меткой (один отсчёт на REC.mk с): по ней поправляется задержка декодера mp3 (у браузеров разная).
+// Декодирование — OfflineAudioContext на частоте записи (24 кГц: вдвое меньше памяти, чем 48 кГц); не вышло — общим контекстом.
+// Нарезка — в простое по ключу (≤ 6 мс за раз): копия куска × множитель громкости (float, без обрезки), края 3 мс; готовый ключ заменяет синтез.
+// Записи ещё нет (первая загрузка, нет сети) — играет синтез этого ключа, как раньше.
+const REC={f:['sfx1.mp3','sfx2.mp3'],mk:0.05,k:{hit_f:[0,0.25,0.295,1.579,0.665,0.28,1.656,1.065,0.365,1.625,1.55,0.31,1.604],hurt:[0,1.98,0.605,1.707,2.705,0.435,1.462,3.26,0.51,1.586],hit_p:[0,3.89,0.1611,1.513,4.1711,0.1611,1.775,4.4523,0.1,1.824],crit:[0,4.6723,0.255,2.098,5.0473,0.185,2.101,5.3522,0.155,2.101],shield_hit:[0,5.6273,0.21,1.586,5.9573,0.115,2.051,6.1923,0.19,1.673],th:[0,6.5023,0.5268,1.608,7.1491,0.515,1.452,7.7841,0.465,1.418],d_big:[0,8.3691,0.595,1.704,9.0841,0.565,2.101],d_stone:[0,9.7691,0.555,1.083,10.4441,0.545,1.181,11.1091,0.54,1.081],d_bone:[0,11.7691,0.27,1.568,12.1591,0.295,1.454,12.5741,0.295,1.791],d_flesh:[0,12.9891,0.395,1.304,13.5041,0.39,1.185,14.0141,0.395,1.165,14.5291,0.395,1.438],d_slime:[0,15.0441,0.432,1.053,15.5961,0.5995,1.053],d_beast:[0,16.3156,0.585,1.129,17.0206,0.5994,1.053,17.74,0.945,1.053],d_bat:[0,18.805,0.55,1.053,19.475,0.45,1.272],tw:[0,20.045,0.835,1.088,21,0.83,1.053,21.95,0.83,1.115,22.9,0.845,1.053],shield_break:[0,23.865,0.385,1.617,24.37,0.39,1.661],h_ice:[0,24.88,0.22,1.775,25.22,0.215,1.665,25.555,0.215,1.61],h_earth:[0,25.89,0.395,1.754,26.405,0.38,2.101,26.905,0.385,2.101],h_light:[0,27.41,0.545,2.101,28.075,0.56,2.101],h_arcane:[0,28.755,0.5,1.105,29.375,0.5,1.269],h_shadow:[0,29.995,0.75,1.053,30.865,0.75,1.053],sw_blade:[0,31.735,0.28,1.053,32.135,0.23,1.053],sw_light:[0,32.485,0.21,1.053,32.815,0.175,1.053],sw_heavy:[0,33.11,0.39,1.053,33.62,0.34,1.053],w_tick:[0,34.08,0.125,2.032],d_ghost:[1,0.25,2.14,1.481],twb:[1,2.51,1.33,1.053,3.96,1.315,1.053,5.395,1.27,1.053],b_roar:[1,6.785,2.995,1.053],b_phase:[1,9.9,1.4703,1.053],b_death:[1,11.4903,3.305,1.053],r_epic:[1,14.9153,0.795,1.126],r_leg:[1,15.8303,1.285,1.052],c_summon:[1,17.2353,1.62,1.053],c_barrier:[1,18.9753,0.985,1.053],heal:[1,20.0803,0.985,1.053],ui_lu:[1,21.1853,1.08,1.053],ui_click:[1,22.3853,0.085,2.101,22.5903,0.08,2.101],ui_book:[1,22.7903,0.735,2.646],ui_bookc:[1,23.6453,0.2251,2.646],chest:[1,23.9904,1.335,2.646],ess:[1,25.4454,0.2755,2.101,25.8409,0.2932,1.944],ess_big:[1,26.2541,0.81,1.758],scroll:[1,27.1841,0.4305,2.612]}},BAT={f:'battle.mp3',t0:0.25,P:153.54,sr:32000,bar:1.6,g:.6};
+const AV=3,RECST=[0,0],REC_ON={};let recTry=0;
+const fetchAB=f=>fetch('assets/audio/'+f+'?av='+AV).then(r=>{if(!r.ok)throw new Error('http '+r.status);return r.arrayBuffer();});
+function decodeAt(ab,sr,ok,no){let c=null;try{const O=window.OfflineAudioContext||window.webkitOfflineAudioContext;if(O)c=new O(1,1,sr);}catch(e){c=null;}
+  const run=(d,fail)=>{let done=false;const y=b=>{if(!done){done=true;ok(b);}},n=e=>{if(!done){done=true;fail(e);}};
+    try{const p=d.decodeAudioData(ab.slice(0),y,n);if(p&&p.then)p.then(y,n);}catch(e){n(e);}};
+  if(c)run(c,()=>run(ctx,no));else run(ctx,no);}
+function recShift(b){const x=b.getChannelData(0),n=Math.min(x.length,Math.round(.2*b.sampleRate));let mi=0,mv=0;
+  for(let i=0;i<n;i++){const v=x[i]<0?-x[i]:x[i];if(v>mv){mv=v;mi=i;}}return mv>.15?mi/b.sampleRate-REC.mk:0;}
+function recCut(b,sp){const x=b.getChannelData(0),sr=b.sampleRate,dt=recShift(b),E=Math.round(.003*sr);
+  for(const k in REC.k){const r=REC.k[k];if(r[0]!==sp)continue;
+    enq(()=>{const arr=[];for(let j=1;j+2<r.length;j+=3){const i0=Math.max(0,Math.round((r[j]+dt-.004)*sr)),n=Math.min(x.length-i0,Math.round((r[j+1]+.008)*sr)),gm=r[j+2];if(n<=2*E)continue;
+        const ab=ctx.createBuffer(1,n,sr),y=ab.getChannelData(0);for(let i=0;i<n;i++)y[i]=x[i0+i]*gm;
+        for(let i=0;i<E;i++){const w=.5-.5*Math.cos(Math.PI*i/E);y[i]*=w;y[n-1-i]*=w;}arr.push(ab);}
+      if(arr.length){arr.base=1;arr.loop=false;BUF[k]=arr;REC_ON[k]=1;}});}}
+function recLoad(i){if(i>=REC.f.length||RECST[i]||!ctx)return;RECST[i]=1;
+  fetchAB(REC.f[i])
+   .then(ab=>new Promise((ok,no)=>decodeAt(ab,24000,ok,no))).then(b=>{recCut(b,i);RECST[i]=2;recLoad(i+1);})
+   .catch(()=>{RECST[i]=3;STAT.recErr=(STAT.recErr|0)+1;recLoad(i+1);if(recTry++<2)setTimeout(()=>{if(RECST[i]===3){RECST[i]=0;recLoad(i);}},20000);});}
 // ---------- голос ----------
 // drop — голос уходит из счёта (VO, CNT) сразу; rm — ещё и отключает узлы, только когда звук доиграл (onended): вытесненный голос успевает погаснуть без щелчка
 function drop(v){const i=VO.indexOf(v);if(i>=0){VO.splice(i,1);CNT[v.key]=Math.max(0,(CNT[v.key]|0)-1);}}
@@ -511,18 +539,27 @@ function bossStop(){const B=MUS.boss;if(!B)return;const t=now();for(const v of B
     try{if(p.cancelAndHoldAtTime)p.cancelAndHoldAtTime(t);else{const c=p.value;p.cancelScheduledValues(t);p.setValueAtTime(c,t);}}catch(e){}
     try{p.setTargetAtTime(0,t,.6);}catch(e){}try{v.s.stop(t+3);}catch(e){}}MUS.boss=null;}
 function bossLoad(){if(MUS.bossBuf||MUS.bossLoading||MUS.bossErr||!ctx)return;MUS.bossLoading=true;
-  fetch('assets/audio/boss.mp3?av=2').then(r=>{if(!r.ok)throw new Error('http '+r.status);return r.arrayBuffer();}).then(ab=>new Promise((ok,no)=>{const p=ctx.decodeAudioData(ab,ok,no);if(p&&p.catch)p.catch(no);}))
+  fetchAB('boss.mp3').then(ab=>new Promise((ok,no)=>{const p=ctx.decodeAudioData(ab,ok,no);if(p&&p.catch)p.catch(no);}))
    .then(b=>{MUS.bossBuf=b;MUS.bossLoading=false;}).catch(()=>{MUS.bossErr=true;MUS.bossLoading=false;});}
+// музыка волны и боя — запись «Heartfelt Battle» (request, CC0): петля 96 тактов (150 уд/мин) минус 60 мс равномощного перекрёста шва — loop без щелчка.
+// Пока не загрузилась — прежний синтез (тайко, остинато). Ушла и вернулась — продолжает с того же такта.
+function batLoad(){if(MUS.batBuf||MUS.batLoading||MUS.batErr||!ctx)return;MUS.batLoading=true;
+  fetchAB(BAT.f).then(ab=>new Promise((ok,no)=>decodeAt(ab,BAT.sr,ok,no)))
+   .then(b=>{MUS.batOff=BAT.t0+recShift(b);MUS.batBuf=b;MUS.batLoading=false;}).catch(()=>{MUS.batErr=true;MUS.batLoading=false;});}
+function batStart(t){try{const s=ctx.createBufferSource();s.buffer=MUS.batBuf;s.loop=true;s.loopStart=MUS.batOff;s.loopEnd=MUS.batOff+BAT.P;
+    const g=ctx.createGain();g.gain.value=BAT.g;s.connect(g);g.connect(mTense);const pos=MUS.batPos||0;s.start(t+.05,MUS.batOff+pos);return {rec:1,s,g,t0:t+.05,pos};}
+  catch(e){STAT.errs++;return {next:t+.15,step:0};}}
+function batStop(T){const P=BAT.P,p=((now()-T.t0+T.pos)%P+P)%P;MUS.batPos=Math.floor(p/BAT.bar)*BAT.bar;try{T.s.stop();}catch(e){}try{T.s.disconnect();T.g.disconnect();}catch(e){}}
 function musSet(w){const t=now(),G={calm:mCalm,tense:mTense,boss:mBoss};if(w==='boss'&&!MUS.bossBuf)w='tense!';const real=w==='tense!'?'tense':w;MUS.inten=w==='tense!'?3:MUS.inten;
   if(real===MUS.cur)return;if(MUS.cur)MUS.off[MUS.cur]=t+4.5;MUS.cur=real;
   for(const k in G)G[k].gain.setTargetAtTime(k===real?1:0,t,k===real?.7:.9);
   if(real==='calm'&&!MUS.calm)MUS.calm={next:t+.2,beat:0,pad:[],mi:4};
-  if(real==='tense'&&!MUS.tense)MUS.tense={next:t+.15,step:0};
+  if(real==='tense'&&!MUS.tense)MUS.tense=MUS.batBuf?batStart(t):{next:t+.15,step:0};
   if(real==='boss'){if(!MUS.boss)MUS.boss={next:t+.05,srcs:[],first:true};}else if(MUS.boss)bossStop();}
 // уходящая музыка доигрывает, пока гаснет (MUS.off — когда погаснет), потом её секвенсор стоит
 function musTick(){const t=now(),ahead=t+.5,live=k=>MUS.cur===k||t<(MUS.off[k]||0);
   if(MUS.calm){if(live('calm'))calmRun(ahead);else{for(const v of MUS.calm.pad)padOff(v,t);MUS.calm=null;}}
-  if(MUS.tense){if(live('tense'))tenseRun(ahead);else MUS.tense=null;}
+  if(MUS.tense){if(live('tense')){if(!MUS.tense.rec)tenseRun(ahead);}else{if(MUS.tense.rec)batStop(MUS.tense);MUS.tense=null;}}
   if(MUS.boss){MUS.boss.srcs=MUS.boss.srcs.filter(v=>v.end>t);bossRun();}}
 // ---------- фон регионов ----------
 const AMB={kind:'',lay:null,evN:{},beds:{},want:''};
@@ -550,7 +587,7 @@ function tick(){if(!ctx||!A||!A.st)return;let s;try{s=A.st();}catch(e){return;}S
     const zb=s.play==='world'?[0,6,7].includes(s.zone):[0,3,11].includes(s.gorge),zd=s.play==='world'?[2,8,9].includes(s.zone):[2,7,8,9].includes(s.gorge);
     MUS.mood=s.mode==='select'||zb?'b':zd?'d':'n';
     let w='calm';if(s.mode==='game'){if(s.boss)w='boss';else if(s.wv===2||s.ag>=6){w='tense';hold=t+8;}else if(t<hold)w='tense';}
-    if(s.mode==='game'&&(s.wv||s.ag>=3))bossLoad();
+    if(s.mode==='game'&&(s.wv||s.ag>=3)){batLoad();bossLoad();}
     if(MUS.forced)w=MUS.forced;MUS.inten=s.wn>=7||s.ag>=12?2:1;musSet(w);musTick();
     // приглушение: пауза (книга, окно уровня), смерть
     const dm=s.dead?.35:s.paused&&!s.set?.55:1,da=s.paused&&!s.set?.6:(w!=='calm'?.7:1);if(dm!==duckM||da!==duckA){duckM=dm;duckA=da;applyVol();}
@@ -628,8 +665,8 @@ const API={
    if(red&&!k)play('champ',{g:.4,pri:4,gap:1500});}),
  // настройки и отладка
  opt:()=>Object.assign({},OPT),
- state:()=>({ctx:ctx?ctx.state:null,sr:ctx?ctx.sampleRate:0,unlocked,worker:!!WK,pend:Object.keys(PEND).length,allowed:allowed(),voices:VO.length,buffers:Object.keys(BUF).length,beds:Object.keys(AMB.beds).length,queue:GENQ.length,amb:AMB.kind,mus:MUS.cur,mood:MUS.mood,boss:!!MUS.bossBuf,stat:Object.assign({},STAT),session:navigator.audioSession?navigator.audioSession.type:'нет'}),
- dbg:{L,play:(n,o)=>play(n,o||{}),force:w=>{MUS.forced=w||'';if(w==='boss')bossLoad();},meter:()=>{if(!meter)return null;const a=new Float32Array(meter.fftSize);meter.getFloatTimeDomainData(a);let p=0,e=0;for(const v of a){p=Math.max(p,Math.abs(v));e+=v*v;}return {peak:p,rms:Math.sqrt(e/a.length)};},
+ state:()=>({ctx:ctx?ctx.state:null,sr:ctx?ctx.sampleRate:0,unlocked,worker:!!WK,pend:Object.keys(PEND).length,allowed:allowed(),voices:VO.length,buffers:Object.keys(BUF).length,beds:Object.keys(AMB.beds).length,queue:GENQ.length,amb:AMB.kind,mus:MUS.cur,mood:MUS.mood,boss:!!MUS.bossBuf,bat:!!MUS.batBuf,batRec:!!(MUS.tense&&MUS.tense.rec),rec:Object.keys(REC_ON).length,recSt:RECST.slice(),stat:Object.assign({},STAT),session:navigator.audioSession?navigator.audioSession.type:'нет'}),
+ dbg:{L,play:(n,o)=>play(n,o||{}),force:w=>{MUS.forced=w||'';if(w==='boss')bossLoad();if(w==='tense')batLoad();},bufs:k=>BUF[k]?BUF[k].slice():[],rec:()=>({st:RECST.slice(),on:Object.keys(REC_ON),bat:!!MUS.batBuf,batOff:MUS.batOff,batPos:MUS.batPos||0}),meter:()=>{if(!meter)return null;const a=new Float32Array(meter.fftSize);meter.getFloatTimeDomainData(a);let p=0,e=0;for(const v of a){p=Math.max(p,Math.abs(v));e+=v*v;}return {peak:p,rms:Math.sqrt(e/a.length)};},
    genAll:()=>{for(const n in L)if(!BUF[n])reqBuf(n);},boss:()=>MUS.boss&&{next:+(MUS.boss.next-now()).toFixed(3),srcs:MUS.boss.srcs.length,P:BOSS_P,dur:MUS.bossBuf?MUS.bossBuf.duration:0},q:()=>GENQ.length+Object.keys(PEND).length,by:()=>Object.assign({},BY),set:o=>{Object.assign(OPT,o);applyVol();},mus:()=>({cur:MUS.cur,inten:MUS.inten,mood:MUS.mood})},
 };
 G.TCSND=API;
@@ -651,7 +688,10 @@ function uiInit(){const body=document.getElementById('setBody');if(!body||docume
   // благодарности: источники звука
   for(const h of body.querySelectorAll('h3'))if(/Благодарности/.test(h.textContent)){const s=h.parentNode;
     const p1=document.createElement('p');p1.className='hint';p1.innerHTML='Музыка босса: «Volatile Reaction» — Kevin MacLeod (<a href="https://incompetech.com" target="_blank" rel="noopener">incompetech.com</a>), лицензия <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">Creative Commons: By Attribution 4.0</a>.';
-    const p2=document.createElement('p');p2.className='hint';p2.textContent='Остальные звуки, фоны регионов и музыка затишья и волн — свои: синтезируются прямо в игре.';s.appendChild(p1);s.appendChild(p2);break;}}
+    const a=(u,t)=>'<a href="'+u+'" target="_blank" rel="noopener">'+t+'</a>',oga='https://opengameart.org/content/';
+    const p3=document.createElement('p');p3.className='hint';p3.innerHTML='Музыка боя: «Heartfelt Battle» — request ('+a('http://www.request.moe','request.moe')+', '+a(oga+'heartfelt-battle-loopable-fantasy-stringspianohorn','OpenGameArt')+'), CC0.';
+    const p4=document.createElement('p');p4.className='hint';p4.innerHTML='Звуки: '+a('https://kenney.nl','Kenney')+' — Impact Sounds, RPG Audio, Interface Sounds (CC0); «Magic Spell SFX» — JaggedStone, «Monster snarls» и «Big scary troll sounds» — Darsycho, «Monster or beast sounds» — pauliuw ('+a('https://opengameart.org','OpenGameArt')+', CC0). Спасибо авторам!';
+    const p2=document.createElement('p');p2.className='hint';p2.textContent='Остальные звуки, фоны регионов и музыка затишья — свои: синтезируются прямо в игре.';s.appendChild(p1);s.appendChild(p3);s.appendChild(p4);s.appendChild(p2);break;}}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',uiInit);else uiInit();
 // звук кнопок в меню и окнах (не в бою: джойстик, атака и слоты чар молчат); своё у книги и карт — щелчок тогда не нужен
 document.addEventListener('click',e=>{try{if(!ctx||performance.now()-uiT<80)return;const b=e.target&&e.target.closest&&e.target.closest('button,.chip,[role=button],input[type=checkbox]');
