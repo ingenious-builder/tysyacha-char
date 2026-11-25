@@ -1,11 +1,11 @@
 // Сервис-воркер «Тысячи чар»: офлайн-кэш и обновление без залипания на старой версии.
 // При каждом выпуске меняй VERSION — старый кэш удалится, новая версия подхватится сама.
-const VERSION = 'v13.25';
+const VERSION = 'v13.26';
 const CACHE='tysyacha-char-'+VERSION;
-// Модели героев (assets/models, загрузчик glTF, hero-models.js) — отдельный кэш, не пропадает при новой версии игры.
+// Модели героев и врагов (assets/models, загрузчик glTF, hero-models.js, foe-models.js) — отдельный кэш, не пропадает при новой версии игры.
 // Грузятся при первом показе героя, не при установке. Новая сборка моделей — поменять MODELS_V здесь и HM_V в index.html.
 const MODELS_V='1',MCACHE='tc-models';
-const isModel=p=>p.includes('/assets/models/')||p.endsWith('/vendor/GLTFLoader.js')||p.endsWith('/hero-models.js');
+const isModel=p=>p.includes('/assets/models/')||p.endsWith('/vendor/GLTFLoader.js')||p.endsWith('/hero-models.js')||p.endsWith('/foe-models.js');
 const CORE=['./','index.html','net-relay.js','campaign.js','net-p2p.js','manifest.webmanifest','vendor/three.min.js','vendor/trystero-nostr-0.21.5.js','icons/icon-192.png','icons/icon-512.png','icons/maskable-512.png','icons/apple-touch-icon.png'];
 self.addEventListener('install',e=>{
   e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()));
