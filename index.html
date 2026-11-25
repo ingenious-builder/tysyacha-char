@@ -249,24 +249,31 @@ html[data-ui=tab] #mm{top:calc(var(--m) + var(--sat) + 70px);width:calc(92px * v
 .bk-top,.bk-nav{display:contents}
 .bk-title{order:0}.tabs{order:1}#heroBtn{order:2}.x{order:3}
 .bk-title{font:700 22px/1 var(--f-display);color:var(--gold);white-space:nowrap}
-.tabs{display:flex;gap:4px;margin-left:auto;background:rgba(255,255,255,.05);padding:3px;border-radius:12px;min-width:0;overflow-x:auto;scrollbar-width:none}
-.tab{position:relative;height:44px;padding:0 12px;border:0;border-radius:11px;background:transparent;color:var(--muted);font:500 14px var(--f-ui);white-space:nowrap}
-.tab span{font-variant-numeric:tabular-nums;opacity:.8}
-.tab.on{background:var(--raise);color:var(--text)}
-.tab .dotb{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--gold);margin-left:5px;vertical-align:middle}
-.x{flex:none;width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--panel-solid);display:grid;place-items:center}
-.x svg{width:18px;height:18px}
+.tabs{display:flex;gap:6px;margin-left:auto;background:rgba(255,255,255,.07);padding:4px;border-radius:16px;min-width:0;overflow-x:auto;scrollbar-width:none}
+.tab{position:relative;height:52px;padding:0 16px;border:1px solid rgba(206,214,255,.16);border-radius:12px;background:rgba(255,255,255,.07);color:#c9d0f0;font:600 17px var(--f-ui);white-space:nowrap;display:flex;align-items:center;justify-content:center;gap:8px;line-height:1.1;transition:background .15s,color .15s}
+.tab b{font-weight:700}
+.tab .ti{width:22px;height:22px;flex:none}
+.tab span{font-variant-numeric:tabular-nums;font-size:14px;font-weight:500;opacity:.85}
+.tab.on{background:linear-gradient(180deg,#f7d58a,#e3a93f);border-color:#ffe3a0;color:#2a1c04;box-shadow:0 0 14px rgba(242,196,107,.5),inset 0 -3px 0 rgba(120,70,0,.45)}
+.tab.on span{opacity:.9}
+.tab .dotb{position:absolute;top:6px;right:8px;display:block;width:12px;height:12px;border-radius:50%;background:#ff5a4d;border:2px solid #131a30;box-shadow:0 0 8px rgba(255,90,77,.8)}
+.tab.on .dotb{border-color:#f7d58a}
+.x{flex:none;width:52px;height:52px;border-radius:14px;border:1px solid rgba(206,214,255,.3);background:#232c4d;color:var(--text);display:grid;place-items:center}
+.x svg{width:24px;height:24px}
 @media (orientation:portrait){
   /* вертикально: вкладки и «закрыть» — внизу, под большим пальцем */
   .bk-head{display:contents}
   .bk-top{display:flex;align-items:center;gap:10px;order:0;flex:none;padding:6px 12px;border-bottom:1px solid var(--line)}
   .bk-top .bk-title{flex:1;order:0;min-width:0;overflow:hidden;text-overflow:ellipsis}
-  .bk-nav{display:flex;align-items:center;gap:8px;order:3;flex:none;padding:8px 12px;border-top:1px solid var(--line);background:linear-gradient(0deg,#0d1120,#131a30)}
+  .bk-nav{display:flex;align-items:center;gap:10px;order:3;flex:none;padding:8px 12px;border-top:1px solid var(--line);background:linear-gradient(0deg,#0d1120,#131a30)}
   .bk-nav .tabs{margin-left:0;flex:1;overflow:visible;order:0}
   .bk-nav .x{order:0}
-  .tab{flex:1;padding:0 4px;font-size:14px;display:flex;flex-direction:column;justify-content:center;align-items:center;line-height:1.15;overflow:hidden;text-overflow:ellipsis}
-  .tab span{display:block;font-size:12px;line-height:1.1}
-  .tab .dotb{position:absolute;top:7px;right:10px;margin:0}
+  .tab{flex:1;height:68px;padding:0 2px;font-size:19px;flex-direction:column;gap:1px;overflow:hidden}
+  .tab .ti{width:22px;height:22px}
+  .tab b{font-size:19px;line-height:1.1}
+  .tab span{display:block;font-size:14px;line-height:1.1;min-height:15px}
+  .tab .dotb{top:6px;right:10px}
+  .bk-nav .x{width:68px;height:68px;border-radius:16px}.bk-nav .x svg{width:28px;height:28px}
   #pendingBar{order:1}
   .pane{order:2}
 }
@@ -610,7 +617,7 @@ html[data-ui=tab] #topc{width:min(440px,36vw);gap:8px}
 html[data-ui=tab] #bossbar b{font-size:20px}html[data-ui=tab] #bossbar .bar{height:14px}
 html[data-ui=tab] #threat,html[data-ui=tab] #gprog{font-size:14px;padding:7px 14px;border-radius:12px}
 html[data-ui=tab] #threat .bar,html[data-ui=tab] #gprog .bar{width:130px;height:7px}
-html[data-ui=tab] #topc{gap:10px}html[data-ui=tab] #tabLibN,html[data-ui=tab] #tabBuildN{font-size:13px}@media (orientation:landscape){html[data-ui=tab] #verTag{left:auto;transform:none;right:max(10px,var(--sar));bottom:calc(var(--sab) + 4px)}html[data-ui=tab] #select .sel-right{padding-bottom:34px}}html[data-ui=tab] #zoneTag{font-size:19px;padding:7px 16px}html[data-ui=tab] #zoneTag small{font-size:14px}
+html[data-ui=tab] #topc{gap:10px}@media (orientation:landscape){html[data-ui=tab] #verTag{left:auto;transform:none;right:max(10px,var(--sar));bottom:calc(var(--sab) + 4px)}html[data-ui=tab] #select .sel-right{padding-bottom:34px}}html[data-ui=tab] #zoneTag{font-size:19px;padding:7px 16px}html[data-ui=tab] #zoneTag small{font-size:14px}
 html[data-ui=tab] #atk svg{width:calc(40px * var(--u));height:calc(40px * var(--u))}
 html[data-ui=tab] .sk svg{width:calc(26px * var(--u));height:calc(26px * var(--u))}
 html[data-ui=tab] .sk .t{font-size:calc(15px * var(--u))}
@@ -708,10 +715,10 @@ html[data-ui=tab] .coop-pl{padding:14px 16px}html[data-ui=tab] .coop-pl b{font-s
 html[data-ui=tab] .coop-wait{font-size:17px}
 /* книга чар */
 html[data-ui=tab] .bk-head{padding:12px 20px;gap:14px}
-@media (max-width:900px){html[data-ui=tab] .bk-head{padding:10px 14px;gap:10px}html[data-ui=tab] .bk-title{font-size:23px}html[data-ui=tab] .tab{padding:0 10px;font-size:16px}html[data-ui=tab] #heroBtn{padding:0 14px}html[data-ui=tab] .bk-title{min-width:0;overflow:hidden;text-overflow:ellipsis}html[data-ui=tab] .tabs{flex:none}}
+@media (max-width:900px){html[data-ui=tab] .bk-head{padding:10px 14px;gap:10px}html[data-ui=tab] .bk-title{font-size:23px}html[data-ui=tab] #heroBtn{padding:0 14px}html[data-ui=tab] .bk-title{min-width:0;overflow:hidden;text-overflow:ellipsis}html[data-ui=tab] .tabs{flex:none}}
 html[data-ui=tab] .bk-title{font-size:30px}
 html[data-ui=tab] .tabs{padding:4px;border-radius:15px}
-html[data-ui=tab] .tab{height:50px;padding:0 22px;font-size:17px;border-radius:12px}
+html[data-ui=tab] .tab{height:60px;padding:0 24px;font-size:20px;border-radius:14px}html[data-ui=tab] .tab .ti{width:26px;height:26px}html[data-ui=tab] .tab span{font-size:15px}@media (orientation:portrait){html[data-ui=tab] .bk-nav .tabs{flex:1}html[data-ui=tab] .tab{flex:1;min-width:0;height:84px;padding:0 6px;font-size:22px}html[data-ui=tab] .tab b{font-size:22px}html[data-ui=tab] .tab span{font-size:16px}html[data-ui=tab] .bk-nav .x{width:84px;height:84px}}
 html[data-ui=tab] .x{width:54px;height:54px;border-radius:15px}html[data-ui=tab] .x svg{width:24px;height:24px}
 html[data-ui=tab] #pendingBar{padding:12px 20px;font-size:17px}html[data-ui=tab] #pendingBar button{height:44px;padding:0 18px;font-size:16px}
 html[data-ui=tab] .filters{padding:14px 20px;gap:10px}
@@ -935,9 +942,9 @@ html[data-ui=tab] #layPan{width:min(460px,calc(100% - 40px));padding:16px 18px;g
     <header class="bk-head">
       <div class="bk-top"><div class="bk-title" id="bkTitle">Книга чар</div><button class="btn" id="heroBtn" type="button">Герои</button></div>
       <div class="bk-nav"><nav class="tabs">
-        <button class="tab on" id="tabLib" type="button">Чары <span id="tabLibN"></span></button>
-        <button class="tab" id="tabBuild" type="button">Билд <span id="tabBuildN">0/50</span></button>
-        <button class="tab" id="tabTal" type="button">Таланты<i class="dotb" id="tabTalDot" hidden></i></button>
+        <button class="tab on" id="tabLib" type="button"><svg class="ti" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5C6.5 4.5 9.5 4.5 12 6c2.5-1.5 5.5-1.5 8-.5V19c-2.5-1-5.5-1-8 .5-2.5-1.5-5.5-1.5-8-.5z"/><path d="M12 6v13.5"/></svg><b>Чары</b><span id="tabLibN"></span></button>
+        <button class="tab" id="tabBuild" type="button"><svg class="ti" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4" width="7" height="7" rx="2"/><rect x="13.5" y="4" width="7" height="7" rx="2"/><rect x="3.5" y="14" width="7" height="7" rx="2"/><rect x="13.5" y="14" width="7" height="7" rx="2"/></svg><b>Билд</b><span id="tabBuildN">0/50</span></button>
+        <button class="tab" id="tabTal" type="button"><svg class="ti" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l2.6 5.3 5.8.8-4.200 4.100 1 5.8L12 16.8l-5.200 2.700 1-5.8L3.6 9.6l5.8-.8z"/></svg><b>Таланты</b><i class="dotb" id="tabTalDot" hidden></i></button>
       </nav>
       <button class="x" id="bkClose" type="button" aria-label="Закрыть книгу"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
     </header>
