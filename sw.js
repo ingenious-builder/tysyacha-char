@@ -1,6 +1,6 @@
 // Сервис-воркер «Тысячи чар»: офлайн-кэш и обновление без залипания на старой версии.
 // При каждом выпуске меняй VERSION — старый кэш удалится, новая версия подхватится сама.
-const VERSION = 'v13.33';
+const VERSION = 'v13.34';
 const CACHE='tysyacha-char-'+VERSION;
 // Модели героев и врагов (assets/models, загрузчик glTF, hero-models.js, foe-models.js) — отдельный кэш, не пропадает при новой версии игры.
 // Грузятся при первом показе героя, не при установке. Новая сборка моделей — поменять MODELS_V здесь и HM_V в index.html.
@@ -11,14 +11,18 @@ const ENV_V='1';
 const FOEJS_V='2';
 // hero-models.js — своя версия ?hv= (HEROJS_V = HMJS_V в index.html): новые герои (21-й — Тимур) без перекачки моделей
 const HEROJS_V='2';
+// звук: audio.js — в CORE (код меняется с игрой); записи assets/audio/ (музыка босса) — свой кэш tc-audio, версия ?av= (AUDIO_V = av в audio.js)
+const AUDIO_V='2',ACACHE='tc-audio';
+const isAudio=p=>p.includes('/assets/audio/');
 const isModel=p=>p.includes('/assets/models/')||p.endsWith('/vendor/GLTFLoader.js')||p.endsWith('/hero-models.js')||p.endsWith('/foe-models.js')||p.endsWith('/env-models.js');
-const CORE=['./','index.html','net-relay.js','campaign.js','net-p2p.js','manifest.webmanifest','vendor/three.min.js','vendor/trystero-nostr-0.21.5.js','icons/icon-192.png','icons/icon-512.png','icons/maskable-512.png','icons/apple-touch-icon.png'];
+const CORE=['./','index.html','net-relay.js','campaign.js','net-p2p.js','audio.js','manifest.webmanifest','vendor/three.min.js','vendor/trystero-nostr-0.21.5.js','icons/icon-192.png','icons/icon-512.png','icons/maskable-512.png','icons/apple-touch-icon.png'];
 self.addEventListener('install',e=>{
   e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()));
 });
 self.addEventListener('activate',e=>{
   e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k.startsWith('tysyacha-char-')&&k!==CACHE).map(k=>caches.delete(k))))
     .then(()=>caches.open(MCACHE)).then(c=>c.keys().then(rs=>Promise.all(rs.filter(r=>{const q=new URL(r.url).searchParams;if(r.url.includes('/foe-models.js')&&q.get('fv')!==FOEJS_V)return true;if(r.url.includes('/hero-models.js')&&q.get('hv')!==HEROJS_V)return true;return q.has('ev')?q.get('ev')!==ENV_V:q.get('v')!==MODELS_V;}).map(r=>c.delete(r))))).catch(()=>{})
+    .then(()=>caches.open(ACACHE)).then(c=>c.keys().then(rs=>Promise.all(rs.filter(r=>new URL(r.url).searchParams.get('av')!==AUDIO_V).map(r=>c.delete(r))))).catch(()=>{})
     .then(()=>self.clients.claim()));
 });
 const netFirst=async(req,ms)=>{
@@ -43,6 +47,8 @@ self.addEventListener('fetch',e=>{
   if(u.origin===location.origin){
     // модели — из своего кэша, сеть только в первый раз
     if(isModel(u.pathname)){e.respondWith(caches.open(MCACHE).then(c=>c.match(req).then(m=>m||fetch(req).then(r=>{if(r&&r.ok)c.put(req,r.clone());return r;}))));return;}
+    // музыка — из своего кэша, сеть только в первый раз
+    if(isAudio(u.pathname)){e.respondWith(caches.open(ACACHE).then(c=>c.match(req).then(m=>m||fetch(req).then(r=>{if(r&&r.ok)c.put(req,r.clone());return r;}))));return;}
     // страница и скрипты — сначала сеть (свежая версия), без сети — кэш
     if(req.mode==='navigate'||u.pathname.endsWith('/')||u.pathname.endsWith('.html')||u.pathname.endsWith('sw.js')||u.pathname.endsWith('.webmanifest')){e.respondWith(netFirst(req,8000));return;}
     e.respondWith(caches.match(req).then(m=>m||fetch(req).then(r=>{if(r&&r.ok){const cl=r.clone();caches.open(CACHE).then(c=>c.put(req,cl));}return r;})));
