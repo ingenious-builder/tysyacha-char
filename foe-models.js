@@ -289,7 +289,7 @@ varying float vRim;
     hydra: { m: 'snake', tint: { darkgreen: 1, lightgreen: 1.3 }, pal: { yellow: 0xffd34d }, glow: { yellow: .7 }, multi: [{ x: 0, z: .55, ry: 0, s: 1.05 }, { x: -.75, z: -.1, ry: .7, s: .9, lag: .18 }, { x: .75, z: -.1, ry: -.7, s: .9, lag: .32 }], hk: .9 },
     shroomk: { m: 'mushk', tint: { secondary: 1 }, pal: { spikes: 0xfff4e0 } },
     reaper: { m: 'gskull', tint: { main: 1 }, pal: { secondary: 0xeae6d2 }, hk: 1.1 },
-    bonelord: { m: 'skwar', hide: ['blade', 'shield', 'helmet'], tint: { cloak: .6, head: 1, jaw: 1, arm: 1, leg: 1 }, pal: { eyes: 0x9dff5a }, glow: { eyes: 1, crown: .3 } },
+    bonelord: { m: 'skwar', hide: ['blade', 'shield', 'helmet'], tint: { cloak: .6, head: 1, jaw: 1, arm: 1, leg: 1 }, pal: { eyes: 0x9dff5a }, glow: { eyes: 1, crown: .3 }, hk: 1.25 },
     banshee: { m: 'ghost', tint: { main: 1 }, pal: { eye_white: 0x10101a, eye_black: 0xcfe0ff }, glow: { main: .25, eye_black: .9 } },
     demon: { m: 'demonw', hide: ['bomb', 'spark'], tint: { main: 1 }, pal: { eye_black: 0xffd34d }, glow: { eye_black: 1 } },
   };
@@ -300,7 +300,7 @@ varying float vRim;
     deadknight: { m: 'skwar', hide: ['axe', 'crown', 'shield'], tint: { cloak: .55, head: 1, jaw: 1, arm: 1, leg: 1 }, pal: { eyes: 0x9affc8 }, glow: { eyes: 1 } },
     skyknight: { m: 'skwar', hide: ['axe', 'crown'], tint: { cloak: 1, helmet: 1.1 }, pal: { eyes: 0xfff2a8 }, glow: { eyes: 1 } },
     gargoyle: { m: 'bat', tint: { main: 1, belly: .8 }, pal: { eyes: 0xff5030 }, glow: { eyes: 1 }, hk: 1.1 },
-    lichking: { m: 'skwar', hide: ['blade', 'shield', 'helmet'], tint: { cloak: .45, head: 1, jaw: 1, arm: 1, leg: 1 }, pal: { eyes: 0x9affc8, crown: 0x9affc8 }, glow: { eyes: 1, crown: .6 } },
+    lichking: { m: 'skwar', hide: ['blade', 'shield', 'helmet'], tint: { cloak: .45, head: 1, jaw: 1, arm: 1, leg: 1 }, pal: { eyes: 0x9affc8, crown: 0x9affc8 }, glow: { eyes: 1, crown: .6 }, hk: 1.25 },
     prismgiant: { m: 'yeti', hide: ['horns', 'tongue'], tint: { main: 1, secondary: .7, teeth: .7, tongue: .5, rocks: 1.2 }, pal: { core: 0xffffff, eye_black: 0xffffff }, glow: { core: 1, eye_black: 1, rocks: .35 } },
   };
   const scl = (c, k) => { const r = Math.min(255, Math.round((c >> 16 & 255) * k)), g = Math.min(255, Math.round((c >> 8 & 255) * k)), b = Math.min(255, Math.round((c & 255) * k)); return (r << 16) | (g << 8) | b; };
