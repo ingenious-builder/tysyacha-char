@@ -7,6 +7,8 @@
 //   node _check/power_check.js --real --k — только проверка множителя редкости в бою (дописывает в real_dps.json)
 //   node _check/power_check.js --fit      — по real_dps.json печатает подогнанные таблицы FP (ph/e/m, k у призыва) —
 //                                            для новых видов чар и после правок механик
+//   node _check/power_check.js --pairs    — ещё и реальный урон критических пар редкостей с талантами (_check/pairs_check.js, браузер ~2 мин):
+//                                            с талантами явно перевёрнутых пар не больше, чем без них
 //   ключи: --root=<папка игры> (по умолчанию — родитель _check), --md=<файл отчёта> (таблицы в markdown)
 // Выход: код 1, если правило редкости нарушено или оценка расходится с замером больше допуска.
 const fs = require('fs'), path = require('path'), vm = require('vm');
@@ -199,6 +201,7 @@ if (require.main === module) (async () => {
   }
   if (flag('fit')) { fit(G); return; }
   let bad = nodeChecks(G, out); bad += compare(G, out); bad += checkK(G, out);
+  if (flag('pairs')) { try { const t = require('child_process').execFileSync(process.execPath, [path.join(__dirname, 'pairs_check.js'), '--root=' + ROOT], { timeout: 1500e3 }).toString(); out.push('', '## Реальный урон пар с талантами', '', ...t.trim().split('\n')); } catch (e) { bad++; out.push('', '## Реальный урон пар с талантами — НАРУШЕНИЕ', '', String(e.stdout || e.message).trim()); } }
   const md = opt('md', null); if (md) fs.writeFileSync(md, out.join('\n') + '\n');
   console.log(out.join('\n')); console.log(bad ? `\nИТОГ: есть нарушения (${bad})` : '\nИТОГ: всё в порядке');
   if (bad) process.exitCode = 1;
