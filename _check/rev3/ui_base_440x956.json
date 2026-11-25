@@ -1,0 +1,546 @@
+{
+ "pyro@160a": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "pyro@50a": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "pyro@50f": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "cryo@160a": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "cryo@50a": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "cryo@50f": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "storm@160a": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "storm@50a": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "storm@50f": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "plague@160a": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "plague@50a": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "plague@50f": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "necro@160a": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "necro@50a": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "necro@50f": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "paladin@160a": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "paladin@50a": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "paladin@50f": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "geo@160a": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "geo@50a": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "geo@50f": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "windr@160a": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "windr@50a": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "windr@50f": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "hemo@160a": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "hemo@50a": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "hemo@50f": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "arcan@160a": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "arcan@50a": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "arcan@50f": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "bers@160a": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "bers@50a": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "bers@50f": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "dk@160a": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "dk@50a": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "dk@50f": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "druid@160a": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "druid@50a": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "druid@50f": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "hunter@160a": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "hunter@50a": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "hunter@50f": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "assassin@160a": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "assassin@50a": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "assassin@50f": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "shaman@160a": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "shaman@50a": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "shaman@50f": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "monk@160a": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "monk@50a": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "monk@50f": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "lock@160a": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "lock@50a": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "lock@50f": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "inq@160a": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "inq@50a": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "inq@50f": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "alch@160a": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "alch@50a": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "alch@50f": {
+  "hscroll": false,
+  "cutHints": [],
+  "nHints": 20,
+  "descCut": [],
+  "sheet": null,
+  "hintsCap": 0,
+  "ex": []
+ },
+ "_note": {
+  "txt": "Таланты обновлены: у героя своя ветка особенности, «Свита» теперь только +1 сфера за очко. Очки возвращены бесплатно — раздай заново или нажми «Авто».",
+  "cut": true
+ }
+}

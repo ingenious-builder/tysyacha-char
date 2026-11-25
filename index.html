@@ -887,7 +887,9 @@ html[data-ui=tab] .aptag{font-size:13px}html[data-ui=tab] .aptag.big{font-size:1
 .aph{display:flex;align-items:center;gap:8px;margin:10px 2px 2px;padding:6px 10px;border-radius:10px;font:800 14px/1.2 var(--f-ui);letter-spacing:.03em;border-left:4px solid}
 .aph small{font:500 12px var(--f-ui);color:var(--muted);margin-left:auto}.aph svg{width:18px;height:18px;flex:none}
 .aph.a{color:var(--ca);border-color:var(--ca);background:rgba(255,122,69,.1)}.aph.p{color:var(--cp);border-color:var(--cp);background:rgba(47,212,176,.09)}
-.sh-top .aptag{display:flex;width:max-content;max-width:100%;margin-top:6px}.aph:first-child{margin-top:2px}
+.sh-top .aptag{display:flex;width:max-content;max-width:100%;margin-top:6px}
+/* 25.11: на 360 верх листа (название, значки) вылезал вправо на 14–23 px — колонка сетки росла по max-content плашки apTag */
+.sh-body{grid-template-columns:minmax(0,1fr)}.sh-top>div{min-width:0;flex:1 1 auto}.aph:first-child{margin-top:2px}
 .bd h3.ha{color:var(--ca)}.bd h3.hp{color:var(--cp)}.bd h3 svg{width:18px;height:18px;align-self:center;flex:none}
 /* форма: активная — круглая кнопка, пассивная — ромб */
 .ico.p,.slots.pas .slot{border-radius:9px;rotate:45deg;scale:.8}
@@ -1677,7 +1679,7 @@ const ctN=x=>String(Math.round(x*100)/100).replace('.',','),ctP=x=>ctN(x)+'%';
 const CT_TAL={
  pyro:[
   {id:'py_fuse',name:'Короткий фитиль',sn:'Фитиль',max:2,need:0,ic:'s_ash',wy:'чаще Вспышка',sel:'el:fire',pwf:v=>1+.2*(5/(5-v)-1),
-   f:v=>'Вспышка на '+(5-v)+'-м жаре · откат '+ctN(2-.3*v)+' с',d:v=>'Вспышка срабатывает на '+(5-v)+'-м жаре (было на 5-м) и снова вспыхивает на том же враге через '+ctN(2-.3*v)+' с (было 2 с). Жар, как и прежде, копится до 5.'},
+   f:v=>'Вспышка на '+(5-v)+'-м жаре · откат '+ctN(2-.3*v)+' с',d:v=>'Вспышка — на '+(5-v)+'-м жаре (было на 5-м), снова на том же враге — через '+ctN(2-.3*v)+' с (было 2 с). Жар копится до 5.'},
   {id:'py_blast',name:'Жаркая вспышка',sn:'Сила вспышки',max:5,need:0,ic:'s_supernova',wy:'сильнее Вспышка',pw:.04,sel:'el:fire',
    f:v=>'Вспышка '+ctP(120*(1+.1*v))+' удара',d:v=>'Урон Вспышки +10% за очко: '+ctP(120*(1+.1*v))+' удара (было 120%) и 40% горения.'},
   {id:'py_wide',name:'Широкое пламя',sn:'Радиус',max:3,need:3,ic:'s_pyre',wy:'шире Вспышка',pw:.04,sel:'el:fire',
@@ -1723,9 +1725,9 @@ const CT_TAL={
   {id:'ne_raise',name:'Зов могил',sn:'Зов могил',max:5,need:0,ic:'s_raise',wy:'больше скелетов',pw:.015,
    f:(v,t)=>'шанс скелета '+((t>=4?30:20)+5*v)+'%',d:(v,t)=>'Убитый рядом враг встаёт скелетом с шансом '+((t>=4?30:20)+5*v)+'% (+5% за очко). Если своих существ уже 8 — вместо скелета взрывается труп.'},
   {id:'ne_bone',name:'Крепкие кости',sn:'Кости',max:3,need:0,ic:'s_bonestorm',wy:'сильнее скелеты',pw:.03,
-   f:v=>'скелет '+(8+2*v)+' с · +'+20*v+'%',d:v=>'Скелеты особенности живут '+(8+2*v)+' с (было 8) и бьют на '+20*v+'% сильнее; взрыв трупа — '+(15+3*v)+'% его здоровья (было 15%).'},
-  {id:'ne_lord',name:'Тёмный владыка',sn:'Владыка',max:3,need:3,ic:'s_souls',wy:'урон от слуг',pw:.09,sel:'hero',
-   f:v=>'+'+(5+v)+'% за слугу, до '+(40+20*v)+'%',d:v=>'Каждый слуга рядом усиливает тебя на '+(5+v)+'% (было 5%), предел +'+(40+20*v)+'% (было 40%).'},
+   f:v=>'скелет '+(8+2*v)+' с · +'+20*v+'%',d:v=>'Скелеты особенности живут '+(8+2*v)+' с (было 8) и бьют на '+20*v+'% сильнее; взрыв трупа — '+(15+2*v)+'% его здоровья (было 15%).'},
+  {id:'ne_lord',name:'Тёмный владыка',sn:'Владыка',max:3,need:3,ic:'s_souls',wy:'урон от слуг',pw:.075,sel:'hero',
+   f:v=>'+'+(5+v)+'% за слугу, до '+(40+15*v)+'%',d:v=>'Каждый слуга рядом усиливает тебя на '+(5+v)+'% (было 5%), предел +'+(40+15*v)+'% (было 40%).'},
   {id:'ne_ward',name:'Костяной заслон',sn:'Заслон',max:3,need:5,ic:'ward',wy:'слуги прикрывают',st:{arm:.04},
    f:v=>'−'+v+'% урона за слугу',d:v=>'Каждый твой слуга рядом (до 8) снижает урон по тебе на '+v+'%: до −'+8*v+'%.'},
   {id:'ne_horde',name:'Неупокоенные',sn:'Неупокоенные',max:1,need:8,key:1,ic:'s_gravecall',wy:'армия мёртвых',pwf:v=>1+.05*v,
@@ -1777,8 +1779,8 @@ const CT_TAL={
  arcan:[
   {id:'ar_flow',name:'Поток',sn:'Поток',max:5,need:0,ic:'focus',wy:'быстрее мана',st:{mpReg:.08},
    f:v=>'мана +'+8*v+'%/с',d:v=>'Мана восстанавливается ещё на '+8*v+'% быстрее (с особенностью ×'+ctN(1.5*(1+.08*v))+').'},
-  {id:'ar_mind',name:'Арканная мощь',sn:'Мощь',max:5,need:0,ic:'s_resonator',wy:'урон от маны',pw:.03,
-   f:(v,t)=>'от маны до +'+((t>=4?55:40)+6*v)+'%',d:(v,t)=>'Урон за ману выше: при полной мане +'+((t>=4?55:40)+6*v)+'% (+6% за очко).'},
+  {id:'ar_mind',name:'Арканная мощь',sn:'Мощь',max:5,need:0,ic:'s_resonator',wy:'урон от маны',pw:.04,
+   f:(v,t)=>'от маны до +'+((t>=4?55:40)+8*v)+'%',d:(v,t)=>'Урон за ману выше: при полной мане +'+((t>=4?55:40)+8*v)+'% (+8% за очко).'},
   {id:'ar_tide',name:'Долгий прилив',sn:'Прилив',max:3,need:3,ic:'surge',wy:'чаще прилив',pw:.005,st:{mpReg:.05},
    f:(v,t)=>'прилив '+ctN((t>=2?4:3)+.5*v)+' с / '+(10-v)+' с',d:(v,t)=>'Прилив маны длится '+ctN((t>=2?4:3)+.5*v)+' с и приходит раз в '+(10-v)+' с (было раз в 10).'},
   {id:'ar_bounce',name:'Рикошет',sn:'Рикошет',max:3,need:5,ic:'s_missiles',wy:'сильнее рикошет',sel:'f:bolt,fan,boomer,s_missiles',pw:.06,
@@ -1788,19 +1790,19 @@ const CT_TAL={
  bers:[
   {id:'be_boil',name:'Кипящая кровь',sn:'Кипение',max:5,need:0,ic:'s_roar',wy:'ярость быстрее',pw:.012,
    f:v=>'ярость ×'+ctN(1+.03*v),d:(v,t)=>'Ярость копится на '+3*v+'% быстрее: +'+ctN((t>=4?8:6)*(1+.03*v))+' за удар по тебе, +'+ctN(2*(1+.03*v))+' за свой.'},
-  {id:'be_fury',name:'Бешеная сила',sn:'Бешенство',max:3,need:0,ic:'s_carnage',wy:'сильнее бешенство',pw:.035,
-   f:v=>'бешенство +'+(25+8*v)+'%',d:v=>'В бешенстве урон +'+(25+8*v)+'% (было 25%).'},
+  {id:'be_fury',name:'Бешеная сила',sn:'Бешенство',max:3,need:0,ic:'s_carnage',wy:'сильнее бешенство',pw:.045,
+   f:v=>'бешенство +'+(25+10*v)+'%',d:v=>'В бешенстве урон +'+(25+10*v)+'% (было 25%).'},
   {id:'be_long',name:'Неистовство',sn:'Неистовство',max:3,need:3,ic:'revenge',wy:'сильнее ярость',pw:.08,
    f:v=>'ярость +'+ctN(.5+.1*v)+'% за ед.',d:v=>'Каждая единица ярости даёт +'+ctN(.5+.1*v)+'% урона (было 0,5%): на сотне и в бешенстве +'+Math.round(50+10*v)+'%.'},
   {id:'be_drink',name:'Кровожадность',sn:'Кровожадность',max:3,need:5,ic:'execute',wy:'лечение в бешенстве',st:{leech:.014},
    f:v=>'вампиризм '+(12+4*v)+'%',d:v=>'В бешенстве '+(12+4*v)+'% урона возвращается здоровьем (было 12%).'},
   {id:'be_end',name:'Кровавый вихрь',sn:'Кровавый вихрь',max:1,need:8,key:1,ic:'s_unshaken',wy:'бешенство бьёт толпу',pwf:v=>1+.12*v,
-   f:v=>v?'в бешенстве — по толпе 10%':'нет',d:()=>'В бешенстве каждый твой удар вблизи задевает и всех врагов в 3 м вокруг цели — на 10% своего урона.'}],
+   f:v=>v?'в бешенстве — по толпе 25%':'нет',d:()=>'В бешенстве каждый твой удар вблизи задевает и всех врагов в 3 м вокруг цели — на 25% своего урона.'}],
  dk:[
   {id:'dk_drain',name:'Жажда стали',sn:'Жажда',max:5,need:0,ic:'thrall',wy:'больше вампиризма',st:{leech:.02},
    f:v=>'вампиризм '+(15+2*v)+'%',d:v=>'Нечестивая сталь возвращает здоровьем '+(15+2*v)+'% урона (было 15%).'},
-  {id:'dk_rune',name:'Руническая сила',sn:'Руна',max:5,need:0,ic:'s_desecrate',wy:'сильнее руна',pw:.05,
-   f:v=>'руна ×'+ctN(1.5+.12*v)+' · 3 с +'+8*v+'%',d:v=>'Рунный удар ×'+ctN(1.5+.12*v)+' (было ×1,5) и зажигает руну на клинке: 3 с весь твой урон +'+8*v+'%.'},
+  {id:'dk_rune',name:'Руническая сила',sn:'Руна',max:5,need:0,ic:'s_desecrate',wy:'сильнее руна',pw:.06,
+   f:v=>'руна ×'+ctN(1.5+.12*v)+' · 3 с +'+10*v+'%',d:v=>'Рунный удар ×'+ctN(1.5+.12*v)+' (было ×1,5) и зажигает руну на клинке: 3 с весь твой урон +'+10*v+'%.'},
   {id:'dk_bone',name:'Костяная броня',sn:'Броня',max:3,need:3,ic:'shell',wy:'больше щит',st:{healF:.003},
    f:(v,t)=>'щит до '+((t>=2?40:30)+5*v)+'%',d:(v,t)=>'Щит из лишнего лечения — до '+((t>=2?40:30)+5*v)+'% здоровья и тает медленнее: '+ctN(3-.5*v)+'% в секунду.'},
   {id:'dk_frost',name:'Ледяная руна',sn:'Ледяная руна',max:3,need:5,ic:'s_icearmor',wy:'руна по толпе',pw:.02,
@@ -2106,10 +2108,11 @@ const fpM=sk=>{const t=(FP[sk.F.id]||{}).m;return t&&t[sk.m]!=null?t[sk.m]:FP_M0
 const EU={fire:1,ice:1.06,storm:1.03,poison:1,shadow:1.05,light:1.06,earth:1.02,wind:1.02,blood:.94,arcane:1.04};
 const SHIELD_V=.7,HEAL_V=.5,CLONE_FR=.5;   // 1 ед. щита = 0,7 урона; 1 ед. лечения = 0,5 (часть уходит впустую); клон повторяет чары с 50%
 // ===== A: сила, категории и значки новых форм (FP, AREAF, ICON, наборы талантов) =====
+// 25.11 (вторая проверка v13.29): метка переподогнана по замеру power_check --real (тройка, спешка, эхо били на 25–35% меньше оценки)
 {const R2=(r)=>Math.min(r,2),MK=sk=>(sk.M.cd?1.4:1),XR=(intr,L)=>cloneRef(true,intr?L:(S&&S.lvl||1));   // XR — урон стандартного билда класса в секунду
 Object.assign(FP,{
  boomer:{ph:5.05,cat:'atk',e:[1.33,.91,1.03,1.73,.91,.91,1.02,1,1.14,.91],m:[1.02,.98,3.14,1.32,1,1.45,1,2.07]},vortex:{ph:41.21,u:1.1,cat:'ctl',e:[1.01,.92,.92,1.12,.92,.92,1.05,1,1.15,.92],m:[1,1.05,2.74,1.22,1,1.5,1,2.06]},decoy:{ph:2.56,u:1.2,cat:'def',e:[1.28,.78,.89,1.5,.78,.78,.79,1,.97,.78],m:[1,1.18,3.24,1.57,1,1.29,1,2.49]},glyph:{ph:1.9,cat:'ctl',e:[1.05,1.01,1,1.05,1,1,1.12,1,1.26,1],m:[.97,1.32,1.36,1,1,1.6,1,.3]},beacon:{ph:11.75,cat:'area',e:[1.56,1.02,1.19,1.95,1,1,1.1,1,1.25,1],m:[1,1.01,3.31,1,1,1.5,1,2.01]},
- rush:{ph:5.69,u:1.15,cat:'mov',e:[1.14,.87,.92,1.37,.87,.87,.95,1,1.08,.87],m:[1.17,1.05,2.83,1.37,1,1.43,1,1.98]},totem:{ph:15.52,cat:'sum',e:[1.46,1.24,1.39,2.95,1.58,1,1.14,1,1.02,1.29],m:[.99,1.4,5.34,1,1,1.42,1,1.8]},wall:{ph:16.26,u:1.15,cat:'ctl',e:[1.13,1,1.02,1.23,1,1,1.13,1,1.25,1],m:[.99,1.16,2.42,1.11,1,1.6,1,1.78]},stasis:{ph:35.77,u:1.2,cat:'ctl',e:[1.03,.91,.93,1.1,.91,.91,1.02,1,1.16,.91],m:[.99,.92,3.97,1.19,1,1.55,1,2.39]},mark:{ph:3.26,cat:'atk',e:[1.32,.85,.85,1.64,.85,.85,.88,1,1.07,.85],m:[1,1.55,4.25,1.42,1,1.31,1,2.46]},
+ rush:{ph:5.69,u:1.15,cat:'mov',e:[1.14,.87,.92,1.37,.87,.87,.95,1,1.08,.87],m:[1.17,1.05,2.83,1.37,1,1.43,1,1.98]},totem:{ph:15.52,cat:'sum',e:[1.46,1.24,1.39,2.95,1.58,1,1.14,1,1.02,1.29],m:[.99,1.4,5.34,1,1,1.42,1,1.8]},wall:{ph:16.26,u:1.15,cat:'ctl',e:[1.13,1,1.02,1.23,1,1,1.13,1,1.25,1],m:[.99,1.16,2.42,1.11,1,1.6,1,1.78]},stasis:{ph:35.77,u:1.2,cat:'ctl',e:[1.03,.91,.93,1.1,.91,.91,1.02,1,1.16,.91],m:[.99,.92,3.97,1.19,1,1.55,1,2.39]},mark:{ph:3.27,cat:'atk',e:[1.3,.85,.85,1.53,.85,.85,.88,1,1.07,.85],m:[1,1.17,3.14,1.42,1,1.31,1,2.11]},
  quake:{ph:3.63,cat:'area',e:[1.31,.92,1,1.73,.92,.92,1.03,1,1.16,.92],m:[1.22,1.27,2.93,1.3,1,1.38,1,2.04]},leap:{ph:1.59,u:1.15,cat:'mov',e:[1.21,.73,.86,1.46,.73,.73,.74,1,.91,.73],m:[1,.62,2.4,1.93,1,1.25,1,2.8]},hook:{ph:1,u:1.2,cat:'ctl',e:[2.24,1,1.33,3,1,1,1.02,1,1.25,1],m:[1,.98,2.95,1,1,1.36,1,1.96]},fan:{ph:4.67,cat:'atk',e:[1.33,1.3,1.68,1.59,1.08,1.09,1.26,1,1.37,1.47],m:[1.08,.9,3.12,.95,1,1.43,1,2]},
  mirror:{ph:0,x:(sk,d,intr,hp,k)=>(hp*.1*k+d*2)*.7+d*2,cat:'def'},
  // пассивки (5А.5): урон срабатывания × частота; защитные — сбережённое здоровье в единицах урона
@@ -2256,6 +2259,12 @@ const CLONE_F=new Set(['bolt','nova','meteor','chain','beam','rain','trap']);
 // новые формы (A): пока у вида нет таблиц замера (ph), урон оценивают формулы A (pv — пассивки); польза без урона — x(sk,урон,intr,здоровье):
 // у активной — за каст, у пассивной — в секунду. Повод «каждый N-й каст» — частота кастов героя (во внутренней силе — 1 каст/с).
 const CASTP=new Set(['surge','twin','s_resonator','s_ancestors','s_darkdeal','s_threads','s_souls','s_instinct','trophy']);
+// CDR_G (25.11, после проверки v13.29): урон активной чары растёт от «Перегрева» как (частота кастов)^g, а не линейно. Замер — стенд
+// реального урона (_check/rev4/tform_task.js, 160-й, 6 потоков, все 20 классов): у прочих видов g ≈ 1 (±0,3 — шум стенда).
+// Руна — луч между двумя рунами живёт, пока руны перекрываются (10 с жизни против 7 с перезарядки): ×1,8 от −20% перезарядки
+// вместо ×1,25; у стены похоже (×1,45); у дождя, метеора, вихря, толчка — ×1,3–1,4 (урон по площади с тиками); прыжок и метка от частых
+// кастов урона на стенде почти не прибавляют. Взяты виды с отклонением g от 1 не меньше 0,25 (меньше — в шуме стенда).
+const CDR_G={glyph:2.6,wall:1.65,leap:0,mark:.2,meteor:1.35,quake:1.25,rain:1.45,vortex:1.4,s_phoenix:1.8,s_bloodlet:1.7,s_hellgate:1.35,s_stormtotem:1.35,s_zero:1.35,s_boulder:.5,s_pyre:.6,s_tomb:.7,s_ancestors:0};
 function skParts(sk,intr,L){L=L||1;
   const F=sk.F,f=F.id,M=sk.M,fp=FP[f]||{},dmg=intr?F.power*(M.dmg||1)*(sk.E.dmg||1)*lvlS(L):skDmg(sk),k=intr?1:skK(sk),hp=intr?(120+24*(L-1))*CLS.hp:P.maxHp;
   let dps=0,ext=0,u=(fp.u||1)*(EU[sk.E.id]||1)*(M.stun?1.06:1)*(M.leech?1.08:1);
@@ -2265,6 +2274,8 @@ function skParts(sk,intr,L){L=L||1;
       else if(kn==='clone')ext=CLONE_FR*k*Math.min(1,inf.life*(M.echo?1.8:1)/cy)*cloneRef(intr,L);
       else{dps=dmg*((fp.k&&fp.k[kn])||30)*summE(sk,kn)*fpM(sk)*inf.n/(inf.D.n||1)/cy;if(inf.D.tau||kn==='totem_slow')u*=1.1;}}
     else{if(fp.ph!==0)dps=dmg*(fp.ph||1)*fpE(sk)*fpM(sk)/cy;
+      // «Перегрев» (перезарядка талантом): у части видов урон растёт не как частота кастов (CDR_G — показатель, замер ниже)
+      if(!intr&&ST.cdr<1&&dps>0){const g=CDR_G[f];if(g!=null){const kc=ST.cdr;ST.cdr=1;let c0;try{c0=skCycle(sk,false,L);}finally{ST.cdr=kc;}if(c0>cy)dps*=Math.pow(c0/cy,g-1);}}
       if(f==='barrier')ext=(hp*.15*(M.dmg||1)*k+dmg*1.6)*(M.count||1)*(M.echo?2:1)*SHIELD_V/Math.max(cy,6);
       if(fp.x)ext+=fp.x(sk,dmg,intr,hp,k,L)/cy;}}
   else{let r=1;   // повод пассивки у героя: число сфер, частота кастов
@@ -2338,24 +2349,33 @@ function rarK(sk){const I=rarInfo(),L=S&&S.lvl||1;if(I.L!==L){I.L=L;I.KL=new Flo
 // slotBoost (A): пока слотов мало, каждая чара сильнее — общий множитель уровня, ступени редкости не трогает;
 // talQ — потолок талантов (ниже): таланты не переворачивают редкости
 const skK=sk=>rarK(sk)*rkMul(sk.id)*slotBoost()*talQ(sk);
-// ---- ПОТОЛОК ТАЛАНТОВ (25.11, после проверки v13.29) ----
+// ---- ПОТОЛОК ТАЛАНТОВ (25.11, после проверки v13.29; переделан после второй проверки) ----
 // Таланты своего вида (Ярость, Каскад, Духи, Свита), ветка класса (стихия и виды особенности — ctTalPw) и даже общие (перезарядка,
 // мана, здоровье у щитов) усиливают одни чары героя сильнее других: до ×2–3,7 между самой усиленной и самой неусиленной. Шаг редкости —
-// ×1,6, разброс внутри ступени — ×1,08: эпическая чара «своего вида» обгоняла легендарную того же ранга.
-// Потолок: t — множитель талантов чары (сила с талантами / без них в стандартном бою: 1 каст/с, мана и здоровье по уровню, без
-// особенности класса). t зажимается в окно [W; W×TAL_CAP]; W выбрано так, что средний (геометрический) t по пулу класса не меняется:
-// срезанное у самых усиленных чар достаётся самым неусиленным, общий прирост силы от талантов остаётся тем же. Итог: таланты меняют силу
-// двух чар одного героя друг против друга не больше чем в TAL_CAP раз (1,45 < 1,6/1,08), поэтому чара следующей редкости того же ранга
-// всегда сильнее, а «Невозможная» (×1,7) — сильнее легендарной. Поправка q = t'/t входит в skK — в настоящий урон, щиты, лечение и
-// призывы, а не только в цифру книги. Пока очков в талантах нет, q = 1.
-const TAL_CAP=1.45;
-const TQ={raw:0,sig:'',key:null,L:0,cls:null,W:null,lc:Math.log(TAL_CAP),t:new Map(),q:new Map(),p0:new Map(),p0k:'',smc:null,smp:null};
+// ×1,6, разброс внутри ступени — ×1,08, 5-й ранг — ×1,44: без потолка эпическая чара «своего вида» обгоняла легендарную.
+// t — множитель талантов чары (сила с талантами / без них в стандартном бою: 1 каст/с, мана и здоровье по уровню, без особенности
+// класса). Потолок односторонний, по ступеням редкости (активные и пассивные — отдельно): t' чары не больше TAL_CAP × наименьшего t'
+// среди чар пула класса ВЫШЕ её редкости (сверху вниз: легендарные режут эпические, те — редкие...). Внутри одной редкости таланты
+// разводят чары как угодно, высшую редкость не режет никто. Итог: сила = база редкости × ранг × t', база следующей редкости ≥ ×1,48
+// (1,6/1,08), а таланты дают низшей не больше, чем слабее всех усиленной высшей, — поэтому чара следующей редкости сильнее и на 5-м ранге
+// (1,44 × 1,0 < 1,48), и с любыми талантами; «Невозможная» (×1,7) — сильнее легендарной. Поправка q = t'/t ≤ 1 входит в skK — в
+// настоящий урон, щиты, лечение и призывы, а не только в цифру книги. Пока очков в талантах нет, q = 1.
+// Подтяжка: чары, которым таланты почти ничего не дают (польза-копия: клон, «Разлом», «Пандемия»; метка, которой «Перегрев» не
+// помогает), тянули бы пределы вниз для всех низших редкостей — «Перегрев» и «Сила стихий» пропадали бы зря (пул терял ×0,8). Поэтому
+// t чары не ниже «обычного» прироста группы G (нижняя четверть t пула, TAL_LIFT): u = max(t, G), предел и поправка считаются от u.
+// Прежний потолок (симметричное окно ×1,45 вокруг среднего) держал порядок только на одном ранге и оставлял от шага редкости запас
+// ×1,02 — в реальном уроне (оценка против боя ±10–15%) пары переворачивались (_check/rev2, _check/rev4).
+const TAL_CAP=1;
+const TAL_LIFT=.25;   // доля пула: «обычный» прирост от талантов — нижняя четверть t группы; ниже него чару подтягивает
+const TQ={raw:0,sig:'',key:null,L:0,cls:null,cut:null,G:null,c:TAL_CAP,lift:TAL_LIFT,fast:0,t:new Map(),q:new Map(),p0:new Map(),p0k:'',smc:null,smp:null};
 // подпись вложенных очков (её пишет computeStats; с мастерством — оно меняет здоровье щитов): по ней живёт кэш поправок
 function talSig(){if(!S||!S.talents||!CLS)return '';let s='';for(const t of TALS()){const v=S.talents[t.id]|0;if(v)s+=t.id+v+',';}return s&&s+'m'+mastB();}
 // стандартный бой для t: 1 каст/с, клон — по стандартному билду, без особенности класса (скидки маны), мана и здоровье — по уровню и талантам
-function tqEnv(fn){const kp=[P.mpRegen,P.maxHp],kc=CR_OVR,kl=CLONE_OVR,ct=typeof CT_ON!=='undefined'?CT_ON:null;
-  TQ.raw++;CR_OVR=1;CLONE_OVR=true;if(ct!==null)CT_ON=0;
-  try{return fn();}finally{TQ.raw--;P.mpRegen=kp[0];P.maxHp=kp[1];CR_OVR=kc;CLONE_OVR=kl;if(ct!==null)CT_ON=ct;}}
+// «Невозможность» на t не влияет (t — отношение), но кэш t общий: считаем всегда с IMP_OFF=false — иначе первый вызов из impBasePwr
+// записал бы p0 без ×1,7, и у других невозможных чар t (а с ним урон) резался бы до следующего сброса кэша
+function tqEnv(fn){const kp=[P.mpRegen,P.maxHp],kc=CR_OVR,kl=CLONE_OVR,ct=typeof CT_ON!=='undefined'?CT_ON:null,ki=typeof IMP_OFF!=='undefined'?IMP_OFF:null;
+  TQ.raw++;CR_OVR=1;CLONE_OVR=true;if(ct!==null)CT_ON=0;if(ki!==null)IMP_OFF=false;
+  try{return fn();}finally{TQ.raw--;P.mpRegen=kp[0];P.maxHp=kp[1];CR_OVR=kc;CLONE_OVR=kl;if(ct!==null)CT_ON=ct;if(ki!==null)IMP_OFF=ki;}}
 function tqPset(){const L=S.lvl;P.mpRegen=(8+.4*(L-1))*ST.mana*CLS.mp;P.maxHp=(120+24*(L-1))*ST.hpMul*CLS.hp;}
 // числа героя заново из талантов tal (по умолчанию — нынешних), без временных надбавок к ST (у «Разлома» урон ×1,4 на время каста,
 // стенды выключают крит), в стандартном бою; потом ST и подпись возвращаются ровно как были
@@ -2369,23 +2389,33 @@ function tqP0(ids){const k=CLS.id+'|'+S.lvl+'|'+mastB();if(TQ.p0k!==k){TQ.p0k=k;
 function tqT(ids){const need=ids.filter(id=>!TQ.t.has(id));
   if(need.length){tqP0(need);tqClean(()=>{for(const id of need){const a=skParts(SKILLS[id],false).pw/rkMul(id),b=TQ.p0.get(id);TQ.t.set(id,a>0&&b>0?a/b:1);}});}
   return ids.map(id=>TQ.t.get(id));}
-// окно [W; W+ln TAL_CAP] по пулу класса: средний ln t пула не меняется (поиск делением пополам). Для скорости «Авто» (сотни
-// перебора раскладок) среднее берётся по каждой 3-й чаре пула (шаг 3 взаимно прост с 8 вариантами чары) — потолок от этого не зависит:
-// его держит зажим каждой чары, выборка сдвигает только общий уровень (на доли процента).
-function tqWin(){if(TQ.smc!==CLS){TQ.smc=CLS;TQ.smp=[...CLS.pool].filter((_,i)=>i%3===0);}const x=tqT(TQ.smp).map(Math.log),n=x.length,lc=TQ.lc;let lo=Infinity,hi=-Infinity,m=0;
-  for(const v of x){if(v<lo)lo=v;if(v>hi)hi=v;m+=v;}if(!n){TQ.W=-lc/2;return;}m/=n;
-  if(hi-lo<=lc){TQ.W=(lo+hi-lc)/2;return;}   // разброс и так в пределах — окно с запасом в обе стороны
-  let a=lo-lc,b=hi;for(let k=0;k<50;k++){const w=(a+b)/2;let s=0;for(const v of x)s+=v<w?w:v>w+lc?w+lc:v;if(s/n<m)a=w;else b=w;}TQ.W=(a+b)/2;}
+// пределы t' по ступеням: cut[группа][ступень] = TAL_CAP × наименьший t' чар выше этой ступени (Infinity — выше нет никого).
+// Весь пул класса (264 чары); пока «Авто» перебирает раскладки (TQ.fast) — каждая 3-я чара: пределы чуть шире, итоговая раскладка
+// считается заново по всему пулу (ключ кэша — с режимом).
+// ступень для потолка — всегда с «Невозможными» (IMP_OFF=false): иначе вызов из impBasePwr записал бы в кэш пределы без них
+function tqRar(sk){const k=typeof IMP_OFF!=='undefined'&&IMP_OFF;if(k)IMP_OFF=false;try{return Math.min(4,rarOf(sk));}finally{if(k)IMP_OFF=true;}}
+function tqCut(){let ids;if(TQ.fast){if(TQ.smc!==CLS){TQ.smc=CLS;TQ.smp=[...CLS.pool].filter((_,i)=>i%3===0);}ids=TQ.smp;}else ids=[...CLS.pool];
+  const t=tqT(ids),mn=[[1/0,1/0,1/0,1/0,1/0],[1/0,1/0,1/0,1/0,1/0]],tg=[[],[]];for(let i=0;i<ids.length;i++)tg[SKILLS[ids[i]].active?0:1].push(t[i]);
+  const G=TQ.G=tg.map(a=>{if(!a.length||!(TQ.lift>=0))return 0;a.sort((x,y)=>x-y);return a[Math.min(a.length-1,Math.floor(a.length*TQ.lift))];});
+  const mxL=TQ.mxL=[0,0];
+  for(let i=0;i<ids.length;i++){const sk=SKILLS[ids[i]],g=sk.active?0:1,r=tqRar(sk),u=Math.max(t[i],G[g]);if(u<mn[g][r])mn[g][r]=u;if(r===3&&u>mxL[g])mxL[g]=u;}
+  // «Невозможная» (ступень 4) легендарные не режет — иначе выпавшая невозможная ослабляла бы легендарные чары «своего вида»;
+  // вместо этого она сама получает от талантов не меньше лучшей легендарной пула (mxL): ×1,7 над легендарной держится и с талантами
+  const cut=[[],[]];for(let g=0;g<2;g++){let m=1/0;cut[g][4]=1/0;for(let r=3;r>=0;r--){cut[g][r]=TQ.c*m;const tm=Math.min(mn[g][r],cut[g][r]);if(tm<m)m=tm;}}
+  TQ.cut=cut;}
 function talQ(sk){if(TQ.raw||!TQ.sig||!S||!CLS)return 1;
-  if(TQ.key!==TQ.sig||TQ.L!==S.lvl||TQ.cls!==CLS){TQ.key=TQ.sig;TQ.L=S.lvl;TQ.cls=CLS;TQ.W=null;TQ.t.clear();TQ.q.clear();}
+  const key=TQ.sig+(TQ.fast?'|f':'')+'|'+TQ.c+'|'+TQ.lift;
+  if(TQ.key!==key||TQ.L!==S.lvl||TQ.cls!==CLS){TQ.key=key;TQ.L=S.lvl;TQ.cls=CLS;TQ.cut=null;TQ.t.clear();TQ.q.clear();}
   let v=TQ.q.get(sk.id);if(v!==undefined)return v;
-  if(TQ.W===null)tqWin();
-  const x=Math.log(tqT([sk.id])[0]),W=TQ.W;v=Math.exp((x<W?W:x>W+TQ.lc?W+TQ.lc:x)-x);TQ.q.set(sk.id,v);return v;}
+  if(TQ.cut===null)tqCut();
+  const g=sk.active?0:1,t=tqT([sk.id])[0],r=tqRar(sk),c=TQ.cut[g][r];v=Math.min(Math.max(t,TQ.G[g],r===4?TQ.mxL[g]:0),c)/t;TQ.q.set(sk.id,v);return v;}
 // разбивка силы для листа чары и книги: база × ранг × уровень × таланты × резонанс × реакции
 function powerBreak(sk){const I=rarInfo();rarK(sk);const base=I.B[sk.id],rm=rkMul(sk.id),cur=skParts(sk,false).pw;
   const kt=S.talents;let lv=cur;S.talents={};computeStats();try{lv=skParts(sk,false).pw;}finally{S.talents=kt;computeStats();}
   const re=resoMul(sk),rv=reactVal(sk.e,RESO_N),n=RESO_N[sk.e]+(EQUIPPED.has(sk.id)?0:1),im=isImp(sk.id)?(sk.active?IMP.dmg/IMP.cd:IMP.dmg):1,sb=slotBoost();
-  return {r:rarOf(sk),base,rank:rm,imp:im,slot:sb,lvl:lv/(base*rm*im*sb),tal:cur/lv,cap:talQ(sk),reso:re,react:rv,total:cur*re*rv,same:n};}
+  // особенность класса (ctAff: основная стихия и формы героя) — тот же множитель, что в «Силе» строки характеристик (pwr → skPower)
+  const af=typeof ctAff==='function'?ctAff(sk):1;
+  return {r:rarOf(sk),base,rank:rm,imp:im,slot:sb,lvl:lv/(base*rm*im*sb),tal:cur/lv,cap:talQ(sk),aff:af,reso:re,react:rv,total:cur*re*rv*af,same:n};}
 const slotNm=(act,i)=>(act?'слоте ':'пассивном слоте ')+(i+1);
 function weakest(act,oc){const key=(act?'a':'p')+(oc||'');if(WKC&&WKC[key]!==undefined)return WKC[key];if(!WKC)WKC={};
   const arr=act?S.active:S.passive,n=act?activeSlots():passiveSlots();let b=null,bp=1e18;
@@ -3758,7 +3788,7 @@ function applyStatus(en,el,dmg){if(cfStatus(en,el,dmg))return;switch(ELEMENTS[el
   case 'light':if(!FROMG_)heal(dmg*.08);en.blindT=3;break;
   case 'earth':en.shredT=4;break;
   case 'arcane':if(!FROMG_)P.mp=Math.min(P.maxMp,P.mp+2);break;}}
-let FROMG_=false;
+let FROMG_=false,FLBG_=0;   // FLBG_ — сила поджога Вспышки Пироманта-гостя (h.fb): хост поджигает ей, как своей
 function dealDamage(en,base,el,o){
   if(en.dead)return;
   if(en.remote)return mpGuestHit(en,base,el,o);
@@ -3767,14 +3797,16 @@ function dealDamage(en,base,el,o){
   let dmg=base,crit=false,R=null;
   const pid=o.fromG?1:0,rcK=o.fromG?(o.rc||1):ST.react;
   if(!o.dot){
-    if(o.pre){crit=!!o.crit;}else{if(el>=0)dmg*=RESO[el];
+    if(o.pre||o.raw){crit=!!o.crit;}else{if(el>=0)dmg*=RESO[el];
     if(Math.random()<ST.crit+cfCritAdd(en,el,o)){dmg*=2*cfCritMul(en,el,o);crit=true;}}
     if(el>=0&&!o.noReact){let own=-1;for(const k in en.marks){const mi=+k;if(mi===el)continue;const r=REACT[rkey(el,mi)];if(r){R=r;own=en.mkOwn&&en.mkOwn[k]!=null?en.mkOwn[k]:-1;delete en.marks[k];break;}}if(!R){en.marks[el]=4;(en.mkOwn||(en.mkOwn={}))[el]=pid;}
       else if(MPH&&MP.peer&&own>=0&&own!==pid)dmg*=mpCross(en,R);}
     if(R){dmg*=R.mul;if(R.type==='mult')dmg*=1+(R.k-1)*rcK;else if(R.type==='freeze'){freezeEn(en,R.k);dmg*=1.3;}else if(R.type==='mana'){if(!o.fromG)P.mp=Math.min(P.maxMp,P.mp+R.k);}if(R.stun)stunEn(en,R.stun);}
   }
   if(en.shredT>0)dmg*=1.15;
-  dmg*=cfDmgOut(en,el,o,dmg)*nfDmgOut(en,el,o,dmg);
+  // o.raw — брызги, посчитанные от уже нанесённого урона («Кровавый вихрь», «Ледяная руна»): резонанс, крит и множители героя
+  // (особенность класса, ctKd, пассивки) в нём уже есть — второй раз не идут
+  if(!o.raw)dmg*=cfDmgOut(en,el,o,dmg)*nfDmgOut(en,el,o,dmg);
   if(en.t.block&&!o.dot){const f=o.knockFrom||P.pos,bx=f.x-en.pos.x,bz=f.z-en.pos.z,bl=Math.hypot(bx,bz)||1;if((bx*Math.sin(en.face)+bz*Math.cos(en.face))/bl>.35){dmg*=.25;if(!en.blk||time-en.blk>.5){en.blk=time;float({x:en.pos.x,y:en.hy-1.2,z:en.pos.z},'Блок','#cfd8e8',13);}}}
   if(en.affix.has('armor'))dmg*=.6;
   dmg=Math.max(1,Math.round(dmg));
@@ -3789,7 +3821,7 @@ function dealDamage(en,base,el,o){
       else if(R.type==='heal'){if(!o.fromG)heal(dmg*R.k);}
       else if(R.type==='freeze')elBurst(EL.ice,en.pos.x,1,en.pos.z,14);
       shake=Math.max(shake,.12);}
-    if(el>=0){FROMG_=!!o.fromG;applyStatus(en,el,dmg);FROMG_=false;}
+    if(el>=0){FROMG_=!!o.fromG;FLBG_=FROMG_&&o.fb||0;applyStatus(en,el,dmg);FROMG_=false;FLBG_=0;}
     const lch=(M&&M.leech||0)+ST.leech;if(lch>0&&!o.fromG)heal(dmg*lch);
     const kn=(el===EL.earth?2.5:0)+(el===EL.wind?1.8:0)+(o.basic?.6:0);
     if(kn>0&&!o.noKnock){const from=o.knockFrom||P.pos;v1.set(en.pos.x-from.x,0,en.pos.z-from.z);if(v1.lengthSq()<1e-4)v1.set(rand(-1,1),0,rand(-1,1));v1.normalize();if(o.pull)v1.negate();en.kb.addScaledVector(v1,kn*4/en.mass);}
@@ -6028,17 +6060,21 @@ function talHint(id){const h=$('#tpHint');let t=TAL_BY[id||tpSel];if(t&&t.b===3&
   const v=T(t.id),m=talNeed(t)-branchPts(t.b),cl=t.b===3;
   if(cl&&!TAL_LOW.matches){let s=`<b>${t.name} ${v}/${t.max}</b>${t.key?' · ключевой':''}`;
     if(talLocked(t))s+=` · <em>замок: вложи в ветку ещё ${m}</em>`;else if(v>=t.max)s+=' · '+talS(t,v)+' · <em>максимум</em>';
-    else s+=' · '+(v?'сейчас '+talS(t,v)+' → '+talNx(talS(t,v),talS(t,v+1)):'с первым очком: '+talS(t,1))+(tpFree()?'':' · нет свободных очков');
-    if(talCapped(t))s+=' · '+talCapD();h.innerHTML=s;return;}
+    else s+=' · '+(v?'сейчас '+talS(t,v)+' → '+talNx(talS(t,v),talS(t,v+1)):'с первым очком: '+talS(t,1))+(tpFree()?'':' · очков нет');
+    h.innerHTML=talCapAdd(s,t);return;}
   let s=`<b>${t.name} ${v}/${t.max}</b>${t.key?' · ключевой':''}: `+(cl?talD(t,Math.max(1,v)):v?t.d(v):'за очко '+t.d(1));
   if(talLocked(t))s+=` · <em>замок: вложи в ветку ещё ${m}</em>`;
   else if(v>=t.max)s+=' · <em>максимум</em>';
-  else{if(!cl)s+=' · '+(v?'сейчас '+talS(t,v)+' → ':'со следующим очком: ')+talS(t,v+1);if(!tpFree())s+=' · нет свободных очков';}
-  if(talCapped(t))s+=' · '+talCapD();h.innerHTML=s;}
-// таланты, что усиливают одни чары сильнее других: им — оговорка о потолке талантов (talQ; подробно — в разбивке силы чары)
+  // при 0 очков «за очко …» уже говорит, что даст следующее — «со следующим очком» не повторяем (на 360–390 подсказка обрезалась)
+  else{if(!cl&&v)s+=' · сейчас '+talS(t,v)+' → '+talS(t,v+1);if(!tpFree())s+=' · очков нет';}
+  h.innerHTML=talCapAdd(s,t);}
+// таланты, что усиливают одни чары сильнее других (свой вид; в ветке класса — часть чар: стихия, формы, pwk): им — оговорка о потолке
+// талантов (talQ; подробно — в разбивке силы чары). Таланты на все чары героя (sel 'hero' или без sel) под потолок не попадают.
 const TAL_KIND=new Set(['wrath','cascade','summ','orbit']);
-const talCapped=t=>TAL_KIND.has(t.id)||t.b===3&&!!(t.sel||t.pw||t.pwf||t.pwk);
-const talCapD=()=>'<em>потолок ×'+fmt2(TAL_CAP)+' к другим чарам</em>';   // строка подсказки — в 2 строки: коротко, полностью — в листе чары
+const talCapped=t=>TAL_KIND.has(t.id)||t.b===3&&(!!t.pwk||!!t.sel&&t.sel!=='hero');
+// подсказка — 2 строки (на iPhone 360 влезает ~85–90 знаков): короткое «· потолок редкости» — только если влезает; полностью — в листе чары
+const TAL_HINT_MAX=80;
+function talCapAdd(s,t){if(!talCapped(t))return s;const n=s.replace(/<[^>]+>/g,'').length;return n+19<=TAL_HINT_MAX?s+' · <em>потолок редкости</em>':s;}
 let tpGlow=new Set(),tpGlowT=0;
 function talGlow(ids){tpGlow=new Set(ids);clearTimeout(tpGlowT);tpGlowT=setTimeout(()=>{tpGlow.clear();$('#branches').querySelectorAll('.tn.ag').forEach(x=>x.classList.remove('ag'));},1600);}
 function talMark(){$('#branches').querySelectorAll('.tn').forEach(x=>x.classList.toggle('sel',x.dataset.t===tpSel));}
@@ -6140,6 +6176,8 @@ function talSmart(n,foe){if(n==null)n=tpFree();const R=talRole(),F=talFoe(foe||t
       base=talVec(F,R);n--;}}
   finally{computeStats();}
   return log;}
+// «Авто» перебирает сотни раскладок: пока он думает, потолок талантов считает пределы по каждой 3-й чаре пула (TQ.fast)
+{const f0=talSmart;talSmart=function(){TQ.fast++;try{return f0.apply(this,arguments);}finally{TQ.fast--;}};}
 const talWhyTxt=e=>{if(e.why==='class'){const t=TAL_BY[e.id];return t&&t.wy?t.wy:'особенность класса';}if(e.why==='open')return 'открыть «'+(TAL_BY[e.via].sn||TAL_BY[e.via].name)+'»';if(e.why==='reserve')return 'про запас';
   const nw=(TAL_WHY[e.id]&&TAL_WHY[e.id][e.why])||(TAL_NEEDS.find(nd=>nd.id===e.why)||{why:e.why}).why,t=TAL_BY[e.id];return t&&t.wy?nw+' → '+t.wy:nw;};
 // строка итога: ветка класса одной частью («ветка «Пожар» +14 (сильнее Вспышка)»), дальше общие — больше очков вперёд
@@ -6187,14 +6225,16 @@ function reactName(e,c){let best=null,bw=0;for(let e2=0;e2<10;e2++){if(e2===e||!
   const w=R.type==='mult'?(R.k-1)*.16:R.type==='aoe'?R.k*.07:R.type==='freeze'?R.k*.06:R.type==='heal'?R.k*.2:.03;if(w>bw){bw=w;best={R,e2};}}return best;}
 function pwBreakHtml(sk){const b=powerBreak(sk),x=(v,t,c)=>`<span${c?' class="'+c+'"':''}>×${fmt2(v)}<i>${t}</i></span>`,on=v=>Math.abs(v-1)>.005;
   const rn=reactName(sk.e,RESO_N),parts=[`<span class="bd">${Math.round(b.base)}<i>${RARITY[Math.min(b.r,3)].n.toLowerCase()}</i></span>`,x(b.rank,'ранг '+rk(sk.id))];if(on(b.imp))parts.push(x(b.imp,'невозможная'));
-  if(on(b.lvl))parts.push(x(b.lvl,'уровень '+S.lvl));if(on(b.slot))parts.push(x(b.slot,'мало слотов'));if(on(b.tal))parts.push(x(b.tal,'таланты'));
-  if(on(b.reso))parts.push(x(b.reso,'резонанс','bl'));if(on(b.react))parts.push(x(b.react,'реакция','bl'));
-  const tn=!on(b.cap)?'':b.cap<1?' В «таланты» входит потолок ×'+fmt2(b.cap)+': эту чару таланты усиливают сильнее других чар героя, а разница между чарами от талантов — не больше ×'+fmt2(TAL_CAP)+', излишек уходит слабее усиленным.':
-    ' В «таланты» входит +'+pct(b.cap-1)+'% от потолка: эту чару таланты усиливают слабее других, ей досталась часть их излишка.';
+  if(on(b.lvl)&&b.lvl>0)parts.push(x(b.lvl,'уровень '+S.lvl));if(on(b.slot))parts.push(x(b.slot,'мало слотов'));if(on(b.tal))parts.push(x(b.tal,'таланты'));
+  if(on(b.aff))parts.push(x(b.aff,'особенность'));if(on(b.reso))parts.push(x(b.reso,'резонанс','bl'));if(on(b.react))parts.push(x(b.react,'реакция','bl'));
+  const tn=!on(b.cap)||!(b.total>0)?'':b.cap<1?' В «таланты» входит потолок ×'+fmt2(b.cap)+': таланты поднимают чару не выше, чем самую слабо усиленную чару редкостью выше, — так редкость остаётся силой.':
+    ' В «таланты» входит +'+pct(b.cap-1)+'%: таланты усиливают эту чару слабее обычного — ей добавлен обычный прирост.';
+  // сила 0 у копий (клон, «Разлом», «Философский камень»): в билде нет чар, которые они повторяют (CLONE_F)
+  const z0=!(b.total>0)&&(sk.F.id==='s_rift'||sk.F.id==='s_philstone'||sk.F.id==='summon'&&CLS&&summInfo(sk,CLS.id).k==='clone')?' Сила 0: в билде нет чар, которые она повторяет (снаряд, кольцо, метеор, цепь, луч, дождь, ловушка).':'';
   const notes=[];if(on(b.reso))notes.push('+'+Math.round((b.reso-1)*100)+'% от резонанса '+GENE[sk.E.id]+': '+plCh(b.same)+' '+GENE[sk.E.id]+' в билде вместе с этой');
   if(on(b.react)&&rn)notes.push('+'+Math.round((b.react-1)*100)+'% — реакция «'+rn.R.name+'»: в билде есть чары '+GENE[ELEMENTS[rn.e2].id]);
   return `<div class="pwb"><b>Сила ${Math.round(b.total)}</b> = ${parts.join(' ')}</div>`+
-    `<p class="note">Сила — урон в секунду (с пользой: щит, лечение, рывок) в обычном бою${sk.active?'':'; у пассивной чары — без нажатий, сравнивай с пассивными'}. Первое число — база редкости: без талантов чара следующей редкости сильнее даже на 5-м ранге, с талантами — всегда на том же ранге (таланты сближают чары героя не больше чем в ${fmt2(TAL_CAP)} раза).${tn}${notes.length?' От билда (пунктир): '+notes.join('; ')+'.':''}</p>`;}
+    `<p class="note">Сила — урон в секунду (с пользой: щит, лечение, рывок) в обычном бою${sk.active?'':'; у пассивной чары — без нажатий, сравнивай с пассивными'}. Первое число — база редкости: чара следующей редкости сильнее даже на 5-м ранге — и с талантами.${tn}${on(b.aff)?' «Особенность» — сродство героя: его основная стихия и формы сильнее.':''}${z0}${notes.length?' От билда (пунктир): '+notes.join('; ')+'.':''}</p>`;}
 const plCh=n=>{const m=n%100,d=n%10;return n+' '+(m>10&&m<20?'чар':d===1?'чара':d>1&&d<5?'чары':'чар');};
 // короткая разбивка для строки книги
 function pwShort(sk){const I=rarInfo();rarK(sk);const base=I.B[sk.id],rm=rkMul(sk.id),bl=resoMul(sk)*reactVal(sk.e,RESO_N),all=pwr(sk),lt=all/(base*rm*bl);
@@ -6204,7 +6244,7 @@ function sheetHtml(sk){const eq=EQUIPPED.has(sk.id),ln=isLearned(sk.id),r=rk(sk.
   const rr=rarOf(sk),up=ln&&!eq?upgradeFor(sk):null,dv=ln&&!eq&&!S.sandbox?dustValue(sk):0;
   if(sk.M.count)st.push(['Повторов','×'+sk.M.count]);
   const cost=rankCost(r);
-  const rankRow=ln?`<div class="rank"><b class="rkw${r>=5?' mx':''}">${r>=5?'Ранг 5 из 5 · МАКС':'Ранг '+r+' из 5'}</b> ${pips(r)} <span>${r<5?'каждый ранг: +'+Math.round(RANK_STEP*100)+'% силы (5-й — ×'+fmt2(1+RANK_STEP*4)+'), следующая редкость на том же ранге всё равно сильнее':'максимум'}</span></div>`:'';
+  const rankRow=ln?`<div class="rank"><b class="rkw${r>=5?' mx':''}">${r>=5?'Ранг 5 из 5 · МАКС':'Ранг '+r+' из 5'}</b> ${pips(r)} <span>${r<5?'каждый ранг: +'+Math.round(RANK_STEP*100)+'% силы (5-й — ×'+fmt2(1+RANK_STEP*4)+'), следующая редкость всё равно сильнее':'максимум'}</span></div>`:'';
   let acts='';
   if(!ln)acts=`<p class="note">Ещё не изучено. Выпадает в свитках с монстров и предлагается при повышении уровня.</p><div class="sh-act"><button type="button" class="btn" data-act="close">Закрыть</button></div>`;
   else{acts=(up?`<p class="note up">↑ Сильнее «${skName(SKILLS[up.tgt])}» в ${slotNm(up.act,up.idx)} на ${pct(up.gain)}% (сила ${Math.round(up.cp)} против ${Math.round(up.tp)}).</p><div class="sh-act"><button type="button" class="btn gold" data-act="swap">Заменить «${skName(SKILLS[up.tgt])}»</button></div>`:'')+`<div class="sh-act">${eq?`<button type="button" class="btn warn" data-act="off">Снять</button>`:`<button type="button" class="btn gold" data-act="on">${pending&&pending.index!=null?'Поставить в слот '+(pending.index+1):'Взять в билд'}</button>`}`+
@@ -6777,7 +6817,7 @@ function mpStepRemote(en,dt){
   const ox=en.pos.x,oz=en.pos.z;if(en.ib&&en.ib.at(ENEMY_DELAY,IP_OUT)){en.pos.x=IP_OUT.x;en.pos.z=IP_OUT.z;}else{en.pos.x=t.x;en.pos.z=t.z;}
   const d=Math.hypot(t.x-en.pos.x,t.z-en.pos.z);
   const f=t.fl;en.face=t.f;en.jy=t.jy;en.moving=!!(f&1)||Math.hypot(en.pos.x-ox,en.pos.z-oz)>.004;
-  en.stun=(f&2)?.6:0;en.frozenT=(f&4)?1:0;en.burnT=(f&8)?1:0;en.poisT=(f&16)?1:0;en.slowT=(f&32)?1:0;
+  en.stun=(f&2)?.6:0;en.frozenT=(f&4)?1:0;en.burnT=(f&8)?1:0;en.poisT=(f&16)?1:0;if(!(f&16))en.poisN=0;en.slowT=(f&32)?1:0;
   en.lunge=(f&64)?.2:0;en.slam=(f&128)?.2:0;en.draw=(f&256)?.2:0;en.busy=(f&512)?.2:0;en.fuse=!!(f&1024);}
 function mpGuestTele(m){if(!MPG||mode!=='game')return;const col=m.c!=null?new THREE.Color(m.c):null,fin=col?t=>teleBoom(t,col):()=>{};
   if(m.sh===0)tele('circle',{x:m.x,z:m.z,r:m.r},m.du,fin);
@@ -6791,8 +6831,10 @@ function mpGuestEProj(m){if(!MPG||mode!=='game')return;
 // ---------- удары гостя по зеркалам врагов ----------
 function mpGuestHit(en,base,el,o){
   let dmg=base,crit=false;
-  if(!o.dot){if(el>=0)dmg*=RESO[el];if(Math.random()<ST.crit+cfCritAdd(en,el,o)){dmg*=2*cfCritMul(en,el,o);crit=true;}}
-  dmg*=cfDmgOut(en,el,o,dmg);
+  if(!o.dot&&!o.raw){if(el>=0)dmg*=RESO[el];if(Math.random()<ST.crit+cfCritAdd(en,el,o)){dmg*=2*cfCritMul(en,el,o);crit=true;}}
+  if(!o.raw)dmg*=cfDmgOut(en,el,o,dmg);
+  // Чумной лекарь-гость: слоёв яда в снимке нет (только флаг) — ведём свою оценку, как cfStatus у хоста; «Токсин» берёт её
+  if(CT_ON&&CLS&&CLS.id==='plague'&&el===EL.poison&&!o.dot)en.poisN=Math.min((S.lvl>=30?15:12)+ctv('pl_cap'),(en.poisN|0)+1);
   dmg=Math.max(1,Math.round(dmg));en.flash=.1;en.selfHit=time;
   float({x:en.pos.x,y:en.hy-1.7,z:en.pos.z},crit?dmg+'!':String(dmg),o.dot?o.dotCol:el>=0?ELEMENTS[el].hex:(o.col||'#ffffff'),o.dot?11:crit?19:14);
   en.hp=Math.max(1,en.hp-dmg);
@@ -6803,12 +6845,12 @@ function mpGuestHit(en,base,el,o){
     if(el>=0){const id=ELEMENTS[el].id;if(id==='shadow')heal(dmg*.12);else if(id==='light')heal(dmg*.08);else if(id==='arcane')P.mp=Math.min(P.maxMp,P.mp+2);}
     if(!o.noProc&&depth<=1&&PASS.brand.length){for(const b of PASS.brand){if(procBudget<=0)break;if(Math.random()<(b.F.chance+ST.luck)/(b.M.cd||1)){procBudget--;procBrand(b,en.pos.clone(),depth+1);}}}}
   const h={u:en.uid,d:dmg,el,cr:crit?1:0,sk:o.sk?o.sk.id:-1,dp:depth,rc:r2(ST.react)};
-  if(o.dot)h.dot=1;if(o.noReact)h.nr=1;if(o.noKnock)h.nk=1;if(o.basic)h.ba=1;if(o.pull)h.pl=1;if(o.stunX)h.sx=o.stunX;if(o.splash)h.sp=1;if(o.dotCol)h.dc=o.dotCol;
+  if(o.dot)h.dot=1;if(o.noReact)h.nr=1;if(o.noKnock)h.nk=1;if(o.basic)h.ba=1;if(o.pull)h.pl=1;if(o.stunX)h.sx=o.stunX;if(o.splash)h.sp=1;if(o.dotCol)h.dc=o.dotCol;if(CT_ON&&CT.inFl&&el===EL.fire)h.fb=Math.round(CT.flB);
   if(o.knockFrom){h.kx=r2(o.knockFrom.x);h.kz=r2(o.knockFrom.z);}
   MP.hitQ.push(h);}
 function mpHostHit(m){
   const en=ENEMIES.find(e=>e.uid===m.u);if(!en||en.dead)return;
-  const o={pre:true,crit:!!m.cr,fromG:true,rc:m.rc,depth:m.dp||0,sk:m.sk>=0?SKILLS[m.sk]:null,dot:!!m.dot,noReact:!!m.nr,noKnock:!!m.nk,basic:!!m.ba,pull:!!m.pl,stunX:m.sx||0,splash:!!m.sp,noProc:true,dotCol:m.dc};
+  const o={pre:true,crit:!!m.cr,fromG:true,rc:m.rc,depth:m.dp||0,sk:m.sk>=0?SKILLS[m.sk]:null,dot:!!m.dot,noReact:!!m.nr,noKnock:!!m.nk,basic:!!m.ba,pull:!!m.pl,stunX:m.sx||0,splash:!!m.sp,noProc:true,dotCol:m.dc,fb:m.fb||0};
   if(m.kx!=null)o.knockFrom={x:m.kx,z:m.kz};
   dealDamage(en,m.d,m.el,o);}
 
@@ -8881,7 +8923,7 @@ for(const F of FORMS){if(F.kind==='active'&&F.sig&&!NFRUN[F.id])NFRUN[F.id]=(sk,
 // Хуки каркаса зовутся и при загрузке (до этих строк) — пока CT_ON=0, они отдают «как без особенности».
 var CT_ON=0;
 const CT_DEF={
- pyro:{n:'Пожар',d:'Огненное попадание раскаляет врага: жар до 5, держится 4 с, горение +15% за каждый жар. На пятом жаре — Вспышка: взрыв на 120% удара и 40% горения, соседям по 2 жара. Огненные чары +10% урона.',t:['радиус вспышки 4 м, соседям 3 жара','вспышка оставляет пламя на 3 с','на пятом жаре сразу две вспышки'],tip:'на пятом огненном попадании враг вспыхивает и поджигает соседей.'},
+ pyro:{n:'Пожар',d:'Огненное попадание раскаляет врага: жар до 5, держится 4 с, горение +15% за каждый жар. На пятом жаре — Вспышка: взрыв на 120% удара и 40% горения, соседям по 2 жара. Огненные чары +10% урона.',t:['радиус вспышки 4 м, соседям 3 жара','твоя вспышка оставляет пламя на 3 с (цепная — нет)','на пятом жаре сразу две вспышки'],tip:'на пятом огненном попадании враг вспыхивает и поджигает соседей.'},
  cryo:{n:'Абсолютный холод',d:'Лёд замораживает со 2-го попадания (а не с 3-го), на 2 с. Удар по замороженному раскалывает его: ×1.8 этому удару и 3 осколка соседям по 35%. Боссов каждые 3 удара льдом замедляют на 10% и делают уязвимее на 8% (до 5 раз).',t:['осколки замораживают','раскол ×2.2','раскол замораживает всех в 3 м'],tip:'удар по замороженному врагу раскалывает его — почти двойной урон и осколки.'},
  storm:{n:'Перегрузка',d:'Каждая чара даёт заряд, до 8. На 8 зарядах следующая чара вызывает Громовой раскат: 6 молний с неба по 80% её урона с оглушением. Цепная молния прыгает на +1 цель.',t:['раскат — 8 молний','молния по оглушённому даёт +0.5 заряда','раскат оглушает на 1 с'],tip:'восемь чар копят заряд — девятая обрушивает молнии с неба.'},
  plague:{n:'Эпидемия',d:'Яд копится до 12 раз (у всех до 8). Отравленный при смерти заражает 2 ближайших половиной своего яда. За каждого отравленного врага рядом лекарь лечится на 0.25% здоровья в секунду, до 3%.',t:['яд до 15 раз','заражает троих','лечение до 5% в секунду'],tip:'яд перекидывается с трупов на живых, а отравленные вокруг лечат тебя.'},
@@ -8957,10 +8999,13 @@ function ctSpawn(kind,el,pos,life,tag,boom,mod){const n0=SUMMONS.length;spawnSum
 const ctFreeN=tag=>{let n=0;for(const s of SUMMONS)if(s.ctTag===tag&&!s.dying&&!s.ghost)n++;return n;};
 // свои существа рядом (тотемы части A — тоже существа: «Тотем» и «Тотем гроз»)
 const ctOwnNear=r=>{let n=0;for(const s of SUMMONS)if(!s.ghost&&!s.dying&&Math.hypot(s.g.position.x-P.pos.x,s.g.position.z-P.pos.z)<r)n++;return n;};
-// «Взрыв трупа» (25.11): своих существ от CT_SCAP — скелет не встаёт, а труп взрывается на 3 м: доля его здоровья (Кости +3% за очко).
-// Убитые этим взрывом сами не взрываются (метка ctNeB) — без цепей по толпе.
-function ctCorpse(en,bn){const p=en.pos.clone(),v=en.maxHp*(.15+.03*bn);
-  later(0,()=>{for(const m of nfFoes(p,3,en)){m.ctNeB=1;dealDamage(m,v,EL.shadow,{ctx:1,depth:1,noReact:true,noProc:true,knockFrom:p});if(!m.dead)m.ctNeB=0;}});
+// «Взрыв трупа» (25.11): своих существ от CT_SCAP — скелет не встаёт, а труп взрывается на 3 м: доля его здоровья (Кости +2% за очко).
+// Убитые этим взрывом сами не взрываются (метка ctNeB) — без цепей по толпе. 25.11 (проверка): цепь шла и в обход — взрыв снимает
+// соседям четверть здоровья, их добивают слуги, их трупы взрываются снова (на части билдов взрывов ×14, ветка ×3,5–7). Теперь задетый
+// взрывом враг 2 с после него не взрывается (ctNeT), и взрывов — не чаще 4 в секунду (ctCorpseOk).
+function ctCorpseOk(en){if(en.ctNeT>time&&en.ctNeT-time<=2)return false;const lx=CT.neXT;if(lx!=null&&time>=lx&&time-lx<.25)return false;CT.neXT=time;return true;}
+function ctCorpse(en,bn){const p=en.pos.clone(),v=en.maxHp*(.15+.02*bn);
+  later(0,()=>{for(const m of nfFoes(p,3,en)){m.ctNeB=1;m.ctNeT=time+2;dealDamage(m,v,EL.shadow,{ctx:1,depth:1,noReact:true,noProc:true,knockFrom:p});if(!m.dead)m.ctNeB=0;}});
   fxBurst(p.x,.8,p.z,3,CT_SHD,.35,.7);fxShock(p.x,p.z,3,CT_SHD,.45);puffs(p.x,.4,p.z,CT_SHD,10);ctProc(p,'Взрыв трупа','#d9b8ff',3);}
 // потолок бесплатных скелетов Некроманта: встают, только пока своих существ меньше CT_SCAP; новые обычные призывы вытесняют их сверх CT_SCAP+2
 const CT_SCAP=8;
@@ -9006,7 +9051,7 @@ function ctThunder(sk){const t=CT.tier,n=(t>=2?8:6)+2*ctv('st_more'),base=skDmg(
   for(const en of ENEMIES)if(!en.dead&&ctD(en)<12)list.push(en);
   for(let k=0;k<n;k++)later(k*.07,()=>{let en=list.length?list[(Math.random()*list.length)|0]:null;if(en&&en.dead)en=nearest(P.pos,12);
     const x=en?en.pos.x:P.pos.x+rand(-6,6),z=en?en.pos.z:P.pos.z+rand(-6,6);skyBolt(x,z,CT_STM);fxGlow(x,z,1.7,CT_STM,.3,.85);
-    if(en&&!en.dead){const ep=en.pos.clone();dealDamage(en,base,EL.storm,{ctx:1,depth:1,noProc:true,knockFrom:ep});stunEn(en,stn);en.ctShkT=time+stn;
+    if(en&&!en.dead){const ep=en.pos.clone();dealDamage(en,base,EL.storm,{ctx:1,depth:1,noProc:true,knockFrom:ep});stunEn(en,stn);en.ctShkT=time+(en.boss?stn*.15:stn);
       // «Ветвистая молния»: перескок на соседа в 5 м на 60%
       if(arc){const m=nearest(ep,5,en);if(m){zigzag(V3(ep.x,1.2,ep.z),V3(m.pos.x,1,m.pos.z),CT_STM);dealDamage(m,base*.6,EL.storm,{ctx:1,depth:1,noProc:true,knockFrom:ep});}}}});
   fxPillar(P.pos.x,P.pos.z,1.2,7,CT_STM,.6);fxShock(P.pos.x,P.pos.z,5,CT_STM,.5);shake=Math.max(shake,.28);ctProc(P.pos,'Громовой раскат!','#fff27a',6);}
@@ -9056,7 +9101,7 @@ function ctRage(n){CT.rageHitT=time;if(time<CT.frenzyT)return;CT.rage=Math.min(1
 function ctRuneHit(en,dmg){CT.dkBufT=time+3;if(!en.dead){en.slowT=Math.max(en.slowT,2);if(CT.tier>=4&&!en.boss)freezeEn(en,1);}
   if(time-CT.dkRuneS>.3){CT.dkRuneS=time;fxRune(en.pos.x,en.pos.z,1.8,CT_ICE,.6);fxBurst(en.pos.x,1,en.pos.z,1.1,CT_ICE,.25,.8);fxRing(en.pos.x,en.pos.z,.3,1.8,CT_ICE,.4);elBurst(EL.ice,en.pos.x,1,en.pos.z,10);ctProc(en.pos,'Рунный удар','#a8e4ff',0);ctRuneX(en,dmg);}}
 // «Ледяная руна» — удар по врагам вокруг цели; «Хватка смерти» — щит 4% здоровья (раз на рунный удар)
-function ctRuneX(en,dmg){const fr=ctv('dk_frost');if(fr&&dmg>0){const p=en.pos.clone();aoe(p,2.5,dmg*.35*fr,EL.ice,{ctx:1,depth:1,noReact:true,noProc:true,knockFrom:p},en);fxShock(p.x,p.z,2.5,CT_ICE,.4);}
+function ctRuneX(en,dmg){const fr=ctv('dk_frost');if(fr&&dmg>0){const p=en.pos.clone();aoe(p,2.5,dmg*.35*fr,EL.ice,{ctx:1,raw:1,depth:1,noReact:true,noProc:true,knockFrom:p},en);fxShock(p.x,p.z,2.5,CT_ICE,.4);}
   if(ctv('dk_grip'))ctShAdd(P.maxHp*.04);}
 const ctDkNeed=()=>(CT.tier>=3?3:4)-(ctv('dk_grip')?1:0);
 function ctDkCount(){CT.dkN++;if(CT.dkN>=ctDkNeed()){CT.dkN=0;return true;}return false;}
@@ -9133,11 +9178,13 @@ function ctUnstable(sk,A){const t=CT.tier;let p;if(A)p=P.pos.clone().addScaledVe
   colBurst(CT_POI,P.pos.x,1.6,P.pos.z,10,3,.5,-1);colBurst(FIREC,P.pos.x,1.6,P.pos.z,8,3,.5,-1);ctProc(P.pos,'Нестабильно: '+names.join(', '),'#c8ff7a',0);}
 
 // ---------- оценка силы с особенностью («Лучший билд» и авто-выбор чар) ----------
-// основная стихия героя и формы, которые особенность усиливает; редкость (intr) не меняется
+// основная стихия героя и формы, которые особенность усиливает; редкость (intr) не меняется. Стихия × форма — не больше ×1,45 (шаг редкости
+// с разбросом ×1,48):
+// «Удар в сердце» ×1,5 у Ассасина поднимал в книге низшую редкость над высшей на том же ранге (25.11)
 const CT_AFF={pyro:{e:{fire:1.2}},cryo:{e:{ice:1.2}},storm:{e:{storm:1.1},f:{chain:1.1}},plague:{e:{poison:1.2}},necro:{e:{shadow:1.2},c:{sum:1.15}},
  paladin:{e:{light:1.05},f:{strike:1.12,leap:1.12}},geo:{e:{earth:1.2}},windr:{e:{wind:1.1},f:{bolt:1.08,boomer:1.08,fan:1.08}},hemo:{e:{blood:1.12}},arcan:{e:{arcane:1.12},f:{s_missiles:1.1}},
  bers:{e:{blood:1.05},f:{strike:1.12,whirl:1.12,rush:1.1,leap:1.1}},dk:{f:{strike:1.15}},druid:{c:{sum:1.2}},hunter:{e:{ice:1.08},f:{bolt:1.15,trap:1.1}},
- assassin:{e:{shadow:1.05},f:{strike:1.15,rush:1.15,s_heartstrike:1.5}},shaman:{c:{sum:1.15},f:{totem:1.15,s_stormtotem:1.15}},monk:{e:{wind:1.1}},lock:{e:{fire:1.15,shadow:1.15}},
+ assassin:{e:{shadow:1.05},f:{strike:1.15,rush:1.15,s_heartstrike:1.38}},shaman:{c:{sum:1.15},f:{totem:1.15,s_stormtotem:1.15}},monk:{e:{wind:1.1}},lock:{e:{fire:1.15,shadow:1.15}},
  inq:{e:{light:1.1},f:{bolt:1.05}},alch:{e:{poison:1.05,arcane:1.05}}};
 function ctAff(sk){const D=CLS&&CT_AFF[CLS.id];if(!D)return 1;let m=1;const fp=FP[sk.F.id];if(D.e&&D.e[sk.E.id])m*=D.e[sk.E.id];
   if(D.f&&D.f[sk.F.id])m*=D.f[sk.F.id];else if(D.c&&fp&&D.c[fp.cat])m*=D.c[fp.cat];return m;}
@@ -9217,7 +9264,9 @@ function cfCritMul(en,el,o){return CT_ON&&!o.fromG&&CLS&&CLS.id==='hunter'&&CT.t
 // контроль и движение с долгой перезарядкой — в бою даёт заметно меньше урона, чем обещает оценка чар (FP); их урон (и слуг) подтянут множителем.
 // Гемомант — после починки «Сцепки» (её зацикленный урон был его главным): Б ×0,62–0,79 к v13.27 → ×1,3 (больше не помогает: упор не в урон)
 // (до 40-го уровня надбавка растёт с нуля: в начале их набор и так держится наравне)
-const CT_KDMG={dk:2.5,druid:2,monk:2.1,hemo:1.3};
+// 25.11 (вторая проверка): Друид и Ледяной охотник в реальном бою «Авто» (160-й, волны по 10, здоровье ×6) отставали от медианы на 25–30%
+// (104 и 104 убийства против 154) — Друиду ×2 → ×2,3, Охотнику ×1,2
+const CT_KDMG={dk:2.5,druid:2.3,monk:2.1,hemo:1.3,hunter:1.2};
 const ctKd=()=>{const k=CT_KDMG[CLS.id];return k?1+(k-1)*Math.min(1,((S?S.lvl:1)-1)/39):1;};
 function cfDmgOut(en,el,o,d){if(!CT_ON||o.fromG||!CLS)return 1;return ctKd()*cfDmgOut0(en,el,o,d);}
 function cfDmgOut0(en,el,o,d){const t=CT.tier,hero=!o.fromS;
@@ -9225,15 +9274,15 @@ function cfDmgOut0(en,el,o,d){const t=CT.tier,hero=!o.fromS;
   case 'pyro':if(o.dot){const h=ctHeat(en);if(h&&en.burnT>0){const b=en.burnDps||0,q=en.poisT>0?(en.poisN|0)*(en.poisDps||0):0;return 1+(.15+.02*ctv('py_ember'))*h*b/Math.max(1e-6,b+q);}return 1;}return el===EL.fire?1.1:1;
   case 'storm':{const sv=ctv('st_stun');return sv&&en.ctShkT>time?1+.12*sv:1;}
   case 'paladin':return hero&&time<CT.paBufT?1+.12*ctv('pa_out'):1;
-  case 'dk':return hero&&time<CT.dkBufT?1+.08*ctv('dk_rune'):1;
+  case 'dk':return hero&&time<CT.dkBufT?1+.1*ctv('dk_rune'):1;
   case 'cryo':if(en.boss)return 1+(.08+.02*ctv('cr_boss'))*Math.min(5,en.ctBc|0);if(!o.dot&&!o.ctx&&en.frozenT>0){en.ctShat=1;return (t>=3?2.2:1.8)+.12*ctv('cr_crack');}return 1;
   case 'plague':{const k=.08*ctv('pl_tox');if(k&&!o.dot&&hero&&en.poisT>0)return 1+.075*k*(en.poisN|0);if(!k||!o.dot||!(en.poisT>0))return 1;const q=(en.poisN|0)*(en.poisDps||0),b=en.burnT>0?en.burnDps||0:0;return 1+k*q/Math.max(1e-6,b+q);}
   case 'geo':{let m=1+(.06+.015*ctv('ge_deep'))*ctCrack(en);if(en.ctSplit&&!o.dot&&!o.ctx){en.ctSplit=0;m*=1.6+.2*ctv('ge_split');}return m;}
   case 'hemo':{if(!hero)return 1;let m=1;const th=.12*ctv('he_thin');if(o.sk&&!o.dot)m*=o.sk.E.id==='blood'?1.15+th:1.4+th;const eg=ctv('he_edge');if(P.hp<P.maxHp*(.5+.1*eg))m*=(t>=3?1.4:1.25)+.05*eg;
     if(time<CT.fsT)m*=1+.03*ctv('he_feast')*CT.fsN;return m;}
-  case 'arcan':return hero&&!o.dot?(1+((t>=4?.55:.4)+.06*ctv('ar_mind'))*Math.max(0,P.mp)/P.maxMp)*(time<CT.surgeT&&ctv('ar_flood')?1.25:1):1;
-  case 'bers':return hero?(1+(.005+.001*ctv('be_long'))*CT.rage)*(time<CT.frenzyT?1.25+.08*ctv('be_fury'):1):1;
-  case 'necro':{const lv=ctv('ne_lord');return hero?1+Math.min(.4+.2*lv,(.05+.01*lv)*CT.near):1;}
+  case 'arcan':return hero&&!o.dot?(1+((t>=4?.55:.4)+.08*ctv('ar_mind'))*Math.max(0,P.mp)/P.maxMp)*(time<CT.surgeT&&ctv('ar_flood')?1.25:1):1;
+  case 'bers':return hero?(1+(.005+.001*ctv('be_long'))*CT.rage)*(time<CT.frenzyT?1.25+.1*ctv('be_fury'):1):1;
+  case 'necro':{const lv=ctv('ne_lord');return hero?1+Math.min(.4+.15*lv,(.05+.01*lv)*CT.near):1;}   // 25.11: предел +15% за очко (было +20%: после починки цепи взрывов ветка ×2,1)
   case 'hunter':return hero&&(en.slowT>0||en.frozenT>0)?1.25+.12*ctv('hu_prey'):1;
   case 'assassin':{if(!hero||o.dot||o.ctx)return 1;const sh=time<CT.shadowT?1+.1*ctv('as_dark'):1;if(CT.shadowFirst&&time<CT.shadowT){CT.shadowFirst=false;en.ctBs=2;return 2.5*sh;}
     if(en.stun>0||en.ctBhT>time||ctBack(en)){en.ctBs=1;return (1.6+.08*ctv('as_back'))*sh;}return sh;}
@@ -9241,6 +9290,7 @@ function cfDmgOut0(en,el,o,d){const t=CT.tier,hero=!o.fromS;
   case 'monk':return hero?1+(.015+.002*ctv('mo_flow'))*CT.series:1;
   case 'druid':{if(!hero)return time<CT.howlT?1.25:1;const pk=ctv('dr_pack');return pk?1+Math.min(.08*pk,.015*pk*CT.near):1;}   // звери: «Дух-волк» (вой стаи); сам: «Вожак стаи»
   case 'lock':return 1+(.08+.02*ctv('lo_hex'))*ctCurse(en);
+  // тики горения и яда (o.dot без ctx) надбавку «по еретику» второй раз не берут: их сила считается от удара, в котором она уже есть
   case 'inq':{let m=en.elite||en.boss?1.15+.05*ctv('in_hunt'):1;if(en.ctHer>time&&!(o.dot&&!o.ctx))m*=(t>=4?1.4:1.25)+.06*ctv('in_judge');return m;}}
   return 1;}
 function cfOnHit(en,d,el,o,crit,R){if(!CT_ON||o.fromG||!CLS)return;const t=CT.tier,hero=!o.fromS,dmg=d;
@@ -9254,9 +9304,9 @@ function cfOnHit(en,d,el,o,crit,R){if(!CT_ON||o.fromG||!CLS)return;const t=CT.ti
   case 'hemo':if(hero)heal(dmg*((t>=2?.14:.1)+.02*ctv('he_leech')));break;
   case 'arcan':if(!o.ctx&&!o.dot&&!o.fromS&&(o.basic||o.sk&&CT_PROJF.has(o.sk.F.id)))ctRico(en,dmg,el,o);break;
   case 'bers':if(hero&&!o.ctx&&!o.dot&&time-CT.rageT>.15&&ctD(en)<4.5+en.r){CT.rageT=time;ctRage(2*(1+.03*ctv('be_boil')));}
-    // «Кровавый вихрь»: в бешенстве удар вблизи задевает всех в 3 м вокруг цели (10%); на одного врага — не чаще раза в 0,25 с
+    // «Кровавый вихрь»: в бешенстве удар вблизи задевает всех в 3 м вокруг цели (25% нанесённого — raw, без второго бешенства и ярости; до 25.11 было 10% с повторным бешенством — на деле ~27%); на одного врага — не чаще раза в 0,25 с
     if(hero&&!o.ctx&&!o.dot&&time<CT.frenzyT&&ctv('be_end')&&ctD(en)<4.5+en.r&&!(en.ctBeT>time)){en.ctBeT=time+.25;const p=en.pos.clone();
-      aoe(p,3,dmg*.1,el>=0?el:EL[CLS.p],{ctx:1,depth:1,noReact:true,noProc:true,knockFrom:p.clone()},en);if(time-CT.beFxT>.3){CT.beFxT=time;fxShock(p.x,p.z,3,RED,.3);}}if(hero&&time<CT.frenzyT)heal(dmg*(.12+.04*ctv('be_drink')));break;
+      aoe(p,3,dmg*.25,el>=0?el:EL[CLS.p],{ctx:1,raw:1,depth:1,noReact:true,noProc:true,knockFrom:p.clone()},en);if(time-CT.beFxT>.3){CT.beFxT=time;fxShock(p.x,p.z,3,RED,.3);}}if(hero&&time<CT.frenzyT)heal(dmg*(.12+.04*ctv('be_drink')));break;
   case 'dk':if(hero)heal(dmg*(.15+.02*ctv('dk_drain')));if(!o.ctx&&!o.dot&&time<=CT.dkRuneT&&(o.basic||o.sk&&o.sk.F.id==='strike'))ctRuneHit(en,dmg);break;
   case 'druid':if(t>=3&&o.fromS)heal(dmg*.01);break;
   case 'hunter':{if(o.sk&&o.sk.F.id==='trap'&&!en.boss)stunEn(en,.8);const ch=ctv('hu_chill');   // «Ледяные стрелы»
@@ -9269,7 +9319,7 @@ function cfOnHit(en,d,el,o,crit,R){if(!CT_ON||o.fromG||!CLS)return;const t=CT.ti
   case 'alch':if(!o.dot&&!o.ctx&&!o.noReact&&el>=0&&(o.depth|0)<=1)ctAlchMark(en,el);break;}}
 // статусы стихий: у Криоманта заморозка со 2-го холода, у Чумного лекаря яд до 12 (15) — свои и гостя на хосте
 function cfStatus(en,el,dmg){if(!CT_ON)return false;const cc=FROMG_?(MP.peer&&MP.peer.cls):CLS&&CLS.id,id=ELEMENTS[el].id;
-  if(cc==='pyro'&&id==='fire'&&CT.inFl&&!FROMG_){en.burnT=3;en.burnDps=Math.max(en.burnDps,CT.flB);return true;}   // Вспышка поджигает силой поджёгшего удара
+  if(cc==='pyro'&&id==='fire'&&(FROMG_?FLBG_>0:CT.inFl)){en.burnT=3;en.burnDps=Math.max(en.burnDps,FROMG_?FLBG_:CT.flB);return true;}   // Вспышка поджигает силой поджёгшего удара
   if(cc==='cryo'&&id==='ice'){const tv=FROMG_?ctvG:ctv,snap=tv('cr_snap')&&!(en.ctSnapT>time);en.slowT=2.5;if(!en.boss){en.chill++;en.chillT=3;if(en.chill>=2||snap){if(en.chill<2)en.ctSnapT=time+1.5;en.chill=0;freezeEn(en,2+.4*tv('cr_deep'));float({x:en.pos.x,y:en.hy-1.2,z:en.pos.z},'Заморожен','#bfeaff',13);elBurst(EL.ice,en.pos.x,1,en.pos.z,10);}}return true;}
   if(cc==='plague'&&id==='poison'){const lvC=FROMG_?((MP.peer&&MP.peer.lvl|0)||1):S.lvl;en.poisN=Math.min((lvC>=30?15:12)+(FROMG_?ctvG:ctv)('pl_cap'),en.poisN+1);en.poisT=4;en.poisDps=Math.max(en.poisDps,dmg*.06);return true;}
   return false;}
@@ -9279,7 +9329,7 @@ function cfOnKill(en,el,o){if(!CT_ON||!CLS)return;if((o.noReward||o.fromG)&&!o.g
   case 'bers':break;   // (25.11, баланс веток) ключевой «Кровавый вихрь» бешенство не продлевает — оно было ~0,9 боя
   case 'necro':{if(ctD(en)>=10)break;const hd=ctv('ne_horde'),bn=ctv('ne_bone'),sure=hd&&(CT.neK=(CT.neK|0)+1)%4===0;   // «Неупокоенные»: каждое 4-е убийство — наверняка
     if(!(sure||Math.random()<(t>=4?.3:.2)+.05*ctv('ne_raise'))||en.ctNeB)break;
-    if(ctOwnAll()>=CT_SCAP){ctCorpse(en,bn);break;}   // 25.11: армия полна — скелету встать некуда, труп взрывается (на 160-м своих существ ~13)
+    if(ctOwnAll()>=CT_SCAP){if(ctCorpseOk(en))ctCorpse(en,bn);break;}   // 25.11: армия полна — скелету встать некуда, труп взрывается (на 160-м своих существ ~13)
     if(ctFreeN('nskel')<(t>=2?6:4)){ctSpawn('skelwar','shadow',en.pos,8+2*bn,'nskel',t>=3||!!hd,bn?s=>{s.dmg*=1+.2*bn;}:null);fxPillar(en.pos.x,en.pos.z,.8,3,CT_SHD,.5);puffs(en.pos.x,.4,en.pos.z,CT_SHD,8);ctProc(en.pos,'Восстал!','#d9b8ff',0);}break;}
   case 'hemo':if(el!==EL.blood||o.guestK)heal(P.maxHp*.02);{const fv=ctv('he_feast');if(fv){heal(P.maxHp*.01*fv);CT.fsN=time<CT.fsT?Math.min(3,(CT.fsN|0)+1):1;CT.fsT=time+4;}}if(t>=4)heal(P.maxHp*.01);colBurst(RED,P.pos.x,1.2,P.pos.z,6,2,.5,-1);break;
   case 'assassin':{const inSh=time<CT.shadowT;if(t>=4&&inSh){for(let i=0;i<8;i++){const id=S.active[i];if(id!=null&&(SKILLS[id].F.id==='strike'||SKILLS[id].F.id==='rush'))P.cds[id]=0;}}
@@ -9345,7 +9395,7 @@ function cfTick(dt){if(!CT_ON||!CLS||P.dead||mode!=='game')return;
     const nd=ctStNeed();if(c>=nd&&(CT.hudN+=dt)>.45){CT.hudN=0;fxGlow(P.pos.x,P.pos.z,1.8,CT_STM,.3,.7);}txt=c>=nd?'Заряд '+nd+'/'+nd+' · раскат готов':'Перегрузка · заряд '+c+'/'+nd;f=CT.charge/nd;break;}
   case 'plague':if((CT.healT-=dt)<=0){CT.healT=.5;let n=0;for(const en of ENEMIES)if(!en.dead&&(en.poisT>0||en.ctPoisT>time)&&ctD(en)<8)n++;CT.poisN=n;{const hv=ctv('pl_heal');CT.healR=Math.min((t>=4?.05:.03)+.01*hv,(.0025+.001*hv)*n);}if(CT.healR>0){heal(P.maxHp*CT.healR*.5);if(Math.random()<.6)emit(PUFF,P.pos.x+rand(-.5,.5),1,P.pos.z+rand(-.5,.5),0,1,0,CT_POI,.6,-.5,1);}}
     txt='Эпидемия · отравлено '+CT.poisN+' · +'+(CT.healR*100).toFixed(2).replace(/\.?0+$/,'')+'%/с';f=CT.healR/((t>=4?.05:.03)+.01*ctv('pl_heal'));break;
-  case 'necro':{const lv=ctv('ne_lord'),w=ctv('ne_ward');txt='Слуги '+CT.near+' · урон +'+Math.round(Math.min(.4+.2*lv,(.05+.01*lv)*CT.near)*100)+'%'+(w&&CT.near?' · защита '+Math.round(w*Math.min(8,CT.near))+'%':'');f=Math.min(1,CT.near/8);}break;
+  case 'necro':{const lv=ctv('ne_lord'),w=ctv('ne_ward');txt='Слуги '+CT.near+' · урон +'+Math.round(Math.min(.4+.15*lv,(.05+.01*lv)*CT.near)*100)+'%'+(w&&CT.near?' · защита '+Math.round(w*Math.min(8,CT.near))+'%':'');f=Math.min(1,CT.near/8);}break;
   case 'paladin':{const fr=CT.wrath/(P.maxHp*ctPaCap());if(fr>.13&&Math.random()<fr*.6)emit(SPARK,P.pos.x+rand(-.5,.5),.4,P.pos.z+rand(-.5,.5),0,rand(1.5,3),0,GOLD,.6,-.6,1);
     txt=CT.wrath>=P.maxHp*.12?'Гнев '+big(CT.wrath)+' · бей вблизи':'Священный гнев '+big(CT.wrath);f=fr;break;}
   case 'geo':{let b=0;for(const en of ENEMIES){if(en.dead)continue;const c=ctCrack(en);if(!c)continue;if(ctD(en)<14&&c>b)b=c;if(Math.random()<c*.04)emit(SPARK,en.pos.x+rand(-.4,.4),.3,en.pos.z+rand(-.4,.4),0,1.2,0,CT_EARTH,.45,-1,1);}
@@ -9358,7 +9408,7 @@ function cfTick(dt){if(!CT_ON||!CLS||P.dead||mode!=='game')return;
   case 'arcan':{if(time>=CT.surgeT&&time>=CT.surgeCd&&P.mp>=P.maxMp*(ctv('ar_flood')?.8:.99)){CT.surgeDur=(t>=2?4:3)+.5*ctv('ar_tide');CT.surgeT=time+CT.surgeDur;CT.surgeCd=time+10-ctv('ar_tide');fxShock(P.pos.x,P.pos.z,4,CT_ARC,.5);fxPillar(P.pos.x,P.pos.z,1.1,5,CT_ARC,.5);ctProc(P.pos,'Прилив маны!','#9cc2ff',4);}
     if(time<CT.surgeT){if((CT.hudN+=dt)>.4){CT.hudN=0;fxRune(P.pos.x,P.pos.z,2.4,CT_ARC,.5);fxRing(P.pos.x,P.pos.z,.4,2.4,CT_ARC,.4);}if(Math.random()<.5)emit(SPARK,P.pos.x+rand(-.8,.8),.3,P.pos.z+rand(-.8,.8),0,2.5,0,CT_ARC,.5,-.5,1);
       const l=CT.surgeT-time;txt='Прилив · чары бесплатно '+l.toFixed(1)+' с';f=l/CT.surgeDur;}
-    else{const k=Math.round(((t>=4?.55:.4)+.06*ctv('ar_mind'))*P.mp/P.maxMp*100);txt='Мана → урон +'+k+'%';f=P.mp/P.maxMp;}break;}
+    else{const k=Math.round(((t>=4?.55:.4)+.08*ctv('ar_mind'))*P.mp/P.maxMp*100);txt='Мана → урон +'+k+'%';f=P.mp/P.maxMp;}break;}
   case 'bers':{if(CT.frenzyOn&&time>=CT.frenzyT){CT.frenzyOn=0;CT.rage=40;}
     if(time<CT.frenzyT){P.slowT=0;if(Math.random()<.6)emit(SPARK,P.pos.x+rand(-.5,.5),rand(.5,1.8),P.pos.z+rand(-.5,.5),0,1.5,0,RED,.45,-1,1);if((CT.hudN+=dt)>.3){CT.hudN=0;heroColor(RED);}
       txt='Бешенство '+(CT.frenzyT-time).toFixed(1)+' с';f=Math.min(1,(CT.frenzyT-time)/ctBeDur());}
