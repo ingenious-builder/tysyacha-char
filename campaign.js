@@ -457,7 +457,7 @@ function visualUpdate(dt){
       p.ring.scale.set(2.1,1,2.1);p.disc.scale.set(2.05,1,2.05);const occ=CS.po[i]>=0,c=occ?(CS.pp>0?0x7dff8a:0xf2c46b):0xb28cff;p.rm.color.setHex(c);p.dm.color.setHex(c);p.rm.opacity=.6+.3*Math.sin(t*6+i);}}}
   if(R.wallM.length){const on=CS.wz>-90;for(let i=0;i<R.wallM.length;i++){const m=R.wallM[i];m.visible=on;if(on){m.position.set(X.gcx(CS.wz),5.5,CS.wz-i*1.4);m.material.opacity=(.92-i*.22)*(.85+.15*Math.sin(t*5+i));}}
     if(R.wallEdge){R.wallEdge.visible=on;if(on){R.wallEdge.position.set(X.gcx(CS.wz),.12,CS.wz+.8);R.wallEdge.material.opacity=.4+.2*Math.sin(t*7);}}
-    if(on&&!X.paused&&Math.random()<.9){const z=CS.wz+rand(-1,2),x=X.gcx(z)+rand(-12,12),w=X.toWorld(x,z);X.emit(X.SPARK,w.x,rand(.2,3),w.z,0,rand(1,3),0,X.RED,rand(.5,1),-1,1);}}
+    if(on&&!X.paused&&Math.random()<.9*(X.FRK||1)){const z=CS.wz+rand(-1,2),x=X.gcx(z)+rand(-12,12),w=X.toWorld(x,z);X.emit(X.SPARK,w.x,rand(.2,3),w.z,0,rand(1,3),0,X.RED,rand(.5,1),-1,1);}}
   if(R.circle){const c=R.circle,cr=CS.cr;c.ring.visible=c.disc.visible=!!cr;if(cr){c.ring.position.x=c.disc.position.x=cr[0];c.ring.position.z=c.disc.position.z=cr[1];const k=.5+.5*(1-clamp(cr[3]/4.2,0,1));c.ring.scale.set(cr[2],1,cr[2]);c.disc.scale.set(cr[2]*k,1,cr[2]*k);c.rm.opacity=.6+.35*Math.sin(t*10);}}
   if(R.shield){const B=X.BOSS,on=!!CS.sh&&B&&!B.dead;R.shield.visible=!!on;if(on){R.shield.position.set(B.pos.x,B.hy*.5,B.pos.z);R.shield.scale.setScalar(B.r*1.6+1.2);R.shield.rotation.y=t;R.shield.material.opacity=.18+.08*Math.sin(t*6);}}
 }
