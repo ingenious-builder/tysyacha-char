@@ -1569,10 +1569,10 @@ function addSway(mat,amp){mat.customProgramCacheKey=()=>'sway'+amp;mat.onBeforeC
   transformed.x+=sw;transformed.z+=sw*.6;`);};}
 // мягкий контровой свет по краю силуэта (в вершинном шейдере, почти бесплатно)
 function rimify(root,col,k){const us=[];root.traverse(o=>{const m=o.isMesh&&o.material;if(!m||!m.isMeshLambertMaterial||m.userData.rimU)return;
-  const u={value:new THREE.Color(col)};m.userData.rimU=u;us.push(u);m.customProgramCacheKey=()=>'rim'+k;
+  const u={value:new THREE.Color(col)};m.userData.rimU=u;us.push(u);const kk=m.userData.rimK!=null?m.userData.rimK:k;m.customProgramCacheKey=()=>'rim'+kk;
   m.onBeforeCompile=sh=>{sh.uniforms.uRim=u;
     sh.vertexShader=sh.vertexShader.replace('void main() {','varying float vRim;\nvoid main() {').replace('#include <project_vertex>','#include <project_vertex>\nvRim=pow(1.-clamp(dot(normalize(transformedNormal),normalize(-mvPosition.xyz)),0.,1.),2.4);');
-    sh.fragmentShader=sh.fragmentShader.replace('void main() {','uniform vec3 uRim;varying float vRim;\nvoid main() {').replace('gl_FragColor = vec4( outgoingLight, diffuseColor.a );','gl_FragColor = vec4( outgoingLight + uRim*vRim*'+k.toFixed(2)+', diffuseColor.a );');};});return us;}
+    sh.fragmentShader=sh.fragmentShader.replace('void main() {','uniform vec3 uRim;varying float vRim;\nvoid main() {').replace('gl_FragColor = vec4( outgoingLight, diffuseColor.a );','gl_FragColor = vec4( outgoingLight + uRim*vRim*'+kk.toFixed(2)+', diffuseColor.a );');};});return us;}
 const treeM=new THREE.MeshLambertMaterial({vertexColors:true});addSway(treeM,.012);
 const tuftM=new THREE.MeshLambertMaterial({vertexColors:true});addSway(tuftM,.55);
 const propM=new THREE.MeshLambertMaterial({vertexColors:true});
@@ -2066,13 +2066,16 @@ function buildHero(L,o){
 }
 function rebuildHero(){if(hero){scene.remove(hero.g);hero.D.forEach(d=>d.dispose());hero.halo.material.dispose();hero.pool.material.dispose();hero.shieldM.material.dispose();}hero=buildHero(CLS.look);hero.g.position.copy(P.pos);heroColor(CLS.color);applyCosmetics();}
 // ---------- модели героев KayKit Adventurers (Kay Lousberg, CC0): грузятся лениво; пока нет или ошибка — процедурные ----------
-const HM_V='1',HM_OFF=/[?&]nomdl=1/.test(location.search),HM_PEND=new Set();let HMW=null;
+const HM_V='1',HM_OFF=/[?&]nomdl=1/.test(location.search),HM_PEND=new Set(),HM_GS=1.2;let HMW=null;
 const LOB_SILSK=new THREE.MeshBasicMaterial({color:0x5b72b8,transparent:true,opacity:.3,depthWrite:false,skinning:true});
 function hmScript(src){return new Promise((ok,no)=>{const s=document.createElement('script');s.src=src;s.async=true;s.onload=ok;s.onerror=()=>no(new Error(src));document.head.appendChild(s);});}
-function hmBoot(){if(HM_OFF||hmBoot.p)return;
+function hmBoot(){if(HM_OFF||hmBoot.p||HMW)return;clearTimeout(hmBoot.tm);
   hmBoot.p=(THREE.GLTFLoader?Promise.resolve():hmScript('vendor/GLTFLoader.js?v='+HM_V)).then(()=>window.HM?0:hmScript('hero-models.js?v='+HM_V))
     .then(()=>{window.HM.V=HM_V;return window.HM.load('');}).then(()=>{HMW=window.HM;for(const h of HM_PEND)if(h.g.parent)hmAttach(h);HM_PEND.clear();if(hero&&hero.mdl&&S)applyCosmetics();})
-    .catch(e=>{console.warn('Модели героев не загрузились — остаются простые',e);HM_PEND.clear();});}
+    .catch(e=>{console.warn('Модели героев не загрузились — остаются простые',e);hmBoot.p=null;hmBoot.n=(hmBoot.n||0)+1;
+      for(const h of HM_PEND)if(!h.g.parent)HM_PEND.delete(h);
+      if(hmBoot.n<6)hmBoot.tm=setTimeout(hmBoot,Math.min(60000,4000*2**(hmBoot.n-1)));else HM_PEND.clear();});}
+addEventListener('online',()=>{if(!HM_OFF&&!HMW&&!hmBoot.p){hmBoot.n=0;hmBoot();}});
 function hmAttach(h){
   if(h.mdl||!HMW||!HMW.has(h.cid))return;let m;
   try{m=HMW.make(h.cid,h.sil?{mat:LOB_SILMAT,matSk:LOB_SILSK}:{});}catch(e){console.warn('модель героя',h.cid,e);return;}
@@ -2085,8 +2088,8 @@ function hmAttach(h){
   h.cape=null;h.legs=[];h.D.push({dispose:()=>m.dispose()});}
 // анимации моделей идут всегда (и на экране смерти, и в лобби); состояние задают animateHero, mpUpdatePeer, lobAnim
 function hmFrame(dt){if(!HMW)return;
-  if(hero&&hero.mdl){if(P.dead&&mode==='game'){hero.g.rotation.z=0;hero.g.position.y=0;hero.mdl.drive({dead:true});}hero.mdl.update(dt);}
-  const pr=MP.peer;if(pr&&pr.hero&&pr.hero.mdl)pr.hero.mdl.update(dt);
+  if(hero&&hero.mdl){if(P.dead&&mode==='game'){hero.g.rotation.z=0;hero.g.position.y=0;hero.lhit=P.hitAt||0;hero.mdl.drive({dead:true});}const gs=mode==='game'?HM_GS:1;hero.body.scale.setScalar(gs);hero.mdl.gs=gs;hero.mdl.update(dt);}
+  const pr=MP.peer;if(pr&&pr.hero&&pr.hero.mdl){pr.hero.body.scale.setScalar(HM_GS);pr.hero.mdl.gs=HM_GS;pr.hero.mdl.update(dt);}
   if(LOB.ph&&LOB.ph.h.mdl)LOB.ph.h.mdl.update(dt);
   if(LOB.sil&&LOB.sil.h.mdl){LOB_SILSK.opacity=LOB_SILMAT.opacity;LOB.sil.h.mdl.update(dt);}}
 function heroColor(c){if(hero.rims)for(const u of hero.rims)u.value.copy(c).lerp(WHITE,.4);hero.orb.material.color.copy(c).lerp(WHITE,.3);hero.halo.material.color.copy(c);hero.pool.material.color.copy(c);if(hero.fists)hero.g.traverse(o=>{if(o.userData&&o.userData.fist)o.material.color.copy(c);});}
@@ -3442,7 +3445,7 @@ function die(){P.dead=true;P.hp=0;hero.g.rotation.z=1.4;hero.g.position.y=.2;if(
 function dieFull(){P.dead=true;P.hp=0;hero.g.rotation.z=1.4;hero.g.position.y=.2;const lost=PLAY==='world'?Math.floor(S.ess*.2):0;S.ess-=lost;
   $('#deadTxt').textContent=PLAY==='gorge'&&GZ&&GZ.camp?(GZ.failText||'Уровень '+GZ.camp.k+' «'+GZ.camp.name+'» не пройден: оба героя пали.')+' Опыт, чары и эссенция сохранены — хозяин комнаты может начать уровень заново.':PLAY==='gorge'&&GZ?'Ущелье '+GZ.g+' «'+GORGES[GZ.g-1]+'» не пройдено. Опыт, чары и эссенция сохранены, попробуй ещё раз или прокачайся в свободном мире.':CLS.name+', уровень '+S.lvl+'. Врагов побеждено: '+S.kills+'. Потеряно '+lost+' эссенции. Чары, билд и таланты на месте.';
   $('#reviveBtn').textContent=PLAY==='gorge'?'Пройти заново':'Воскреснуть';later(1,()=>{$('#dead').hidden=false;syncPause();});saveSoon();}
-function revive(){if(MPon){mpReviveBtn();return;}if(PLAY==='gorge'&&GZ){startGorge(GZ.g,GZ.camp);return;}P.dead=false;$('#dead').hidden=true;hero.g.rotation.z=0;hero.g.position.y=0;P.pos.set(0,0,0);P.prev.set(0,0,0);P.hp=P.maxHp;P.mp=P.maxMp;
+function revive(){if(MPon){mpReviveBtn();return;}if(PLAY==='gorge'&&GZ){startGorge(GZ.g,GZ.camp);return;}P.dead=false;$('#dead').hidden=true;hero.g.rotation.z=0;hero.g.position.y=0;hero.lhit=P.hitAt||0;P.pos.set(0,0,0);P.prev.set(0,0,0);P.hp=P.maxHp;P.mp=P.maxMp;
   for(let i=ENEMIES.length-1;i>=0;i--){if(!ENEMIES[i].boss&&ENEMIES[i].pos.length()<24)removeEnemy(i);}
   if(BOSS){const i=ENEMIES.indexOf(BOSS);if(i>=0)removeEnemy(i);BOSS=null;threat=Math.floor(THREAT_MAX*.6);}
   for(let i=EPROJ.length-1;i>=0;i--){dropProjVis(EPROJ[i].o);EPROJ.splice(i,1);}
@@ -4992,7 +4995,7 @@ function mpOnCast(sk,A){
 // ---------- подъём павшего ----------
 function mpDowned(){MP.down=true;MP.revT=0;P.shield=0;hint('Ты упал. Напарник может поднять тебя — нужно постоять рядом 3 секунды.',0);hurtFlash=1;}
 function mpRevived(){
-  if(!P.dead)return;P.dead=false;MP.down=false;hero.g.rotation.z=0;hero.g.position.y=0;P.hp=Math.max(1,P.maxHp*.5);P.invulnT=2.5;
+  if(!P.dead)return;P.dead=false;MP.down=false;hero.g.rotation.z=0;hero.g.position.y=0;hero.lhit=P.hitAt||0;P.hp=Math.max(1,P.maxHp*.5);P.invulnT=2.5;
   fxPillar(P.pos.x,P.pos.z,1.4,7,GOLD,.9);fxRing(P.pos.x,P.pos.z,.5,4,GOLD,.6);colBurst(GOLD,P.pos.x,1,P.pos.z,30,5,.9,-1);
   hint('Тебя подняли!',2.5);syncPause();}
 function mpRevive(dt){
