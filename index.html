@@ -1763,10 +1763,11 @@ function computeStats(){
   ST.hpMul=(1+.1*T('vit'))*(1+.01*mastB());ST.armor=(1-.05*T('armor'))*(CLS.armor||1);ST.regen=2*T('regen');ST.leech=.02*T('leech');ST.wrath=1+.2*T('wrath');
   ST.mana=1+.1*T('mana');ST.summDmg=1+.2*T('summ');ST.summMax=3+T('summ');ST.luck=.03*T('luck');ST.cascade=1+.15*T('cascade');ST.orbitN=T('orbit');ST.orbitDmg=1+.15*T('orbit');cfStats();}
 const WRATH=new Set(['strike','blink','revenge','whirl']),CASC=new Set(['doom','aura','trail','trap']);
-// PASS_K: пассивок в билде 8, а не 21 — каждая сильнее. slotBoost: пока слотов мало, чары сильнее (сводится к 1 у 100-го уровня)
-const PASS_K=1.7,SLOT_BOOST=[[1,1.15],[5,1.25],[10,1.5],[15,1.6],[20,1.5],[25,1.4],[30,1.38],[40,1.3],[50,1.25],[60,1.24],[70,1.2],[80,1.2],[90,1.15],[100,1.1],[999,1.1]];
+// PASS_K: пассивок в билде 8, а не 42 — каждая сильнее (ориентир DESIGN-obraz 1,9). slotBoost: пока слотов мало, чары сильнее; после 100-го — ×1,26 (слотов 8+8 вместо 8+42)
+const PASS_K=1.9,SLOT_BOOST=[[1,1],[5,1.89],[10,2.09],[15,2.21],[20,1.93],[25,1.8],[30,1.8],[40,1.61],[50,1.52],[60,1.52],[70,1.41],[80,1.41],[90,1.35],[100,1.26],[999,1.26]];
+// SLOT_BOOST подобран под «Лучший билд» v13.27 (build_bp.js: сила A / v13.27 ≈ 0,97 на 5–100 уровне; механики классов B — сверху)
 let SB_OFF=false;   // стенд замера силы выключает надбавку
-const slotBoost=()=>{if(!S||S.sandbox||SB_OFF)return 1;const L=S.lvl;for(let i=1;i<SLOT_BOOST.length;i++){const a=SLOT_BOOST[i-1],b=SLOT_BOOST[i];if(L<=b[0])return a[1]+(b[1]-a[1])*(L-a[0])/(b[0]-a[0]);}return 1.1;};
+const slotBoost=()=>{if(!S||S.sandbox||SB_OFF)return 1;const L=S.lvl;for(let i=1;i<SLOT_BOOST.length;i++){const a=SLOT_BOOST[i-1],b=SLOT_BOOST[i];if(L<=b[0])return a[1]+(b[1]-a[1])*(L-a[0])/(b[0]-a[0]);}return SLOT_BOOST[SLOT_BOOST.length-1][1];};
 function skDmg(sk){const f=sk.F.id;let m=1;if(WRATH.has(f))m=ST.wrath;else if(CASC.has(f))m=ST.cascade;else if(f==='summon')m=ST.summDmg;else if(f==='orbit')m=ST.orbitDmg;
   return sk.F.power*(sk.M.dmg||1)*(sk.E.dmg||1)*lvlScale()*ST.dmg*skK(sk)*m*(isImp(sk.id)?IMP.dmg:1);}   // skK — редкость × ранг; невозможная — свой слой
 const skCd=sk=>(sk.F.cd||1)*(sk.M.cd||1)*ST.cdr*(isImp(sk.id)?IMP.cd:1);
@@ -1849,7 +1850,7 @@ Object.assign(FP,{
  s_phoenix:{ph:4.03,u:1.1,cat:'atk',e:[1,1,1,1,1,1,1,1,1,1],m:[1,1.15,2.85,1.19,1,1.45,1,1.92]},s_supernova:{ph:4.86,u:1.3,cat:'area',e:[1,1,1,1,1,1,1,1,1,1],m:[1,1.02,3.01,1,1,1.4,1,2.01]},s_tomb:{ph:7.63,u:1.25,cat:'ctl',e:[1,1,1,1,1,1,1,1,1,1],m:[1,.85,2.7,1.32,1,1.37,1,1.99]},s_zero:{ph:8.2,u:1.3,cat:'area',e:[1,1,1,1,1,1,1,1,1,1],m:[.99,.98,2.95,1.07,1,1.36,1,1.98]},
  s_ballstorm:{ph:27.6,cat:'area',e:[1,1,1,1,1,1,1,1,1,1],m:[.98,.99,2.86,1,1,1.57,1,1.96]},s_skywrath:{ph:18.52,u:1.3,cat:'area',e:[1,1,1,1,1,1,1,1,1,1],m:[1,1.09,2.81,1.36,1,1.57,1,1.81]},s_boulder:{ph:2.64,u:1.1,cat:'atk',e:[1,1,1,1,1,1,1,1,1,1],m:[1,1.15,3.39,1.06,1,1.51,1,2.15]},s_earthquake:{ph:35.28,u:1.3,cat:'area',e:[1,1,1,1,1,1,1,1,1,1],m:[.98,1,2.78,1,1,1.45,1,1.74]},
  s_lantern:{ph:61.77,u:1.1,cat:'area',e:[1,1,1,1,1,1,1,1,1,1],m:[1.02,1,3.14,1.19,1,1.34,1,1.77]},s_pandemic:{ph:0,x:(sk,d,intr,hp,k,L)=>12*k*XR(intr,L),u:1.3,cat:'area'},s_bloodlet:{ph:17.13,u:1.15,cat:'atk',e:[1,1,1,1,1,1,1,1,1,1],m:[.98,.92,3.19,1.22,1,1.46,1,2.16]},s_pact:{ph:5.85,u:1.3,cat:'area',e:[1,1,1,1,1,1,1,1,1,1],m:[1,1,3.02,1,1,1.51,1,2]},
- s_missiles:{ph:4.54,cat:'atk',e:[1,1,1,1,1,1,1,1,1,1],m:[1.08,.95,3.03,1,1,1.45,1,2.05]},s_rift:{ph:0,x:(sk,d,intr,hp,k,L)=>4*k*cloneRef(intr,L),cat:'area'},s_mutagen:{ph:39.13,u:1.1,cat:'def',e:[1,1,1,1,1,1,1,1,1,1],m:[1,1.59,.91,1.61,1,1.47,1,1.1]},
+ s_missiles:{ph:4.54,cat:'atk',e:[1,1,1,1,1,1,1,1,1,1],m:[1.08,.95,3.03,1,1,1.45,1,2.05]},s_rift:{ph:0,x:(sk,d,intr,hp,k,L)=>10*k*cloneRef(intr,L),cat:'area'},s_mutagen:{ph:39.13,u:1.1,cat:'def',e:[1,1,1,1,1,1,1,1,1,1],m:[1,1.59,.91,1.61,1,1.47,1,1.1]},
  s_philstone:{ph:0,x:(sk,d,intr,hp,k,L)=>12*k*cloneRef(intr,L),cat:'area'},s_raise:{ph:11,cat:'sum',e:[1,1,1,1,1,1,1,1,1,1],m:[1,1.36,3.11,1,1,1.37,1,2]},s_bonestorm:{ph:0,x:(sk,d,intr,hp,k,L)=>10*k*XR(intr,L),u:1.3,cat:'sum'},
  s_bearform:{ph:0,x:(sk,d,intr,hp,k,L)=>5*k*XR(intr,L),u:1.2,cat:'def'},s_awaken:{ph:64.04,u:1.3,cat:'sum',e:[1,1,1,1,1,1,1,1,1,1],m:[.99,1.31,1.73,1.08,1,1.5,1,1.94]},s_stormtotem:{ph:11,cat:'sum',e:[1,1,1,1,1,1,1,1,1,1],m:[.99,1.42,3.95,1,1,1.24,1,2.06]},s_elemlord:{ph:28.37,u:1.3,cat:'sum',e:[1,1,1,1,1,1,1,1,1,1],m:[1.01,1.3,1,1.09,1,1.36,1,2.02]},
  s_hellgate:{ph:16.27,cat:'sum',e:[1,1,1,1,1,1,1,1,1,1],m:[.98,1.83,1.04,1.43,1,1.41,1,1.85]},s_pactdemon:{ph:51.25,u:1.3,cat:'sum',e:[1,1,1,1,1,1,1,1,1,1],m:[1,1.14,.97,1.27,1,1.49,1,1.09]},s_galearrow:{ph:2.32,u:1.1,cat:'atk',e:[1,1,1,1,1,1,1,1,1,1],m:[1.01,1.08,3.06,1.71,1,1.36,1,2.03]},s_arrowstorm:{ph:15.6,u:1.3,cat:'atk',e:[1,1,1,1,1,1,1,1,1,1],m:[.98,1.76,.95,1.17,1,1.62,1,1.15]},
@@ -1995,7 +1996,7 @@ function skParts(sk,intr,L){L=L||1;
 const summE=(sk,kn)=>kn==='skelmage'?Math.pow((FP.bolt.e||[])[sk.e]||1,.75):fpE(sk);
 // клон: половина урона чар, которые он умеет повторять (внутренняя — две средние активные класса; у героя — его билд)
 let CLONE_OVR=null;   // проверки: клону — стандартный билд
-function cloneRef(intr,L){if(intr||CLONE_OVR){const I=rarInfo();return intr&&(L||1)===1?I.cref:I.crefL||I.cref;}let s=0;for(const id of EQUIPPED){const x=SKILLS[id];if(x.active&&CLONE_F.has(x.F.id))s+=skParts(x,false).dps;}return s;}
+function cloneRef(intr,L){if(intr||CLONE_OVR)return crefOf(intr?L:(S&&S.lvl||1));let s=0;for(const id of EQUIPPED){const x=SKILLS[id];if(x.active&&CLONE_F.has(x.F.id))s+=skParts(x,false).dps;}return s;}
 // «Сила» — эквивалент урона в секунду для текущего героя; cnt — число чар каждой стихии в билде (с этой чарой), intr — внутренняя сила
 function skPower(sk,cnt,intr){const v=skParts(sk,intr).pw;return intr?v:v*resoMul(sk,cnt)*reactVal(sk.e,cnt||RESO_N);}
 const resoMul=(sk,cnt)=>{const c=cnt||RESO_N;return 1+ST.resoPer*(c[sk.e]+(cnt||EQUIPPED.has(sk.id)?0:1));};
@@ -2018,15 +2019,23 @@ const RANK_STEP=.11,RANK_MAX=5;     // ранг: +11% силы, 5-й = ×1,44 �
 const rkMul=id=>1+RANK_STEP*(rk(id)-1);
 const RAR_CACHE={},medOf=a=>{const b=a.slice().sort((x,y)=>x-y);return b[b.length>>1];};
 const crefAt=L=>{const a=[...CLS.pool].filter(id=>SKILLS[id].active&&SKILLS[id].F.id!=='summon').map(id=>skParts(SKILLS[id],true,L).dps);return a.length?2*medOf(a):60;};
+// стандартный урон билда класса (клон, портал, «польза» ульт) — свой кэш, без rarInfo (его читают и при расчёте ступеней)
+const CREF={};function crefOf(L){L=L||1;const k=CLS.id+'|'+L;let v=CREF[k];if(v==null){CREF[k]=60;v=CREF[k]=crefAt(L);}return v;}
+// база ступеней — общая для всех героев: медиана внутренней силы группы (активные, пассивные) по пулам ВСЕХ классов.
+// У героев теперь свои формы (часть A): по медиане своего пула сила героев расходилась почти вдвое (Чумной лекарь ×1,4, Охотник ×0,7).
+let RAR_G=null;
+function rarMedG(){if(RAR_G)return RAR_G;const keep=CLS,acc=[[],[]];
+  try{for(const C of CLASSES){CLS=C;for(const id of C.pool){const sk=SKILLS[id];acc[sk.active?0:1].push(Math.max(1e-3,skParts(sk,true).pw));}}}finally{CLS=keep;}
+  return RAR_G=[medOf(acc[0]),medOf(acc[1])];}
 function rarInfo(){const k=CLS.id;if(RAR_CACHE[k])return RAR_CACHE[k];
   const N=SKILLS.length,I={map:new Map(),U:new Uint8Array(N),K:new Float64Array(N),B:new Float64Array(N),b0:[0,0],cref:0};
   RAR_CACHE[k]=I;   // заранее: клон читает cref
   const gm=a=>Math.exp(a.reduce((s,v)=>s+Math.log(Math.max(v,1e-6)),0)/a.length),ids=[...CLS.pool];
-  I.cref=crefAt(1);
+  I.cref=crefOf(1);const MG=rarMedG();
   for(const act of [true,false]){const arr=ids.filter(id=>SKILLS[id].active===act).map(id=>{const q=skParts(SKILLS[id],true),fq=FP[SKILLS[id].F.id]||{};return {id,p:Math.max(1e-3,q.pw),u:q.dps<=0&&!fq.pv&&!fq.x};});if(!arr.length)continue;
     const fm={};for(const x of arr){const f=SKILLS[x.id].F.id;(fm[f]=fm[f]||[]).push(x);}
     for(const f in fm){const g=fm[f],m=gm(g.map(x=>x.p));g.sort((a,b)=>a.p-b.p||a.id-b.id);g.forEach((x,i)=>{x.w=(i+.5)/g.length;x.q=x.p/m;});}
-    arr.sort((a,b)=>a.w-b.w||a.q-b.q||a.id-b.id);const n=arr.length,cut=RAR_Q.map(q=>Math.floor(n*q)),b0=RAR_B0[act?0:1]*medOf(arr.map(x=>x.p))*(act?1:PASS_K);I.b0[act?0:1]=b0;   // PASS_K (A): пассивок в билде 8 — база пассивных выше
+    arr.sort((a,b)=>a.w-b.w||a.q-b.q||a.id-b.id);const n=arr.length,cut=RAR_Q.map(q=>Math.floor(n*q)),b0=RAR_B0[act?0:1]*MG[act?0:1]*(act?1:PASS_K);I.b0[act?0:1]=b0;   // PASS_K (A): пассивок в билде 8 — база пассивных выше
     for(let i=0;i<n;i++){const x=arr[i];let r=0;while(r<cut.length&&i>=cut[r])r++;
       const lo=r?cut[r-1]:0,hi=(r<cut.length?cut[r]:n)-1,pos=hi>lo?(i-lo)/(hi-lo):0,B=b0*RAR_POW[r]*(1+RAR_W*pos);
       // чара без урона (тотем лечения): лечение не раздуваем больше ×1,5 — она остаётся слабой обычной, база = её настоящая сила
@@ -2036,7 +2045,7 @@ function rarMap(){return rarInfo().map;}
 const rarOf=sk=>isImp(sk.id)?4:rarMap().get(sk.id)|0;
 // множитель редкости к настоящему урону на нынешнем уровне героя: сила без талантов = база × уровень (lvlS) × ранг у ЛЮБОЙ чары —
 // иначе с ростом маны дорогие по мане чары обгоняли бы следующую редкость. Чара вне пула класса (запрещённый вид) — середина обычных.
-function rarK(sk){const I=rarInfo(),L=S&&S.lvl||1;if(I.L!==L){I.L=L;I.KL=new Float64Array(SKILLS.length);I.crefL=L>1?crefAt(L):I.cref;}
+function rarK(sk){const I=rarInfo(),L=S&&S.lvl||1;if(I.L!==L){I.L=L;I.KL=new Float64Array(SKILLS.length);}
   let v=I.KL[sk.id];if(v)return v;
   if(!I.B[sk.id])I.B[sk.id]=I.b0[sk.active?0:1]*(1+RAR_W/2);
   v=I.KL[sk.id]=Math.min(I.U[sk.id]?RAR_KU:20,I.B[sk.id]*lvlS(L)/Math.max(1e-3,skParts(sk,true,L).pw));return v;}
@@ -2045,8 +2054,8 @@ const skK=sk=>rarK(sk)*rkMul(sk.id)*slotBoost();
 // разбивка силы для листа чары и книги: база × ранг × уровень × таланты × резонанс × реакции
 function powerBreak(sk){const I=rarInfo();rarK(sk);const base=I.B[sk.id],rm=rkMul(sk.id),cur=skParts(sk,false).pw;
   const kt=S.talents;let lv=cur;S.talents={};computeStats();try{lv=skParts(sk,false).pw;}finally{S.talents=kt;computeStats();}
-  const re=resoMul(sk),rv=reactVal(sk.e,RESO_N),n=RESO_N[sk.e]+(EQUIPPED.has(sk.id)?0:1),im=isImp(sk.id)?(sk.active?IMP.dmg/IMP.cd:IMP.dmg):1;
-  return {r:rarOf(sk),base,rank:rm,imp:im,lvl:lv/(base*rm*im),tal:cur/lv,reso:re,react:rv,total:cur*re*rv,same:n};}
+  const re=resoMul(sk),rv=reactVal(sk.e,RESO_N),n=RESO_N[sk.e]+(EQUIPPED.has(sk.id)?0:1),im=isImp(sk.id)?(sk.active?IMP.dmg/IMP.cd:IMP.dmg):1,sb=slotBoost();
+  return {r:rarOf(sk),base,rank:rm,imp:im,slot:sb,lvl:lv/(base*rm*im*sb),tal:cur/lv,reso:re,react:rv,total:cur*re*rv,same:n};}
 const slotNm=(act,i)=>(act?'слоте ':'пассивном слоте ')+(i+1);
 function weakest(act,oc){const key=(act?'a':'p')+(oc||'');if(WKC&&WKC[key]!==undefined)return WKC[key];if(!WKC)WKC={};
   const arr=act?S.active:S.passive,n=act?activeSlots():passiveSlots();let b=null,bp=1e18;
@@ -5743,7 +5752,7 @@ function reactName(e,c){let best=null,bw=0;for(let e2=0;e2<10;e2++){if(e2===e||!
   const w=R.type==='mult'?(R.k-1)*.16:R.type==='aoe'?R.k*.07:R.type==='freeze'?R.k*.06:R.type==='heal'?R.k*.2:.03;if(w>bw){bw=w;best={R,e2};}}return best;}
 function pwBreakHtml(sk){const b=powerBreak(sk),x=(v,t,c)=>`<span${c?' class="'+c+'"':''}>×${fmt2(v)}<i>${t}</i></span>`,on=v=>Math.abs(v-1)>.005;
   const rn=reactName(sk.e,RESO_N),parts=[`<span class="bd">${Math.round(b.base)}<i>${RARITY[Math.min(b.r,3)].n.toLowerCase()}</i></span>`,x(b.rank,'ранг '+rk(sk.id))];if(on(b.imp))parts.push(x(b.imp,'невозможная'));
-  if(on(b.lvl))parts.push(x(b.lvl,'уровень '+S.lvl));if(on(b.tal))parts.push(x(b.tal,'таланты'));
+  if(on(b.lvl))parts.push(x(b.lvl,'уровень '+S.lvl));if(on(b.slot))parts.push(x(b.slot,'мало слотов'));if(on(b.tal))parts.push(x(b.tal,'таланты'));
   if(on(b.reso))parts.push(x(b.reso,'резонанс','bl'));if(on(b.react))parts.push(x(b.react,'реакция','bl'));
   const notes=[];if(on(b.reso))notes.push('+'+Math.round((b.reso-1)*100)+'% от резонанса '+GENE[sk.E.id]+': '+plCh(b.same)+' '+GENE[sk.E.id]+' в билде вместе с этой');
   if(on(b.react)&&rn)notes.push('+'+Math.round((b.react-1)*100)+'% — реакция «'+rn.R.name+'»: в билде есть чары '+GENE[ELEMENTS[rn.e2].id]);
