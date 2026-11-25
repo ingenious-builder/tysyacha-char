@@ -142,7 +142,7 @@ html[data-ui=tab] #mm{top:calc(var(--m) + var(--sat) + 70px);width:calc(100px * 
 #toast.nt small{display:block;margin-top:1px;font:500 12px/1.3 var(--f-ui);color:var(--muted)}
 html[data-ui=tab] #toast.nt b{font-size:18px}html[data-ui=tab] #toast.nt small{font-size:14px}
 #app:has(#banner.on) #toast{opacity:0!important}
-@media (orientation:portrait) and (max-height:640px){#app:has(#mpHint:not([hidden])) #toast{opacity:0!important}}
+@media (orientation:portrait){#app:has(>#mpHud:not([hidden])>#mpHint:not([hidden])) #toast{opacity:0!important}}
 #banner{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);width:max-content;max-width:calc(100% - 32px);text-align:center;pointer-events:none;padding:10px 16px;border-radius:14px;background:rgba(8,12,24,.72);border:1px solid rgba(255,255,255,.12);opacity:0;transition:opacity .4s}
 #banner.on{opacity:1}
 #banner b{display:block;font:700 clamp(28px,7vw,46px)/1.1 var(--f-display);color:var(--gold);text-shadow:0 2px 12px rgba(0,0,0,.8);text-wrap:balance}
@@ -270,6 +270,10 @@ html[data-ui=tab] #toast.nt b{font-size:18px}html[data-ui=tab] #toast.nt small{f
   #select .cgh{grid-row:1;grid-column:1/span var(--n);margin:0 2px}
   #select .cgrp>.cls{grid-row:2}
   #select .cgrp+.cgrp{padding-left:12px;border-left:1px solid var(--line)}
+  /* планшет в портрете на любой высоте — та же лента с прокруткой пальцем (на iPad 12,9″/13″ выше 1250 px раньше была сетка 7×3,
+     лента без прокрутки обрезала 9 героев); плитки планшета — 104 px, как были, чтобы имена не рвались («Некроман/т») */
+  html[data-ui=tab] #select .classes{grid-template-columns:none;overflow-x:auto;overflow-y:hidden;touch-action:pan-x;max-height:none;padding:8px 24px 10px;scroll-padding:0 24px}
+  html[data-ui=tab] #select .cgrp{grid-auto-columns:104px}
 }
 html[data-ui=tab] #select .cgh{font-size:13px}html[data-ui=tab] #select .cgh small{font-size:13px}
 
@@ -653,11 +657,22 @@ html[data-ui=tab] .set-out{height:64px;font-size:21px}
 #mpArrow svg{position:absolute;inset:7px;width:30px;height:30px;transform:rotate(var(--a,0deg));filter:drop-shadow(0 0 4px #ff4a3a)}
 #mpArrow.up b{top:auto;bottom:100%;margin:0 0 1px}
 #mpArrow b{position:absolute;left:50%;top:100%;transform:translateX(-50%);margin-top:1px;padding:1px 6px;border-radius:7px;background:rgba(40,6,6,.82);font:700 11px/1.3 var(--f-ui);color:#ffd0c8;white-space:nowrap}
+#mpArrow.sd b{top:50%;left:100%;transform:translateY(-50%);margin:0 0 0 2px}#mpArrow.sd.lt b{left:auto;right:100%;margin:0 2px 0 0}
 @keyframes mpPulse{50%{transform:scale(1.35);opacity:.55}}
 @media (prefers-reduced-motion:reduce){#mpArrow i,#app>#mpHud #mpCard.down{animation:none}}
 @media (orientation:portrait){
   html:not([data-ui=tab]) #app>#mpHud #mpRow{right:calc(var(--m) + var(--sar));justify-content:space-between}
   #mpHint{bottom:calc(var(--sab) + var(--lift) + 256px);max-width:calc(100% - var(--sal) - var(--sar) - 32px)}
+}
+/* ui2: подсказка кооператива — на месте плашки сообщений сверху (под панелями), а не внизу по центру под героем.
+   В портрете одно место на одно сообщение: пока видна подсказка, плашки #toast ждут (toastHeld), стопкой в две строки они ложились на героя.
+   iPad в альбоме — подсказка сразу под плашкой (--th — высота плашки, пишет toastShow). Телефон в альбоме — как было: обе внизу между кнопками */
+@media (orientation:portrait){
+  #app>#mpHud>#mpHint{top:var(--y3,calc(var(--sat) + var(--m) + 190px));bottom:auto}
+}
+@media (orientation:landscape){
+  html[data-ui=tab] #app>#mpHud>#mpHint{top:var(--yt,calc(var(--m) + var(--sat) + 150px));bottom:auto}
+  html[data-ui=tab] #app:has(#toast.on)>#mpHud>#mpHint{top:calc(var(--yt,calc(var(--m) + var(--sat) + 150px)) + var(--th,40px) + 6px)}
 }
 @media (max-width:380px){#mpCombo small{display:none}#mpCard b{max-width:72px}}
 @media (max-height:460px){.coop-mode small{display:none}.coop-pl{padding:6px 10px}.ov .coop-wait{font-size:13px}}
@@ -5569,33 +5584,57 @@ function toastSk(sk,t,sub){if(rarOf(sk)>=2)rarPop(sk,sub);else toast(t+(sk.activ
 // ui2 (25.11, Артём: «окна слишком везде вылазят постоянно, без конца»): мелкие сообщения — одна плашка #toast сверху, не по центру боя.
 // В бою один и тот же текст — не чаще раза в 12 с; новое не перебивает текущее раньше 1,2 с (ждёт; в очереди не больше двух, старое выкидываем).
 // В меню (книга, настройки) — сразу и без отсева, как раньше. cls 'nt' + sub — плашка с заголовком (уровень, слот, мастерство).
-const TST={q:[],seen:new Map(),minT:0,qT:0};
+// Пока по центру баннер (босс, «Босс повержен», цель), плашка под ним не видна (#app:has(#banner.on) #toast) — сообщения ждут конца баннера
+// (иначе «Уровень N» за победу над боссом гас, так и не показавшись). Очередь переполнена — первой выкидываем мелочь, а не плашку уровня/слота ('nt').
+const TST={q:[],seen:new Map(),minT:0,qT:0,banEnd:0,cur:null,th:0};
 // своя копия esc: toast зовут и при запуске, раньше строки const esc (иначе ошибка «до объявления»)
 function toastEsc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function toastBusy(){try{return mode==='game'&&!bookOpen&&!setOpen;}catch(e){return false;}}
+// держат плашку: баннер по центру (до его конца) и в портрете — подсказка напарника на том же месте сверху (пока видна). Вернёт, до какого времени ждать, или 0
+function toastHeld(){const now=performance.now();if(now<TST.banEnd&&$('#banner').classList.contains('on'))return TST.banEnd+250;
+  if(innerHeight>=innerWidth&&!$('#mpHud').hidden&&!$('#mpHint').hidden)return now+400;return 0;}
+// уступить место (баннеру, подсказке): плашка гаснет, важная ('nt': уровень, слот) — первой в очередь и выйдет потом
+function toastYield(at){const te=$('#toast');if(!te.classList.contains('on'))return;clearTimeout(toastT);te.classList.remove('on');const c=TST.cur;TST.cur=null;if(c&&c[2]==='nt')toastQ(c,at,true);}
+function toastQ(x,at,front){TST.q=TST.q.filter(y=>y[0]!==x[0]);if(front)TST.q.unshift(x);else TST.q.push(x);
+  if(TST.q.length>2){const i=TST.q.findIndex(y=>y[2]!=='nt');TST.q.splice(i>=0?i:0,1);}
+  clearTimeout(TST.qT);TST.qT=setTimeout(toastNext,Math.max(0,at-performance.now())+30);}
 function toast(t,ms,cls,sub){if(!t)return;const now=performance.now();
   if(toastBusy()){const key=t+'|'+(sub||''),l=TST.seen.get(key);if(l&&now-l<12000)return;TST.seen.set(key,now);
     if(TST.seen.size>80)for(const [k,v] of TST.seen)if(now-v>12000)TST.seen.delete(k);
-    if(now<TST.minT){TST.q=TST.q.filter(x=>x[0]!==t);TST.q.push([t,ms,cls,sub]);if(TST.q.length>2)TST.q.shift();clearTimeout(TST.qT);TST.qT=setTimeout(toastNext,TST.minT-now+30);return;}}
+    const hu=toastHeld();if(hu){toastQ([t,ms,cls,sub],hu);return;}
+    if(now<TST.minT){toastQ([t,ms,cls,sub],TST.minT);return;}}
   toastShow(t,ms,cls,sub);}
-function toastNext(){const x=TST.q.shift();if(x)toastShow(x[0],x[1],x[2],x[3]);}
+function toastNext(){if(!TST.q.length)return;const hu=toastHeld();if(hu){clearTimeout(TST.qT);TST.qT=setTimeout(toastNext,Math.max(200,hu-performance.now()));return;}
+  const x=TST.q.shift();toastShow(x[0],x[1],x[2],x[3]);}
 function toastShow(t,ms,cls,sub){const el=$('#toast');el.className=cls||'';if(sub)el.innerHTML='<b>'+toastEsc(t)+'</b><small>'+toastEsc(sub)+'</small>';else el.textContent=t;
-  el.classList.add('on');clearTimeout(toastT);TST.minT=performance.now()+1200;
-  toastT=setTimeout(()=>{el.classList.remove('on');if(TST.q.length){clearTimeout(TST.qT);TST.qT=setTimeout(toastNext,280);}},ms||1900);}
+  el.classList.add('on');clearTimeout(toastT);TST.minT=performance.now()+1200;TST.cur=[t,ms,cls,sub];
+  // высота плашки — для подсказки напарника под ней (--th) и для стрелки «Друг упал» ниже стопки сообщений
+  const h=el.offsetHeight;if(h&&h!==TST.th){TST.th=h;document.documentElement.style.setProperty('--th',h+'px');}
+  toastT=setTimeout(()=>{el.classList.remove('on');TST.cur=null;if(TST.q.length){clearTimeout(TST.qT);TST.qT=setTimeout(toastNext,280);}},ms||1900);}
 let banT=0;
 // ui2: «Уровень N», «Открыт слот», «Мастерство N», «Особенность «…» · II» — в бою не баннером по центру, а плашкой сверху;
-// пришли в одну секунду (уровень + слот) — одной плашкой. Боссы, опасность, цели кампании, сундук — баннером, как раньше.
-const BAN_MINOR=/^(Уровень \d|Открыт слот|Мастерство \d|Особенность «)/;let ntLast={t:0,b:''};
-function bannerMinor(b,s){const now=performance.now();
-  if(now-ntLast.t<1800&&ntLast.b&&ntLast.b.indexOf(b)<0){const prev=ntLast.b;b=prev+' · '+b.charAt(0).toLowerCase()+b.slice(1);ntLast={t:now,b};
-    const qi=TST.q.findIndex(x=>x[0]===prev);if(qi>=0)TST.q[qi]=[b,3000,'nt',s];else toastShow(b,3000,'nt',s);return;}/* прошлая ещё в очереди — заменить там, уже на экране — сразу */
-  ntLast={t:now,b};toast(b,2800,'nt',s);}
+// пришли подряд (≤ 1,8 с между ними) — одной плашкой; сообщение того же вида заменяет прошлое, а не дописывается:
+// 4 уровня подряд + слот → «Уровень 5 · открыт слот», подпись — последняя. Боссы, опасность, сундук — баннером, как раньше.
+// Только уровень героя («Уровень 5»): вступление уровня кампании «Уровень 3 · Кристалл» с целью остаётся баннером по центру.
+const BAN_MINOR=/^(Уровень \d+$|Открыт слот|Мастерство \d|Особенность «)/;let ntLast={t:0,b:'',parts:null};
+const ntKind=b=>/^Уровень/.test(b)?'lv':/^Открыт слот/.test(b)?'sl':/^Мастерство/.test(b)?'ms':'ft';
+function bannerMinor(b,s){const now=performance.now(),k=ntKind(b);
+  if(now-ntLast.t<1800&&ntLast.parts){const prev=ntLast.b;ntLast.parts.set(k,b);let nb='';for(const v of ntLast.parts.values())nb+=nb?' · '+v.charAt(0).toLowerCase()+v.slice(1):v;
+    ntLast.t=now;ntLast.b=nb;
+    /* прошлая ещё в очереди — заменить там; уже на экране — сразу перерисовать; иначе (выкинута, погасла) — обычной плашкой */
+    const qi=TST.q.findIndex(x=>x[0]===prev);if(qi>=0){TST.q[qi]=[nb,3000,'nt',s];return;}
+    if(TST.cur&&TST.cur[0]===prev&&$('#toast').classList.contains('on')&&!toastHeld()){toastShow(nb,3000,'nt',s);return;}
+    toast(nb,3000,'nt',s);return;}
+  ntLast={t:now,b,parts:new Map([[k,b]])};toast(b,2800,'nt',s);}
 // k: 'boss' — выход босса / новая фаза, 'win' — босс повержен (крупнее, с подписью lbl сверху и «наездом»)
 function banner(b,s,red,k,lbl){if(!k&&!red&&mode==='game'&&BAN_MINOR.test(b)){bannerMinor(b,s);return;}
   $('#bannerB').textContent=b;$('#bannerS').textContent=s;const el=$('#banner');el.classList.toggle('red',!!red);
   const kb=k==='boss',kw=k==='win';if((kb||kw)&&el.classList.contains('on')){el.classList.remove('on');void el.offsetWidth;}
   el.classList.toggle('boss',kb);el.classList.toggle('win',kw);if(lbl)el.dataset.k=lbl;else delete el.dataset.k;
-  el.classList.add('on');clearTimeout(banT);banT=setTimeout(()=>el.classList.remove('on'),k?2700:2600);}
+  const dur=k?2700:2600;TST.banEnd=performance.now()+dur;
+  // ui2: плашка под баннером не видна — важная (уровень, слот: 'nt') возвращается в очередь первой и выйдет после баннера, мелочь гаснет
+  toastYield(TST.banEnd+250);
+  el.classList.add('on');clearTimeout(banT);banT=setTimeout(()=>el.classList.remove('on'),dur);}
 let zoneT=0;
 // 25.11 на входе — полоса уровней региона (не зависит от героя) и короткая оценка: перерос / рано
 function zoneSub(z){const L=S.lvl,b=LVB[z];let s='Враги ур. '+bandTxt(z);if(z>=ZABYSS)s+=' и сильнее с каждым шагом';else if(L>b[1]+3)s+=' · ты сильнее — опыта почти нет';
@@ -5685,10 +5724,11 @@ function mmGorge(g,sz,s,pl,ML,M,edge,Rw,now){const Z=GZ,th=Z.th||{};
   return toExit!=null?'<b>'+(Z.camp?'Уровень '+Z.camp.k:'Ущелье '+Z.g)+'</b>'+(Z.open?'выход открыт · ':'до выхода ')+toExit+' м':'';}
 // ---------- ui2: раскладка верха HUD по реальной высоте панелей ----------
 // --y1 — строка напарника (под панелью героя; в портрете телефона — и под мини-картой), --y2 — полоса босса/цели (#topc),
-// --y3 — сообщения (#toast, #rarPop, #upg). Меряем раз в 0,2 с и пишем, только если что-то сдвинулось.
-const HUDL={t:0,k:''};
+// --y3 — сообщения (#toast, #rarPop, #upg; в портрете на том же месте — подсказка напарника #mpHint, по очереди с плашкой). Меряем раз в 0,2 с и пишем, только если что-то сдвинулось.
+const HUDL={t:0,k:'',hh:0};
 function hudLayTick(dt){HUDL.t-=dt;if(HUDL.t>0)return;HUDL.t=.2;luBtnSync();if(mode!=='game'||$('#hud').hidden)return;
   const de=document.documentElement,por=innerHeight>=innerWidth,tab=de.dataset.ui==='tab';
+  const mh=$('#mpHint');HUDL.hh=mh&&!mh.hidden?mh.offsetHeight:0;/* высота подсказки — стрелке «Друг упал» (ниже стопки сообщений) */
   let y1=$('#stats').getBoundingClientRect().bottom;if(por&&!tab&&!mmEl.hidden)y1=Math.max(y1,mmEl.getBoundingClientRect().bottom);y1=Math.round(y1+6);
   const row=$('#mpRow'),rh=row&&!$('#mpHud').hidden?row.offsetHeight:0,y2=y1+(rh?rh+6:0);
   const tc=$('#topc'),th=tc?tc.offsetHeight:0,y3=y2+(th?th+6:0);
@@ -6940,7 +6980,7 @@ function mpOnPos(m){
   if(!pr.on){/* напарник в игре — значит вошёл */pr.on=true;if(MP.active)mpPeerModelMake();}
   pr.ib.push(m.ts!=null?m.ts:performance.now(),m.x,m.z);pr.tx=m.x;pr.tz=m.z;pr.tf=m.f;pr.hp=m.h;pr.maxHp=m.m;pr.mv=m.mv;pr.sw=m.sw;pr.sh=m.sh;pr.rp=m.rp;pr.lvl=m.l||pr.lvl;if(m.k!=null)pr.ctt=String(m.k);
   if(m.c&&pr.castT<.1)pr.castT=.3;
-  const wasDead=pr.dead;pr.dead=!!m.d;if(pr.dead&&!wasDead&&MP.active)hint(pr.nick+' упал — встань рядом на 3 секунды, чтобы поднять',5);
+  const wasDead=pr.dead;pr.dead=!!m.d;if(pr.dead&&!wasDead&&MP.active)hint(pr.nick+' упал — подними: постой рядом 3 с',5);
   if(!pr.placed){pr.pos.set(m.x,0,m.z);pr.placed=true;}}
 function mpUpdatePeer(dt){
   const pr=MP.peer;if(!pr||!pr.on||!pr.hero)return;const h=pr.hero;
@@ -7167,10 +7207,12 @@ function mpWinUi(){
 }
 
 // ---------- подсказки и панель напарника ----------
-// ui2: одна и та же подсказка с таймером (кампания шлёт «Кристалл ждёт…» каждые 6 с) — не чаще раза в 15 с, пока она не на экране
-const HINT_SEEN=new Map();
-function hint(text,sec){if(text&&sec&&mode==='game'){const now=performance.now(),l=HINT_SEEN.get(text);if(l&&now-l<15000&&MP.hint!==text)return;HINT_SEEN.set(text,now);}
-  MP.hint=text;MP.hintT=sec;mpHintUntil=sec?performance.now()+sec*1000:0;const el=$('#mpHint');el.textContent=text;el.hidden=!text;}
+// ui2: отсев повторов — только у периодических напоминаний кампании (такт кампании шлёт их каждые 6–12 с): не чаще раза в 15 с, пока она не на экране.
+// События («X упал — подними», «Нить порвалась») и ответы на нажатия («Нить ещё не готова», «Вы и так рядом») — всегда, сколько бы раз ни пришли.
+const HINT_SEEN=new Map(),HINT_NAG=/^(Кристалл ждёт|Для плит нужны двое|Отставшего можно подтянуть)/;
+function hint(text,sec){if(text&&sec&&mode==='game'&&HINT_NAG.test(text)){const now=performance.now(),l=HINT_SEEN.get(text);if(l&&now-l<15000&&MP.hint!==text)return;HINT_SEEN.set(text,now);}
+  MP.hint=text;MP.hintT=sec;mpHintUntil=sec?performance.now()+sec*1000:0;const el=$('#mpHint');el.textContent=text;el.hidden=!text;
+  if(text&&innerHeight>=innerWidth&&!$('#mpHud').hidden)toastYield(performance.now()+400);}/* портрет: одно место сверху — плашка уступает подсказке */
 const mpTxtC={};
 function mpTxt(el,key,val){if(mpTxtC[key]!==val){mpTxtC[key]=val;el.textContent=val;}}
 function mpHud(){
@@ -7196,13 +7238,17 @@ const mpAV=new THREE.Vector3();let mpAK='';
 function mpArrowTick(pr){const el=$('#mpArrow');if(!el)return;
   if(!(pr&&pr.on&&pr.dead&&pr.pos&&mode==='game'&&!P.dead)){if(!el.hidden)el.hidden=true;return;}
   const W=innerWidth,H=innerHeight;mpAV.set(pr.pos.x,1,pr.pos.z).project(camera);let nx=mpAV.x,ny=-mpAV.y;if(mpAV.z>1){nx=-nx;ny=-ny;}
-  // свободное поле: сверху — под панелями героя/напарника/цели (HUDL.y3), по бокам — с местом под подпись; напарник в нём виден сам — стрелки нет
-  const px=(nx*.5+.5)*W,py=(ny*.5+.5)*H,T=(H>=W?(HUDL.y3||190):56)+28,Bt=H-84,Lf=62,Rt=W-62;
+  // свободное поле: сверху — под панелями героя/напарника/цели (HUDL.y3) и под сообщением на этом месте (подсказка #mpHint или плашка #toast — что видно сейчас),
+  // по бокам — с местом под подпись; напарник в нём виден сам — стрелки нет
+  let T=56;if(H>=W){T=HUDL.y3||190;const mh=!$('#mpHint').hidden?(HUDL.hh||30):$('#toast').classList.contains('on')?(TST.th||40):0;if(mh)T+=mh+6;}T+=28;
+  const px=(nx*.5+.5)*W,py=(ny*.5+.5)*H,Bt=H-84,Lf=62,Rt=W-62;
   if(mpAV.z<=1&&px>24&&px<W-24&&py>T-12&&py<H-40){if(!el.hidden)el.hidden=true;return;}
   const cx=W/2,cy=(T+Bt)/2,dx=px-cx||.001,dy=py-cy||.001;
   const t=Math.min((dx>0?Rt-cx:Lf-cx)/dx,(dy>0?Bt-cy:T-cy)/dy),ax=cx+dx*t,ay=cy+dy*t;
   el.hidden=false;el.style.transform='translate('+ax.toFixed(1)+'px,'+ay.toFixed(1)+'px)';el.style.setProperty('--a',(Math.atan2(dy,dx)*180/Math.PI+90).toFixed(0)+'deg');
-  const d=Math.round(Math.hypot(pr.pos.x-P.pos.x,pr.pos.z-P.pos.z)),k=(pr.nick||'').slice(0,10)+' упал · '+d+' м';if(k!==mpAK){mpAK=k;$('#mpArrowT').textContent=k;}el.classList.toggle('up',ay>cy);}
+  const d=Math.round(Math.hypot(pr.pos.x-P.pos.x,pr.pos.z-P.pos.z)),k=(pr.nick||'').slice(0,10)+' упал · '+d+' м';if(k!==mpAK){mpAK=k;$('#mpArrowT').textContent=k;}
+  // у верхнего края подпись — сбоку от стрелки (под стрелкой она ложилась на героя), у нижнего — над стрелкой
+  const top=ay<=T+.5;el.classList.toggle('up',!top&&ay>cy);el.classList.toggle('sd',top);el.classList.toggle('lt',top&&ax>W/2);}
 
 // ---------- кадровое обновление кооператива ----------
 function mpUpdate(dt){
