@@ -1584,6 +1584,9 @@ const CLASSES=[
 // третья стихия класса: по характеру, даёт ещё 19 баз чар (всего 57 баз × 8 вариантов)
 const THIRD={pyro:'earth',cryo:'wind',storm:'wind',plague:'blood',necro:'poison',paladin:'fire',geo:'storm',windr:'ice',hemo:'shadow',arcan:'ice',bers:'fire',dk:'blood',druid:'wind',hunter:'earth',assassin:'blood',shaman:'wind',monk:'fire',lock:'blood',inq:'earth',alch:'fire'};
 // ===== A: раздача общих форм по образу (DESIGN-obraz 4.1): 6 активных + 4 пассивные + 3 фирменные; описания 4.2 =====
+// 25.11 (Артём): телепорт (blink) — только у быстрых: Странник ветров, Ассасин, Монах ветра. Гемомант: blink → hook (Кровавая цепь —
+// тянет врага к себе), Арканист: blink → trap (Арканная мина — руны под врагами). Изученные прежние телепорты у них — в «Прежних чарах».
+const TELE_SWAP={hemo:['hook','У Гемоманта вместо него — цепь (тянет врага к себе и оглушает): она уже изучена'],arcan:['trap','У Арканиста вместо него — мины (три руны взрываются под врагами): они уже изучены']};
 const CLASS_KIT={
  pyro:{arch:'mag',ca:['bolt','meteor','rain','nova','fan','beacon'],cp:['surge','focus','rebirth','sprite'],sig:['s_phoenix','s_ash','s_supernova'],
   desc:'Каждое огненное попадание раскаляет врага: на пятом жаре он вспыхивает и поджигает соседей. Феникс проносится сквозь толпу и возвращается, Сверхновая бьёт раскалённых сильнее и взрывает их разом.'},
@@ -1601,9 +1604,9 @@ const CLASS_KIT={
   desc:'Земляные попадания покрывают врага трещинами — каждая усиливает урон по нему, а на пятой он расколот и оглушён. Валун катится сквозь строй и растёт, Землетрясение раскалывает всё вокруг.'},
  windr:{arch:'shoot',ca:['bolt','chain','mark','boomer','blink','fan'],cp:['volley','trail','slip','battery'],sig:['s_galearrow','s_feather','s_arrowstorm'],
   desc:'Сильнее на бегу: попутный ветер копится, и следующий выстрел бьёт сильнее и прошивает врагов насквозь. Ураганная стрела стягивает врагов в вихрь, Буря стрел косит всех вокруг.'},
- hemo:{arch:'dark',ca:['beam','barrier','blink','mark','vortex','nova'],cp:['link','twin','harvest','brink'],sig:['s_bloodlet','s_threads','s_pact'],
+ hemo:{arch:'dark',ca:['beam','barrier','hook','mark','vortex','nova'],cp:['link','twin','harvest','brink'],sig:['s_bloodlet','s_threads','s_pact'],
   desc:'Каждая чара стоит ему 3% здоровья и вдвое меньше маны, зато бьёт на 40% сильнее, а ниже половины здоровья — ещё сильнее. Возвращает жизнь вампиризмом и убийствами — играть на грани.'},
- arcan:{arch:'arc',ca:['glyph','stasis','blink','mirror','beacon','decoy'],cp:['orbit','deflect','battery','rift'],sig:['s_missiles','s_resonator','s_rift'],
+ arcan:{arch:'arc',ca:['glyph','stasis','trap','mirror','beacon','decoy'],cp:['orbit','deflect','battery','rift'],sig:['s_missiles','s_resonator','s_rift'],
   desc:'Чем больше маны, тем сильнее чары, а полная мана даёт прилив — несколько секунд чары бесплатны. Снаряды и ракеты рикошетят к соседу, Разлом реальности повторяет все его заклинания.'},
  bers:{arch:'fight',ca:['strike','whirl','leap','rush','quake','boomer'],cp:['revenge','execute','trophy','shell'],sig:['s_roar','s_bloodpool','s_carnage'],
   desc:'Ярость копится от ударов — по нему и его собственных — и делает его быстрее и сильнее; на сотне он впадает в бешенство с вампиризмом. Бросает топор, прыгает в толпу и ревёт так, что враги бегут.'},
@@ -1989,6 +1992,16 @@ function validChar(d,c){if(!d||!Array.isArray(d.active)||!Array.isArray(d.passiv
     const f=newChar(c);s.lvl=1;s.xp=0;s.ess=0;s.ranks={};s.talents={};s.active=f.active;s.passive=f.passive;s.learned=f.learned;
     for(const id of f.learned)if(!s.book.includes(id))s.book.push(id);
   }else{s.book=Array.isArray(d.book)?[...new Set(d.book.filter(v=>c.poolAll.has(v)))]:[...s.learned];for(const id of s.learned)if(!s.book.includes(id))s.book.push(id);}
+  // 25.11: телепорт ушёл из набора Гемоманта и Арканиста. Изученные телепорты — в «Прежних чарах» (как в v13.28), а вместо каждого изучена
+  // чара новой формы той же стихии и варианта (Кровавый рывок · Мощь → Кровавая цепь · Мощь); стоявший в билде — она же встаёт в его слот
+  {const sw=TELE_SWAP[c.id];let n=0;if(d.teleKit)s.teleKit=d.teleKit;
+    if(sw){const cv=v=>{const k=v!=null&&SKILLS[v];return k&&k.F.id==='blink'&&c.legacy.has(v)?sid(k.E.id,sw[0],k.M.id):null;};
+      for(const [src,dst] of [[d.learned,s.learned],[Array.isArray(d.book)?d.book:[],s.book]])for(const v of src){const w=cv(v);if(w!=null&&c.pool.has(w)&&!dst.includes(w)){dst.push(w);n++;}}
+      for(let i=0;i<8;i++){const w=cv(d.active[i]);if(w!=null&&c.pool.has(w)&&s.active[i]==null&&!s.active.includes(w))s.active[i]=w;}
+      if(n)s.teleKit='Телепорт теперь только у быстрых героев (Странник ветров, Ассасин, Монах ветра). '+sw[1]+' в тех же стихиях и вариантах, что и твои телепорты. Сами телепорты — в «Прежних чарах».';}
+    // прежние чары, чья форма вернулась в набор класса (у Арканиста — мины), снова изучены
+    for(const v of (Array.isArray(d.legacy)?d.legacy:[]))if(c.pool.has(v)){if(!s.learned.includes(v))s.learned.push(v);if(!s.book.includes(v))s.book.push(v);}}
+  if(d.teleNote)s.teleNote=d.teleNote;
   if(d.drop&&Array.isArray(d.drop.b)&&Array.isArray(d.drop.i))s.drop={b:d.drop.b.filter(Number.isInteger).slice(0,18),i:d.drop.i.filter(v=>c.poolAll.has(v)).slice(0,18)}; // память выпадения чар
   if(!d.mig2){s.mig2=1;s.needBest=1;const st=sid(c.p,c.sig[0],'mighty');if(!s.learned.includes(st))s.learned.push(st);if(!s.book.includes(st))s.book.push(st);
     const nl=new Set([...s.legacy,...s.book.filter(v=>c.legacy.has(v))]).size;(NFS.mig||(NFS.mig=[])).push([c.name,nl]);}
@@ -2349,6 +2362,7 @@ function upgradeFor(sk,hyp){
   if(EQUIPPED.has(sk.id)||(!hyp&&!isLearned(sk.id)))return null;
   const act=sk.active,arr=act?S.active:S.passive,n=act?activeSlots():passiveSlots(),free=arr.findIndex((v,i)=>i<n&&v==null)>=0;
   let tgt=baseSlot(sk);
+  if(tgt==null&&act&&isTele(sk)){for(let i=0;i<n;i++){const v=arr[i];if(v!=null&&isTele(SKILLS[v])){tgt=v;break;}}} // телепорт меняется только на телепорт
   if(tgt==null){
     {const same=[];for(let i=0;i<n;i++){const v=arr[i];if(v!=null&&SKILLS[v].f===sk.f)same.push(v);}
       if(same.length>=2||(act&&same.length&&free))tgt=same.reduce((a,b)=>pwr(SKILLS[a])<=pwr(SKILLS[b])?a:b);}
@@ -2356,6 +2370,7 @@ function upgradeFor(sk,hyp){
   if(tgt==null)return null;
   const T_=SKILLS[tgt],cnt=RESO_N.slice();cnt[T_.e]--;cnt[sk.e]++;
   if(act&&FP[sk.F.id].cat==='mov'&&FP[T_.F.id].cat!=='mov'&&movFull(arr))return null;   // движения в билде уже хватает
+  if(act&&isTele(sk)&&!isTele(T_)&&teleN(arr,T_.id)>=TELE_MAX)return null;             // телепорт в билде уже есть — второй не ставим
   const tp=pwr(T_),cp=skPower(sk,cnt),gain=cp/tp-1;
   if(gain<.06)return null;
   return {tgt,gain,idx:arr.indexOf(tgt),cp,tp,act};}
@@ -2368,17 +2383,35 @@ const MOV_MAX=2;
 // движения в активных слотах уже MOV_MAX; movAlt — есть ли изученная не-движение активная вне билда (иначе слот не пустует)
 function movFull(arr){const n=activeSlots();let c=0;for(let i=0;i<n;i++){const v=arr[i];if(v!=null&&FP[SKILLS[v].F.id].cat==='mov')c++;}return c>=MOV_MAX;}
 function movAlt(arr){for(const id of LEARNED){const sk=SKILLS[id];if(sk&&sk.active&&!arr.includes(id)&&CLS.pool.has(id)&&FP[sk.F.id].cat!=='mov'&&baseSlot(sk)==null&&formSlot(sk)==null)return true;}return false;}
+// 25.11 (Артём: «когда 2 телепорта занимают 2 слота… они ещё на автомате не нажимаются»): чара движения — телепорт (blink) — переносит
+// героя, а не бьёт цель. В активных слотах она одна — везде: «Лучший билд», автозамена, авто-выбор, новый слот, своими руками (вторая
+// встаёт — первая уходит в книгу). Рывок (rush) и прыжок (leap) — удары с подходом к цели, автобой жмёт их сам: для них общий MOV_MAX.
+const TELEF=new Set(['blink']),TELE_MAX=1;
+const isTele=sk=>!!sk&&sk.active&&TELEF.has(sk.F.id);
+function teleN(arr,skipId){let c=0;for(const v of arr)if(v!=null&&v!==skipId&&isTele(SKILLS[v]))c++;return c;}
+// лучшая изученная активная вне билда и не телепорт — на место ушедшего телепорта (как при открытии слота)
+function teleRefill(arr,i){let b=null,bp=-1;for(const id of (S.sandbox?CLS.pool:LEARNED)){if(arr.includes(id))continue;const sk=SKILLS[id];if(!sk||!sk.active||!CLS.pool.has(id)||isTele(sk))continue;
+    if(baseSlot(sk)!=null||formSlot(sk)!=null)continue;const p=pwr(sk);if(p>bp){bp=p;b=id;}}
+  if(b!=null)arr[i]=b;return b;}
+// лишние телепорты из билда — в книгу: остаётся keep (только что поставленный) или самый сильный; на их место — лучшие изученные
+function teleCap(keep){const arr=S.active;if(teleN(arr)<=TELE_MAX)return null;
+  let k=keep!=null&&arr.includes(keep)?keep:null;if(k==null){let bp=-1;for(const v of arr)if(v!=null&&isTele(SKILLS[v])){const p=pwr(SKILLS[v]);if(p>bp){bp=p;k=v;}}}
+  const out=[],put=[];for(let i=0;i<arr.length;i++){const v=arr[i];if(v==null||v===k||!isTele(SKILLS[v]))continue;arr[i]=null;out.push(v);if(i<activeSlots()){const b=teleRefill(arr,i);if(b!=null)put.push(b);}}
+  return {keep:k,out,put};}
+const teleMsg=r=>'Чара движения в билде — только одна: «'+r.out.map(id=>skName(SKILLS[id])).join('», «')+'» '+(r.out.length>1?'ушли':'ушла')+' в книгу'+(r.put.length?', вместо '+(r.out.length>1?'них':'неё')+' «'+r.put.map(id=>skName(SKILLS[id])).join('», «')+'»':'');
+// сказать сейчас (после «В билде: …») или при входе в игру, если билд поправлен в меню
+function teleSay(r){if(!r)return;const t=teleMsg(r);if(mode==='game')setTimeout(()=>toast(t,4500),40);else if(S)S.teleNote=t;}
 function bestBuildPlan(){
   const na=activeSlots(),np=passiveSlots(),L=classSkills().filter(x=>isLearned(x.id));
   const cnt=new Array(10).fill(0),usedB=new Set(),formN={},cats={},catN={};let free=false;
   const run=(list,n,act)=>{const res=[];
     const pick=cf=>{let best=null,bs=-1;
-      for(const sk of list){if(usedB.has(sk.bk))continue;const ct=FP[sk.F.id].cat;if(cf&&ct!==cf)continue;const fc=formN[sk.f]||0;if(fc>=2)continue;if(act&&ct==='mov'&&(catN.mov|0)>=MOV_MAX&&!free)continue;
+      for(const sk of list){if(usedB.has(sk.bk))continue;const ct=FP[sk.F.id].cat;if(cf&&ct!==cf)continue;const fc=formN[sk.f]||0;if(fc>=2)continue;if(act&&ct==='mov'&&(catN.mov|0)>=MOV_MAX&&!free)continue;if(act&&isTele(sk)&&(catN.tele|0)>=TELE_MAX)continue;
         cnt[sk.e]++;let sc=skPower(sk,cnt);cnt[sk.e]--;
         if(fc)sc*=Math.pow(.82,fc);if(act&&!cats[ct])sc*=CATB[ct]||1;if(sk.F.sig)sc*=1.4; // фирменные — лицо героя: в «Лучшем билде» в приоритете
         
         if(sc>bs){bs=sc;best=sk;}}
-      if(!best){if(!free&&act&&!cf){free=true;const ok=pick();free=false;return ok;}return false;}res.push(best.id);usedB.add(best.bk);formN[best.f]=(formN[best.f]||0)+1;cnt[best.e]++;const bc=FP[best.F.id].cat;cats[bc]=1;catN[bc]=(catN[bc]|0)+1;return true;};
+      if(!best){if(!free&&act&&!cf){free=true;const ok=pick();free=false;return ok;}return false;}res.push(best.id);usedB.add(best.bk);formN[best.f]=(formN[best.f]||0)+1;cnt[best.e]++;const bc=FP[best.F.id].cat;cats[bc]=1;catN[bc]=(catN[bc]|0)+1;if(act&&isTele(best))catN.tele=(catN.tele|0)+1;return true;};
     // обязательные слоты: защита и движение (если изучены и есть место для атаки)
     if(act)for(const c of ['def','mov'])if(res.length<n-1)pick(c);
     while(res.length<n&&pick());
@@ -3625,7 +3658,7 @@ function pickDistinct(ids,n,usedF,usedB){const c=ids.slice(),r=[];for(let i=c.le
 const baseSlot=sk=>{for(const a of [S.active,S.passive])for(const v of a)if(v!=null&&v!==sk.id&&SKILLS[v].bk===sk.bk)return v;return null;};
 function learn(id,autoEquip){impLearn(id);if(!LEARNED.has(id)){LEARNED.add(id);S.learned.push(id);}if(!BOOK.has(id)){BOOK.add(id);S.book.push(id);}
   if(autoEquip&&!EQUIPPED.has(id)&&baseSlot(SKILLS[id])==null&&formSlot(SKILLS[id])==null){const sk=SKILLS[id],arr=sk.active?S.active:S.passive,n=sk.active?activeSlots():passiveSlots();const idx=arr.findIndex((v,i)=>i<n&&v==null);
-    if(idx>=0&&!(sk.active&&FP[sk.F.id].cat==='mov'&&movFull(arr)&&movAlt(arr)))arr[idx]=id;}
+    if(idx>=0&&!(sk.active&&FP[sk.F.id].cat==='mov'&&movFull(arr)&&movAlt(arr))&&!(isTele(sk)&&teleN(arr)>=TELE_MAX))arr[idx]=id;}
   onBuildChanged();saveSoon();if(autoEquip)checkUpgrade(id);}
 // плашка «новая чара сильнее»
 let UPG=null,upgTm=0;
@@ -3800,7 +3833,7 @@ function runRestore(js){const o=JSON.parse(js);for(const k of RUNF)S[k]=o[k];LEA
 // таланты на старте забега — умным «Авто» (как кнопка) против врагов уровня забега; очки мастерства остаются игроку
 function autoTalents(foe){const n=tpTotal()-tpSpent()-mastTp();if(n>0)talSmart(n,foe);}
 function runFresh(l0){const f=newChar(CLS);S.lvl=1;S.xp=0;S.ess=0;S.ranks={};S.talents={};
-  if(!S.sandbox){S.active=f.active;S.passive=f.passive;S.learned=f.learned;}
+  if(!S.sandbox){delete S.teleNote;S.active=f.active;S.passive=f.passive;S.learned=f.learned;}
   LEARNED=new Set(S.learned);for(const id of S.learned)if(!BOOK.has(id)){BOOK.add(id);S.book.push(id);}
   computeStats();EQUIPPED=new Set(equippedIds());
   if(!S.sandbox)for(let l=2;l<=l0;l++){S.lvl=l;const pool=rollPool();if(pool.length)learn(wpick(pool).id,true);}
@@ -4336,10 +4369,45 @@ function basicAttack(){
     spawnProj({pos:new THREE.Vector3(P.pos.x,1.25,P.pos.z).addScaledVector(d,.6),dir:d,speed:24,dmg,el:-1,col,sk:null,depth:0,target:tg,size:.17,range:18,basic:true,hit:new Set()});}
   else if(!tg){fxSlash(P.pos.x,P.pos.z,Math.atan2(Math.cos(P.face),Math.sin(P.face)),2.2,col);}
   cfOnBasic(tg,dmg);nfOnBasic(tg);}
+// ---------- 25.11 (Артём): автобой сам жмёт телепорт — раньше не жал никогда, и чара только занимала слот ----------
+// · мало здоровья (< 40%) и толпа (3+ в 4,5 м или 2+ вплотную) или босс вплотную — прочь, туда, где врагов меньше всего;
+// · стрелок и маг: враг вплотную — отскок, а цель остаётся на расстоянии выстрела;
+// · ближний бой (Ассасин, Монах ветра): цель в 5–11 м — телепорт к ней, встаёт рядом, а не в неё.
+// Точка всегда безопасная: в мире (не в стену и не за край), не в лужу врагов и не в их телеграф, не вплотную к боссу.
+let TELE_AD=null;
+function teleSpot(x,z,tg){const q={x,z};collide(q,.4);if(Math.hypot(q.x-x,q.z-z)>.25)return null;
+  for(const e of EZ)if(Math.hypot(q.x-e.x,q.z-e.z)<e.r+.9)return null;
+  for(const t of TELE)if(!t.cancel&&inTele(t,q.x,q.z,.9))return null;
+  for(const en of ENEMIES)if(!en.dead&&en.boss&&en!==tg&&Math.hypot(en.pos.x-q.x,en.pos.z-q.z)<en.r+3.5)return null;
+  return q;}
+function teleRisk(x,z){let n=0;for(const en of ENEMIES){if(en.dead)continue;const d=Math.hypot(en.pos.x-x,en.pos.z-z)-en.r,w=en.boss||en.elite||en.champ?2:1;if(d<5.5)n+=d<2.5?2*w:w;}return n;}
+function teleAuto(sk){
+  if(P.dashT>0||(NFS.heroY||0)>0)return 'target';
+  const len=sk.M.radius?9:7,hp=P.hp/Math.max(1,P.maxHp),x0=P.pos.x,z0=P.pos.z,near=countNear(P.pos,2.4);
+  const bossNear=ENEMIES.some(en=>!en.dead&&en.boss&&Math.hypot(en.pos.x-x0,en.pos.z-z0)<en.r+3);
+  // отскок и подход — только когда маны хватает и на удары (иначе телепорт съедает ману атак); уйти от смерти — всегда
+  let want=null;const mpOk=P.mp>=cfMana(sk)+P.maxMp*.3;
+  if(hp<.4&&(countNear(P.pos,4.5)>=3||near>=2||bossNear))want='out';
+  else if(!mpOk)return 'target';
+  else if(!CLS.melee&&near>=1)want='kite';
+  else if(CLS.melee){const tg=getTarget(16);if(tg&&!tg.dead){const dx=tg.pos.x-x0,dz=tg.pos.z-z0,d=Math.hypot(dx,dz);
+      if(d>5+tg.r&&d<len+tg.r+2.5){const L=Math.min(len,Math.max(3,d-tg.r-1.1)),ux=dx/d,uz=dz/d,q=teleSpot(x0+ux*L,z0+uz*L,tg);
+        if(q&&(hp>.5||teleRisk(q.x,q.z)<6)){TELE_AD={dir:new THREE.Vector3(ux,0,uz),len:L,t:time};return 'ok';}}}
+    return 'target';}
+  if(!want)return 'target';
+  const r0=teleRisk(x0,z0),tg=getTarget(16);let cx=0,cz=0;for(const en of ENEMIES){if(en.dead)continue;const dx=x0-en.pos.x,dz=z0-en.pos.z,d=Math.hypot(dx,dz)||1;if(d<6){cx+=dx/d;cz+=dz/d;}}
+  let best=null,bs=-1e9;
+  for(let k=0;k<16;k++){const a=k/16*TAU,ux=Math.cos(a),uz=Math.sin(a);for(const L of [len,len*.65]){const q=teleSpot(x0+ux*L,z0+uz*L,null);if(!q)continue;
+      let mn=1e9;for(const en of ENEMIES)if(!en.dead)mn=Math.min(mn,Math.hypot(en.pos.x-q.x,en.pos.z-q.z)-en.r);
+      const rk=teleRisk(q.x,q.z);let sc=-rk*10+Math.min(mn,8)+(ux*cx+uz*cz)*1.5;
+      if(want==='kite'){if(mn<4)continue;if(tg&&!tg.dead&&Math.hypot(tg.pos.x-q.x,tg.pos.z-q.z)<13)sc+=4;}
+      if(sc>bs){bs=sc;best={ux,uz,L,rk};}}}
+  if(!best||best.rk>=r0)return 'target';
+  TELE_AD={dir:new THREE.Vector3(best.ux,0,best.uz),len:best.L,t:time};return 'ok';}
 function canCast(sk,manual,A){
   if(P.dead)return 'dead';if((P.cds[sk.id]||0)>0)return 'cd';if(!cfCanPay(sk))return 'mana';const F=sk.F.id;
   if(manual||A){if(F==='chain'&&!(A&&coneTarget(A.dir,sk.F.range+2,.6))&&!getTarget(sk.F.range))return 'target';return 'ok';}
-  if(F==='blink')return 'no';
+  if(F==='blink')return teleAuto(sk);
   if(F==='nova')return countNear(P.pos,4.5*skR(sk))>0?'ok':'target';
   if(F==='whirl')return countNear(P.pos,3*skR(sk))>0&&!WHIRLS.length?'ok':'target';
   if(F==='barrier')return P.shield<=0&&(P.hp<P.maxHp*.85||countNear(P.pos,5)>=2)?'ok':'target';
@@ -4375,7 +4443,9 @@ function cast(sk,A,cl){
     beam:()=>{const t2=pick(sk.F.range+2);const d=A?A.dir.clone():t2?v1.set(t2.pos.x-P.pos.x,0,t2.pos.z-P.pos.z).normalize().clone():fwd();P.face=Math.atan2(d.x,d.z);fireBeam(sk,d,dmg,R);},
     summon:()=>spawnSummon(sk),
     blink:(i)=>{if(i){aoe(P.pos,2.6*R,dmg,sk.e,{sk,depth:0});novaFx(sk,P.pos.x,P.pos.z,2.6*R);return;}
-      const dir=A?A.dir.clone():(moveDir()||fwd());const dist=sk.M.radius?9:7,start=P.pos.clone();
+      // автобой (teleAuto) задал направление и длину; «Эхо» в автобое — второй взрыв на месте, без второго прыжка вслепую
+      const ad=!A&&TELE_AD&&time-TELE_AD.t<1?TELE_AD:null;if(ad&&ad.used){aoe(P.pos,2.6*R,dmg,sk.e,{sk,depth:0});novaFx(sk,P.pos.x,P.pos.z,2.6*R);return;}if(ad)ad.used=1;
+      const dir=A?A.dir.clone():ad?ad.dir.clone():(moveDir()||fwd());const dist=ad?ad.len:sk.M.radius?9:7,start=P.pos.clone();
       aoe(start,2.6*R,dmg,sk.e,{sk,depth:0});novaFx(sk,start.x,start.z,2.6*R);
       const end=start.clone().addScaledVector(dir,dist);collide(end,.4);
       fxGhost(start.x,start.z,Math.atan2(dir.x,dir.z),col,.35);xq(()=>{fxBeam(v1.set(start.x,1,start.z),v2.set(end.x,1,end.z),col,.3,.5);fxBeam(v1.set(start.x,1,start.z),v2.set(end.x,1,end.z),lightC(col),.2,.09);fxRune(start.x,start.z,2.2,col,.6);fxRune(end.x,end.z,2.2,col,.6);});
@@ -5716,10 +5786,10 @@ const apTag=(sk,big)=>`<span class="aptag ${sk.active?'a':'p'}${big?' big':''}">
 const apWhere=sk=>sk.active?'<span class="where a">Куда встанет: в активный слот (кнопка в бою)</span>':'<span class="where p">Куда встанет: в пассивный слот (работает сама)</span>';
 function cardStat(sk){return sk.active?`${fmt(skDmg(sk))} урона · ${cfMana(sk)} маны · ${fmt(skCd(sk))} с`:`${fmt(skDmg(sk))} урона`;}
 function cardPow(sk){const r=rarOf(sk),u=upgradeFor(sk,true),arr=sk.active?S.active:S.passive,n=sk.active?activeSlots():passiveSlots();
-  const free=baseSlot(sk)==null&&arr.findIndex((v,i)=>i<n&&v==null)>=0&&formSlot(sk)==null;
+  const free=baseSlot(sk)==null&&arr.findIndex((v,i)=>i<n&&v==null)>=0&&formSlot(sk)==null&&!(isTele(sk)&&teleN(arr)>=TELE_MAX);
   return `<small class="pw" data-r="${r}">${RARITY[r].n} · сила ${Math.round(pwr(sk))}${free?' · встанет в свободный слот':u?' · ↑ сильнее «'+skName(SKILLS[u.tgt])+'» на '+pct(u.gain)+'%':''}</small>`;}
 function luScore(sk){if(sk.rankUp)return 1.15e6+pwr(sk);const u=upgradeFor(sk,true),arr=sk.active?S.active:S.passive,n=sk.active?activeSlots():passiveSlots();
-  const free=baseSlot(sk)==null&&arr.findIndex((v,i)=>i<n&&v==null)>=0&&formSlot(sk)==null;
+  const free=baseSlot(sk)==null&&arr.findIndex((v,i)=>i<n&&v==null)>=0&&formSlot(sk)==null&&!(isTele(sk)&&teleN(arr)>=TELE_MAX);
   return (free?2e6:0)+(u?1e6*(1+u.gain):0)+pwr(sk);}
 function luAutoRun(n){const names=[];let best=null,nr=0;while(n-->0&&luQueue>0){const ch=rollChoices();if(!ch.length){luNone();break;}
   let b=ch[0],bs=-1;for(const sk of ch){const v=luScore(sk);if(v>bs){bs=v;b=sk;}}
@@ -5731,7 +5801,7 @@ function luSync(){const a=$('#luAuto');if(a)a.textContent='Авто-выбор: 
 function setAutoLu(v){S.autoLu=!!v;if(S.autoLu)S.autoBest=true;saveSoon();const c=$('#autoLu');if(c)c.checked=S.autoLu;const b=$('#autoBest');if(b)b.checked=!!S.autoBest;}
 function openLevelUp(){if(S.autoLu){luAutoRun(luQueue);return;}const ch=rollChoices();if(!ch.length){luNone();return;}luOpen=true;hideUpg();syncPause();
   $('#luTitle').textContent='Уровень '+S.lvl+(luQueue>1?' · ещё '+(luQueue-1):'');$('#luSub').textContent='Выбери новые чары. Если есть свободный слот, они сразу встанут в билд.'+(talFreeUse()?' Очков талантов: '+tpFree()+'.':'');luSync();
-  $('#luCards').innerHTML=ch.map(sk=>{const r=rarOf(sk);return `<button type="button" class="card" data-id="${sk.id}" data-r="${r}"><span class="rbn">${rarGem(r)}<span>${RARITY[r].n}</span>${rarGem(r)}</span><span class="ico${sk.active?'':' p'}" data-r="${r}" style="--c:${sk.E.hex}">${svg(sk.F.id)}${modBadge(sk)}${rarDeco(r)}</span><span class="ct">${apTag(sk)}<span class="tag">${sk.F.role} · ${sk.E.name}${luTag(sk)}${bookOn()&&!sk.rankUp&&BOOK.has(sk.id)?'<i class="nv">из Книги чар</i>':''}</span><b>${sk.base}</b><span class="var">${sk.M.name}: ${sk.M.desc}</span><small>${cap(skLead(sk))}</small><small>${cardStat(sk)}</small>${sk.rankUp?rkPow(sk)+rkWhere(sk):cardPow(sk)+apWhere(sk)}</span></button>`;}).join('');
+  $('#luCards').innerHTML=ch.map(sk=>{const r=rarOf(sk);return `<button type="button" class="card" data-id="${sk.id}" data-r="${r}"><span class="rbn">${rarGem(r)}<span>${RARITY[r].n}</span>${rarGem(r)}</span><span class="ico${sk.active?'':' p'}" data-r="${r}" style="--c:${sk.E.hex}">${svg(sk.F.id)}${modBadge(sk)}${rarDeco(r)}</span><span class="ct">${apTag(sk)}<span class="tag">${isTele(sk)?TELE_TAG:sk.F.role} · ${sk.E.name}${luTag(sk)}${bookOn()&&!sk.rankUp&&BOOK.has(sk.id)?'<i class="nv">из Книги чар</i>':''}</span><b>${sk.base}</b><span class="var">${sk.M.name}: ${sk.M.desc}</span><small>${cap(skLead(sk))}</small><small>${cardStat(sk)}</small>${sk.rankUp?rkPow(sk)+rkWhere(sk):cardPow(sk)+apWhere(sk)}</span></button>`;}).join('');
   $('#luSkip').textContent='Пропустить: +'+(20+S.lvl*5)+' эссенции';$('#lvlup').hidden=false;}
 function closeLevelUp(){impDiscard();luOpen=false;$('#lvlup').hidden=true;luQueue=Math.max(0,luQueue-1);luDelay=1.2;syncPause();}
 $('#luCards').addEventListener('click',e=>{const b=e.target.closest('.card');if(!b)return;const id=+b.dataset.id,sk=LU_LAST.find(x=>x.id===id)||SKILLS[id];
@@ -5805,10 +5875,13 @@ const pips=r=>`<span class="pips">${[1,2,3,4,5].map(i=>`<i class="${i<=r?'on':''
 const learnedVars=bk=>{let n=0;for(let m=0;m<NM;m++)if(isLearned(bk*NM+m))n++;return n;};
 function rankLine(sk,lv){const r=rk(sk.id),mx=r>=5,can=!mx&&S.ess>=rankCost(r);
   return `<span class="rkl${mx?' mx':''}"><b>${mx?'Ранг 5 из 5 · МАКС':'Ранг '+r+' из 5'}</b>${pips(r)}${can?'<em>↑ можно повысить</em>':''}</span><span class="meta2">${lv>1?'вариантов '+lv+'/'+NM+' · ':''}${cardStat(sk)}</span>`;}
+// пометка на карточке чары движения (25.11): в билде одна; что с ней делает автобой
+const TELE_TAG='<i style="font-style:normal;color:#9fd8ff">Движение: в билде одна</i>';
+const teleNoteHtml=()=>'<p class="note" style="font-size:.86em"><b style="color:#9fd8ff;font-weight:500">Движение: в билде одна.</b> Поставишь вторую — первая уйдёт в книгу. Автобой жмёт её сам: '+(CLS&&CLS.melee?'телепорт к дальней цели и прочь из толпы, когда мало здоровья':'отскок от врага вплотную и прочь из толпы, когда мало здоровья')+'; в стену, за край, в лужи врагов и к боссу не прыгает.</p>';
 function rowHtml(sk,nv){const eq=EQUIPPED.has(sk.id),ln=isLearned(sk.id),lv=learnedVars(sk.bk),r=rarOf(sk),u=ln&&!eq?upgradeFor(sk):null;
   const other=!eq&&ln?[...EQUIPPED].find(id=>SKILLS[id].bk===sk.bk):null;
   return `<button type="button" class="row${eq?' eq':''}${ln?'':' locked'}" data-id="${sk.id}" data-r="${r}"><span class="ico${sk.active?'':' p'}" data-r="${r}" style="--c:${sk.E.hex}">${svg(sk.F.id)}${modBadge(sk)}${rarDeco(r)}</span>
-  <span class="rt"><span class="nm">${sk.base} <i>· ${sk.M.name}</i></span>${apTag(sk)}<span class="meta"><b class="pw" data-r="${r}">сила ${Math.round(pwr(sk))}</b> · ${sk.F.role} · <b class="rn">${rarGem(r)}${RARITY[r].n}</b>${ln?'':' · не изучено'}</span>${ln?rankLine(sk,lv):''}<span class="meta3">${pwShort(sk)}</span></span>${eq?'<span class="badge">в билде · р.'+rk(sk.id)+'</span>':u?`<span class="badge rec">↑ +${pct(u.gain)}%</span>`:other!=null?'<span class="badge">есть вариант в билде</span>':''}</button>`;}
+  <span class="rt"><span class="nm">${sk.base} <i>· ${sk.M.name}</i></span>${apTag(sk)}<span class="meta"><b class="pw" data-r="${r}">сила ${Math.round(pwr(sk))}</b> · ${isTele(sk)?TELE_TAG:sk.F.role} · <b class="rn">${rarGem(r)}${RARITY[r].n}</b>${ln?'':' · не изучено'}</span>${ln?rankLine(sk,lv):''}<span class="meta3">${pwShort(sk)}</span></span>${eq?'<span class="badge">в билде · р.'+rk(sk.id)+'</span>':u?`<span class="badge rec">↑ +${pct(u.gain)}%</span>`:other!=null?'<span class="badge">есть вариант в билде</span>':''}</button>`;}
 function classSkills(){const a=[];CLS.pool.forEach(id=>a.push(SKILLS[id]));const er=e=>e===CLS.p?0:e===CLS.s?1:2;a.sort((x,y)=>er(x.E.id)-er(y.E.id)||x.f-y.f||x.m-y.m);return a;}
 const F2_={sort:'power',weak:false};let WEAKN=0,WEAKE=0;
 function renderSort(){$('#fSort').innerHTML=chip('По силе',F2_.sort==='power','data-sort="power"')+chip('По редкости',F2_.sort==='rar','data-sort="rar"')+chip('По стихии',F2_.sort==='el','data-sort="el"')+
@@ -6154,7 +6227,7 @@ function sheetHtml(sk){const eq=EQUIPPED.has(sk.id),ln=isLearned(sk.id),r=rk(sk.
     (r<5&&S.ess<cost?`<p class="note">Нужно ${cost} эссенции, есть ${S.ess}. Эссенция падает со всех врагов.</p>`:'');}
   const vars=`<div class="vars" role="group" aria-label="Варианты чары">${MODS.map((M,mi)=>{const v=SKILLS[sk.bk*NM+mi];return `<button type="button" class="vchip${v.id===sk.id?' on':''}${isLearned(v.id)?'':' lk'}" data-v="${v.id}">${MODG[mi]} ${M.name}${EQUIPPED.has(v.id)?' ●':''}</button>`;}).join('')}</div>`;
   return `<div class="sh-body"><div class="sh-top"><span class="ico${sk.active?'':' p'}" data-r="${rr}" style="--c:${sk.E.hex}">${svg(sk.F.id)}${modBadge(sk)}${rarDeco(rr)}</span><div><h2>${sk.F.id==='summon'&&CLS?summInfo(sk).name:sk.base}</h2><p><span class="tagc rar" data-r="${rr}">${rarGem(rr)}${RARITY[rr].n}</span><span class="tagc v">${sk.M.name}</span><span class="tagc">${sk.F.role}</span><span class="tagc" style="border-color:${sk.E.hex}">${sk.E.name}</span></p>${apTag(sk,1)}</div></div>
-  ${vars}<p class="note" style="margin-top:0">${apWhere(sk)}</p><p class="lead">${cap(skLead(sk))}</p>${sk.F.hint?'<p class="note" style="font-size:.86em;opacity:.8">'+sk.F.hint+'</p>':''}${impNote(sk)}<p class="note"><b style="color:var(--ess);font-weight:500">${sk.M.name}:</b> ${sk.M.desc}.</p>
+  ${vars}<p class="note" style="margin-top:0">${apWhere(sk)}</p><p class="lead">${cap(skLead(sk))}</p>${sk.F.hint?'<p class="note" style="font-size:.86em;opacity:.8">'+sk.F.hint+'</p>':''}${isTele(sk)?teleNoteHtml():''}${impNote(sk)}<p class="note"><b style="color:var(--ess);font-weight:500">${sk.M.name}:</b> ${sk.M.desc}.</p>
   ${sk.F.id==='summon'?`<p class="note"><b style="color:var(--ess);font-weight:500">Призыв:</b> одновременно до ${ST.summMax} призывов (талант «Повелитель духов» добавляет места). У существа своя полоска здоровья; с уровнем оно крупнее и крепче. Напарник по коопу видит твоих существ, а их удары засчитываются.</p>`:''}
   ${rankRow}${pwBreakHtml(sk)}<div class="stats">${st.map(([k,v])=>`<div>${k}<b>${v}</b></div>`).join('')}</div></div>${acts}`;}
 let sheetId=null;
@@ -6169,7 +6242,9 @@ $('#sheet').addEventListener('click',e=>{if(e.target.id==='sheet'){closeSheet();
   else if(a==='on'){const r=equip(sk.id);closeSheet();
     if(r==='ok'){toast('В билде: '+skName(sk));if(pending&&pending.index!=null){setPending(null);closeBook();}}
     else if(r==='full'){setPending({replace:sk.id});showTab('build');toast('Слоты заняты. Нажми слот, который заменить');}}});
-function putInSlot(id,type,idx){const arr=type==='active'?S.active:S.passive,bk=SKILLS[id].bk;for(const a of [S.active,S.passive])for(let j=0;j<a.length;j++)if(a[j]!=null&&SKILLS[a[j]].bk===bk)a[j]=null;arr[idx]=id;onBuildChanged();}
+function putInSlot(id,type,idx){const arr=type==='active'?S.active:S.passive,bk=SKILLS[id].bk;for(const a of [S.active,S.passive])for(let j=0;j<a.length;j++)if(a[j]!=null&&SKILLS[a[j]].bk===bk)a[j]=null;arr[idx]=id;
+  // вторая чара движения встала руками — первая уходит в книгу, на её место лучшая изученная (и короткое «почему»)
+  const tc=type==='active'&&isTele(SKILLS[id])?teleCap(id):null;onBuildChanged();teleSay(tc);}
 function equip(id){const sk=SKILLS[id];if(EQUIPPED.has(id))return 'ok';const type=sk.active?'active':'passive';
   if(pending&&pending.index!=null&&pending.type===type){putInSlot(id,type,pending.index);return 'ok';}
   const arr=sk.active?S.active:S.passive,n=sk.active?activeSlots():passiveSlots();const ov=baseSlot(sk);if(ov!=null){putInSlot(id,type,arr.indexOf(ov));return 'ok';}const idx=arr.findIndex((v,i)=>i<n&&v==null);if(idx<0)return 'full';putInSlot(id,type,idx);return 'ok';}
@@ -6179,6 +6254,8 @@ function setPending(p){pending=p;const bar=$('#pendingBar');
   if(bookTab==='lib'&&bookOpen)renderList();}
 $('#pendingCancel').addEventListener('click',()=>setPending(null));
 function onBuildChanged(){
+  // страховка: телепортов в активных слотах не больше одного, каким бы путём билд ни собрался (случайный, тестовый режим, «Вернуть», сохранение)
+  if(S&&CLS&&Array.isArray(S.active))teleSay(teleCap());
   EQUIPPED=new Set(equippedIds());PWC=new Map();WKC=null;
   RESO_N.fill(0);EQUIPPED.forEach(id=>RESO_N[SKILLS[id].e]++);for(let i=0;i<10;i++)RESO[i]=1+ST.resoPer*RESO_N[i];
   rebuildPassives();updateHudSlots();saveSoon();refreshUpg();
@@ -7731,7 +7808,9 @@ function nfReset(){nfClr();NFS.heroY=0;if(hero)hero.g.position.y=0;for(const a o
   NFS.lv=S.lvl;NFS.sa=activeSlots();NFS.sp=passiveSlots();NFS.hudK='';nfHudInit();
   const im=NFS.impMsg,mg=!!(NFS.mig&&NFS.mig.length);NFS.impMsg=null;
   if(mg){const m=NFS.mig;NFS.mig=null;setTimeout(()=>toast('Чары классов обновлены: у каждого героя свои формы и фирменные чары. Прежние чары — в книге, их можно распылить. Пассивки стали другими — загляни в книгу. Фирменные открываются на 1, 12 и 20 уровне.',9000),1200);}
-  if(im&&im.length)setTimeout(()=>{impFx(P.pos.x,P.pos.z,1);toast('Невозможные чары перешли на чары нового набора: '+im.join('; ')+'.',11000);},mg?10500:1500);}
+  if(im&&im.length)setTimeout(()=>{impFx(P.pos.x,P.pos.z,1);toast('Невозможные чары перешли на чары нового набора: '+im.join('; ')+'.',11000);},mg?10500:1500);
+  // 25.11: телепорт ушёл из набора класса / второй телепорт снят с билда, пока герой был в меню — сказать один раз при входе
+  {const t=[S.teleKit,S.teleNote].filter(Boolean).join(' ');delete S.teleKit;delete S.teleNote;if(t)setTimeout(()=>toast(t,10000),(mg?10500:1500)+(im&&im.length?11500:0));}}
 // «Невозможные» прежних форм (25.11): невозможность «навсегда» не пропадает с обновлением — переходит на легендарную чару
 // нового набора класса той же стихии и вида (активная/пассивная), по возможности того же варианта и роли; изученная — изучена и новая
 function nfImpMig(){NFS.impMsg=null;if(!S||!CLS||!CLS.legacy||!Array.isArray(S.imp))return;const L=S.imp,msg=[];
@@ -7747,7 +7826,7 @@ var nfCW0=clearWorld;clearWorld=function(){nfClr();NFS.heroY=0;return nfCW0.appl
 // новый слот открылся — ставим туда лучшую изученную чару
 function nfFillSlots(){let ch=0;for(const act of [true,false]){const arr=act?S.active:S.passive,n=act?activeSlots():passiveSlots();
     for(let i=0;i<n;i++){if(arr[i]!=null)continue;let b=null,bp=-1;const mf=act&&movFull(arr);for(const id of LEARNED){if(EQUIPPED.has(id)||arr.includes(id))continue;const sk=SKILLS[id];if(!sk||sk.active!==act||!CLS.pool.has(id))continue;
-        if(baseSlot(sk)!=null||formSlot(sk)!=null)continue;const p=pwr(sk)*(mf&&FP[sk.F.id].cat==='mov'?.01:1);if(p>bp){bp=p;b=id;}}if(b!=null){arr[i]=b;ch++;EQUIPPED.add(b);}}}
+        if(baseSlot(sk)!=null||formSlot(sk)!=null)continue;if(act&&isTele(sk)&&teleN(arr)>=TELE_MAX)continue;const p=pwr(sk)*(mf&&FP[sk.F.id].cat==='mov'?.01:1);if(p>bp){bp=p;b=id;}}if(b!=null){arr[i]=b;ch++;EQUIPPED.add(b);}}}
   if(ch){onBuildChanged();toast('В открытый слот встала '+(ch>1?ch+' чары':'чара')+' из изученных');}}
 // ---------- полоса пассивок у HUD, кнопка «Батареи», дымка «На краю» ----------
 function nfHudInit(){if(NFS.hud&&document.body.contains(NFS.hud))return;const host=document.querySelector('#hud .bars');if(!host)return;
@@ -9119,7 +9198,8 @@ function cfPay(sk){P.mp-=cfMana(sk);let hp=0;if(sk.E.id==='blood')hp+=P.maxHp*.0
 // урон этого каста (до чары): порыв Странника, нестабильная чара Алхимика, рунный удар Рыцаря, перенос Ассасина за спину
 function cfCastMul(sk,cl){if(!CT_ON||!CLS||cl)return 1;const t=CT.tier,F=sk.F.id;
   switch(CLS.id){
-  case 'windr':{const g=CT.gust,k=(t>=4?.008:.006)+.0008*ctv('wi_edge');CT.gustUsed=g;CT.gust=0;CT.galeP=g>=99.5&&ctv('wi_gale')?1:0;if(g>=50){fxRing(P.pos.x,P.pos.z,.4,2.6,CT_WIND,.35);colBurst(CT_WIND,P.pos.x,1.3,P.pos.z,12,4,.35,0);ctProc(P.pos,'Порыв +'+Math.round(g*k*100)+'%','#c8fff0',0);}return 1+g*k;}
+  // 25.11: телепорт порыв не тратит — он не выстрел (автобой жмёт его сам, и порыв уходил впустую: −20% урона Странника в замере)
+  case 'windr':{if(isTele(sk)){CT.gustUsed=0;return 1;}const g=CT.gust,k=(t>=4?.008:.006)+.0008*ctv('wi_edge');CT.gustUsed=g;CT.gust=0;CT.galeP=g>=99.5&&ctv('wi_gale')?1:0;if(g>=50){fxRing(P.pos.x,P.pos.z,.4,2.6,CT_WIND,.35);colBurst(CT_WIND,P.pos.x,1.3,P.pos.z,12,4,.35,0);ctProc(P.pos,'Порыв +'+Math.round(g*k*100)+'%','#c8fff0',0);}return 1+g*k;}
   case 'alch':CT.alN++;if(CT.alN>=ctAlNeed()){CT.alN=0;CT.unst=true;return 1.7+.1*ctv('al_vol');}return 1;
   case 'dk':if(F==='strike'&&ctDkCount()){CT.dkRuneT=time+.4;return 1.5+.12*ctv('dk_rune');}return 1;
   case 'assassin':if(F==='strike'){const tg=getTarget(sk.F.range+2);if(tg&&!tg.dead)ctBehind(tg);}return 1;}
