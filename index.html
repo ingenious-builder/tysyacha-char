@@ -2042,8 +2042,8 @@ const ST={};
 function computeStats(){
   ST.dmg=(1+.06*T('power'))*(1+.01*mastB());ST.cdr=1-.04*T('cdr');ST.crit=.05+.04*T('crit');ST.resoPer=.03+.01*T('reso');ST.react=1+.25*T('react');
   ST.hpMul=(1+.1*T('vit'))*(1+.01*mastB());ST.armor=(1-.05*T('armor'))*(CLS.armor||1);ST.regen=2*T('regen');ST.leech=.02*T('leech');ST.wrath=1+.2*T('wrath');
-  ST.mana=1+.1*T('mana');ST.summDmg=1+.2*T('summ');ST.summMax=3+T('summ');ST.luck=.03*T('luck');ST.cascade=1+.15*T('cascade');ST.orbitN=T('orbit');ST.orbitDmg=1;cfStats();ctTalStats();}   // «Свита» (25.11): только сферы — было ещё +15% урона за очко (×2,9 Стражам)
-const WRATH=new Set(['strike','blink','revenge','whirl']),CASC=new Set(['doom','aura','trail','trap']);
+  ST.mana=1+.1*T('mana');ST.summDmg=1+.2*T('summ');ST.summMax=3+T('summ');ST.luck=.03*T('luck');ST.cascade=1+.15*T('cascade');ST.orbitN=T('orbit');ST.orbitDmg=1;cfStats();ctTalStats();TQ.sig=talSig();}   // «Свита» (25.11): только сферы — было ещё +15% урона за очко (×2,9 Стражам)
+const WRATH=new Set(['strike','blink','revenge','whirl']),CASC=new Set(['doom','aura','trail','trap']),CASC_R=new Set(CASC);   // CASC_R — где «Каскад» расширяет зону урона
 // PASS_K: пассивок в билде 8, а не 42 — каждая сильнее (ориентир DESIGN-obraz 1,9). slotBoost: пока слотов мало, чары сильнее; после 100-го — ×1,26 (слотов 8+8 вместо 8+42)
 const PASS_K=1.9,SLOT_BOOST=[[1,1],[5,1.89],[10,2.09],[15,2.21],[20,1.93],[25,1.8],[30,1.8],[40,1.61],[50,1.52],[60,1.52],[70,1.41],[80,1.41],[90,1.35],[100,1.26],[999,1.26]];
 // SLOT_BOOST подобран под «Лучший билд» v13.27 (build_bp.js: сила A / v13.27 ≈ 0,97 на 5–100 уровне; механики классов B — сверху)
@@ -2273,6 +2273,10 @@ function skParts(sk,intr,L){L=L||1;
     if(fp.ph!=null)dps=dmg*fp.ph*fpE(sk)*fpM(sk)*r;else if(fp.pv)ext+=fp.pv(sk,dmg,(M.count||1)*(M.echo?2:1),intr);   // без замера — формула A как польза
     if(fp.x)ext+=fp.x(sk,dmg,intr,hp,k,L)*r;}
   if(!intr){const ck=ctTalPw(sk);if(ck!==1){dps*=ck;ext*=ck;}}   // ветка класса (25.11) — в «таланты ×N»
+  // «Каскад» даёт аурам, карам, следам и ловушкам не только урон, но и радиус (skR): в зону попадает больше врагов. Замер 25.11
+  // (_check/rar, поток толпы, 3/3): урон этих чар растёт ×2,0–2,2 при ×1,45 от одного урона — радиус добавляет ×1,37–1,5.
+  // У глифа, стены и тотема (тоже «Каскад») радиус урона не прибавил — им только урон.
+  if(!intr&&CASC_R.has(f)&&ST.cascade>1)dps*=1+(ST.cascade-1)*(sk.active?.8:1);
   return {dps,u,ext,pw:dps*u+ext};}
 // стихия у призыва; скелет-маг стреляет снарядами — его стихия работает почти как у снаряда (яд копится, тьма раскалывает)
 const summE=(sk,kn)=>kn==='skelmage'?Math.pow((FP.bolt.e||[])[sk.e]||1,.75):fpE(sk);
@@ -2331,13 +2335,57 @@ function rarK(sk){const I=rarInfo(),L=S&&S.lvl||1;if(I.L!==L){I.L=L;I.KL=new Flo
   let v=I.KL[sk.id];if(v)return v;
   if(!I.B[sk.id])I.B[sk.id]=I.b0[sk.active?0:1]*(1+RAR_W/2);
   v=I.KL[sk.id]=Math.min(I.U[sk.id]?RAR_KU:20,I.B[sk.id]*lvlS(L)/Math.max(1e-3,skParts(sk,true,L).pw));return v;}
-// slotBoost (A): пока слотов мало, каждая чара сильнее — общий множитель уровня, ступени редкости не трогает
-const skK=sk=>rarK(sk)*rkMul(sk.id)*slotBoost();
+// slotBoost (A): пока слотов мало, каждая чара сильнее — общий множитель уровня, ступени редкости не трогает;
+// talQ — потолок талантов (ниже): таланты не переворачивают редкости
+const skK=sk=>rarK(sk)*rkMul(sk.id)*slotBoost()*talQ(sk);
+// ---- ПОТОЛОК ТАЛАНТОВ (25.11, после проверки v13.29) ----
+// Таланты своего вида (Ярость, Каскад, Духи, Свита), ветка класса (стихия и виды особенности — ctTalPw) и даже общие (перезарядка,
+// мана, здоровье у щитов) усиливают одни чары героя сильнее других: до ×2–3,7 между самой усиленной и самой неусиленной. Шаг редкости —
+// ×1,6, разброс внутри ступени — ×1,08: эпическая чара «своего вида» обгоняла легендарную того же ранга.
+// Потолок: t — множитель талантов чары (сила с талантами / без них в стандартном бою: 1 каст/с, мана и здоровье по уровню, без
+// особенности класса). t зажимается в окно [W; W×TAL_CAP]; W выбрано так, что средний (геометрический) t по пулу класса не меняется:
+// срезанное у самых усиленных чар достаётся самым неусиленным, общий прирост силы от талантов остаётся тем же. Итог: таланты меняют силу
+// двух чар одного героя друг против друга не больше чем в TAL_CAP раз (1,45 < 1,6/1,08), поэтому чара следующей редкости того же ранга
+// всегда сильнее, а «Невозможная» (×1,7) — сильнее легендарной. Поправка q = t'/t входит в skK — в настоящий урон, щиты, лечение и
+// призывы, а не только в цифру книги. Пока очков в талантах нет, q = 1.
+const TAL_CAP=1.45;
+const TQ={raw:0,sig:'',key:null,L:0,cls:null,W:null,lc:Math.log(TAL_CAP),t:new Map(),q:new Map(),p0:new Map(),p0k:'',smc:null,smp:null};
+// подпись вложенных очков (её пишет computeStats; с мастерством — оно меняет здоровье щитов): по ней живёт кэш поправок
+function talSig(){if(!S||!S.talents||!CLS)return '';let s='';for(const t of TALS()){const v=S.talents[t.id]|0;if(v)s+=t.id+v+',';}return s&&s+'m'+mastB();}
+// стандартный бой для t: 1 каст/с, клон — по стандартному билду, без особенности класса (скидки маны), мана и здоровье — по уровню и талантам
+function tqEnv(fn){const kp=[P.mpRegen,P.maxHp],kc=CR_OVR,kl=CLONE_OVR,ct=typeof CT_ON!=='undefined'?CT_ON:null;
+  TQ.raw++;CR_OVR=1;CLONE_OVR=true;if(ct!==null)CT_ON=0;
+  try{return fn();}finally{TQ.raw--;P.mpRegen=kp[0];P.maxHp=kp[1];CR_OVR=kc;CLONE_OVR=kl;if(ct!==null)CT_ON=ct;}}
+function tqPset(){const L=S.lvl;P.mpRegen=(8+.4*(L-1))*ST.mana*CLS.mp;P.maxHp=(120+24*(L-1))*ST.hpMul*CLS.hp;}
+// числа героя заново из талантов tal (по умолчанию — нынешних), без временных надбавок к ST (у «Разлома» урон ×1,4 на время каста,
+// стенды выключают крит), в стандартном бою; потом ST и подпись возвращаются ровно как были
+function tqClean(fn,tal){const keep=Object.assign({},ST),ks=TQ.sig,kt=S.talents;if(tal)S.talents=tal;
+  try{computeStats();return tqEnv(()=>{tqPset();return fn();});}finally{S.talents=kt;Object.assign(ST,keep);TQ.sig=ks;}}
+// сила без талантов, приведённая к 1-му рангу (кэш на класс, уровень и мастерство; при пересчёте — сразу весь пул, одним заходом)
+function tqP0(ids){const k=CLS.id+'|'+S.lvl+'|'+mastB();if(TQ.p0k!==k){TQ.p0k=k;TQ.p0.clear();}
+  if(ids.every(id=>TQ.p0.has(id)))return;const need=[...new Set([...ids,...CLS.pool])].filter(id=>!TQ.p0.has(id));
+  tqClean(()=>{for(const id of need)TQ.p0.set(id,skParts(SKILLS[id],false).pw/rkMul(id));},{});}
+// множитель талантов t у чар ids
+function tqT(ids){const need=ids.filter(id=>!TQ.t.has(id));
+  if(need.length){tqP0(need);tqClean(()=>{for(const id of need){const a=skParts(SKILLS[id],false).pw/rkMul(id),b=TQ.p0.get(id);TQ.t.set(id,a>0&&b>0?a/b:1);}});}
+  return ids.map(id=>TQ.t.get(id));}
+// окно [W; W+ln TAL_CAP] по пулу класса: средний ln t пула не меняется (поиск делением пополам). Для скорости «Авто» (сотни
+// перебора раскладок) среднее берётся по каждой 3-й чаре пула (шаг 3 взаимно прост с 8 вариантами чары) — потолок от этого не зависит:
+// его держит зажим каждой чары, выборка сдвигает только общий уровень (на доли процента).
+function tqWin(){if(TQ.smc!==CLS){TQ.smc=CLS;TQ.smp=[...CLS.pool].filter((_,i)=>i%3===0);}const x=tqT(TQ.smp).map(Math.log),n=x.length,lc=TQ.lc;let lo=Infinity,hi=-Infinity,m=0;
+  for(const v of x){if(v<lo)lo=v;if(v>hi)hi=v;m+=v;}if(!n){TQ.W=-lc/2;return;}m/=n;
+  if(hi-lo<=lc){TQ.W=(lo+hi-lc)/2;return;}   // разброс и так в пределах — окно с запасом в обе стороны
+  let a=lo-lc,b=hi;for(let k=0;k<50;k++){const w=(a+b)/2;let s=0;for(const v of x)s+=v<w?w:v>w+lc?w+lc:v;if(s/n<m)a=w;else b=w;}TQ.W=(a+b)/2;}
+function talQ(sk){if(TQ.raw||!TQ.sig||!S||!CLS)return 1;
+  if(TQ.key!==TQ.sig||TQ.L!==S.lvl||TQ.cls!==CLS){TQ.key=TQ.sig;TQ.L=S.lvl;TQ.cls=CLS;TQ.W=null;TQ.t.clear();TQ.q.clear();}
+  let v=TQ.q.get(sk.id);if(v!==undefined)return v;
+  if(TQ.W===null)tqWin();
+  const x=Math.log(tqT([sk.id])[0]),W=TQ.W;v=Math.exp((x<W?W:x>W+TQ.lc?W+TQ.lc:x)-x);TQ.q.set(sk.id,v);return v;}
 // разбивка силы для листа чары и книги: база × ранг × уровень × таланты × резонанс × реакции
 function powerBreak(sk){const I=rarInfo();rarK(sk);const base=I.B[sk.id],rm=rkMul(sk.id),cur=skParts(sk,false).pw;
   const kt=S.talents;let lv=cur;S.talents={};computeStats();try{lv=skParts(sk,false).pw;}finally{S.talents=kt;computeStats();}
   const re=resoMul(sk),rv=reactVal(sk.e,RESO_N),n=RESO_N[sk.e]+(EQUIPPED.has(sk.id)?0:1),im=isImp(sk.id)?(sk.active?IMP.dmg/IMP.cd:IMP.dmg):1,sb=slotBoost();
-  return {r:rarOf(sk),base,rank:rm,imp:im,slot:sb,lvl:lv/(base*rm*im*sb),tal:cur/lv,reso:re,react:rv,total:cur*re*rv,same:n};}
+  return {r:rarOf(sk),base,rank:rm,imp:im,slot:sb,lvl:lv/(base*rm*im*sb),tal:cur/lv,cap:talQ(sk),reso:re,react:rv,total:cur*re*rv,same:n};}
 const slotNm=(act,i)=>(act?'слоте ':'пассивном слоте ')+(i+1);
 function weakest(act,oc){const key=(act?'a':'p')+(oc||'');if(WKC&&WKC[key]!==undefined)return WKC[key];if(!WKC)WKC={};
   const arr=act?S.active:S.passive,n=act?activeSlots():passiveSlots();let b=null,bp=1e18;
@@ -2420,7 +2468,7 @@ const IMP_OFFER=new Set();let IMP_OFF=false;
 const isImp=id=>!IMP_OFF&&!!S&&(IMP_OFFER.has(id)||!!S.imp&&S.imp.includes(id));
 const rarBase=sk=>rarMap().get(sk.id)|0;
 const impList=()=>S.imp||(S.imp=[]);
-const impDirty=()=>{PWC=new Map();WKC=null;};
+const impDirty=()=>{PWC=new Map();WKC=null;TQ.key=null;TQ.p0k='';};   // невозможная меняет силу без талантов — потолок талантов пересчитать
 // сила той же чары без невозможности — для «во сколько раз сильнее легендарной»
 function impBasePwr(sk){IMP_OFF=true;try{return skPower(sk);}finally{IMP_OFF=false;}}
 function impW(){if(PLAY==='gorge'&&GZ)return IMP_ZW[clamp(Math.round((GZ.lv||1)/3),0,8)];return IMP_ZW[clamp(zoneOf(P.pos.x,P.pos.z),0,IMP_ZW.length-1)];}
@@ -5980,12 +6028,16 @@ function talHint(id){const h=$('#tpHint');let t=TAL_BY[id||tpSel];if(t&&t.b===3&
   if(cl&&!TAL_LOW.matches){let s=`<b>${t.name} ${v}/${t.max}</b>${t.key?' · ключевой':''}`;
     if(talLocked(t))s+=` · <em>замок: вложи в ветку ещё ${m}</em>`;else if(v>=t.max)s+=' · '+talS(t,v)+' · <em>максимум</em>';
     else s+=' · '+(v?'сейчас '+talS(t,v)+' → '+talNx(talS(t,v),talS(t,v+1)):'с первым очком: '+talS(t,1))+(tpFree()?'':' · нет свободных очков');
-    h.innerHTML=s;return;}
+    if(talCapped(t))s+=' · '+talCapD();h.innerHTML=s;return;}
   let s=`<b>${t.name} ${v}/${t.max}</b>${t.key?' · ключевой':''}: `+(cl?talD(t,Math.max(1,v)):v?t.d(v):'за очко '+t.d(1));
   if(talLocked(t))s+=` · <em>замок: вложи в ветку ещё ${m}</em>`;
   else if(v>=t.max)s+=' · <em>максимум</em>';
   else{if(!cl)s+=' · '+(v?'сейчас '+talS(t,v)+' → ':'со следующим очком: ')+talS(t,v+1);if(!tpFree())s+=' · нет свободных очков';}
-  h.innerHTML=s;}
+  if(talCapped(t))s+=' · '+talCapD();h.innerHTML=s;}
+// таланты, что усиливают одни чары сильнее других: им — оговорка о потолке талантов (talQ; подробно — в разбивке силы чары)
+const TAL_KIND=new Set(['wrath','cascade','summ','orbit']);
+const talCapped=t=>TAL_KIND.has(t.id)||t.b===3&&!!(t.sel||t.pw||t.pwf||t.pwk);
+const talCapD=()=>'<em>потолок ×'+fmt2(TAL_CAP)+' к другим чарам</em>';   // строка подсказки — в 2 строки: коротко, полностью — в листе чары
 let tpGlow=new Set(),tpGlowT=0;
 function talGlow(ids){tpGlow=new Set(ids);clearTimeout(tpGlowT);tpGlowT=setTimeout(()=>{tpGlow.clear();$('#branches').querySelectorAll('.tn.ag').forEach(x=>x.classList.remove('ag'));},1600);}
 function talMark(){$('#branches').querySelectorAll('.tn').forEach(x=>x.classList.toggle('sel',x.dataset.t===tpSel));}
@@ -6136,10 +6188,12 @@ function pwBreakHtml(sk){const b=powerBreak(sk),x=(v,t,c)=>`<span${c?' class="'+
   const rn=reactName(sk.e,RESO_N),parts=[`<span class="bd">${Math.round(b.base)}<i>${RARITY[Math.min(b.r,3)].n.toLowerCase()}</i></span>`,x(b.rank,'ранг '+rk(sk.id))];if(on(b.imp))parts.push(x(b.imp,'невозможная'));
   if(on(b.lvl))parts.push(x(b.lvl,'уровень '+S.lvl));if(on(b.slot))parts.push(x(b.slot,'мало слотов'));if(on(b.tal))parts.push(x(b.tal,'таланты'));
   if(on(b.reso))parts.push(x(b.reso,'резонанс','bl'));if(on(b.react))parts.push(x(b.react,'реакция','bl'));
+  const tn=!on(b.cap)?'':b.cap<1?' В «таланты» входит потолок ×'+fmt2(b.cap)+': эту чару таланты усиливают сильнее других чар героя, а разница между чарами от талантов — не больше ×'+fmt2(TAL_CAP)+', излишек уходит слабее усиленным.':
+    ' В «таланты» входит +'+pct(b.cap-1)+'% от потолка: эту чару таланты усиливают слабее других, ей досталась часть их излишка.';
   const notes=[];if(on(b.reso))notes.push('+'+Math.round((b.reso-1)*100)+'% от резонанса '+GENE[sk.E.id]+': '+plCh(b.same)+' '+GENE[sk.E.id]+' в билде вместе с этой');
   if(on(b.react)&&rn)notes.push('+'+Math.round((b.react-1)*100)+'% — реакция «'+rn.R.name+'»: в билде есть чары '+GENE[ELEMENTS[rn.e2].id]);
   return `<div class="pwb"><b>Сила ${Math.round(b.total)}</b> = ${parts.join(' ')}</div>`+
-    `<p class="note">Сила — урон в секунду (с пользой: щит, лечение, рывок) в обычном бою${sk.active?'':'; у пассивной чары — без нажатий, сравнивай с пассивными'}. Первое число — база редкости: чара следующей редкости сильнее даже на 5-м ранге.${notes.length?' От билда (пунктир): '+notes.join('; ')+'.':''}</p>`;}
+    `<p class="note">Сила — урон в секунду (с пользой: щит, лечение, рывок) в обычном бою${sk.active?'':'; у пассивной чары — без нажатий, сравнивай с пассивными'}. Первое число — база редкости: без талантов чара следующей редкости сильнее даже на 5-м ранге, с талантами — всегда на том же ранге (таланты сближают чары героя не больше чем в ${fmt2(TAL_CAP)} раза).${tn}${notes.length?' От билда (пунктир): '+notes.join('; ')+'.':''}</p>`;}
 const plCh=n=>{const m=n%100,d=n%10;return n+' '+(m>10&&m<20?'чар':d===1?'чара':d>1&&d<5?'чары':'чар');};
 // короткая разбивка для строки книги
 function pwShort(sk){const I=rarInfo();rarK(sk);const base=I.B[sk.id],rm=rkMul(sk.id),bl=resoMul(sk)*reactVal(sk.e,RESO_N),all=pwr(sk),lt=all/(base*rm*bl);
@@ -6149,7 +6203,7 @@ function sheetHtml(sk){const eq=EQUIPPED.has(sk.id),ln=isLearned(sk.id),r=rk(sk.
   const rr=rarOf(sk),up=ln&&!eq?upgradeFor(sk):null,dv=ln&&!eq&&!S.sandbox?dustValue(sk):0;
   if(sk.M.count)st.push(['Повторов','×'+sk.M.count]);
   const cost=rankCost(r);
-  const rankRow=ln?`<div class="rank"><b class="rkw${r>=5?' mx':''}">${r>=5?'Ранг 5 из 5 · МАКС':'Ранг '+r+' из 5'}</b> ${pips(r)} <span>${r<5?'каждый ранг: +'+Math.round(RANK_STEP*100)+'% силы (5-й — ×'+fmt2(1+RANK_STEP*4)+'), следующая редкость всё равно сильнее':'максимум'}</span></div>`:'';
+  const rankRow=ln?`<div class="rank"><b class="rkw${r>=5?' mx':''}">${r>=5?'Ранг 5 из 5 · МАКС':'Ранг '+r+' из 5'}</b> ${pips(r)} <span>${r<5?'каждый ранг: +'+Math.round(RANK_STEP*100)+'% силы (5-й — ×'+fmt2(1+RANK_STEP*4)+'), следующая редкость на том же ранге всё равно сильнее':'максимум'}</span></div>`:'';
   let acts='';
   if(!ln)acts=`<p class="note">Ещё не изучено. Выпадает в свитках с монстров и предлагается при повышении уровня.</p><div class="sh-act"><button type="button" class="btn" data-act="close">Закрыть</button></div>`;
   else{acts=(up?`<p class="note up">↑ Сильнее «${skName(SKILLS[up.tgt])}» в ${slotNm(up.act,up.idx)} на ${pct(up.gain)}% (сила ${Math.round(up.cp)} против ${Math.round(up.tp)}).</p><div class="sh-act"><button type="button" class="btn gold" data-act="swap">Заменить «${skName(SKILLS[up.tgt])}»</button></div>`:'')+`<div class="sh-act">${eq?`<button type="button" class="btn warn" data-act="off">Снять</button>`:`<button type="button" class="btn gold" data-act="on">${pending&&pending.index!=null?'Поставить в слот '+(pending.index+1):'Взять в билд'}</button>`}`+
