@@ -21,10 +21,8 @@
       const add = [];
       g.scene.traverse(o => { if (!o.isMesh || !o.userData || !o.userData.k) return; add.push(o); });
       for (const o of add) {
-        const u = o.userData, L = EM.lib[u.k] || (EM.lib[u.k] = { all: [], vars: [], lite: null, r: 0, lum: 1 });
-        const geo = o.geometry; geo.computeBoundingSphere();
-        L.all[u.v] = { geo, lite: !!u.lite };
-        L.r = Math.max(L.r, geo.boundingSphere.center.length() + geo.boundingSphere.radius);
+        const u = o.userData, L = EM.lib[u.k] || (EM.lib[u.k] = { all: [], vars: [], lite: null, lum: 1 });
+        L.all[u.v] = { geo: o.geometry, lite: !!u.lite };
         if (u.glow) L.glow = u.glow;
       }
       for (const k in EM.lib) {
@@ -50,9 +48,9 @@
     return m[k];
   }
 
-  // ---------- неподвижный декор: InstancedMesh -> варианты × клетки ----------
+  // ---------- общее ----------
   function upright(A, o) {
-    // камни раньше крутились как попало (додекаэдр симметричен); у модели должна остаться только поворот вокруг вертикали
+    // камни раньше крутились как попало (додекаэдр симметричен); у модели остаётся только поворот вокруг вертикали
     const sy = Math.hypot(A[o + 4], A[o + 5], A[o + 6]); if (!sy || A[o + 5] / sy > .92) return;
     const sx = Math.hypot(A[o], A[o + 1], A[o + 2]), sz = Math.hypot(A[o + 8], A[o + 9], A[o + 10]);
     const yaw = Math.atan2(-A[o + 2], A[o]) || vh(A[o + 12], A[o + 14]) * 6.283, c = Math.cos(yaw), s = Math.sin(yaw);
@@ -140,12 +138,15 @@
     root.emAt = { x: _v.x, z: _v.z };
     for (const m of root.emMade) if (m.parent === root) fill(m, _v.x, _v.z);
   };
+  // обёртка ссылается на общие буферы вершин вида (их используют и другие меши, в т. ч. через VAO) — перед освобождением
+  // убрать их из обёртки, иначе three.js удалит общие буферы и чужие меши останутся со ссылкой на удалённый буфер
+  function dropWrap(w) { for (const a of ['position', 'normal', 'color', 'aVar']) w.deleteAttribute(a); w.setIndex(null); w.dispose(); }
   // root: группа (worldGroup, gorgeGroup); kmap: геометрия -> вид;
   // maxV: сколько вариантов модели слить (больше — разнообразнее, но вершины всех вариантов считаются у каждого экземпляра)
   EM.swap = function (root, kmap, maxV) {
     if (!root.emMade) root.emMade = [];
-    // меши прошлой постройки (ущелье перестроено) — освободить (общие буферы вершин при следующем кадре загрузятся заново — это мелочь)
-    root.emMade = root.emMade.filter(m => { if (m.parent === root) return true; if (m.emWrap) m.emWrap.dispose(); m.dispose(); return false; });
+    // меши прошлой постройки (ущелье перестроено) — освободить: свои буферы (экземпляры, номер варианта), но не общие буферы вершин
+    root.emMade = root.emMade.filter(m => { if (m.parent === root) return true; if (m.emWrap) dropWrap(m.emWrap); if (m.emBase.userData.emFix) { m.emBase.dispose(); if (m.emSel) m.emSel.dispose(); } m.dispose(); return false; });
     EM.roots.add(root);
     const list = [];
     for (const o of root.children) if (o.isInstancedMesh && o.emK == null && !o.emSkip) { const k = kmap.get(o.geometry); if (k && EM.lib[k]) list.push([o, k]); }
