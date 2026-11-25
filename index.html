@@ -1110,6 +1110,122 @@ const FORMS=[
  {id:'surge',kind:'passive',role:'Каждый 4-й каст',power:46,how:'Каждый 4-й твой активный каст выпускает волну',
   names:['Перегрев','Пик холода','Перегрузка','Вспышка заразы','Прилив тьмы','Озарение','Толчок','Шквал','Кровавый прилив','Арканный резонанс']},
 ];
+// ===== A: данные новых форм (DESIGN-obraz: 15 общих активных, 19 новых пассивок, 60 фирменных); порядок не менять, только дописывать =====
+{const AJ={m:['Огненный','Ледяной','Грозовой','Ядовитый','Теневой','Святой','Каменный','Ветряной','Кровавый','Арканный'],f:['Огненная','Ледяная','Грозовая','Ядовитая','Теневая','Святая','Каменная','Ветряная','Кровавая','Арканная'],
+  n:['Огненное','Ледяное','Грозовое','Ядовитое','Теневое','Святое','Каменное','Ветряное','Кровавое','Арканное'],p:['Огненные','Ледяные','Грозовые','Ядовитые','Теневые','Святые','Каменные','Ветряные','Кровавые','Арканные']};
+ const nm=(g,w)=>AJ[g].map(a=>a+' '+w),L=s=>s.split(',');
+ // --- общие активные (раздел 5) ---
+ FORMS.push(
+ {id:'boomer',kind:'active',role:'Атака',cd:3,mana:12,power:26,range:11,how:'Диск летит 11 м сквозь врагов и возвращается к тебе, по пути назад бьёт сильнее',names:L('Огненная чакра,Ледяной диск,Грозовой обруч,Ядовитый серп,Теневая чакра,Солнечный диск,Каменный жернов,Вихревой серп,Кровавый серп,Арканное кольцо')},
+ {id:'vortex',kind:'active',role:'Контроль',cd:9,mana:24,power:12,range:14,how:'Воронка 3 с стягивает врагов в центр и в конце схлопывается взрывом',names:L('Огненный водоворот,Ледяная воронка,Око бури,Трясина,Чёрная дыра,Звезда-притяжение,Зыбучие пески,Воздушная воронка,Кровавый омут,Сингулярность')},
+ {id:'decoy',kind:'active',role:'Защита',cd:12,mana:18,power:40,range:6,sk:'decoy',how:'Двойник на 5 с перетягивает на себя врагов вокруг и в конце взрывается',names:L('Огненный двойник-приманка,Ледяная статуя,Грозовой фантом,Ядовитое чучело,Теневой двойник,Светлый образ,Каменный истукан,Миражный двойник,Кровавый двойник,Зеркальный образ')},
+ {id:'glyph',kind:'active',role:'Ловушка',cd:7,mana:16,power:30,range:12,how:'Руна на земле 10 с: твоя другая чара по врагу на руне зажигает её взрывом, две руны рядом связаны лучом',names:L('Руна огня,Руна инея,Руна грома,Руна чумы,Руна тени,Святая руна,Руна тверди,Руна ветра,Руна крови,Руна чар')},
+ {id:'beacon',kind:'active',role:'Площадь',cd:8,mana:22,power:10,range:9,how:'2.5 с вокруг тебя крутится луч 9 м и режет всех, кого задел; можно ходить',names:L('Огненный маяк,Ледяной маяк,Грозовой маяк,Кислотная карусель,Теневой маятник,Солнечный маяк,Каменная коса,Ветряная мельница,Кровавая карусель,Арканный маяк')},
+ {id:'rush',kind:'active',role:'Ближний бой',cd:5,mana:14,power:38,range:9,how:'Рывок 9 м сквозь врагов: каждый задетый ранен, а через полсекунды рассечённые ещё и взрываются',names:L('Огненный прорыв,Ледяной прорыв,Громовой прорыв,Ядовитый прорыв,Теневой прорыв,Светлый натиск,Таранный натиск,Рассекающий ветер,Кровавый прорыв,Арканный прорыв')},
+ {id:'totem',kind:'active',role:'Призыв',cd:11,mana:22,power:14,range:10,sk:'turret',how:'Тотем на 12 с сам стреляет снарядами стихии в ближайшего врага',names:L('Тотем пламени,Тотем стужи,Тотем грома,Чумной котёл,Обелиск тьмы,Святой обелиск,Каменный идол,Тотем ветров,Кровавый идол,Арканный кристалл')},
+ {id:'wall',kind:'active',role:'Контроль',cd:10,mana:20,power:12,range:10,how:'Стена 8 м на 5 с: враги не проходят и ранятся о неё, в конце она рушится на них',names:L('Стена огня,Ледяная стена,Стена молний,Стена спор,Стена мрака,Стена света,Каменная стена,Стена ветра,Кровавая ограда,Арканная преграда')},
+ {id:'mirror',kind:'active',role:'Защита',cd:9,mana:14,power:30,range:3,how:'2 с всё, что в тебя летит, разворачивается обратно, а кто ударил вблизи — оглушён и получает свой удар',names:L('Огненное зерцало,Ледяное зеркало,Грозовой отбойник,Ядовитый панцирь,Зеркало тьмы,Святой эгид,Каменный бастион,Вихревой отбойник,Кровавый отпор,Арканное зеркало')},
+ {id:'stasis',kind:'active',role:'Контроль',cd:12,mana:24,power:8,range:12,how:'Купол 4 с: время внутри почти стоит — враги и их снаряды еле движутся, твои чары по ним сильнее',names:L('Плавящий зной,Вечная мерзлота,Статический купол,Липкий туман,Безвременье,Застывший миг,Зыбучая твердь,Штиль,Вязкая кровь,Остановка времени')},
+ {id:'mark',kind:'active',role:'Атака',cd:8,mana:14,power:20,range:15,how:'Метка на сильнейшего врага 5 с копит часть урона по нему и в конце взрывается всем накопленным',names:L('Пылающая метка,Метка стужи,Грозовая метка,Чумная метка,Метка смерти,Метка суда,Метка обвала,Метка бури,Метка крови,Метка распада')},
+ {id:'quake',kind:'active',role:'Площадь',cd:6,mana:18,power:34,range:12,how:'Волна по земле 12 м подбрасывает врагов, а за ней остаётся трещина',names:L('Огненная борозда,Ледяной разлом,Грозовая трещина,Ядовитый разлом,Теневой разрыв,Сияющая волна,Разлом земли,Ветряная волна,Кровавая борозда,Арканная волна')},
+ {id:'leap',kind:'active',role:'Ближний бой',cd:7,mana:14,power:46,range:10,how:'Прыжок по дуге до 10 м: в воздухе не ранят, при приземлении удар по кругу и оглушение',names:L('Падающее пламя,Ледяное падение,Громовое падение,Ядовитое падение,Теневое падение,Небесный прыжок,Сокрушающий прыжок,Прыжок урагана,Кровавый прыжок,Арканное падение')},
+ {id:'hook',kind:'active',role:'Контроль',cd:8,mana:12,power:24,range:12,how:'Цепь 12 м: первого врага притягивает к тебе и оглушает, а к боссу тянет тебя',names:L('Огненный аркан,Ледяная цепь,Грозовой гарпун,Ядовитый хлыст,Хватка тьмы,Цепь света,Каменный крюк,Аркан ветра,Кровавая цепь,Арканная привязь')},
+ {id:'fan',kind:'active',role:'Атака',cd:4,mana:14,power:18,range:7,how:'7 коротких снарядов веером: вблизи по одной цели попадают почти все',names:L('Веер искр,Ледяные осколки,Веер разрядов,Ядовитые брызги,Веер теней,Веер света,Каменная шрапнель,Веер ветра,Кровавые иглы,Звёздный веер')},
+ // --- новые общие пассивки (раздел 5А) ---
+ {id:'link',kind:'passive',role:'Всегда',trig:'always',power:0,names:nm('f','сцепка'),line:'Два ближайших врага скованы цепью: часть урона по одному достаётся второму; умер один — цепь перескакивает на следующего.',hint:'40% урона переходит второму, до 10 м'},
+ {id:'volley',kind:'passive',role:'По таймеру',trig:'timer',power:18,names:nm('p','клинки'),line:'За спиной по одному вырастают четыре клинка; когда готовы все, они сами летят в четырёх разных врагов.',hint:'клинок раз в 1.25 с, полный залп раз в 5 с, 14 м'},
+ {id:'ward',kind:'passive',role:'По таймеру',trig:'timer',power:12,names:nm('m','оберег'),line:'Над плечом висит оберег: первый удар по тебе он забирает целиком и разлетается осколками во врагов, потом вырастает снова.',hint:'раз в 8 с, 5 осколков'},
+ {id:'deflect',kind:'passive',role:'По таймеру',trig:'timer',power:20,names:nm('m','отбойник'),line:'Раз в несколько секунд первый вражеский снаряд, летящий в тебя, разворачивается в стрелка и бьёт его вдвое.',hint:'раз в 6 с, урон снаряда ×2 и сверху сила чары'},
+ {id:'twin',kind:'passive',role:'Касты',trig:'casts',power:0,names:nm('m','двойник'),line:'Каждую пятую чару за тобой повторяет призрачный двойник: появляется рядом, колдует то же самое и тает.',hint:'через 0.3 с, 70% силы, бесплатно'},
+ {id:'combo',kind:'passive',role:'Попадания вблизи',trig:'hits',power:20,names:nm('m','таран'),line:'Каждый третий удар вблизи — тяжёлый: враг отлетает и сбивает всех, в кого врезался.',hint:'отброс 6 м, сбитым урон и оглушение 0.6 с'},
+ {id:'battery',kind:'passive',role:'Попадания',trig:'hits',power:120,names:nm('f','батарея'),line:'Твой урон заряжает батарею; полная — загорается кнопка-молния: нажми, и разряд бьёт всех вокруг.',hint:'кнопка у HUD или клавиша R; разряд 10 м, оглушение 0.5 с; в автобое срабатывает сама'},
+ {id:'rift',kind:'passive',role:'Крит',trig:'crit',power:30,names:nm('m','провал'),line:'Критический удар открывает под врагом маленькую чёрную воронку: она стягивает соседей и через секунду схлопывается.',hint:'3.5 м, не чаще раза в 1.5 с'},
+ {id:'thrall',kind:'passive',role:'Убийство',trig:'kill',power:15,names:nm('f','свита'),line:'Каждый пятый убитый враг встаёт на твою сторону тенью себя и дерётся восемь секунд.',hint:'не больше 3 сразу; элиты и боссы не встают'},
+ {id:'harvest',kind:'passive',role:'Убийство',trig:'kill',power:0,names:nm('p','искры жизни'),line:'Убитые роняют искры, и те сами летят к тебе: каждая чуть лечит и даёт ману.',hint:'искра: 1.5% здоровья и 3 маны, притягивается с 8 м'},
+ {id:'trophy',kind:'passive',role:'Убийство элиты',trig:'elite',power:0,names:nm('m','трофей'),line:'Убитая элита роняет трофей; подбери — и три следующие чары бесплатны и без перезарядки.',hint:'трофей лежит 15 с; с босса — 5 чар'},
+ {id:'slip',kind:'passive',role:'Удар по тебе',trig:'hurt',power:30,names:nm('n','ускользание'),line:'Когда тебя бьют, ты исчезаешь и появляешься в пяти метрах позади, а на старом месте остаётся силуэт и взрывается.',hint:'раз в 10 с, этот удар не проходит'},
+ {id:'stagger',kind:'passive',role:'Удар по тебе',trig:'hurt',power:0,names:nm('f','отсрочка'),line:'Половина урона по тебе приходит не сразу, а растягивается на три секунды; каждое убийство сжигает часть долга.',hint:'убийство снимает треть долга'},
+ {id:'brink',kind:'passive',role:'Мало здоровья',trig:'brink',power:0,names:L('Тлеющий миг,Застывший миг,Миг молнии,Вязкий миг,Миг тьмы,Светлый миг,Каменный миг,Миг ветра,Кровавый миг,Остановленный миг'),line:'Здоровья меньше трети — время вокруг замедляется: враги и их снаряды еле движутся, а ты нет.',hint:'3 с, раз в 40 с'},
+ {id:'rebirth',kind:'passive',role:'Смертельный удар',trig:'brink',power:50,names:L('Возрождение из пепла,Ледяной сон,Второй разряд,Живучесть чумы,Филактерия,Благословение,Каменное сердце,Второе дыхание,Неистощимая кровь,Отмотка времени'),line:'Раз в полторы минуты смертельный удар не убивает: ты вспыхиваешь, встаёшь с частью здоровья и отбрасываешь всех вокруг.',hint:'40% здоровья, раз в 90 с'},
+ {id:'focus',kind:'passive',role:'Стоишь',trig:'stand',power:20,names:L('Шар пламени,Шар льда,Шар грозы,Шар яда,Шар тьмы,Шар света,Шар камня,Шар ветра,Шар крови,Шар чар'),line:'Пока стоишь, над головой растёт шар силы; сделал шаг — шар срывается в ближайшего врага: чем дольше стоял, тем сильнее.',hint:'полный шар за 3 с — урон вчетверо больше'},
+ {id:'shell',kind:'passive',role:'Окружили',trig:'crowd',power:45,names:nm('m','кокон'),line:'Окружили — вокруг тебя на две секунды вырастает кристалл: тебя не ранят, а потом он разлетается осколками во все стороны.',hint:'5 врагов в 4 м, раз в 15 с'},
+ {id:'sprite',kind:'passive',role:'Реакция стихий',trig:'react',power:12,names:L('Дитя огня,Дитя льда,Дитя грозы,Дитя яда,Дитя тьмы,Дитя света,Дитя камня,Дитя ветра,Дитя крови,Дитя чар'),line:'Каждая реакция двух стихий рождает маленького духа; он шесть секунд летает рядом и бьёт врагов.',hint:'до 3 духов'},
+ {id:'execute',kind:'passive',role:'Добивание',trig:'finish',power:0,names:nm('f','казнь'),line:'Враг на последних каплях здоровья светится красным, и твой удар добивает его сразу.',hint:'обычный враг ниже 20%, элита ниже 12%; по боссу ниже 20% урон больше'});
+ // --- старые пассивки: id те же, новые имена и строки (раздел 5А.2) ---
+ const OLDP={aura:{role:'Всегда',trig:'always',names:nm('m','ореол'),line:'Круг у ног жжёт всех, кто в него зашёл; чем больше врагов внутри, тем он шире и ярче.',hint:'3 м и шире с каждым врагом, до 6 м'},
+  orbit:{role:'Всегда',trig:'always',power:14,names:nm('p','стражи'),line:'Вокруг тебя кружат три сферы; враг подошёл ближе трёх метров — сфера сама срывается в него и потом вырастает снова.',hint:'сфера отрастает за 4 с'},
+  surge:{role:'Касты',trig:'casts',names:L('Перегрев,Пик холода,Перегрузка,Брожение,Прилив тьмы,Озарение,Нарастание,Порыв,Прилив крови,Переполнение'),line:'Каждая чара зажигает деление; на четвёртом ты вспыхиваешь, и следующая чара бьёт почти вдвое сильнее.',hint:'следующая чара ×1.8'},
+  brand:{role:'Попадания',trig:'hits',power:40,names:nm('n','клеймо'),line:'Каждое попадание выжигает на враге знак; пятый знак взрывает его и раскидывает знаки по соседям.',hint:'знаки живут 5 с, взрыв 2.5 м'},
+  doom:{role:'Убийство',trig:'kill',names:nm('f','детонация'),line:'Убитый враг взрывается; если взрыв добил соседа — взрывается и он, и так по цепочке.',hint:'3 м, цепочка до 6, каждый следующий сильнее'},
+  revenge:{role:'Удар по тебе',trig:'hurt',names:nm('p','шипы'),line:'Ударили тебя — из-под ног выстреливают шипы и отбрасывают всех вокруг.',hint:'4 м, не чаще раза в 1.5 с'},
+  trail:{role:'Бег',trig:'run',names:L('Огненный след,Ледяной след,Грозовой след,Ядовитый след,Теневой след,Светлый след,Каменный след,Пыльный вихрь,Кровавый след,Арканный след'),line:'На бегу за тобой тянется полоса стихии: огонь горит, лёд замедляет, яд травит.',hint:'полоса живёт 2.4 с'}};
+ for(const f of FORMS)if(OLDP[f.id]){Object.assign(f,OLDP[f.id]);f.how=f.line;}
+ for(const f of FORMS)if(f.line&&!f.how)f.how=f.line;
+ // --- фирменные: 3 на героя (акт. 1 ур., пасс. 12 ур., ульта 20 ур.), одна стихия ---
+ const SG=(sig,id,el,kind,lvl,nm1,o)=>Object.assign({id,sig,els:[el],el,kind,lvl,role:kind==='passive'?'Фирменная':lvl>=20?'Ульта':'Фирменная',names:Array(10).fill(nm1)},o);
+ FORMS.push(
+ SG('pyro','s_phoenix','fire','active',1,'Феникс',{cd:9,mana:26,power:40,range:16,how:'Огненная птица летит 16 м сквозь врагов, раскаляет их и оставляет огненную полосу, а потом возвращается и лечит тебя'}),
+ SG('pyro','s_ash','fire','passive',12,'Пепел',{power:20,trig:'kill',line:'Горящий враг, умирая, оставляет угли: врагов они жгут, а тебя на углях ускоряют и усиливают.',hint:'угли 1.5 м на 4 с; на углях +25% бега и +15% урона'}),
+ SG('pyro','s_supernova','fire','active',20,'Сверхновая',{ult:true,cd:40,mana:60,power:120,range:9,how:'Над головой растёт огненный шар и взрывается на 9 м: раскалённые враги получают больше и тут же вспыхивают'}),
+ SG('cryo','s_tomb','ice','active',1,'Ледяная гробница',{cd:10,mana:24,power:50,range:12,how:'Цель и все рядом вмерзают в глыбу на 2.5 с, потом глыба раскалывается осколками'}),
+ SG('cryo','s_winterheart','ice','passive',12,'Сердце зимы',{power:0,trig:'react',line:'Тебя нельзя замедлить и заморозить, а каждый раскол замороженного возвращает ману и ускоряет чары.',hint:'раскол: +4 маны и −0.3 с ко всем перезарядкам'}),
+ SG('cryo','s_zero','ice','active',20,'Абсолютный ноль',{ult:true,cd:45,mana:60,power:70,range:9,how:'3 с вокруг растёт метель до 9 м, а в конце все в ней замерзают и раскалываются'}),
+ SG('storm','s_ballstorm','storm','active',1,'Шаровая гроза',{cd:8,mana:22,power:14,range:14,how:'Шаровая молния 4 с плывёт к цели и бьёт молниями трёх ближайших врагов'}),
+ SG('storm','s_rod','storm','passive',12,'Громоотвод',{power:30,trig:'hurt',line:'Когда тебя бьют, в ударившего иногда сама бьёт молния и даёт заряды.',hint:'шанс 30%, не чаще раза в 0.5 с'}),
+ SG('storm','s_skywrath','storm','active',20,'Гнев небес',{ult:true,cd:40,mana:55,power:60,range:15,how:'4 с с неба бьют 14 молний по самым сильным врагам вокруг и оглушают'}),
+ SG('geo','s_boulder','earth','active',1,'Валун',{cd:7,mana:18,power:45,range:16,how:'Катящийся валун 16 м сбивает строй, растёт и бьёт сильнее с каждым сбитым'}),
+ SG('geo','s_debris','earth','passive',12,'Обломки',{power:18,trig:'kill',line:'Враг, убитый земляной чарой, разлетается тремя камнями в соседей.',hint:'камни летят во врагов в 6 м'}),
+ SG('geo','s_earthquake','earth','active',20,'Землетрясение',{ult:true,cd:45,mana:60,power:30,range:9,how:'4 с от тебя каждые полсекунды расходится ударная волна 9 м и оглушает врагов'}),
+ SG('plague','s_lantern','poison','active',1,'Чумной фонарь',{cd:12,mana:22,power:8,range:10,how:'Фонарь на 8 с: туман вокруг травит врагов, а тебя внутри лечит'}),
+ SG('plague','s_immune','poison','passive',12,'Иммунитет',{power:0,trig:'hurt',line:'Яд врагов и их лужи на тебя не действуют, а отравленные враги бьют тебя слабее.',hint:'урон от отравленных −15%'}),
+ SG('plague','s_pandemic','poison','active',20,'Пандемия',{ult:true,cd:40,mana:55,power:30,range:20,how:'Весь яд на врагах вокруг срабатывает разом и удваивается, а от каждого отравленного к тебе тянется лечащая нить'}),
+ SG('hemo','s_bloodlet','blood','active',1,'Кровопускание',{cd:9,mana:0,hpCost:.08,power:18,range:12,how:'Четыре врага 3 с истекают кровью по нитям к тебе — вся она тебя лечит, а в конце из них бьют шипы'}),
+ SG('hemo','s_threads','blood','passive',12,'Кровавые нити',{power:0,trig:'brink',line:'Когда здоровья меньше трети, от врагов рядом к тебе тянутся кровавые нити и пьют их здоровье для тебя.',hint:'до 5 нитей, 8 м'}),
+ SG('hemo','s_pact','blood','active',20,'Багровый пакт',{ult:true,cd:45,mana:0,power:60,range:10,how:'Жертвует почти треть здоровья: волна крови 10 м бьёт вчетверо от отданного и возвращает тебе половину урона'}),
+ SG('arcan','s_missiles','arcane','active',1,'Чародейские ракеты',{cd:4,mana:16,power:16,range:16,how:'6 самонаводящихся ракет летят в 6 разных врагов и возвращают ману'}),
+ SG('arcan','s_resonator','arcane','passive',12,'Резонатор',{power:0,trig:'casts',line:'Каждые 150 потраченной маны следующая чара сильнее в полтора раза и перезаряжается вдвое быстрее.',hint:'3 руны вокруг тебя показывают заряд'}),
+ SG('arcan','s_rift','arcane','active',20,'Разлом реальности',{ult:true,cd:50,mana:40,power:0,range:0,how:'4 с над тобой висит портал и бесплатно повторяет каждую твою чару'}),
+ SG('alch','s_mutagen','poison','active',1,'Мутаген',{cd:15,mana:20,power:12,range:3,how:'Выпивает колбу на 8 с: по последнему реагенту — ядовитое дыхание, быстрые чары или огненные колбы'}),
+ SG('alch','s_fumes','poison','passive',12,'Летучие пары',{power:0,trig:'always',line:'Твои облака и лужи сами ползут к ближайшему врагу и живут дольше.',hint:'живут на 50% дольше'}),
+ SG('alch','s_philstone','poison','active',20,'Философский камень',{ult:true,cd:50,mana:50,power:0,range:0,how:'10 с все броски тройные: колбы, веер, бомбы и мины летят тремя копиями'}),
+ SG('necro','s_raise','shadow','active',1,'Поднять мёртвых',{cd:12,mana:28,power:15,range:12,sk:'raised',how:'Из свежих трупов вокруг встают скелеты-воины и дерутся 10 с'}),
+ SG('necro','s_souls','shadow','passive',12,'Жатва душ',{power:0,trig:'kill',line:'Собрав двадцать душ, следующая чара тратит их все: бьёт вдвое и лечит твоих слуг.',hint:'огоньки на поясе сливаются в шар над головой'}),
+ SG('necro','s_bonestorm','shadow','active',20,'Костяная буря',{ult:true,cd:45,mana:50,power:30,range:12,how:'Все твои слуги взрываются костями и тут же встают снова целыми'}),
+ SG('druid','s_bearform','earth','active',1,'Медвежья шкура',{cd:18,mana:25,power:20,range:3,how:'На 10 с становишься медведем: больше здоровья, тяжёлые удары лапой и рёв, который оглушает'}),
+ SG('druid','s_spores','poison','passive',12,'Споры',{power:20,trig:'kill',line:'Враг, умерший с ядом, выпускает споры: они сами летят к врагам и оставляют лужу.',hint:'2 споры с каждого'}),
+ SG('druid','s_awaken','earth','active',20,'Пробуждение леса',{ult:true,cd:50,mana:60,power:15,range:8,sk:'treant',how:'Вокруг встают три древня на 14 с, их корни снова и снова сковывают врагов'}),
+ SG('shaman','s_stormtotem','storm','active',1,'Тотем гроз',{cd:12,mana:24,power:22,range:9,sk:'stormtotem',how:'Тотем 12 с каждую секунду бьёт молнией с неба в случайного врага рядом'}),
+ SG('shaman','s_ancestors','storm','passive',12,'Голос предков',{power:15,trig:'casts',line:'Каждая пятая чара бесплатно зовёт волка-духа на шесть секунд.',hint:'волк-дух живёт 6 с'}),
+ SG('shaman','s_elemlord','storm','active',20,'Великий элементаль',{ult:true,cd:50,mana:60,power:30,range:12,sk:'bigelem',how:'Огромный элементаль бури 15 с бьёт цепными молниями по шести врагам, а умирая — оставляет грозу'}),
+ SG('lock','s_hellgate','fire','active',1,'Врата ада',{cd:14,mana:30,power:15,range:12,how:'Портал 8 с выпускает бесов, они бегут к проклятым и взрываются'}),
+ SG('lock','s_darkdeal','fire','passive',12,'Тёмная сделка',{power:0,trig:'casts',line:'Когда маны мало, чары берут недостающее здоровьем.',hint:'не ниже 15% здоровья'}),
+ SG('lock','s_pactdemon','fire','active',20,'Сделка с демоном',{ult:true,cd:60,mana:50,power:40,range:10,how:'Приносит слуг в жертву ради силы, и с неба падает Инфернал на 15 с'}),
+ SG('windr','s_galearrow','wind','active',1,'Ураганная стрела',{cd:7,mana:18,power:40,range:20,how:'Стрела-вихрь пронзает всех на линии 20 м и стягивает пронзённых в вихрь'}),
+ SG('windr','s_feather','wind','passive',12,'Лёгкость пера',{power:0,trig:'run',line:'На полном попутном ветре ты не касаешься земли: лужи, ловушки и замедления на тебя не действуют.',hint:'перья за спиной — признак'}),
+ SG('windr','s_arrowstorm','wind','active',20,'Буря стрел',{ult:true,cd:40,mana:40,power:14,range:14,how:'4 с ты сам стреляешь шесть стрел в секунду в ближайших врагов, можно бегать'}),
+ SG('hunter','s_net','ice','active',1,'Ледяная сеть',{cd:9,mana:18,power:14,range:12,how:'Сеть 4 м падает в точку: все внутри обездвижены на 2 с и получают больше урона'}),
+ SG('hunter','s_instinct','ice','passive',12,'Чутьё',{power:20,trig:'hurt',line:'Дальний враг, который целится в тебя, загорается знаком «!», и твой следующий выстрел сам летит в него.',hint:'сбивает его выстрел и делает добычей'}),
+ SG('hunter','s_boltrain','ice','active',20,'Ливень болтов',{ult:true,cd:40,mana:45,power:25,range:12,how:'3 с с неба падают 24 ледяных болта по врагам вокруг'}),
+ SG('assassin','s_bladedance','shadow','active',1,'Танец клинков',{cd:10,mana:18,power:30,range:10,how:'За 0.6 с прыгает между пятью врагами и бьёт каждого, в прыжках неуязвим'}),
+ SG('assassin','s_poisonblades','poison','passive',12,'Отравленные клинки',{power:14,trig:'hits',line:'Каждый удар вблизи отравляет врага, а умерший с ядом лопается ядовитым облаком.',hint:'+2 яда за удар, облако 2.5 м'}),
+ SG('assassin','s_heartstrike','shadow','active',20,'Удар в сердце',{ult:true,cd:30,mana:30,power:120,range:16,how:'Телепорт за спину сильнейшего врага и удар, тем страшнее, чем больше комбо; раненого добивает сразу'}),
+ SG('bers','s_roar','blood','active',1,'Кровавый рёв',{cd:14,mana:0,hpCost:.05,power:10,range:8,how:'Рёв: враги рядом в страхе бегут, а ты быстрее бьёшь и копишь ярость'}),
+ SG('bers','s_bloodpool','blood','passive',12,'Кровавая лужа',{power:6,trig:'kill',line:'Враг, убитый вблизи, оставляет лужу крови: в ней ты лечишься, а враги кровоточат.',hint:'лужа 2 м на 6 с'}),
+ SG('bers','s_carnage','blood','active',20,'Кровавая бойня',{ult:true,cd:50,mana:0,power:0,range:3,how:'5 с тебя не убить, каждый удар рубит по кругу, а в конце бойня тебя лечит'}),
+ SG('monk','s_hundred','wind','active',1,'Сто кулаков',{cd:6,mana:14,power:10,range:4,how:'1.2 с двенадцать ударов по врагу перед тобой, последний отбрасывает далеко'}),
+ SG('monk','s_calm','wind','passive',12,'Внутренний покой',{power:0,trig:'stand',line:'Если три секунды тебя не ранили, следующий удар двойной и лечит.',hint:'ладони светятся, пока удар заряжен'}),
+ SG('monk','s_windpath','wind','active',20,'Путь ветра',{ult:true,cd:45,mana:40,power:24,range:10,how:'4 с ты неуязвим и сам носишься между врагами, а в конце волна света лечит'}),
+ SG('inq','s_pyre','light','active',1,'Костёр',{cd:10,mana:22,power:70,range:15,how:'Печать над целью, и через секунду столп святого огня: по виновным вдвое'}),
+ SG('inq','s_unshaken','light','passive',12,'Непоколебимость',{power:0,trig:'hurt',line:'Тебя не оглушить и не замедлить, а каждая такая попытка злит тебя и усиливает.',hint:'+10% урона на 3 с за попытку, до трёх'}),
+ SG('inq','s_inquisition','light','active',20,'Инквизиция',{ult:true,cd:45,mana:45,power:22,range:15,how:'5 с из арбалета летят святые болты по виновным, каждый делает цель виновной'}),
+ SG('paladin','s_consecrate','light','active',1,'Освящённая земля',{cd:14,mana:24,power:10,range:5,how:'Круг 5 м на 6 с под тобой: тебя и напарника лечит, врагов жжёт и слепит'}),
+ SG('paladin','s_faith','light','passive',12,'Щит веры',{power:0,trig:'hurt',line:'Каждый четвёртый удар по тебе полностью гасит щит веры.',hint:'блок даёт правосудие'}),
+ SG('paladin','s_skyhammer','light','active',20,'Молот небес',{ult:true,cd:45,mana:45,power:200,range:8,how:'Молот падает с неба перед тобой, оглушает всех и тянет врагов на себя'}),
+ SG('dk','s_gravecall','shadow','active',1,'Зов могилы',{cd:12,mana:22,power:30,range:6,how:'Руки мертвецов из-под земли хватают всех вокруг, каждый схваченный лечит тебя'}),
+ SG('dk','s_icearmor','ice','passive',12,'Ледяная броня',{power:0,trig:'brink',line:'Когда здоровья мало, на тебе вырастает ледяной панцирь, а враги рядом замерзают.',hint:'раз в 30 с, панцирь на 30% здоровья'}),
+ SG('dk','s_desecrate','shadow','active',20,'Осквернение',{ult:true,cd:45,mana:40,power:12,range:6,how:'8 с за тобой ходит тёмный круг: враги в нём вязнут и гибнут, а ты пьёшь из них жизнь'}));
+}
+// ----- /A данные -----
 const FORM={}; FORMS.forEach((f,i)=>FORM[f.id]=i);
 const MODS=[
  {id:'mighty',  name:'Мощь',      desc:'+60% урона, +50% маны', dmg:1.6, mana:1.5},
@@ -1123,20 +1239,20 @@ const MODS=[
 ];
 const MOD={}; MODS.forEach((m,i)=>MOD[m.id]=i);
 const NFS={},CFS={};
-const NF=FORMS.length,NM=MODS.length,PER_EL=NF*NM;
+const NF=FORMS.length,NM=MODS.length,NF0=19;
+// база чары: старые формы (f<19) — e*19+f (как в v13.8), новые — 190+(f-19)*10+e; id = база*8 + вариант
+const bkOf=(e,f)=>f<NF0?e*NF0+f:190+(f-NF0)*10+e;
 const SKILLS=[];
-for(let e=0;e<10;e++)for(let f=0;f<NF;f++)for(let m=0;m<NM;m++){
-  const E=ELEMENTS[e],F=FORMS[f],M=MODS[m];
-  SKILLS.push({id:e*PER_EL+f*NM+m,e,f,m,E,F,M,bk:e*NF+f,active:F.kind==='active',base:F.names[e],
-    key:(F.names[e]+' '+M.name+' '+E.name+' '+F.role).toLowerCase()});
-}
-const sid=(e,f,m)=>EL[e]*PER_EL+FORM[f]*NM+MOD[m];
-const skName=sk=>(sk.F.id==='summon'&&CLS?summInfo(sk).name:sk.base)+' · '+sk.M.name;
+for(let f=0;f<NF;f++)for(let e=0;e<10;e++){const F=FORMS[f];if(F.els&&F.els.indexOf(ELEMENTS[e].id)<0)continue;
+  for(let m=0;m<NM;m++){const E=ELEMENTS[e],M=MODS[m],bk=bkOf(e,f),id=bk*NM+m;
+    SKILLS[id]={id,e,f,m,E,F,M,bk,active:F.kind==='active',base:F.names[e],key:(F.names[e]+' '+M.name+' '+E.name+' '+F.role).toLowerCase()};}}
+const sid=(e,f,m)=>{const F=FORMS[FORM[f]];return bkOf(F.els?EL[F.els[0]]:EL[e],FORM[f])*NM+MOD[m];};
+const skName=sk=>(sk.F.id==='summon'&&CLS?summInfo(sk).name:sk.base)+' · '+sk.M.name+(CLS&&CLS.legacy&&CLS.legacy.has(sk.id)?' · прежняя':'');
 const MODG=['+','»','×3','◎','♥','✸','✦','≈'];
 const ELG={fire:'<path d="M12 3c1 4 5 6 5 11a5 5 0 0 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-6 1-10z"/>',ice:'<path d="M12 3v18M4 7.5l16 9M20 7.5l-16 9"/>',storm:'<path d="M13 2L5 14h6l-1 8 8-12h-6z"/>',poison:'<path d="M12 3c4 5 6 8 6 11a6 6 0 0 1-12 0c0-3 2-6 6-11z"/>',shadow:'<path d="M17 3a9 9 0 1 0 4 14 7 7 0 0 1-4-14z"/>',light:'<circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/>',earth:'<path d="M2 20L9 7l4 7 3-4 6 10z"/>',wind:'<path d="M3 8h11a3 3 0 1 0-3-3M3 13h15a3 3 0 1 1-3 3M3 18h7"/>',blood:'<path d="M12 2c3 4 6 7 6 11a6 6 0 0 1-12 0c0-4 3-7 6-11z"/>',arcane:'<path d="M12 2l3 7 7 3-7 3-3 7-3-7-7-3 7-3z"/>'};
 const elBadge=sk=>{const c=sk.E.hex;return '<i class="eb" style="--c:'+c+'"><svg viewBox="0 0 24 24" fill="'+c+'" fill-opacity=".35" stroke="'+c+'" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">'+ELG[sk.E.id]+'</svg></i>';};
 const modBadge=sk=>elBadge(sk)+`<i class="mb" title="${sk.M.name}">${MODG[sk.m]}</i>`;
-const skLead=sk=>sk.F.id==='summon'&&CLS?summLead(sk):sk.F.how+', '+sk.E.short+'.';
+const skLead=sk=>sk.F.id==='summon'&&CLS?summLead(sk):sk.F.line?sk.F.line:sk.F.sig?sk.F.how+'.':sk.F.how+', '+sk.E.short+'.';
 
 const rkey=(a,b)=>a<b?a*16+b:b*16+a;
 const REACT={},REACT_LIST=[];
@@ -1214,11 +1330,64 @@ const CLASSES=[
 ];
 // третья стихия класса: по характеру, даёт ещё 19 баз чар (всего 57 баз × 8 вариантов)
 const THIRD={pyro:'earth',cryo:'wind',storm:'wind',plague:'blood',necro:'poison',paladin:'fire',geo:'storm',windr:'ice',hemo:'shadow',arcan:'ice',bers:'fire',dk:'blood',druid:'wind',hunter:'earth',assassin:'blood',shaman:'wind',monk:'fire',lock:'blood',inq:'earth',alch:'fire'};
+// ===== A: раздача общих форм по образу (DESIGN-obraz 4.1): 6 активных + 4 пассивные + 3 фирменные; описания 4.2 =====
+const CLASS_KIT={
+ pyro:{arch:'mag',ca:['bolt','meteor','rain','nova','fan','beacon'],cp:['surge','focus','rebirth','sprite'],sig:['s_phoenix','s_ash','s_supernova'],
+  desc:'Каждое огненное попадание раскаляет врага: на пятом жаре он вспыхивает и поджигает соседей. Феникс проносится сквозь толпу и возвращается, Сверхновая взрывает всё раскалённое разом.'},
+ cryo:{arch:'mag',ca:['beam','stasis','wall','barrier','mirror','fan'],cp:['ward','shell','brink','orbit'],sig:['s_tomb','s_winterheart','s_zero'],
+  desc:'Морозит толпу и раскалывает замороженных: удар по льду — двойной урон и осколки во все стороны. Гробница запечатывает группу, Абсолютный ноль замораживает всё вокруг.'},
+ storm:{arch:'mag',ca:['chain','rain','meteor','beam','vortex','beacon'],cp:['link','brand','rift','surge'],sig:['s_ballstorm','s_rod','s_skywrath'],
+  desc:'Копит заряд с каждой молнией и тратит его на усиленные чары; на десяти зарядах в цель бьёт молния с неба. Шаровая гроза плывёт по полю и бьёт всех рядом.'},
+ plague:{arch:'dark',ca:['chain','rain','vortex','nova','stasis','beam'],cp:['aura','doom','trail','execute'],sig:['s_lantern','s_immune','s_pandemic'],
+  desc:'Яд копится до двенадцати раз, ослабляет врага и перескакивает с мёртвых на живых; каждый отравленный рядом лечит лекаря. Фонарь травит всех вокруг, Пандемия взрывает весь яд разом.'},
+ necro:{arch:'summ dark',ca:['summon','mark','chain','nova','hook','wall'],cp:['doom','twin','orbit','rebirth'],sig:['s_raise','s_souls','s_bonestorm'],
+  desc:'Каждая смерть рядом даёт ему душу, а души усиливают армию мёртвых. Поднимает павших врагов и взрывает собственных слуг, чтобы тут же поднять снова.'},
+ paladin:{arch:'tank holy',ca:['strike','barrier','mirror','glyph','leap','beacon'],cp:['stagger','shell','link','rebirth'],sig:['s_consecrate','s_faith','s_skyhammer'],
+  desc:'Каждый удар по паладину возвращается врагу светом, а принятый урон копит Правосудие — полная шкала превращает удар молотом в Кару. Освящает землю и обрушивает Молот небес.'},
+ geo:{arch:'mag',ca:['quake','wall','meteor','nova','beam','barrier'],cp:['shell','rift','aura','focus'],sig:['s_boulder','s_debris','s_earthquake'],
+  desc:'Каждая земляная чара обкладывает его камнем: меньше урона, но медленнее шаг; на восьмом слое удар становится тяжёлым и оглушает. Валун катится сквозь строй и растёт.'},
+ windr:{arch:'shoot',ca:['bolt','chain','mark','boomer','blink','fan'],cp:['volley','trail','slip','battery'],sig:['s_galearrow','s_feather','s_arrowstorm'],
+  desc:'Сильнее на бегу: попутный ветер разгоняет стрелы, на полном ветре они прошивают всю линию. Ураганная стрела стягивает врагов в вихрь.'},
+ hemo:{arch:'dark',ca:['beam','barrier','blink','mark','vortex','nova'],cp:['link','twin','harvest','brink'],sig:['s_bloodlet','s_threads','s_pact'],
+  desc:'Каждое заклинание стоит ему здоровья вместо маны, и чем меньше крови осталось, тем сильнее бьёт. Возвращает жизнь вампиризмом и убийствами — играть на грани.'},
+ arcan:{arch:'arc',ca:['glyph','stasis','blink','mirror','beacon','decoy'],cp:['orbit','deflect','battery','rift'],sig:['s_missiles','s_resonator','s_rift'],
+  desc:'Сильнее, когда чередует чары: каждая новая форма подряд добавляет урон, повтор сбивает ритм. Почти не остаётся без маны, а Разлом реальности повторяет все его заклинания.'},
+ bers:{arch:'fight',ca:['strike','whirl','leap','rush','quake','boomer'],cp:['revenge','execute','trophy','shell'],sig:['s_roar','s_bloodpool','s_carnage'],
+  desc:'Каждый удар по нему копит ярость, а ярость делает его быстрее и сильнее; на пределе он впадает в неистовство и рубит всех вокруг. Бросает топор, прыгает в толпу и ревёт так, что враги бегут.'},
+ dk:{arch:'tank dark',ca:['strike','whirl','quake','vortex','barrier','hook'],cp:['revenge','thrall','aura','combo'],sig:['s_gravecall','s_icearmor','s_desecrate'],
+  desc:'Каждый удар его клинка вытягивает жизнь и копит руническую силу для Удара смерти. Хватает врагов из-под земли, тащит их к себе и стоит в толпе, пока она не кончится.'},
+ druid:{arch:'summ nature',ca:['summon','totem','trap','quake','stasis','wall'],cp:['sprite','harvest','orbit','volley'],sig:['s_bearform','s_spores','s_awaken'],
+  desc:'Чем больше зверей рядом, тем крепче друид; исчезая, они оставляют целебные ростки. Сам становится медведем и будит древний лес.'},
+ hunter:{arch:'shoot trapper',ca:['bolt','trap','totem','boomer','hook','decoy'],cp:['trophy','focus','slip','deflect'],sig:['s_net','s_instinct','s_boltrain'],
+  desc:'Выбирает добычу и бьёт по ней сильнее всех; убитая добыча сразу перезаряжает его ловушки. Ставит сети, приманки и турели.'},
+ assassin:{arch:'rogue',ca:['strike','blink','rush','decoy','boomer','fan'],cp:['combo','execute','slip','brink'],sig:['s_bladedance','s_poisonblades','s_heartstrike'],
+  desc:'Исчезает в тени и бьёт втрое из засады; каждый его рывок заканчивается за спиной цели, а удар в спину сильнее. Копит комбо и тратит его на смертельный удар.'},
+ shaman:{arch:'summ storm nature',ca:['summon','totem','chain','rain','quake','glyph'],cp:['sprite','surge','brand','rebirth'],sig:['s_stormtotem','s_ancestors','s_elemlord'],
+  desc:'Тотемы и духи шамана связаны с ним молниями — между ними бьют разряды по всем, кто встал на линии. Ставит тотем гроз и вызывает Великого элементаля.'},
+ monk:{arch:'fight holy',ca:['strike','rush','blink','leap','whirl','mirror'],cp:['combo','deflect','stagger','trail'],sig:['s_hundred','s_calm','s_windpath'],
+  desc:'Бьёт сериями: каждый удар подряд быстрее и сильнее, на пятом и десятом из ладони вырывается волна ветра. Сто кулаков и Путь ветра — вихрь ударов по всей толпе.'},
+ lock:{arch:'summ dark',ca:['summon','meteor','mark','wall','rain','vortex'],cp:['thrall','twin','volley','rift'],sig:['s_hellgate','s_darkdeal','s_pactdemon'],
+  desc:'Проклинает огнём и тьмой — демоны рвут проклятых в первую очередь, а каждая их смерть питает его скверной. Открывает врата ада и приносит слуг в жертву ради Инфернала.'},
+ inq:{arch:'fight holy shoot',melee:false,ca:['bolt','glyph','trap','hook','mark','mirror'],cp:['brand','ward','stagger','trophy'],sig:['s_pyre','s_unshaken','s_inquisition'],
+  desc:'Выносит приговор: кто его ударил или попал под метку, тот виновен и получает больше урона, а смерть виновного взрывается святым огнём. Арбалет, печати и цепь света.'},
+ alch:{arch:'alch arc',ca:['bolt','trap','totem','meteor','stasis','fan'],cp:['trail','doom','sprite','battery'],sig:['s_mutagen','s_fumes','s_philstone'],
+  desc:'Смешивает три реагента — яд, аркану и огонь; собрав все три, бросает колбу-катализатор с двойной реакцией. Котёл, мины и бомбы — его оружие.'}};
+for(const c of CLASSES){const k=CLASS_KIT[c.id];c.oldDesc=c.desc;Object.assign(c,k);
+  // совместимость с экраном выбора (renderSelInfo берёт pa[0], pa[2], sa[0], pp[0]): фирменная, ульта, вторая общая, пассивка
+  c.pa=[k.sig[0],k.ca[0],k.sig[2]];c.sa=[k.ca[1]];c.pp=[k.cp[0]];c.sp=[];}
+// ----- /A раздача -----
 const ROLES={'Маг':'Дальний бой, много маны, хрупкий','Призыватель':'Помощники в бою, средняя прочность','Стрелок':'Дальний бой и скорость','Ловкач':'Скорость и ближний бой, мало здоровья','Боец':'Ближний бой, крепкий','Танк':'Ближний бой, много здоровья и броня'};
 const CLASS_BY={};CLASSES.forEach(c=>{CLASS_BY[c.id]=c;c.icon='w_'+c.look.weapon;c.ban=new Set(c.ban||[]);
-  c.t=THIRD[c.id];c.core=new Set([...c.pa.map(f=>[c.p,f]),...c.pp.map(f=>[c.p,f]),...c.sa.map(f=>[c.s,f]),...c.sp.map(f=>[c.s,f])].map(([e,f])=>EL[e]*NF+FORM[f]));
-  c.pairs=[];c.pairsAll=[];for(const e of [c.p,c.s,c.t])for(const F of FORMS){c.pairsAll.push([e,F.id]);if(!c.ban.has(F.id))c.pairs.push([e,F.id]);}
-  c.pool=new Set();c.poolAll=new Set();for(const [e,f] of c.pairsAll)for(const m of MODS){const id=sid(e,f,m.id);c.poolAll.add(id);if(!c.ban.has(f))c.pool.add(id);}
+  c.t=THIRD[c.id];const els=[c.p,c.s,c.t];
+  // пул героя: 6 общих активных и 4 пассивные во всех трёх стихиях + 3 фирменные в своей стихии (264 чары)
+  c.pool=new Set();c.pairs=[];
+  for(const f of [...c.ca,...c.cp])for(const e of els){c.pairs.push([e,f]);for(const m of MODS)c.pool.add(sid(e,f,m.id));}
+  for(const f of c.sig){const e=FORMS[FORM[f]].els[0];c.pairs.push([e,f]);for(const m of MODS)c.pool.add(sid(e,f,m.id));}
+  c.pairsAll=c.pairs;
+  // прежний пул v13.8: изученное оттуда остаётся в книге «Прежние чары»
+  c.legacy=new Set();for(const e of els)for(const F of FORMS.slice(0,NF0))if(!c.ban.has(F.id))for(const m of MODS){const id=sid(e,F.id,m.id);if(!c.pool.has(id))c.legacy.add(id);}
+  c.poolAll=new Set([...c.pool,...c.legacy]);
+  c.core=new Set([...c.sig,c.ca[0],c.ca[1]].map(f=>bkOf(EL[FORMS[FORM[f]].els?FORMS[FORM[f]].els[0]:c.p],FORM[f])));
   c.color=ELEMENTS[EL[c.p]].color;c.hex=ELEMENTS[EL[c.p]].hex;});
 
 const BRANCHES=[{name:'Стихии',sub:'урон и реакции',c:'#ff8a3d'},{name:'Стойкость',sub:'выживание и ближний бой',c:'#6fd08c'},{name:'Таинство',sub:'мана, призывы, пассивки',c:'#b58cff'}];
@@ -1295,33 +1464,39 @@ let SAVE={cur:null,q:'auto',chars:{}};
 function loadSave(hot){let d=hot&&hot.SAVE?hot.SAVE:null;if(!d){try{const raw=localStorage.getItem(SAVE_KEY);if(raw)d=JSON.parse(raw);}catch(e){}}
   if(d&&d.chars&&typeof d.chars==='object'){SAVE.cur=CLASS_BY[d.cur]?d.cur:null;SAVE.q=['auto','high','mid','low'].includes(d.q)?d.q:'auto';SAVE.chars={};for(const id in d.chars){if(CLASS_BY[id])SAVE.chars[id]=validChar(d.chars[id],CLASS_BY[id]);}SAVE.camp=window.TCCF?(d.camp&&typeof d.camp==='object'?d.camp:null):null;}}
 let CLS=null,S=null,LEARNED=new Set(),EQUIPPED=new Set(),BOOK=new Set();
-function newChar(c){const s={lvl:1,xp:0,kills:0,ess:0,learned:[],ranks:{},talents:{},active:Array(8).fill(null),passive:Array(42).fill(null),sandbox:false,auto:false,autoBest:false,autoLu:false,bosses:0,gorge:0,mx:0,book:[],runs:0,mig:0};
-  s.active[0]=sid(c.p,c.pa[0],'swift');s.active[1]=sid(c.s,c.sa[0],'mighty');
-  s.passive[0]=sid(c.p,c.pp[0],'huge');
+function newChar(c){const s={lvl:1,xp:0,kills:0,ess:0,learned:[],ranks:{},talents:{},active:Array(8).fill(null),passive:Array(42).fill(null),sandbox:false,auto:false,autoBest:false,autoLu:false,bosses:0,gorge:0,mx:0,book:[],runs:0,mig:0,legacy:[],mig2:1,scrL:0};
+  // старт: первая общая активная (Спешка), фирменная № 1 (Мощь), первая общая пассивная (Размах)
+  s.active[0]=sid(c.p,c.ca[0],'swift');s.active[1]=sid(c.p,c.sig[0],'mighty');
+  s.passive[0]=sid(c.p,c.cp[0],'huge');
   s.learned=[...s.active,...s.passive].filter(v=>v!=null);return s;}
 function validChar(d,c){if(!d||!Array.isArray(d.active)||!Array.isArray(d.passive)||!Array.isArray(d.learned))return newChar(c);
   const s=newChar(c);s.lvl=clamp(d.lvl|0,1,999);s.xp=Math.max(0,+d.xp||0);s.kills=d.kills|0;s.ess=Math.max(0,d.ess|0);s.sandbox=!!d.sandbox;s.auto=d.auto===true;s.autoBest=d.autoBest===true;s.autoLu=d.autoLu===true;s.autoRank=d.autoRank===true;s.bosses=d.bosses|0;s.gorge=clamp(d.gorge|0,0,12);
-  s.learned=d.learned.filter(v=>c.poolAll.has(v));s.ranks=(d.ranks&&typeof d.ranks==='object')?d.ranks:{};s.talents=(d.talents&&typeof d.talents==='object')?d.talents:{};
+  const L0=d.learned.filter(v=>c.poolAll.has(v));s.learned=L0.filter(v=>c.pool.has(v));s.scrL=d.scrL|0;
+  s.legacy=[...new Set([...(Array.isArray(d.legacy)?d.legacy:[]),...L0].filter(v=>c.legacy.has(v)))];s.ranks=(d.ranks&&typeof d.ranks==='object')?d.ranks:{};s.talents=(d.talents&&typeof d.talents==='object')?d.talents:{};
   for(let i=0;i<8;i++){const v=d.active[i];s.active[i]=(v!=null&&c.pool.has(v)&&SKILLS[v].active)?v:null;}
   for(let i=0;i<42;i++){const v=d.passive[i];s.passive[i]=(v!=null&&c.pool.has(v)&&!SKILLS[v].active)?v:null;}
   const seenB=new Set();for(const a of [s.active,s.passive])for(let i=0;i<a.length;i++){if(a[i]==null)continue;const b=SKILLS[a[i]].bk;if(seenB.has(b))a[i]=null;else seenB.add(b);}
   s.mx=Math.max(0,+d.mx||0);s.runs=d.runs|0;s.mig=d.mig|0;
   if(d.mx==null){ // старое сохранение: уровень и опыт переходят в мастерство, изученное - в Книгу чар
-    const L0=clamp(d.lvl|0,1,999);let tot=Math.max(0,+d.xp||0);for(let l=1;l<L0;l++)tot+=xpBase(l);
-    s.mx=Math.round(tot*.5+(Math.max(0,d.ess|0))/10);s.book=[...s.learned];s.mig=L0>1?L0:0;
+    const LV0=clamp(d.lvl|0,1,999);let tot=Math.max(0,+d.xp||0);for(let l=1;l<LV0;l++)tot+=xpBase(l);
+    s.mx=Math.round(tot*.5+(Math.max(0,d.ess|0))/10);s.book=[...L0];s.mig=LV0>1?LV0:0;
     const f=newChar(c);s.lvl=1;s.xp=0;s.ess=0;s.ranks={};s.talents={};s.active=f.active;s.passive=f.passive;s.learned=f.learned;
     for(const id of f.learned)if(!s.book.includes(id))s.book.push(id);
   }else{s.book=Array.isArray(d.book)?[...new Set(d.book.filter(v=>c.poolAll.has(v)))]:[...s.learned];for(const id of s.learned)if(!s.book.includes(id))s.book.push(id);}
+  if(!d.mig2){s.mig2=1;s.needBest=1;const st=sid(c.p,c.sig[0],'mighty');if(!s.learned.includes(st))s.learned.push(st);if(!s.book.includes(st))s.book.push(st);
+    const nl=new Set([...s.legacy,...s.book.filter(v=>c.legacy.has(v))]).size;(NFS.mig||(NFS.mig=[])).push([c.name,nl]);}
   return s;}
 let saveTimer=0;
 function save(){if(CLS&&S){SAVE.chars[CLS.id]=S;SAVE.cur=CLS.id;}try{localStorage.setItem(SAVE_KEY,JSON.stringify(SAVE));}catch(e){}}
 function saveSoon(){clearTimeout(saveTimer);saveTimer=setTimeout(save,400);}
 
 const isLearned=id=>S.sandbox?CLS.pool.has(id):LEARNED.has(id);
-const activeSlots=()=>S.sandbox?8:Math.min(8,3+Math.floor((S.lvl-1)/2));
-const passiveSlots=()=>S.sandbox?42:Math.min(42,4+(S.lvl-1)*2);
-const activeLvl=j=>j<3?1:2*(j-2)+1;
-const passiveLvl=i=>i<4?1:Math.ceil((i-3)/2)+1;
+// слоты открываются плавно до 100-го уровня: бодрое начало (3 + 3), последний активный — на 90-м, последний пассивный — на 100-м
+const ACT_AT=[1,1,1,4,10,22,45,90],PAS_AT=[1,1,1,8,20,40,70,100];
+const activeSlots=()=>S.sandbox?8:ACT_AT.filter(x=>x<=S.lvl).length;
+const passiveSlots=()=>S.sandbox?PAS_AT.length:PAS_AT.filter(x=>x<=S.lvl).length;
+const activeLvl=j=>ACT_AT[j]||999;
+const passiveLvl=i=>PAS_AT[i]||999;
 function equippedIds(){const a=[];const na=activeSlots(),np=passiveSlots();
   for(let i=0;i<na;i++)if(S.active[i]!=null)a.push(S.active[i]);
   for(let i=0;i<np;i++)if(S.passive[i]!=null)a.push(S.passive[i]);return a;}
@@ -1359,8 +1534,11 @@ function computeStats(){
   ST.hpMul=(1+.1*T('vit'))*(1+.01*mastB());ST.armor=(1-.05*T('armor'))*(CLS.armor||1);ST.regen=2*T('regen');ST.leech=.02*T('leech');ST.wrath=1+.2*T('wrath');
   ST.mana=1+.1*T('mana');ST.summDmg=1+.2*T('summ');ST.summMax=3+T('summ');ST.luck=.03*T('luck');ST.cascade=1+.15*T('cascade');ST.orbitN=T('orbit');ST.orbitDmg=1+.15*T('orbit');cfStats();}
 const WRATH=new Set(['strike','blink','revenge','whirl']),CASC=new Set(['doom','aura','trail','trap']);
+// PASS_K: пассивок в билде 8, а не 21 — каждая сильнее. slotBoost: пока слотов мало, чары сильнее (сводится к 1 у 100-го уровня)
+const PASS_K=1.9,SLOT_BOOST=[[1,1],[10,1.15],[20,1.4],[30,1.55],[45,1.6],[60,1.5],[80,1.3],[100,1.1],[140,1]];
+const slotBoost=()=>{if(!S||S.sandbox)return 1;const L=S.lvl;for(let i=1;i<SLOT_BOOST.length;i++){const a=SLOT_BOOST[i-1],b=SLOT_BOOST[i];if(L<=b[0])return a[1]+(b[1]-a[1])*(L-a[0])/(b[0]-a[0]);}return 1;};
 function skDmg(sk){const f=sk.F.id;let m=1;if(WRATH.has(f))m=ST.wrath;else if(CASC.has(f))m=ST.cascade;else if(f==='summon')m=ST.summDmg;else if(f==='orbit')m=ST.orbitDmg;
-  return sk.F.power*(sk.M.dmg||1)*(sk.E.dmg||1)*lvlScale()*ST.dmg*(1+.2*(rk(sk.id)-1))*m;}
+  return sk.F.power*(sk.M.dmg||1)*(sk.E.dmg||1)*lvlScale()*ST.dmg*(1+.2*(rk(sk.id)-1))*m*(sk.active?1:PASS_K)*slotBoost();}
 const skCd=sk=>(sk.F.cd||1)*(sk.M.cd||1)*ST.cdr*(1-.04*(rk(sk.id)-1));
 const skMana=sk=>Math.round((sk.F.mana||0)*(sk.M.mana||1));
 const skR=sk=>(sk.M.radius||1)*(CASC.has(sk.F.id)?ST.cascade:1);
@@ -1376,6 +1554,143 @@ const FP={bolt:{ph:1.15,cat:'atk'},chain:{ph:3.2,cat:'atk'},beam:{ph:2.4,cat:'at
   trap:{ph:3.9,u:1.1,cat:'ctl'},blink:{ph:3,u:1.25,cat:'mov'},barrier:{cat:'def'},summon:{cat:'sum'},
   aura:{cat:'pas'},brand:{cat:'pas'},doom:{cat:'pas'},revenge:{cat:'pas'},orbit:{cat:'pas'},trail:{cat:'pas'},surge:{cat:'pas'}};
 const AREAF=new Set(['nova','meteor','rain','whirl','blink','trap']);
+// ===== A: сила, категории и значки новых форм (FP, AREAF, ICON, наборы талантов) =====
+{const R2=(r)=>Math.min(r,2),MK=sk=>(sk.M.cd?1.4:1);
+Object.assign(FP,{
+ boomer:{ph:3.2,cat:'atk'},vortex:{ph:12,u:1.1,cat:'ctl'},decoy:{ph:2,u:1.2,cat:'def'},glyph:{ph:4,cat:'ctl'},beacon:{ph:10,cat:'area'},
+ rush:{ph:3.5,u:1.15,cat:'mov'},totem:{ph:15,cat:'sum'},wall:{ph:8,u:1.15,cat:'ctl'},stasis:{ph:6,u:1.2,cat:'ctl'},mark:{ph:3,cat:'atk'},
+ quake:{ph:3.5,cat:'area'},leap:{ph:3,u:1.15,cat:'mov'},hook:{ph:1.5,u:1.2,cat:'ctl'},fan:{ph:3.5,cat:'atk'},
+ mirror:{cat:'def',av:(sk,d,r,intr)=>((intr?100*CLS.hp:P.maxHp)*.1+d*2)*.7+d*2},
+ // пассивки (5А.5): урон срабатывания × частота; защитные — сбережённое здоровье в единицах урона
+ aura:{cat:'pas',pv:(sk,d,r)=>d*3.9*r/(sk.M.cd||1)},
+ orbit:{cat:'pas',pv:(sk,d,r,intr)=>d*(3+(intr?0:ST.orbitN))*.55*MK(sk)*R2(r)},
+ link:{cat:'pas',pv:(sk,d,r)=>d*2.4*R2(r)},volley:{cat:'pas',pv:(sk,d,r)=>d*4/5*1.1*MK(sk)*r},
+ ward:{cat:'pas',pv:(sk,d,r)=>d*5*.8/8*MK(sk)*R2(r)+d*1.2},deflect:{cat:'pas',pv:(sk,d,r)=>d*1.6/6*MK(sk)*R2(r)*2.2},
+ surge:{cat:'pas',pv:(sk,d,r,intr)=>(intr?1:castRate())/(sk.M.cd?3:4)*d*2.4*R2(r)},
+ twin:{cat:'pas',pv:(sk,d,r,intr)=>(intr?1:castRate())/(sk.M.cd?3:5)*d*3*R2(r)},
+ brand:{cat:'pas',pv:(sk,d,r)=>d*2.6/1.6*.7*r*MK(sk)},combo:{cat:'pas',pv:(sk,d,r)=>d*2.2*(CLS.melee?1:.5)*r*MK(sk)},
+ battery:{cat:'pas',pv:(sk,d,r)=>d*6/13*MK(sk)*R2(r)},rift:{cat:'pas',pv:(sk,d,r)=>d*3.5/1.5*.6*MK(sk)*R2(r)},
+ doom:{cat:'pas',pv:(sk,d,r)=>d*.35*2.6*1.4*r},thrall:{cat:'pas',pv:(sk,d,r)=>d*1.8*MK(sk)*R2(r)},
+ harvest:{cat:'pas',pv:(sk,d,r)=>d*1.8*MK(sk)*R2(r)},trophy:{cat:'pas',pv:(sk,d,r)=>d*1.7*R2(r)},
+ revenge:{cat:'pas'},slip:{cat:'pas',pv:(sk,d,r)=>d*1.5/10*MK(sk)*R2(r)+d*1.5},stagger:{cat:'pas',pv:(sk,d,r)=>d*2.2*R2(r)},
+ brink:{cat:'pas',pv:(sk,d,r)=>d*1.9*MK(sk)*R2(r)},rebirth:{cat:'pas',pv:(sk,d,r)=>d*2/9*MK(sk)*R2(r)+d*1.6},trail:{cat:'pas'},
+ focus:{cat:'pas',pv:(sk,d,r)=>d*3.2/3*.8*MK(sk)*r},shell:{cat:'pas',pv:(sk,d,r)=>d*5/15*MK(sk)*R2(r)+d*.9},
+ sprite:{cat:'pas',pv:(sk,d,r)=>d*7/.8*.25*R2(r)*MK(sk)},execute:{cat:'pas',pv:(sk,d,r)=>d*2.3*R2(r)},
+ // фирменные (ульты u 1.3)
+ s_phoenix:{ph:5,u:1.1,cat:'atk'},s_supernova:{ph:7,u:1.3,cat:'area'},s_tomb:{ph:5,u:1.25,cat:'ctl'},s_zero:{ph:10,u:1.3,cat:'area'},
+ s_ballstorm:{ph:28,cat:'area'},s_skywrath:{ph:14,u:1.3,cat:'area'},s_boulder:{ph:5,u:1.1,cat:'atk'},s_earthquake:{ph:24,u:1.3,cat:'area'},
+ s_lantern:{ph:30,u:1.1,cat:'area'},s_pandemic:{ph:8,u:1.3,cat:'area'},s_bloodlet:{ph:16,u:1.15,cat:'atk'},s_pact:{ph:6,u:1.3,cat:'area'},
+ s_missiles:{ph:6,cat:'atk'},s_rift:{cat:'area',av:(sk,d,r,intr)=>(intr?20:castRate()*4*20)*1.3},s_mutagen:{ph:16,u:1.1,cat:'def'},
+ s_philstone:{cat:'area',av:(sk,d,r,intr)=>(intr?22:castRate()*10*14)*1.3},s_raise:{ph:24,cat:'sum'},s_bonestorm:{ph:9,u:1.3,cat:'sum'},
+ s_bearform:{ph:10,u:1.2,cat:'def'},s_awaken:{ph:40,u:1.3,cat:'sum'},s_stormtotem:{ph:12,cat:'sum'},s_elemlord:{ph:30,u:1.3,cat:'sum'},
+ s_hellgate:{ph:15,cat:'sum'},s_pactdemon:{ph:16,u:1.3,cat:'sum'},s_galearrow:{ph:5,u:1.1,cat:'atk'},s_arrowstorm:{ph:22,u:1.3,cat:'atk'},
+ s_net:{ph:4,u:1.3,cat:'ctl'},s_boltrain:{ph:24,u:1.3,cat:'area'},s_bladedance:{ph:5,u:1.15,cat:'mov'},s_heartstrike:{ph:2,u:1.3,cat:'atk'},
+ s_roar:{ph:4,u:1.3,cat:'def'},s_carnage:{cat:'def',av:(sk,d,r,intr)=>(intr?40:P.maxHp*.5)*1.3},s_hundred:{ph:12,cat:'atk'},s_windpath:{ph:16,u:1.3,cat:'mov'},
+ s_pyre:{ph:3,u:1.1,cat:'area'},s_inquisition:{ph:25,u:1.3,cat:'atk'},s_consecrate:{ph:24,u:1.15,cat:'def'},s_skyhammer:{ph:4,u:1.3,cat:'area'},
+ s_gravecall:{ph:4,u:1.2,cat:'ctl'},s_desecrate:{ph:32,u:1.3,cat:'def'},
+ s_ash:{cat:'pas',pv:(sk,d,r)=>d*2.4*R2(r)},s_winterheart:{cat:'pas',pv:(sk,d,r)=>16*R2(r)},s_rod:{cat:'pas',pv:(sk,d,r)=>d*.9*MK(sk)*R2(r)},
+ s_debris:{cat:'pas',pv:(sk,d,r)=>d*2*R2(r)},s_immune:{cat:'pas',pv:()=>18},s_threads:{cat:'pas',pv:()=>17},s_resonator:{cat:'pas',pv:(sk,d,r,intr)=>(intr?1:castRate())*16},
+ s_fumes:{cat:'pas',pv:()=>16},s_souls:{cat:'pas',pv:()=>17},s_spores:{cat:'pas',pv:(sk,d,r)=>d*2.2*R2(r)},s_ancestors:{cat:'pas',pv:(sk,d,r,intr)=>(intr?1:castRate())/5*d*8},
+ s_darkdeal:{cat:'pas',pv:()=>15},s_feather:{cat:'pas',pv:()=>16},s_instinct:{cat:'pas',pv:(sk,d,r)=>d*1.2*R2(r)},s_poisonblades:{cat:'pas',pv:(sk,d,r)=>d*3*R2(r)},
+ s_bloodpool:{cat:'pas',pv:(sk,d,r)=>d*3.5*R2(r)},s_calm:{cat:'pas',pv:()=>17},s_unshaken:{cat:'pas',pv:()=>16},s_faith:{cat:'pas',pv:()=>18},s_icearmor:{cat:'pas',pv:()=>17}});
+['vortex','beacon','wall','stasis','quake','glyph','s_supernova','s_zero','s_ballstorm','s_skywrath','s_earthquake','s_lantern','s_pandemic','s_pact','s_awaken','s_boltrain','s_skyhammer','s_desecrate','s_consecrate','s_pyre'].forEach(f=>AREAF.add(f));
+['rush','leap','hook'].forEach(f=>WRATH.add(f));['glyph','wall','totem'].forEach(f=>CASC.add(f));}
+Object.assign(ICON,{
+ boomer:'<path d="M5 19L9 5c.3-1 1.6-1.2 2.2-.4L13 7l-3 9 9-.5 1.5 2c.6.8 0 1.9-1 2z"/>',
+ vortex:'<path d="M12 12a1.5 1.5 0 0 1 3 0 3 3 0 0 1-6 0 4.5 4.5 0 0 1 9 0 6 6 0 0 1-12 0 7.5 7.5 0 0 1 15 0"/>',
+ decoy:'<circle cx="8" cy="7" r="2.5"/><path d="M4 20v-4a4 4 0 0 1 8 0v4"/><circle cx="16.5" cy="7" r="2.5" stroke-dasharray="2 2"/><path d="M12.5 20v-4a4 4 0 0 1 8 0v4" stroke-dasharray="2 2"/>',
+ glyph:'<path d="M12 2l8.5 5v10L12 22l-8.5-5V7z"/><path d="M12 7v10M9 9l6 6M15 9l-6 6"/>',
+ beacon:'<circle cx="12" cy="12" r="2"/><path d="M12 12L21 6"/><path d="M12 3a9 9 0 1 0 9 9" stroke-dasharray="2.5 2.5"/>',
+ rush:'<path d="M3 12h12M3 7h7M3 17h7"/><path d="M14 6l7 6-7 6"/>',
+ totem:'<rect x="9" y="4" width="6" height="16" rx="1"/><path d="M6 20h12M9 9h6M9 14h6M12 1v3"/>',
+ wall:'<path d="M3 20V8h18v12"/><path d="M3 12h18M3 16h18M8 8v4M14 8v4M11 12v4M17 12v4M8 16v4M14 16v4"/>',
+ mirror:'<path d="M4 19a8 8 0 0 1 16 0z"/><path d="M3 4l5 5M8 4v5H3"/>',
+ stasis:'<path d="M6 3h12M6 21h12M7 3c0 5 10 5 10 9s-10 4-10 9M17 3c0 5-10 5-10 9s10 4 10 9"/>',
+ mark:'<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 1v5M12 18v5M1 12h5M18 12h5"/>',
+ quake:'<path d="M2 18h20"/><path d="M4 18l3-4 2 2 3-5 3 4 2-2 3 5"/>',
+ leap:'<path d="M3 20c3-9 9-14 18-14"/><path d="M15 3l6 3-3 6"/><path d="M2 22h8"/>',
+ hook:'<path d="M14 3v9a5 5 0 1 1-10 0"/><path d="M4 12l3 2M14 3h4"/>',
+ fan:'<path d="M4 20L12 4M4 20l12-8M4 20h16M4 20l14-14M4 20l4-16"/>',
+ link:'<circle cx="5" cy="12" r="3"/><circle cx="19" cy="12" r="3"/><path d="M8 12h2M14 12h2M10.5 10.5l3 3M13.5 10.5l-3 3"/>',
+ volley:'<path d="M12 3v10M8 5l2 9M16 5l-2 9M4 8l5 7M20 8l-5 7"/><path d="M6 20h12"/>',
+ ward:'<circle cx="12" cy="9" r="6"/><path d="M12 5v8M9 7l6 4M15 7l-6 4"/><path d="M8 17l-2 4M16 17l2 4M12 16v5"/>',
+ deflect:'<path d="M12 2l8 4.5v9L12 20l-8-4.5v-9z"/><path d="M4 12h6M7 9l3 3-3 3"/>',
+ twin:'<circle cx="9" cy="7" r="3"/><path d="M4 21v-3a5 5 0 0 1 10 0v3"/><circle cx="16" cy="6" r="2.5" opacity=".55"/><path d="M13 20v-2a4 4 0 0 1 8 0v2" opacity=".55"/>',
+ combo:'<rect x="3" y="9" width="8" height="7" rx="2"/><path d="M11 12.5h3M17 8l4 4.5-4 4.5M14 12.5h7"/>',
+ battery:'<rect x="4" y="6" width="15" height="12" rx="2"/><path d="M19 10h2v4h-2M12 8l-3 5h4l-3 5"/>',
+ rift:'<ellipse cx="12" cy="13" rx="9" ry="4"/><ellipse cx="12" cy="13" rx="4" ry="1.6"/><path d="M12 2v5M9 4l3 3 3-3"/>',
+ thrall:'<circle cx="12" cy="7" r="3.5"/><path d="M6 21c0-5 2.5-8 6-8s6 3 6 8"/><path d="M3 21h18" stroke-dasharray="2 2"/><path d="M10 6.5h.01M14 6.5h.01"/>',
+ harvest:'<circle cx="12" cy="18" r="3"/><circle cx="6" cy="8" r="1.5"/><circle cx="18" cy="7" r="1.5"/><circle cx="12" cy="4" r="1.5"/><path d="M7 9.5l3 6M17 8.5l-3 7M12 5.5V15"/>',
+ trophy:'<path d="M12 2l5 7-5 13-5-13z"/><path d="M7 9h10"/>',
+ slip:'<circle cx="17" cy="6" r="2.5"/><path d="M14 20l2-6 3 2v4M16 14l-2-4"/><circle cx="6" cy="8" r="2.5" stroke-dasharray="2 2"/><path d="M3 20l2-6" stroke-dasharray="2 2"/>',
+ stagger:'<circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/><path d="M5 6L3 4M19 6l2-2"/>',
+ brink:'<path d="M6 3h12M6 21h12M7 3c0 5 10 5 10 9s-10 4-10 9M17 3c0 5-10 5-10 9s10 4 10 9"/><path d="M10 18h4"/>',
+ rebirth:'<path d="M12 21c-4-1-7-4-7-8 0-3 2-5 3-7 1 2 2 3 4 3-1-3 0-5 2-7 1 3 5 5 5 10 0 5-3 8-7 9z"/><path d="M12 13v5M10 15l2-2 2 2"/>',
+ focus:'<circle cx="12" cy="7" r="4"/><path d="M12 13v3M9 22l3-6 3 6"/><path d="M5 7H3M21 7h-2M7 2l1 1.5M17 2l-1 1.5"/>',
+ shell:'<path d="M12 2l7 5v10l-7 5-7-5V7z"/><path d="M12 2v20M5 7l14 10M19 7L5 17"/>',
+ sprite:'<circle cx="9" cy="11" r="3.5"/><circle cx="15" cy="13" r="3.5"/><path d="M4 5l1.5 1.5M20 5l-1.5 1.5M12 20v2"/>',
+ execute:'<path d="M5 19L19 5"/><path d="M15 5h4v4"/><circle cx="7" cy="7" r="3"/><path d="M14 17l3 3M17 14l3 3"/>',
+ s_phoenix:'<path d="M2 9c4 0 7 2 10 6 3-4 6-6 10-6-3 3-5 4-7 4l-3 6-3-6c-2 0-4-1-7-4z"/><path d="M12 9V5"/>',
+ s_ash:'<path d="M3 20h18"/><path d="M7 20c0-3 2-3 2-6M12 20c0-4 3-4 2-8M17 20c0-3-2-3-1-6"/>',
+ s_supernova:'<circle cx="12" cy="12" r="4"/><path d="M12 1v5M12 18v5M1 12h5M18 12h5M4.2 4.2l3.5 3.5M16.3 16.3l3.5 3.5M19.8 4.2l-3.5 3.5M7.7 16.3l-3.5 3.5"/>',
+ s_tomb:'<path d="M7 21V8l5-5 5 5v13z"/><path d="M12 8v10M9 11l3 2 3-2"/>',
+ s_winterheart:'<path d="M12 21S4 15 4 9a4 4 0 0 1 8-1 4 4 0 0 1 8 1c0 6-8 12-8 12z"/><path d="M12 9v8M9 11l6 4M15 11l-6 4"/>',
+ s_zero:'<circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6L5.6 18.4"/>',
+ s_ballstorm:'<circle cx="12" cy="12" r="6"/><path d="M12 6l-2 5h4l-2 5"/><path d="M3 4l2 2M21 4l-2 2M3 20l2-2M21 20l-2-2"/>',
+ s_rod:'<path d="M12 2v20M8 22h8"/><path d="M12 2l-4 6h3l-2 5"/><path d="M15 6l3 2"/>',
+ s_skywrath:'<path d="M4 8a5 5 0 0 1 9-3 4 4 0 0 1 7 3H4z"/><path d="M13 8l-3 6h4l-3 8"/><path d="M4 22h4M16 22h4"/>',
+ s_boulder:'<circle cx="11" cy="13" r="7"/><path d="M8 10l3 3-2 3M14 9l-1 4 3 2"/><path d="M19 20h3M20 16h2"/>',
+ s_debris:'<path d="M12 12l-7-6M12 12l7-5M12 12l1 9"/><rect x="3" y="3" width="4" height="4"/><rect x="17" y="3" width="4" height="4"/><rect x="11" y="19" width="4" height="3"/>',
+ s_earthquake:'<path d="M2 18h20"/><path d="M12 18l-2-5 3-3-2-5"/><path d="M5 14a7 7 0 0 1 14 0M8 15a4 4 0 0 1 8 0"/>',
+ s_lantern:'<path d="M12 2v3"/><rect x="8" y="5" width="8" height="12" rx="2"/><path d="M10 21h4M12 17v4"/><path d="M3 12c1-1 2 1 3 0M18 12c1-1 2 1 3 0"/>',
+ s_immune:'<path d="M12 21c-5-3-8-6-8-11V5l8-3 8 3v5c0 5-3 8-8 11z"/><path d="M12 7c2 3 3 4 3 6a3 3 0 0 1-6 0c0-2 1-3 3-6z"/>',
+ s_pandemic:'<circle cx="12" cy="12" r="4"/><circle cx="4" cy="5" r="2"/><circle cx="20" cy="5" r="2"/><circle cx="4" cy="19" r="2"/><circle cx="20" cy="19" r="2"/><path d="M6 6.5l3 3M18 6.5l-3 3M6 17.5l3-3M18 17.5l-3-3"/>',
+ s_bloodlet:'<path d="M12 3c3 4 5 6 5 9a5 5 0 0 1-10 0c0-3 2-5 5-9z"/><path d="M3 21l5-5M21 21l-5-5M12 22v-5"/>',
+ s_threads:'<circle cx="12" cy="12" r="3"/><path d="M3 4c4 2 5 5 7 7M21 4c-4 2-5 5-7 7M3 20c4-2 5-5 7-6M21 20c-4-2-5-5-7-6"/>',
+ s_pact:'<path d="M16 3a9 9 0 1 0 5 13 7 7 0 0 1-5-13z"/><path d="M8 12l1 3 1-3"/>',
+ s_missiles:'<path d="M4 20c2-8 6-12 14-14"/><path d="M4 14c3-5 6-7 11-8"/><path d="M15 3l4 3-3 4"/>',
+ s_resonator:'<circle cx="12" cy="12" r="3"/><path d="M12 2l2 3h-4zM21 16l-3.5.5 1.5-3.5zM3 16l2-3 1.5 3.5z"/>',
+ s_rift:'<ellipse cx="12" cy="9" rx="8" ry="4"/><ellipse cx="12" cy="9" rx="3.5" ry="1.6"/><path d="M8 15l-2 6M12 15v6M16 15l2 6"/>',
+ s_mutagen:'<path d="M9 2h6M10 2v5l-4 3v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V10l-4-3V2"/><path d="M6 14h12M10 17h.01M14 18h.01"/>',
+ s_fumes:'<path d="M4 18c2-2 4 2 6 0s4 2 6 0 3 1 4 0"/><path d="M6 13c2-2 4 2 6 0s4 2 6 0"/><path d="M9 8c1-2 3 0 4-2"/>',
+ s_philstone:'<path d="M12 2l7 7-7 13-7-13z"/><path d="M5 9h14M12 2v20"/>',
+ s_raise:'<circle cx="7" cy="9" r="4"/><circle cx="17" cy="9" r="4"/><path d="M5 13v3h4v-3M15 13v3h4v-3M4 21h16"/>',
+ s_souls:'<circle cx="12" cy="6" r="3.5"/><circle cx="5" cy="17" r="2"/><circle cx="12" cy="19" r="2"/><circle cx="19" cy="17" r="2"/><path d="M6 15l4-6M12 17v-7M18 15l-4-6"/>',
+ s_bonestorm:'<path d="M8 8l8 8"/><circle cx="6.5" cy="6.5" r="2"/><circle cx="17.5" cy="17.5" r="2"/><path d="M12 2v3M2 12h3M22 12h-3M12 22v-3"/>',
+ s_bearform:'<circle cx="12" cy="13" r="7"/><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="6" r="2.5"/><path d="M10 12h.01M14 12h.01M10 16c1 1 3 1 4 0"/>',
+ s_spores:'<circle cx="12" cy="12" r="3"/><circle cx="5" cy="6" r="1.5"/><circle cx="19" cy="7" r="1.5"/><circle cx="18" cy="18" r="1.5"/><circle cx="6" cy="18" r="1.5"/><path d="M7 7l3 3M17 8l-3 3M16 16l-2-2M8 16l2-2"/>',
+ s_awaken:'<path d="M5 21l2-9 2 9M11 21l2-12 2 12M17 21l2-8 2 8M2 21h20"/>',
+ s_stormtotem:'<rect x="9" y="7" width="6" height="14" rx="1"/><path d="M6 21h12"/><path d="M13 1l-3 4h4l-3 4"/>',
+ s_ancestors:'<path d="M4 4l4 5h8l4-5v9l-4 6h-8l-4-6z"/><path d="M9 13h.01M15 13h.01M11 17h2"/>',
+ s_elemlord:'<path d="M12 2c4 3 6 6 6 10a6 6 0 0 1-12 0c0-4 2-7 6-10z"/><path d="M13 8l-3 5h4l-3 5"/>',
+ s_hellgate:'<ellipse cx="12" cy="11" rx="6" ry="9"/><ellipse cx="12" cy="11" rx="2.5" ry="5"/><path d="M4 22h16"/>',
+ s_darkdeal:'<path d="M12 3c3 4 5 6 5 9a5 5 0 0 1-10 0c0-3 2-5 5-9z"/><path d="M9 14l2 2 4-5"/>',
+ s_pactdemon:'<path d="M5 3l3 5h8l3-5v8a7 7 0 0 1-14 0z"/><path d="M9 12h.01M15 12h.01M9 16h6"/>',
+ s_galearrow:'<path d="M3 21L21 3"/><path d="M14 3h7v7"/><path d="M3 15l3 3M6 12l3 3"/>',
+ s_feather:'<path d="M20 4C10 4 5 10 4 20c4-6 10-10 16-16z"/><path d="M4 20l9-9M9 9h5M7 13h4"/>',
+ s_arrowstorm:'<path d="M5 3v12M12 3v14M19 3v12"/><path d="M3 13l2 3 2-3M10 15l2 3 2-3M17 13l2 3 2-3"/><path d="M3 22h18"/>',
+ s_net:'<path d="M3 3l18 18M21 3L3 21M3 12h18M12 3v18"/><circle cx="12" cy="12" r="9"/>',
+ s_instinct:'<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><path d="M12 8v4M12 15v.01"/>',
+ s_boltrain:'<path d="M4 6a5 5 0 0 1 9-3 4 4 0 0 1 7 3z"/><path d="M6 9l-2 6M11 9l-2 8M16 9l-2 6M20 9l-2 8"/>',
+ s_bladedance:'<path d="M5 19L19 5M5 5l14 14"/><circle cx="12" cy="12" r="9" stroke-dasharray="2 3"/>',
+ s_poisonblades:'<path d="M4 20l9-9"/><path d="M13 11l6-7 1 1-5 8z"/><path d="M6 8c1 2 2 2 2 3a1.5 1.5 0 0 1-3 0c0-1 0-1 1-3z"/>',
+ s_heartstrike:'<path d="M12 21S4 15 4 9a4 4 0 0 1 8-1 4 4 0 0 1 8 1c0 6-8 12-8 12z"/><path d="M3 21L21 3"/>',
+ s_roar:'<path d="M4 9v6h4l6 5V4L8 9z"/><path d="M17 8c1.5 1 1.5 7 0 8M20 5c3 3 3 11 0 14"/>',
+ s_bloodpool:'<ellipse cx="12" cy="17" rx="9" ry="4"/><path d="M12 3c2 3 3 4 3 6a3 3 0 0 1-6 0c0-2 1-3 3-6z"/>',
+ s_carnage:'<path d="M6 21L18 5"/><path d="M14 4c3.5-.5 6.5 2 6.5 6-2-2-5-2.5-7.5-1.5z"/><path d="M18 21L6 5"/><path d="M10 4c-3.5-.5-6.5 2-6.5 6 2-2 5-2.5 7.5-1.5z"/>',
+ s_hundred:'<path d="M7 21v-7l-3-3V6M7 14V5M10 14V4M13 14V5M13 11l3-2"/><path d="M17 4l3 3M19 2l3 3M16 8l3 3"/>',
+ s_calm:'<circle cx="12" cy="12" r="9"/><path d="M12 3a4.5 4.5 0 0 1 0 9 4.5 4.5 0 0 0 0 9"/><circle cx="12" cy="7.5" r="1"/><circle cx="12" cy="16.5" r="1"/>',
+ s_windpath:'<path d="M3 8h11a3 3 0 1 0-3-3M3 13h15a3 3 0 1 1-3 3M3 18h7"/><path d="M19 4l2 2"/>',
+ s_pyre:'<path d="M12 3c2 3 5 5 5 9a5 5 0 0 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-5 1-8z"/><path d="M4 21l16-3M4 18l16 3"/>',
+ s_unshaken:'<path d="M12 2l8 3v6c0 5-3.4 8.6-8 10.5-4.6-1.9-8-5.5-8-10.5V5z"/><path d="M12 6v8M8 10h8"/>',
+ s_inquisition:'<path d="M4 8c5 2.5 11 2.5 16 0"/><path d="M12 6v14M4 8l8 4 8-4M10 3h4M12 1v4"/>',
+ s_consecrate:'<ellipse cx="12" cy="17" rx="9" ry="4"/><path d="M12 3v10M8 7h8"/>',
+ s_faith:'<path d="M12 2l8 3v6c0 5-3.4 8.6-8 10.5-4.6-1.9-8-5.5-8-10.5V5z"/><path d="M8 11l3 3 5-6"/>',
+ s_skyhammer:'<path d="M9 13l-6 8"/><path d="M8 5l8 8 4-4-8-8z"/><path d="M16 21h5M18 17h3"/>',
+ s_gravecall:'<path d="M6 21v-6l-2-3 2-2 2 3V9M12 21v-8l-1-3 2-2 1 4V7M18 21v-6l2-3-2-2-2 3V9"/><path d="M3 21h18"/>',
+ s_icearmor:'<path d="M12 2l8 3v6c0 5-3.4 8.6-8 10.5-4.6-1.9-8-5.5-8-10.5V5z"/><path d="M12 6v10M8.5 8l7 6M15.5 8l-7 6"/>',
+ s_desecrate:'<ellipse cx="12" cy="17" rx="9" ry="4"/><path d="M8 12c0-3 2-5 4-8 2 3 4 5 4 8M12 9v4"/>'});
+// ----- /A сила и значки -----
 const EU={fire:1,ice:1.06,storm:1.02,poison:1.06,shadow:1.04,light:1.04,earth:1.03,wind:1.03,blood:.94,arcane:1.03};
 let CR_OVR=null;
 function skCycle(sk,intr){const cd=intr?(sk.F.cd||1)*(sk.M.cd||1):skCd(sk),regen=intr?8*CLS.mp:(P.mpRegen||8);
@@ -1388,13 +1703,14 @@ function reactVal(e,c){let best=0;for(let e2=0;e2<10;e2++){if(e2===e||!c[e2])con
 function skPower(sk,cnt,intr){
   const F=sk.F,f=F.id,M=sk.M,fp=FP[f],dmg=intr?F.power*(M.dmg||1)*(sk.E.dmg||1):skDmg(sk),reps=(M.count||1)*(M.echo?2:1);let v;
   if(sk.active){const cy=skCycle(sk,intr);let tot;
-    if(f==='barrier'){const hp=intr?100*CLS.hp:P.maxHp;tot=(hp*.15+dmg*1.6)*.7+dmg*2.9;}
+    if(fp.av)tot=fp.av(sk,dmg,reps,intr);else if(f==='barrier'){const hp=intr?100*CLS.hp:P.maxHp;tot=(hp*.15+dmg*1.6)*.7+dmg*2.9;}
     else if(f==='summon'){const gol=sk.E.id==='earth'||sk.E.id==='ice'||sk.E.id==='blood';tot=dmg*14*(gol?1.8:.9)*1.1*Math.min(reps,2);}
     else if(f==='blink')tot=dmg*fp.ph*((2+(M.count||1)-1)/2+(M.echo?.5:0))*fp.u;
     else tot=dmg*fp.ph*reps*(fp.u||1);
     v=tot/cy;}
   else{
-    if(f==='aura')v=dmg*(M.count||1)*(M.echo?2:1)*3/(M.cd||1);
+    if(fp&&fp.pv)v=fp.pv(sk,dmg,reps,intr);
+    else if(f==='aura')v=dmg*(M.count||1)*(M.echo?2:1)*3/(M.cd||1);
     else if(f==='brand')v=2.5*(F.chance+(intr?0:ST.luck))/(M.cd||1)*dmg*reps*3.2;
     else if(f==='doom')v=.3*dmg*reps*2.4;
     else if(f==='revenge')v=Math.min(1/(F.icd*(M.cd||1)),.4)*dmg*reps*2.4*.9;
@@ -1447,7 +1763,7 @@ function bestBuildPlan(){
   const cnt=new Array(10).fill(0),usedB=new Set(),formN={},cats={};
   const run=(list,n,act)=>{const res=[];
     const pick=cf=>{let best=null,bs=-1;
-      for(const sk of list){if(usedB.has(sk.bk))continue;const ct=FP[sk.F.id].cat;if(cf&&ct!==cf)continue;const fc=formN[sk.f]||0;if(fc>=(act?2:3))continue;
+      for(const sk of list){if(usedB.has(sk.bk))continue;const ct=FP[sk.F.id].cat;if(cf&&ct!==cf)continue;const fc=formN[sk.f]||0;if(fc>=2)continue;
         cnt[sk.e]++;let sc=skPower(sk,cnt);cnt[sk.e]--;
         if(fc)sc*=Math.pow(.82,fc);if(act&&!cats[ct])sc*=CATB[ct]||1;
         if(sc>bs){bs=sc;best=sk;}}
@@ -2245,7 +2561,7 @@ function updateLoot(dt){for(let i=LOOT.length-1;i>=0;i--){const l=LOOT[i],p=l.g.
   essAccT-=dt;if(essAcc>0&&essAccT<=0){float(P.pos,'+'+essAcc+' эссенции','#d4b0ff',13);essAcc=0;essAccT=.5;}}
 function dropLoot(en){const tot=Math.max(1,Math.round(en.xp*.55));const n=en.boss?12:en.elite?5:tot>6?2:1,rw=en.rw||1;
   for(let i=0;i<n;i++)dropItem('ess',en.pos.x,en.pos.z,Math.max(1,Math.round(tot/n)));
-  let sc=en.boss?3:en.champ?2:Math.random()<Math.min(.9,(en.elite?.45:.04)*Math.min(3,rw))?1:0;if(rw>=1.6&&(en.boss||en.elite)&&Math.random()<Math.min(.9,.3*rw))sc++;if(en.guard)sc+=2;for(let i=0;i<sc;i++)dropItem('scroll',en.pos.x,en.pos.z);
+  let sc=en.boss?3:en.champ?2:Math.random()<Math.min(.9,(en.elite?.45:.04)*Math.min(3,rw))?1:0;if(rw>=1.6&&(en.boss||en.elite)&&Math.random()<Math.min(.9,.3*rw))sc++;if(sc&&!en.boss&&!en.elite&&!en.champ&&!en.guard){if((S.scrL|0)>=2)sc=0;else S.scrL=(S.scrL|0)+1;}if(en.guard)sc+=2;for(let i=0;i<sc;i++)dropItem('scroll',en.pos.x,en.pos.z);
   if(en.boss||en.elite||Math.random()<.1)dropItem('hp',en.pos.x,en.pos.z);}
 const formSlot=sk=>{if(!sk.active)return null;for(const v of S.active)if(v!=null&&v!==sk.id&&SKILLS[v].f===sk.f)return v;return null;};
 function pickDistinct(ids,n,usedF,usedB){const c=ids.slice(),r=[];for(let i=c.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[c[i],c[j]]=[c[j],c[i]];}
@@ -2268,12 +2584,15 @@ function showUpg(sk,u){if(luOpen||bookOpen){hideUpg();return;}UPG=sk.id;const T_
   el.hidden=false;clearTimeout(upgTm);upgTm=setTimeout(hideUpg,14000);}
 function hideUpg(){UPG=null;clearTimeout(upgTm);const el=$('#upg');if(el)el.hidden=true;}
 function refreshUpg(){if(UPG==null)return;const sk=SKILLS[UPG],u=upgradeFor(sk);if(!u)hideUpg();else showUpg(sk,u);}
-function unlearnedPool(){const a=[];CLS.pool.forEach(id=>{if(!LEARNED.has(id))a.push(SKILLS[id]);});return a;}
+// фирменные открываются на своём уровне (1, 12, 20)
+const sigOpen=sk=>!sk.F.lvl||S.sandbox||S.lvl>=sk.F.lvl;
+function unlearnedPool(){const a=[];CLS.pool.forEach(id=>{if(!LEARNED.has(id)&&sigOpen(SKILLS[id]))a.push(SKILLS[id]);});return a;}
 // свитки и выбор уровня: сначала новые базы чар (а не ещё один вариант уже известной), чары ядра класса втрое чаще
 function rollPool(){const all=unlearnedPool(),lb=new Set();LEARNED.forEach(id=>lb.add(SKILLS[id].bk));const nb=all.filter(s=>!lb.has(s.bk));return nb.length&&Math.random()<.9?nb:all;}
 function wpick(c){let t=0;const bk=bookOn(),w=c.map(s=>(CLS.core.has(s.bk)?3:1)*(bk&&BOOK.has(s.id)?2.5:1));for(const x of w)t+=x;let r=Math.random()*t;for(let i=0;i<c.length;i++){r-=w[i];if(r<=0)return c[i];}return c[0];}
 function learnRandom(){const pool=rollPool();
-  if(!pool.length||S.sandbox){S.ess+=60;toast('Свиток рассыпался в 60 эссенции');return;}
+  if(!pool.length||S.sandbox){const b=S.sandbox?null:nfBoostPick();if(b){S.ranks[b.id]=rk(b.id)+1;onBuildChanged();saveSoon();fxPillar(P.pos.x,P.pos.z,.8,5,GOLD,.7);toast('Свиток: «'+skName(b)+'» — ранг '+rk(b.id));return;}
+    const v=20+5*S.lvl;S.ess+=v;toast('Свиток рассыпался в '+v+' эссенции');return;}
   const sk=wpick(pool);learn(sk.id,true);fxPillar(P.pos.x,P.pos.z,.8,5,GOLD,.7);colBurst(GOLD,P.pos.x,1.2,P.pos.z,20,4,.7,-2);
   toast('Свиток: «'+skName(sk)+'»'+(EQUIPPED.has(sk.id)?' — сразу в билде':' — в книге'));}
 
@@ -2637,7 +2956,7 @@ const SUMM_CLS={
   shaman:['elemental','stormbird','stormbird','golem','totem_heal','elemental','totem_slow','wolves'],
   lock:['infernal','imps','imps','golem','wolves','imps','lion','skelmage']};
 const SUMM_EL={fire:'lion',ice:'golem',storm:'stormbird',poison:'wolves',shadow:'skelwar',light:'totem_heal',earth:'golem',wind:'stormbird',blood:'imps',arcane:'elemental'};
-const summKind=(sk,cid)=>{const t=SUMM_CLS[cid];return t?t[sk.m]:SUMM_EL[sk.E.id];};
+const summKind=(sk,cid)=>{if(sk.kindO)return sk.kindO;if(sk.F.sk)return sk.F.sk;const t=SUMM_CLS[cid];return t?t[sk.m]:SUMM_EL[sk.E.id];};
 const SKIND={
   golem:{n:1,hp:1.7,spd:3.9,reach:1.9,cd:1.1,life:18,sz:1,ct:1,tau:1,fr:3,name:(el,cx)=>cx==='necro'?'Костяной колосс':GOLN[el],d:'танк: притягивает врагов, бьёт кулаками, удар по земле оглушает',b:(sk,cx)=>bGolem(sk,cx)},
   bear:{n:1,hp:1.5,spd:5,reach:1.9,cd:1.0,life:16,sz:1,ct:1,tau:1,fr:3,name:el=>ADJM[el]+' медведь',d:'танк: ревом притягивает врагов, тяжёлые удары лапой отбрасывают',b:sk=>bBear(sk)},
@@ -2669,8 +2988,8 @@ function spawnSummon(sk,o){o=o||{};const ghost=!!o.ghost;
   if(ghost&&(!MP.peer||!MP.active))return;
   const own=ghost?MP.peer:P,cid=ghost?o.cls:CLS.id,info=summInfo(sk,cid),D=info.D,k=info.k,el=sk.E.id,lvl=ghost?(own.lvl||1):S.lvl;
   // лимит групп (у гостя-призрака свой), общий предел существ
-  const lim=ghost?4:ST.summMax,cap=ghost?9:15;
-  const groups=()=>{const a=[];for(const s of SUMMONS)if(s.ghost===ghost&&!s.dying&&a.indexOf(s.gid)<0)a.push(s.gid);return a;};
+  const lim=D.own?(D.lim||2):ghost?4:ST.summMax,cap=ghost?9:15;
+  const ownK=!!D.own,groups=()=>{const a=[];for(const s of SUMMONS)if(s.ghost===ghost&&!s.dying&&!!s.def.own===ownK&&(!ownK||s.kind===k)&&a.indexOf(s.gid)<0)a.push(s.gid);return a;};
   let gl=groups();while(gl.length>=lim&&gl.length){const gid=gl.shift();for(const s of SUMMONS)if(s.gid===gid&&!s.dying)killSummon(s,true);gl=groups();}
   let cnt=0;for(const s of SUMMONS)if(s.ghost===ghost&&!s.dying)cnt++;
   if(cnt+info.n>cap){for(const s of SUMMONS){if(cnt+info.n<=cap)break;if(s.ghost===ghost&&!s.dying){killSummon(s,true);cnt--;}}}
@@ -2699,7 +3018,7 @@ function killSummon(s,quiet){cfSummGone(s);if(s.dying)return;s.dying=.35;s.bar.v
   elBurst(s.sk.e,p.x,1,p.z,quiet?8:14);fxBurst(p.x,1,p.z,1.2*Math.min(1.6,s.sc),s.col,.3,.6);
   if(!quiet&&!s.ghost&&s.boom&&s.hp<=0){const r=2.6*s.R;fxShock(p.x,p.z,r,s.col,.45);fxBurst(p.x,.8,p.z,r*.8,s.col,.35,.7);aoe(p,r,s.dmg*(s.kind==='imps'?1.6:1.3),s.sk.e,{sk:s.sk,depth:1,knockFrom:p.clone()});}
   else if(!quiet&&s.ghost&&s.boom&&s.hp<=0){const r=2.6;fxShock(p.x,p.z,r,s.col,.45);fxBurst(p.x,.8,p.z,r*.8,s.col,.35,.7);}}
-const sCount=()=>{const a=new Set();for(const s of SUMMONS)if(!s.ghost&&!s.dying)a.add(s.gid);return a.size;};
+const sCount=()=>{const a=new Set();for(const s of SUMMONS)if(!s.ghost&&!s.dying&&!s.def.own)a.add(s.gid);return a.size;};
 function sdmg(s,en,m,o){if(s.ghost||en.dead)return;dealDamage(en,s.dmg*m,s.sk.e,Object.assign({sk:s.sk,depth:0,knockFrom:s.g.position.clone()},o));}
 function sAoe(s,p,r,m,o){r*=s.R;o=o||{};if(s.ghost){if(o.stunX)for(const en of ENEMIES){if(en.dead)continue;const dx=en.pos.x-p.x,dz=en.pos.z-p.z,rr=r+en.r;if(dx*dx+dz*dz<=rr*rr)stunEn(en,o.stunX);}return;}
   aoe(p,r,s.dmg*m,s.sk.e,Object.assign({sk:s.sk,depth:0,knockFrom:p.clone()},o));}
@@ -4016,9 +4335,12 @@ let NEWVER=false;window.addEventListener('tc-newversion',async()=>{try{const t=a
 // LEVEL-UP CHOICE
 // =====================================================================
 let luOpen=false;
-function rollChoices(){const pool=rollPool();if(!pool.length)return[];const res=[];
+function rollChoices(){NFS.boost=false;const pool=rollPool();if(!pool.length){const b=nfBoostChoices();NFS.boost=b.length>0;return b;}const res=[];
   const take=f=>{const c=pool.filter(s=>f(s)&&!res.some(r=>r.bk===s.bk));if(c.length)res.push(wpick(c));};
-  take(s=>s.active);take(s=>!s.active);take(s=>s.E.id===CLS.s);let g=0;while(res.length<3&&g++<9)take(()=>true);return res;}
+  // 1-я карта — активная, 2-я — пассивная, 3-я — открывшаяся и ещё не изученная фирменная, иначе любая
+  take(s=>s.active&&!s.F.sig);take(s=>!s.active&&!s.F.sig);
+  {const sg=unlearnedPool().filter(s=>s.F.sig&&!knownBase(s)&&!res.some(r=>r.bk===s.bk));if(sg.length){const lo=Math.min(...sg.map(s=>s.F.lvl||1));const c=sg.filter(s=>(s.F.lvl||1)===lo);res.push(c[Math.random()*c.length|0]);}}
+  let g=0;while(res.length<3&&g++<9)take(()=>true);return res;}
 const knownBase=sk=>{for(const id of LEARNED)if(SKILLS[id].bk===sk.bk)return true;return false;};
 function cardStat(sk){return sk.active?`${fmt(skDmg(sk))} урона · ${skMana(sk)} маны · ${fmt(skCd(sk))} с`:`${fmt(skDmg(sk))} урона · пассивная`;}
 function cardPow(sk){const r=rarOf(sk),u=upgradeFor(sk,true),arr=sk.active?S.active:S.passive,n=sk.active?activeSlots():passiveSlots();
@@ -4028,18 +4350,21 @@ function luScore(sk){const u=upgradeFor(sk,true),arr=sk.active?S.active:S.passiv
   const free=baseSlot(sk)==null&&arr.findIndex((v,i)=>i<n&&v==null)>=0&&formSlot(sk)==null;
   return (free?2e6:0)+(u?1e6*(1+u.gain):0)+pwr(sk);}
 function luAutoRun(n){const names=[];while(n-->0&&luQueue>0){const ch=rollChoices();if(!ch.length){luQueue=0;break;}
-  let b=ch[0],bs=-1;for(const sk of ch){const v=luScore(sk);if(v>bs){bs=v;b=sk;}}
+  let b=ch[0],bs=-1;for(const sk of ch){const v=NFS.boost?-rk(sk.id)*1e6+pwr(sk):luScore(sk);if(v>bs){bs=v;b=sk;}}
+  if(NFS.boost){S.ranks[b.id]=rk(b.id)+1;onBuildChanged();saveSoon();luQueue--;names.push(skName(b)+' → ранг '+rk(b.id));continue;}
   learn(b.id,true);luQueue--;names.push(skName(b));}
   if(names.length)toast(names.length===1?'Изучено: '+names[0]:'Изучено '+names.length+': '+names.slice(0,3).join(', ')+(names.length>3?'…':''));
   luDelay=.5;}
 function luSync(){const a=$('#luAuto');if(a)a.textContent='Авто-выбор: '+(S.autoLu?'вкл':'выкл');const l=$('#luAll');if(l){l.hidden=luQueue<2;l.textContent='Авто для всех '+luQueue;}}
 function setAutoLu(v){S.autoLu=!!v;if(S.autoLu)S.autoBest=true;saveSoon();const c=$('#autoLu');if(c)c.checked=S.autoLu;const b=$('#autoBest');if(b)b.checked=!!S.autoBest;}
 function openLevelUp(){if(S.autoLu){luAutoRun(luQueue);return;}const ch=rollChoices();if(!ch.length){luQueue=0;return;}luOpen=true;hideUpg();syncPause();
-  $('#luTitle').textContent='Уровень '+S.lvl+(luQueue>1?' · ещё '+(luQueue-1):'');$('#luSub').textContent='Выбери новые чары. Если есть свободный слот, они сразу встанут в билд.'+(talFreeUse()?' Очков талантов: '+tpFree()+'.':'');luSync();
-  $('#luCards').innerHTML=ch.map(sk=>`<button type="button" class="card" data-id="${sk.id}"><span class="ico${sk.active?'':' p'}" data-r="${rarOf(sk)}" style="--c:${sk.E.hex}">${svg(sk.F.id)}${modBadge(sk)}</span><span class="ct"><span class="tag">${sk.F.role} · ${sk.E.name}${knownBase(sk)?'<i class="nv">вариант известной</i>':'<i class="nv">новая чара</i>'}${bookOn()&&BOOK.has(sk.id)?'<i class="nv">из Книги чар</i>':''}</span><b>${sk.base}</b><span class="var">${sk.M.name}: ${sk.M.desc}</span><small>${cap(skLead(sk))}</small><small>${cardStat(sk)}</small>${cardPow(sk)}</span></button>`).join('');
+  $('#luTitle').textContent='Уровень '+S.lvl+(luQueue>1?' · ещё '+(luQueue-1):'');$('#luSub').textContent=(NFS.boost?'Все чары героя изучены — выбери, какую из билда усилить на ранг бесплатно.':'Выбери новые чары. Если есть свободный слот, они сразу встанут в билд.')+(talFreeUse()?' Очков талантов: '+tpFree()+'.':'');luSync();
+  $('#luCards').innerHTML=ch.map(sk=>`<button type="button" class="card" data-id="${sk.id}"><span class="ico${sk.active?'':' p'}" data-r="${rarOf(sk)}" style="--c:${sk.E.hex}">${svg(sk.F.id)}${modBadge(sk)}</span><span class="ct"><span class="tag">${sk.F.role} · ${sk.E.name}${NFS.boost?'<i class="nv">усиление: ранг '+(rk(sk.id)+1)+'</i>':sk.F.sig&&!knownBase(sk)?'<i class="nv">фирменная</i>':knownBase(sk)?'<i class="nv">вариант известной</i>':'<i class="nv">новая чара</i>'}${bookOn()&&BOOK.has(sk.id)?'<i class="nv">из Книги чар</i>':''}</span><b>${sk.base}</b><span class="var">${sk.M.name}: ${sk.M.desc}</span><small>${cap(skLead(sk))}</small><small>${cardStat(sk)}</small>${cardPow(sk)}</span></button>`).join('');
   $('#luSkip').textContent='Пропустить: +'+(20+S.lvl*5)+' эссенции';$('#lvlup').hidden=false;}
 function closeLevelUp(){luOpen=false;$('#lvlup').hidden=true;luQueue=Math.max(0,luQueue-1);luDelay=1.2;syncPause();}
-$('#luCards').addEventListener('click',e=>{const b=e.target.closest('.card');if(!b)return;const sk=SKILLS[+b.dataset.id];learn(sk.id,true);toast('Изучено: '+skName(sk)+(EQUIPPED.has(sk.id)?' — в билде':' — в книге'));closeLevelUp();});
+$('#luCards').addEventListener('click',e=>{const b=e.target.closest('.card');if(!b)return;const sk=SKILLS[+b.dataset.id];
+  if(NFS.boost){S.ranks[sk.id]=rk(sk.id)+1;onBuildChanged();saveSoon();toast('Усилено: '+skName(sk)+' — ранг '+rk(sk.id));closeLevelUp();return;}
+  learn(sk.id,true);toast('Изучено: '+skName(sk)+(EQUIPPED.has(sk.id)?' — в билде':' — в книге'));closeLevelUp();});
 $('#luAuto').addEventListener('click',()=>{setAutoLu(!S.autoLu);if(S.autoLu){luOpen=false;$('#lvlup').hidden=true;luAutoRun(luQueue);syncPause();toast('Авто-выбор чар включён (и автозамена в билде)');}else luSync();});
 $('#luAll').addEventListener('click',()=>{luOpen=false;$('#lvlup').hidden=true;luAutoRun(luQueue);syncPause();});
 $('#autoLu').addEventListener('change',e=>{setAutoLu(e.target.checked);toast(S.autoLu?'Чары после уровня выбираются сами (и автозамена в билде)':'Чары после уровня — через окно выбора');});
@@ -4100,7 +4425,8 @@ function renderList(keep){
   LIST=L;renderSort();
   $('#found').textContent=LIST.length?('Найдено: '+LIST.length+' · редкость — среди своего типа (активные и пассивные отдельно)'+(WEAKN&&!F2_.weak?' · слабых свёрнуто: '+WEAKN:'')):'';
   listEl.scrollTop=0;shown=0;listEl.innerHTML=LIST.length?'':'<p class="hint" style="padding:12px 0">'+(F_.type==='learned'?'Среди изученных таких нет. Новые чары выпадают в свитках и даются за уровень.':'Ничего не нашлось. Сбрось фильтры или поищи по-другому.')+'</p>';
-  more();if(keep){while(shown<LIST.length&&listEl.scrollHeight<st+listEl.clientHeight+50)more();listEl.scrollTop=st;}}
+  more();if(keep){while(shown<LIST.length&&listEl.scrollHeight<st+listEl.clientHeight+50)more();listEl.scrollTop=st;}
+  renderLegacy();}
 $('#fSort').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
   if(b.dataset.sort){F2_.sort=b.dataset.sort;renderList();}
   else if(b.dataset.weak){F2_.weak=!F2_.weak;renderList();}
@@ -4120,9 +4446,9 @@ function slotHtml(id,i,kind,unlocked,lvlNeed){
 function renderBuild(){
   const na=activeSlots(),np=passiveSlots();
   $('#slotsA').innerHTML=S.active.map((id,i)=>slotHtml(id,i,'a',i<na,activeLvl(i))).join('');
-  $('#slotsP').innerHTML=S.passive.map((id,i)=>slotHtml(id,i,'p',i<np,passiveLvl(i))).join('');
+  $('#slotsP').innerHTML=S.passive.slice(0,PAS_AT.length).map((id,i)=>slotHtml(id,i,'p',i<np,passiveLvl(i))).join('');
   const ca=S.active.slice(0,na).filter(v=>v!=null).length,cp=S.passive.slice(0,np).filter(v=>v!=null).length;
-  $('#actN').textContent=ca+' / '+na+(na<8?' (всего 8)':'');$('#pasN').textContent=cp+' / '+np+(np<42?' (всего 42)':'');
+  $('#actN').textContent=ca+' / '+na+(na<8?' (всего 8)':'');$('#pasN').textContent=cp+' / '+np+(np<PAS_AT.length?' (всего '+PAS_AT.length+')':'');
   $('#resoHint').textContent='Каждые чары стихии в билде дают ей +'+Math.round(ST.resoPer*100)+'% урона.';
   const rs=ELEMENTS.map((e,i)=>({e,i,n:RESO_N[i]})).filter(x=>x.n>0).sort((a,b)=>b.n-a.n);
   $('#reso').innerHTML=rs.length?rs.map(x=>`<span class="rchip" style="--c:${x.e.hex}"><span class="dot"></span>${x.e.name} ×${x.n} <b>+${Math.round(x.n*ST.resoPer*100)}%</b></span>`).join(''):'<p class="hint">Пока пусто.</p>';
@@ -4259,7 +4585,7 @@ function sheetHtml(sk){const eq=EQUIPPED.has(sk.id),ln=isLearned(sk.id),r=rk(sk.
     (r<5&&S.ess<cost?`<p class="note">Нужно ${cost} эссенции, есть ${S.ess}. Эссенция падает со всех врагов.</p>`:'');}
   const vars=`<div class="vars" role="group" aria-label="Варианты чары">${MODS.map((M,mi)=>{const v=SKILLS[sk.bk*NM+mi];return `<button type="button" class="vchip${v.id===sk.id?' on':''}${isLearned(v.id)?'':' lk'}" data-v="${v.id}">${MODG[mi]} ${M.name}${EQUIPPED.has(v.id)?' ●':''}</button>`;}).join('')}</div>`;
   return `<div class="sh-body"><div class="sh-top"><span class="ico${sk.active?'':' p'}" data-r="${rr}" style="--c:${sk.E.hex}">${svg(sk.F.id)}${modBadge(sk)}</span><div><h2>${sk.F.id==='summon'&&CLS?summInfo(sk).name:sk.base}</h2><p><span class="tagc rar" data-r="${rr}">${RARITY[rr].n}</span><span class="tagc v">${sk.M.name}</span><span class="tagc">${sk.F.role}</span><span class="tagc" style="border-color:${sk.E.hex}">${sk.E.name}</span></p></div></div>
-  ${vars}<p class="lead">${cap(skLead(sk))}</p><p class="note"><b style="color:var(--ess);font-weight:500">${sk.M.name}:</b> ${sk.M.desc}.</p>
+  ${vars}<p class="lead">${cap(skLead(sk))}</p>${sk.F.hint?'<p class="note" style="font-size:.86em;opacity:.8">'+sk.F.hint+'</p>':''}<p class="note"><b style="color:var(--ess);font-weight:500">${sk.M.name}:</b> ${sk.M.desc}.</p>
   ${sk.F.id==='summon'?`<p class="note"><b style="color:var(--ess);font-weight:500">Призыв:</b> одновременно до ${ST.summMax} призывов (талант «Повелитель духов» добавляет места). У существа своя полоска здоровья; с уровнем оно крупнее и крепче. Напарник по коопу видит твоих существ, а их удары засчитываются.</p>`:''}
   ${rankRow}<div class="stats">${st.map(([k,v])=>`<div>${k}<b>${v}</b></div>`).join('')}</div></div>${acts}`;}
 let sheetId=null;
@@ -4951,6 +5277,7 @@ function mpPeerCast(m){
   const sk=m.s>=0?SKILLS[m.s]:null,from=new THREE.Vector3(px,1.3,pz);
   if(!sk){const col=pr.color;if(CLASS_BY[pr.cls].melee){fxSlash(px,pz,Math.atan2(m.z-pz,m.x-px),2.2,col);}else fxBeam(from,new THREE.Vector3(m.x,1.1,m.z),col,.14,.07);return;}
   const col=sk.E.color,F=sk.F.id;
+  if(NFPEER[F]){colBurst(col,px+Math.sin(pr.tf)*.4,1.8,pz+Math.cos(pr.tf)*.4,7,2,.35,-1);NFPEER[F](sk,m,pr,from);return;}
   colBurst(col,px+Math.sin(pr.tf)*.4,1.8,pz+Math.cos(pr.tf)*.4,7,2,.35,-1);fxGlow(px,pz,1.6,col,.3,.6);
   if(F==='summon'){spawnSummon(sk,{ghost:true,cls:pr.cls,at:{x:m.x,z:m.z}});return;}
   if(F==='bolt'||F==='chain'){fxBeam(from,new THREE.Vector3(m.x,1.1,m.z),col,.3,.16);colBurst(col,m.x,1,m.z,8,3,.3,2);}
@@ -5380,11 +5707,500 @@ function start(hot){
 if(/[?&]debug\b/.test(location.search))window.__ev=c=>eval(c);
 window.__tc={lu:()=>({open:luOpen,q:luQueue,auto:!!S.autoLu,paused,all:!$('#luAll').hidden,allTxt:$('#luAll').textContent,title:$('#luTitle').textContent}),lvlAt:(x,z)=>enemyLvAt(x,z),zoneAt:(x,z)=>zoneOf(x,z),stats:(tid,lv)=>{const t=MOBS[tid];return {hp:Math.round(t.hp*(1+.42*(lv-1))*(t.boss?1.3:2.2)),dmg:Math.round(t.dmg*(1+.22*(lv-1))*(t.boss?1:.9))};},chunks:()=>CH.size,inst:()=>PK.reduce((a,k)=>a+k.im.count,0),halfNear:()=>ENEMIES.forEach((e,i)=>{if(e.dead)return;e.hp=Math.round(e.maxHp*(.25+.25*(i%3)));e.pos.set(P.pos.x+2.5*Math.cos(i*1.3),0,P.pos.z+2.5*Math.sin(i*1.3));e.stun=3;}),bars:()=>ENEMIES.filter(e=>!e.dead).map(e=>[e.tid,Math.round(e.hp),e.maxHp,e.bar.visible,+e.fill.scale.x.toFixed(2)]),gorge:g=>startGorge(g),gstate:()=>GZ&&{g:GZ.g,prog:GZ.prog,boss:GZ.bossSpawned,open:GZ.open,won:GZ.won,L:GZ.L},tpLocal:z=>{const w=toWorld(gcx(z),z);P.pos.set(w.x,0,w.z);P.prev.copy(P.pos);},boss:()=>{threat=THREAT_MAX;},xp:n=>gainXp(n),ess:n=>{S.ess+=n;},state:()=>({cls:CLS.id,mode,lvl:S.lvl,ess:S.ess,kills:S.kills,hp:P.hp,learned:LEARNED.size,enemies:aliveCount(),boss:!!BOSS,fx:FX.length,proj:PROJ.length,lu:luOpen,pp:Q.pp,shadow:Q.shadow,pr}),tp:(x,z)=>{P.pos.set(x,0,z);P.prev.set(x,0,z);},sel:id=>selectClass(id),cast:i=>trySlot(i,true)};
 // ===== НОВЫЕ ФОРМЫ, ПАССИВКИ И ФИРМЕННЫЕ: механика (часть A) =====
-var NFRUN={},NFCAN={};
-function nfPassOwn(sk,i){return false;} function nfPassBuilt(){}
-function nfOnCast(sk,A){} function nfDmgOut(en,el,o,d){return 1;} function nfOnHit(en,d,el,o,crit,R){}
-function nfOnKill(en,el,o){} function nfDmgIn(d,src,o){return d;} function nfOnBasic(tg){}
-function nfTick(dt){} function nfEProj(p,i,dt){return false;} function nfAI(en,dt,dx,dz,dist){return false;} function nfReset(){}
+// Реестры: NFRUN[форма](sk,A,i,dmg,R,col,cl) — каст активной; NFCAN[форма](sk,manual,A) — можно ли в автобое; NFPEER[форма](sk,m,pr,from) — вид у напарника;
+// NFP[форма] — пассивка {build,drop,tick,hit,kill,dmgIn,dmgOut,cast,eproj,basic,hud}; сущности — nfEnt({up(dt),end(),hit,kill,dmgIn,dmgOut,eproj,ai,cast}).
+var NFRUN={},NFCAN={},NFPEER={},NFP={};
+var NF_TWIN_OK={bolt:1,nova:1,meteor:1,chain:1,beam:1,rain:1,trap:1,fan:1,boomer:1,quake:1,vortex:1,glyph:1,mark:1,wall:1,stasis:1,beacon:1};
+FXG.oct=G.oct;
+// ---------- A-ядро: помощники ----------
+function nfEnt(o){(NFS.ents||(NFS.ents=[])).push(o);return o;}
+function nfMesh(kind,col,op){const m=takeMesh(kind);m.material.color.copy(col);m.material.opacity=op==null?1:op;return m;}
+function nfFoes(pos,r,skip){const a=[];for(const en of ENEMIES){if(en.dead||en===skip)continue;const dx=en.pos.x-pos.x,dz=en.pos.z-pos.z,rr=r+en.r;if(dx*dx+dz*dz<=rr*rr)a.push(en);}return a;}
+function nfStrong(pos,r,skip){let b=null,bs=-1;for(const en of nfFoes(pos,r,skip)){const s=(en.boss?1e9:en.elite||en.champ?1e6:0)+en.maxHp;if(s>bs){bs=s;b=en;}}return b;}
+function nfHit(en,dmg,sk,o){if(!en.dead)dealDamage(en,dmg,sk.e,Object.assign({sk,depth:0},o||{}));}
+function nfAoe(pos,r,dmg,sk,o,ex){return aoe(pos,r,dmg,sk.e,Object.assign({sk,depth:0},o||{}),ex);}
+function nfDir(sk,A,r){if(A)return A.dir.clone();const t=getTarget((r||sk.F.range)+2);return t?new THREE.Vector3(t.pos.x-P.pos.x,0,t.pos.z-P.pos.z).normalize():fwd();}
+function nfPt(sk,A,minD,defD){return aimPoint(sk,A,0,minD==null?2:minD,defD==null?6:defD);}
+function nfSlow(en,k){en.tkW=Math.min(en.tkW==null?1:en.tkW,k);}
+function nfInSeg(en,ax,az,dx,dz,len,hw){const rx=en.pos.x-ax,rz=en.pos.z-az,al=rx*dx+rz*dz;if(al<-en.r||al>len+en.r)return false;return Math.abs(rx*dz-rz*dx)<hw+en.r;}
+function nfClr(){if(NFS.ents)for(const e of NFS.ents){try{if(e.end)e.end();}catch(_){}}NFS.ents=[];}
+// стихийный штрих новых общих форм (DESIGN-obraz, раздел 5)
+function nfTwist(sk,pos,n,dmg,tg){const id=sk.E.id;
+  if(id==='fire')addZone(pos.x,pos.z,1.6,2,sk.e,dmg*.25,sk);
+  else if(id==='ice'){if(tg&&!tg.boss&&!tg.dead){tg.chill=(tg.chill|0)+1;tg.chillT=3;}}
+  else if(id==='storm'){if(tg&&!tg.dead){const nb=nearest(tg.pos,5,tg);if(nb){zigzag(new THREE.Vector3(tg.pos.x,1,tg.pos.z),new THREE.Vector3(nb.pos.x,1,nb.pos.z),sk.E.color);dealDamage(nb,dmg*.5,sk.e,{sk,depth:1,noProc:true});}}}
+  else if(id==='poison')addZone(pos.x,pos.z,1.8,3,sk.e,dmg*.2,sk);
+  else if(id==='shadow')heal(dmg*.06*Math.max(1,n));
+  else if(id==='light'){if(n>=3)heal(P.maxHp*.03);}
+  else if(id==='earth'){if(tg&&!tg.dead)stunEn(tg,.3);spikeAt(pos.x,pos.z,EARTHC,.3,1.1);}
+  else if(id==='arcane')P.mp=Math.min(P.maxMp,P.mp+Math.max(1,n));}
+// регистрация общей активной: ветер шире, кровь сильнее и стоит 2% здоровья
+function nfAct(id,fn,can,peer){NFRUN[id]=(sk,A,i,dmg,R,col,cl)=>{if(sk.E.id==='blood'){dmg*=1.25;if(!i&&!cl)P.hp=Math.max(1,P.hp-P.maxHp*.02);}if(sk.E.id==='wind')R*=1.2;return fn(sk,A,i,dmg,R,col,cl);};if(can)NFCAN[id]=can;if(peer)NFPEER[id]=peer;}
+// ---------- общие активные (15) ----------
+// Бумеранг
+nfAct('boomer',(sk,A,i,dmg,R,col)=>{const d=nfDir(sk,A);if(i)d.applyAxisAngle(v2.set(0,1,0),i===1?.32:-.32);
+  const m=nfMesh('arc',col,.95);m.scale.set(.75*R,.75*R,.75*R);const o={g:m};const p=new THREE.Vector3(P.pos.x,1.1,P.pos.z);m.position.copy(p);const tr=trailStart(o,col,.22);
+  const out=sk.F.range*(sk.M.radius?1.2:1),h1=new Set(),h2=new Set();let t=0,back=false,dist=0;
+  nfEnt({up(dt){t+=dt;const sp=24;if(!back){p.addScaledVector(d,sp*dt);dist+=sp*dt;if(dist>=out){back=true;fxGlow(p.x,p.z,1.2,col,.25,.7);colBurst(col,p.x,1.1,p.z,5,3,.25,0);}}
+    else{v1.set(P.pos.x-p.x,0,P.pos.z-p.z);const L=v1.length();if(L<1.1||t>3){if(L<1.1){P.cds[sk.id]=(P.cds[sk.id]||0)*.6;fxBurst(P.pos.x,1.1,P.pos.z,.9,col,.2,.7);}return false;}p.addScaledVector(v1.divideScalar(L),sp*1.15*dt);}
+    m.position.copy(p);m.rotation.y+=dt*20;emit(SPARK,p.x,p.y,p.z,rand(-.5,.5),rand(0,.5),rand(-.5,.5),col,.3,0,1);
+    const hs=back?h2:h1,hr=1.05*R;for(const en of ENEMIES){if(en.dead||hs.has(en))continue;const dx=en.pos.x-p.x,dz=en.pos.z-p.z,rr=hr+en.r;
+      if(dx*dx+dz*dz<rr*rr){hs.add(en);nfHit(en,back?dmg*1.3:dmg,sk,{knockFrom:p.clone()});elBurst(sk.e,en.pos.x,1,en.pos.z,6);if(hs.size===1)nfTwist(sk,en.pos,1,dmg,en);}}
+    return true;},end(){trailEnd(tr);dropMesh(m);}});},null,
+  (sk,m,pr,from)=>{const to=new THREE.Vector3(m.x,1.1,m.z);fxBeam(from,to,sk.E.color,.35,.25);fxRing(m.x,m.z,.3,1.4,sk.E.color,.35);});
+// Воронка
+nfAct('vortex',(sk,A,i,dmg,R,col)=>{const c=nfPt(sk,A,3,7);if(i)c.add(v3.set(rand(-2,2),0,rand(-2,2)));const r=5*R;
+  const a=nfMesh('ring2',col,.55),b=nfMesh('ring2',col,.4),dk=nfMesh('disc',new THREE.Color(0x10081a),.0);
+  for(const m of [a,b,dk])m.position.set(c.x,.08,c.z);a.scale.set(r,1,r);b.scale.set(r*.6,1,r*.6);dk.scale.set(r*.9,1,r*.9);dk.material.blending=THREE.NormalBlending;
+  let t=0,tick=0;fxShock(c.x,c.z,r,col,.4);
+  nfEnt({up(dt){t+=dt;a.rotation.y+=dt*3;b.rotation.y-=dt*5;dk.material.opacity=Math.min(.45,t*1.5);
+    for(let k=0;k<3;k++){const an=rand(0,TAU),rr=r*rand(.6,1);emit(PUFF,c.x+Math.cos(an)*rr,rand(.2,1.2),c.z+Math.sin(an)*rr,-Math.cos(an)*rr*1.5-Math.sin(an)*3,.3,-Math.sin(an)*rr*1.5+Math.cos(an)*3,col,.55,0,0);}
+    for(const en of nfFoes(c,r)){if(en.boss||en.remote)continue;const dx=c.x-en.pos.x,dz=c.z-en.pos.z,L=Math.hypot(dx,dz);if(L>.5){const k=Math.min(L,3.5*dt/Math.max(.6,Math.sqrt(en.mass||1)));en.pos.x+=dx/L*k;en.pos.z+=dz/L*k;}}
+    tick-=dt;if(tick<=0){tick=.3;nfAoe(c,r,dmg,sk,{noKnock:true});}
+    if(t>=3){nfAoe(c,3*R,dmg*3,sk,{knockFrom:c});fxShock(c.x,c.z,3.5*R,col,.5);fxBurst(c.x,.8,c.z,2.5*R,col,.35,.8);fxGlow(c.x,c.z,4*R,WHITE,.3,.6);elBurst(sk.e,c.x,.6,c.z,20);nfTwist(sk,c,3,dmg,nearest(c,3));shake=Math.max(shake,.15);return false;}
+    return true;},end(){dk.material.blending=THREE.AdditiveBlending;dropMesh(a);dropMesh(b);dropMesh(dk);}});},
+  sk=>{const t=getTarget(sk.F.range);return t&&countNear(t.pos,5)>=2?'ok':'target';},
+  (sk,m,pr)=>{fxShock(m.x,m.z,5,sk.E.color,.6);fxRing(m.x,m.z,5,.5,sk.E.color,1.2,.6);});
+// Приманка: двойник-призыв (вид decoy, свой лимит), перетягивает врагов и взрывается
+nfAct('decoy',(sk,A,i,dmg,R,col,cl)=>{let p;if(A)p=P.pos.clone().addScaledVector(A.dir,Math.max(2,A.dist*sk.F.range));else{const t=getTarget(10);p=t?P.pos.clone().lerp(t.pos,.45):P.pos.clone().addScaledVector(fwd(),-4);}p.y=0;collide(p,.4);
+  const n0=SUMMONS.length;spawnSummon(sk,{at:p});const s=SUMMONS.length>n0?SUMMONS[SUMMONS.length-1]:null;if(!s)return;s.g.position.set(p.x,0,p.z);s.exD=dmg;
+  nfEnt({up(){if(s.dying||!SUMMONS.includes(s)||s.hp<=0||s.life<=0){const q=s.g.position.clone();nfAoe(q,3.5*R,dmg,sk,{knockFrom:q});novaFx(sk,q.x,q.z,3.5*R);nfTwist(sk,q,3,dmg,nearest(q,3.5));return false;}return true;}});},
+  ()=>countNear(P.pos,8)>=3?'ok':'target',
+  (sk,m,pr)=>{spawnSummon(sk,{ghost:true,cls:pr.cls,at:{x:m.x,z:m.z}});});
+// Руна: вспыхивает от твоих других чар, две руны рядом связаны лучом
+nfAct('glyph',(sk,A,i,dmg,R,col)=>{const c=nfPt(sk,A,2,6);if(i)c.add(v3.set(rand(-2.5,2.5),0,rand(-2.5,2.5)));const r=3*R;
+  const mine=(NFS.ents||[]).filter(e=>e.glyph&&e.sk.id===sk.id);if(mine.length>=2)mine[0].t=99;
+  const m=nfMesh('rune',col,.7);m.position.set(c.x,.1,c.z);m.scale.set(r*.5,1,r*.5);fxPillar(c.x,c.z,.6,3,col,.5);
+  const e=nfEnt({glyph:1,sk,c,t:0,cd:0,n:0,lk:null,lt:0,
+    up(dt){this.t+=dt;this.cd-=dt;m.rotation.y+=dt*.6;m.material.opacity=.45+.25*Math.sin(time*4)+(this.cd>0?.3:0);
+      const o=(NFS.ents||[]).find(x=>x!==this&&x.glyph&&x.t<10&&x.c.distanceTo(c)<10);
+      if(o){if(!this.lk&&o.lk==null){this.lk=nfMesh('beam',col,.5);}if(this.lk){const B=o.c;this.lk.position.set((c.x+B.x)/2,.4,(c.z+B.z)/2);this.lk.lookAt(B.x,.4,B.z);const L=c.distanceTo(B);this.lk.scale.set(.12,.12,L);this.lk.material.opacity=.35+.2*Math.sin(time*9);
+        this.lt-=dt;if(this.lt<=0){this.lt=.5;const dx=(B.x-c.x)/L,dz=(B.z-c.z)/L;for(const en of ENEMIES){if(en.dead)continue;if(nfInSeg(en,c.x,c.z,dx,dz,L,.5))nfHit(en,dmg*.3,sk,{noKnock:true,noProc:true,glyph:1});}}}}
+      else if(this.lk){dropMesh(this.lk);this.lk=null;}
+      return this.t<10&&this.n<4;},
+    hit(en,d,el,o){if(this.cd>0||!o.sk||o.glyph||o.dot||o.np||o.sk.F.id==='glyph'||(o.depth|0)>1)return;if(Math.hypot(en.pos.x-c.x,en.pos.z-c.z)>r+en.r)return;
+      this.cd=1;this.n++;const q=c.clone();later(0,()=>{nfAoe(q,r,dmg,sk,{glyph:1,knockFrom:q});nfTwist(sk,q,2,dmg,en);});fxRune(c.x,c.z,r*1.3,col,.6);fxPillar(c.x,c.z,r*.5,5,col,.45);fxShock(c.x,c.z,r,col,.4);elBurst(sk.e,c.x,.5,c.z,14);},
+    end(){dropMesh(m);if(this.lk)dropMesh(this.lk);}});},null,
+  (sk,m)=>{fxRune(m.x,m.z,3,sk.E.color,1.2);fxPillar(m.x,m.z,.6,3,sk.E.color,.5);});
+// Маяк: крутящийся вокруг героя луч
+nfAct('beacon',(sk,A,i,dmg,R,col)=>{const len=9*R,sp=1.2*TAU,a0=i*TAU/3+(A?Math.atan2(A.dir.z,A.dir.x):rand(0,TAU));
+  const bm=nfMesh('beam',col,.75),core=nfMesh('beam',WHITE,.55),tip=nfMesh('sphere',col,.8);tip.scale.setScalar(.35);const last=new Map();let t=0;
+  nfEnt({beacon:1,up(dt){t+=dt;const a=a0+sp*t,cx=Math.cos(a),cz=Math.sin(a),x0=P.pos.x,z0=P.pos.z,ex=x0+cx*len,ez=z0+cz*len,k=Math.min(1,t*6,(2.5-t)*6);
+    bm.position.set(x0+cx*len/2,1.1,z0+cz*len/2);bm.lookAt(ex,1.1,ez);bm.scale.set(.28*k,.28*k,len);core.position.copy(bm.position);core.quaternion.copy(bm.quaternion);core.scale.set(.09*k,.09*k,len);tip.position.set(ex,1.1,ez);
+    for(let q=0;q<2;q++){const f=rand(.3,1);emit(SPARK,x0+cx*len*f,1.1,z0+cz*len*f,rand(-1,1),rand(0,1.5),rand(-1,1),col,.3,0,1);}
+    for(const en of ENEMIES){if(en.dead)continue;const dx=en.pos.x-x0,dz=en.pos.z-z0,dd=Math.hypot(dx,dz);if(dd>len+en.r||dd<.3)continue;
+      let da=Math.atan2(dz,dx)-a;da=Math.atan2(Math.sin(da),Math.cos(da));if(Math.abs(da)>Math.atan2(en.r+.45,dd))continue;const lt=last.get(en)||-9;if(time-lt<.25)continue;last.set(en,time);
+      nfHit(en,dmg,sk,{knockFrom:P.pos.clone(),noKnock:true});if(Math.random()<.35)nfTwist(sk,en.pos,1,dmg,en);}
+    return t<2.5&&!P.dead;},end(){dropMesh(bm);dropMesh(core);dropMesh(tip);}});},
+  ()=>countNear(P.pos,8)>=2&&!(NFS.ents||[]).some(e=>e.beacon)?'ok':'target',
+  (sk,m,pr)=>{fxRing(pr.pos.x,pr.pos.z,1,9,sk.E.color,.6,.5);});
+// Прорыв: рывок сквозь строй и отложенный второй удар по рассечённым
+nfAct('rush',(sk,A,i,dmg,R,col)=>{const d=nfDir(sk,A,9);const len=9*(sk.M.radius?1.2:1),s0=P.pos.clone(),end=s0.clone().addScaledVector(d,len);collide(end,.4);const L=s0.distanceTo(end)||.1;
+  const hit=[];for(const en of ENEMIES){if(en.dead)continue;if(nfInSeg(en,s0.x,s0.z,d.x,d.z,L,1.1*R)){hit.push(en);nfHit(en,dmg,sk,{knockFrom:s0.clone()});en.nfCut=time;}}
+  P.dashV.copy(d).multiplyScalar(L/.2);P.dashT=.2;P.invulnT=Math.max(P.invulnT,.3);P.face=Math.atan2(d.x,d.z);P.swingT=.25;
+  const a=new THREE.Vector3(s0.x,1,s0.z),b=new THREE.Vector3(end.x,1,end.z);fxBeam(a,b,col,.35,.5);fxBeam(a,b,WHITE,.22,.14);for(let k=0;k<10;k++){const f=k/10;emit(PUFF,lerp(a.x,b.x,f),rand(.4,1.4),lerp(a.z,b.z,f),0,rand(0,.5),0,col,.45,0,1);}
+  if(hit.length)nfTwist(sk,hit[0].pos,hit.length,dmg,hit[0]);
+  later(.6,()=>{for(const en of hit){if(en.dead)continue;const q=en.pos.clone();fxBurst(q.x,1,q.z,1.2,col,.3,.8);fxSlash(q.x,q.z,rand(0,TAU),1.6,col);nfAoe(q,1.5*R,dmg*.7,sk,{knockFrom:q,noProc:true});}if(hit.length)shake=Math.max(shake,.12);});},
+  sk=>{const t=getTarget(9);return t?'ok':'target';},
+  (sk,m,pr,from)=>{fxBeam(from,new THREE.Vector3(m.x,1,m.z),sk.E.color,.35,.4);});
+// Тотем-турель (вид turret, свой лимит 2)
+nfAct('totem',(sk,A,i,dmg,R,col)=>{let p;if(A)p=P.pos.clone().addScaledVector(A.dir,Math.max(2,A.dist*6));else{const t=getTarget(10);p=t?P.pos.clone().lerp(t.pos,.4):P.pos.clone().addScaledVector(fwd(),2.5);}p.y=0;collide(p,.5);const n0=SUMMONS.length;spawnSummon(sk,{at:p});if(SUMMONS.length>n0)SUMMONS[SUMMONS.length-1].g.position.set(p.x,0,p.z);},
+  sk=>getTarget(10)&&SUMMONS.filter(s=>!s.ghost&&!s.dying&&s.kind==='turret').length<2?'ok':'target',
+  (sk,m,pr)=>{spawnSummon(sk,{ghost:true,cls:pr.cls,at:{x:m.x,z:m.z}});});
+// Стена: поперёк взгляда, враги не проходят, в конце рушится вперёд
+nfAct('wall',(sk,A,i,dmg,R,col)=>{const d=nfDir(sk,A,10),c=A?P.pos.clone().addScaledVector(d,Math.max(2.5,A.dist*sk.F.range)):(()=>{const t=getTarget(12);return t?P.pos.clone().addScaledVector(d,Math.min(6,t.pos.distanceTo(P.pos)*.6)):P.pos.clone().addScaledVector(d,4);})();
+  if(i){const rot=i===1?Math.PI/2:-Math.PI/2;c.addScaledVector(d,1.5);d.applyAxisAngle(v2.set(0,1,0),rot*.5);}c.y=0;
+  const hl=4*(sk.M.radius?1.5:1),px=-d.z,pz=d.x,id=sk.E.id,segs=[],N=8;
+  for(let k=0;k<N;k++){const f=(k+.5)/N*2-1,x=c.x+px*hl*f,z=c.z+pz*hl*f;let m;
+    if(id==='earth'||id==='ice'){m=nfMesh('cone',id==='ice'?ICEC:EARTHC,.85);m.scale.set(.42,1.7+rand(0,.5),.42);m.rotation.set(rand(-.15,.15),rand(0,3),rand(-.15,.15));}
+    else{m=nfMesh('pillar',col,.4);m.scale.set(.45,2.1,.45);}m.position.set(x,0,z);segs.push([m,x,z]);}
+  let t=0,tick=0,fl=0;const last=new Map();fxShock(c.x,c.z,3,col,.4);
+  nfEnt({up(dt){t+=dt;const k=Math.min(1,t*5);for(const [m] of segs){m.scale.y=(id==='earth'||id==='ice'?1.8:2.1)*k;if(id!=='earth'&&id!=='ice')m.material.opacity=.3+.12*Math.sin(time*7+m.position.x);}
+    fl-=dt;if(fl<=0){fl=.3;if(id==='fire'){const s=segs[Math.random()*N|0];fxTongue(s[1],s[2],rand(1.2,2.2),FIREC,.5);}else if(id==='storm'){const a=segs[Math.random()*(N-1)|0],b=segs[segs.indexOf(a)+1];zigzag(new THREE.Vector3(a[1],1.4,a[2]),new THREE.Vector3(b[1],1.4,b[2]),col);}else emit(SPARK,c.x+px*hl*rand(-1,1),rand(.3,2),c.z+pz*hl*rand(-1,1),0,1,0,col,.6,0,1);}
+    tick-=dt;const doT=tick<=0;if(doT)tick=.5;
+    for(const en of ENEMIES){if(en.dead||en.remote)continue;const rx=en.pos.x-c.x,rz=en.pos.z-c.z,al=rx*px+rz*pz;if(Math.abs(al)>hl+en.r*.5)continue;const pe=rx*d.x+rz*d.z,lim=.55+en.r;
+      if(Math.abs(pe)<lim){if(!en.boss){const sgn=pe>=0?1:-1;en.pos.x+=d.x*(sgn*lim-pe);en.pos.z+=d.z*(sgn*lim-pe);}
+        if(doT){const lt=last.get(en)||-9;if(time-lt>.45){last.set(en,time);nfHit(en,dmg,sk,{noKnock:true});}}}}
+    if(t>=5){const f=new THREE.Vector3(c.x+d.x*2,0,c.z+d.z*2);let n=0;for(const en of ENEMIES){if(en.dead)continue;if(nfInSeg(en,c.x-px*hl,c.z-pz*hl,px,pz,hl*2,2.2)){const rx=en.pos.x-c.x,rz=en.pos.z-c.z;if(rx*d.x+rz*d.z>-1){nfHit(en,dmg*2.5,sk,{knockFrom:c.clone()});n++;}}}
+      for(const [,x,z] of segs){shards(sk.e,x,.8,z,3,6);}fxShock(f.x,f.z,4.5,col,.5);puffs(c.x,.5,c.z,col.clone().multiplyScalar(.5),6,2,1);nfTwist(sk,f,n,dmg,nearest(f,4));shake=Math.max(shake,.12);return false;}
+    return true;},end(){for(const [m] of segs)dropMesh(m);}});},
+  sk=>{const t=getTarget(10);return t&&countNear(t.pos,4)>=2?'ok':'target';},
+  (sk,m,pr)=>{fxPillar(m.x,m.z,1,3,sk.E.color,.6);fxShock(m.x,m.z,4,sk.E.color,.5);});
+// Отражение: 2 с всё летящее в тебя — обратно, ударивший вблизи оглушён и получает свой удар
+nfAct('mirror',(sk,A,i,dmg,R,col)=>{const r=1.9*R,m=nfMesh('sphere',col,.0);m.scale.setScalar(r);let t=0;fxShock(P.pos.x,P.pos.z,r+1,col,.4);fxPillar(P.pos.x,P.pos.z,1,3,col,.4);
+  nfEnt({mirror:1,up(dt){t+=dt;m.position.set(P.pos.x,1,P.pos.z);m.rotation.y+=dt*2;m.material.opacity=.16+.06*Math.sin(time*10);return t<2*(sk.M.radius?1.4:1)&&!P.dead;},
+    eproj(p,i){const g=p.o.g;if(Math.hypot(g.position.x-P.pos.x,g.position.z-P.pos.z)>r+.3)return false;
+      const src=p.src&&!p.src.dead?p.src:nearest(P.pos,16);fxBurst(g.position.x,g.position.y,g.position.z,.8,col,.2,.9);colBurst(col,g.position.x,g.position.y,g.position.z,6,4,.3,2);
+      if(src){const dir=new THREE.Vector3(src.pos.x-g.position.x,0,src.pos.z-g.position.z).normalize();spawnProj({pos:g.position.clone(),dir,speed:24,dmg:(p.dmg||10)*2+dmg,el:sk.e,sk,depth:0,target:src,size:.24,range:22,hit:new Set()});}
+      dropProjVis(p.o);EPROJ.splice(i,1);return true;},
+    dmgIn(d,src,o){if(o.dot||o.debt||!src||!src.pos||src.dead)return d;if(Math.hypot(src.pos.x-P.pos.x,src.pos.z-P.pos.z)>4.5)return d;
+      stunEn(src,.8);nfHit(src,d+dmg,sk,{knockFrom:P.pos.clone()});fxBurst(src.pos.x,1,src.pos.z,1,col,.25,.9);fxRing(P.pos.x,P.pos.z,.5,r+.6,col,.3,.8);return 0;},
+    end(){dropMesh(m);}});},
+  ()=>{let n=0;for(const p of EPROJ){const g=p.o.g;if(Math.hypot(g.position.x-P.pos.x,g.position.z-P.pos.z)<7)n++;}return n||countNear(P.pos,3)>=2?'ok':'target';},
+  (sk,m,pr)=>{fxShock(pr.pos.x,pr.pos.z,2.6,sk.E.color,.5);fxBurst(pr.pos.x,1,pr.pos.z,1.8,sk.E.color,.5,.4);});
+// Стазис: купол, в котором время почти стоит
+nfAct('stasis',(sk,A,i,dmg,R,col)=>{const c=nfPt(sk,A,3,7);if(i)c.add(v3.set(rand(-2.5,2.5),0,rand(-2.5,2.5)));const r=5*R;
+  const dm=nfMesh('sphere',col,.0),rn=nfMesh('rune',col,.5);dm.position.set(c.x,0,c.z);dm.scale.set(r,r*.55,r);rn.position.set(c.x,.1,c.z);rn.scale.set(r*.55,1,r*.55);
+  let t=0,tick=0;fxShock(c.x,c.z,r,col,.5);
+  nfEnt({stasis:1,c,r,up(dt){t+=dt;const k=Math.min(1,t*4,(4-t)*4);dm.material.opacity=.15*k;rn.rotation.y+=dt*.3;rn.material.opacity=.45*k;
+    if(Math.random()<.6){const a=rand(0,TAU),q=Math.sqrt(Math.random())*r;emit(SPARK,c.x+Math.cos(a)*q,rand(.2,2.4),c.z+Math.sin(a)*q,rand(-.3,.3),rand(-.1,.2),rand(-.3,.3),col,1.2,0,5);}
+    for(const en of nfFoes(c,r))nfSlow(en,.4);tick-=dt;if(tick<=0){tick=.5;nfAoe(c,r,dmg,sk,{noKnock:true});}
+    if(t>=4){fxShock(c.x,c.z,r,WHITE,.4);return false;}return true;},
+    dmgOut(en,el,o){return o.sk&&Math.hypot(en.pos.x-c.x,en.pos.z-c.z)<r+en.r?1.25:1;},
+    eproj(p,i,dt){const g=p.o.g,inn=Math.hypot(g.position.x-c.x,g.position.z-c.z)<r;if(inn){g.position.addScaledVector(p.dir,-p.speed*dt*.9);p.life+=dt*.9;p.nfSt=1;return false;}
+      if(p.nfSt){colBurst(col,g.position.x,g.position.y,g.position.z,4,2,.3,0);dropProjVis(p.o);EPROJ.splice(i,1);return true;}return false;},
+    end(){dropMesh(dm);dropMesh(rn);}});nfTwist(sk,c,2,dmg,nearest(c,r));},
+  sk=>{const t=getTarget(sk.F.range);return t&&countNear(t.pos,5)>=3?'ok':'target';},
+  (sk,m)=>{fxShock(m.x,m.z,5,sk.E.color,.8);fxRune(m.x,m.z,5,sk.E.color,1.5);});
+// Метка: копит урон по сильнейшему и взрывается
+nfAct('mark',(sk,A,i,dmg,R,col)=>{const tg=A?coneTarget(A.dir,sk.F.range+2,.7)||nfStrong(P.pos,sk.F.range):nfStrong(P.pos,sk.F.range);if(!tg)return;
+  const rg=nfMesh('ring',col,.8),gl=nfMesh('glow',col,.6);let t=0,acc=0;
+  nfEnt({up(dt){t+=dt;const k=1+Math.min(1.5,acc/Math.max(1,dmg*4));rg.position.set(tg.pos.x,(tg.hy||2)+.4,tg.pos.z);rg.scale.set(.6*k,1,.6*k);rg.rotation.y+=dt*3;gl.position.set(tg.pos.x,(tg.hy||2)+.35,tg.pos.z);gl.scale.set(.8*k,1,.8*k);
+    if(tg.dead||t>=5||ENEMIES.indexOf(tg)<0){const q=tg.pos.clone(),dd=acc+dmg;fxPillar(q.x,q.z,1.2*R,8,col,.5);fxShock(q.x,q.z,4*R,col,.6);fxBurst(q.x,1,q.z,2.4*R,col,.35,.8);elBurst(sk.e,q.x,.8,q.z,22);
+      later(0,()=>{nfAoe(q,4*R,dd,sk,{knockFrom:q,noProc:true});nfTwist(sk,q,3,dd,null);});float({x:q.x,y:3,z:q.z},'Метка: '+Math.round(dd),sk.E.hex,16);return false;}return true;},
+    hit(en,d,el,o){if(en===tg&&!o.nfMark)acc+=d*.3;},end(){dropMesh(rg);dropMesh(gl);}});fxRing(tg.pos.x,tg.pos.z,.4,2,col,.4);},null,
+  (sk,m)=>{fxPillar(m.x,m.z,.5,6,sk.E.color,.6);});
+// Разлом: волна по земле, подбрасывает, за ней трещина
+nfAct('quake',(sk,A,i,dmg,R,col)=>{const d=nfDir(sk,A,12);if(i)d.applyAxisAngle(v2.set(0,1,0),i===1?.3:-.3);const s0=P.pos.clone(),len=12*(sk.M.radius?1.3:1),hw=1.25*R,hit=new Set();let t=0,sp=0,zn=0;const ex=sk.E.id==='earth'||sk.E.id==='ice';
+  nfEnt({up(dt){t+=dt;const fr=Math.min(len,len*t/.6);
+    while(sp<fr&&sp<len){const x=s0.x+d.x*sp,z=s0.z+d.z*sp;if(ex||HQ())spikeAt(x+rand(-.4,.4),z+rand(-.4,.4),ex&&sk.E.id==='ice'?ICEC:ex?EARTHC:col,rand(.2,.3)*R,rand(.7,1.2));else fxGlow(x,z,1,col,.3,.7);
+      if(sk.E.id==='fire')fxTongue(x,z,1.4,FIREC,.45);puffs(x,.3,z,C_DUST,1,1.2,.6);sp+=1.5;}
+    while(zn<fr-1&&zn<len){addZone(s0.x+d.x*(zn+2),s0.z+d.z*(zn+2),1.3*R,3,sk.e,dmg*.3,sk);zn+=4;}
+    for(const en of ENEMIES){if(en.dead||hit.has(en))continue;const rx=en.pos.x-s0.x,rz=en.pos.z-s0.z,al=rx*d.x+rz*d.z;if(al<0||al>fr+en.r)continue;if(Math.abs(rx*d.z-rz*d.x)>hw+en.r)continue;
+      hit.add(en);nfHit(en,dmg,sk,{stunX:.5,noKnock:true});shards(sk.e,en.pos.x,.5,en.pos.z,3,5);if(hit.size===1)nfTwist(sk,en.pos,1,dmg,en);}
+    return t<.65;}});shake=Math.max(shake,.1);},null,
+  (sk,m,pr)=>{const a=new THREE.Vector3(pr.pos.x,.3,pr.pos.z),b=new THREE.Vector3(m.x,.3,m.z);fxBeam(a,b,sk.E.color,.5,.6);});
+// Прыжок по дуге
+nfAct('leap',(sk,A,i,dmg,R,col,cl)=>{if(cl)return;const t0=A?null:getTarget(12);let e;if(A)e=P.pos.clone().addScaledVector(A.dir,Math.max(2,A.dist*sk.F.range));else if(t0){const dd=t0.pos.distanceTo(P.pos);e=P.pos.clone().lerp(t0.pos,Math.max(0,(dd-1.2)/dd));}else e=P.pos.clone().addScaledVector(fwd(),6);
+  const s0=P.pos.clone();if(e.distanceTo(s0)>10)e=s0.clone().add(e.sub(s0).setLength(10));e.y=0;collide(e,.4);let t=0;const T=.45;
+  if(i){later(.45+i*.15,()=>{nfAoe(P.pos,3.5*R,dmg*.6,sk,{knockFrom:P.pos.clone(),stunX:.3});fxShock(P.pos.x,P.pos.z,3*R,col,.4);});return;}
+  P.face=Math.atan2(e.x-s0.x,e.z-s0.z);
+  nfEnt({up(dt){t+=dt;const k=Math.min(1,t/T);P.pos.set(lerp(s0.x,e.x,k),0,lerp(s0.z,e.z,k));P.prev.copy(P.pos);NFS.heroY=Math.sin(k*Math.PI)*2.4;P.invulnT=Math.max(P.invulnT,.1);P.swingT=.25;
+    if(Math.random()<.7)emit(PUFF,P.pos.x,NFS.heroY+.6,P.pos.z,0,0,0,col,.4,0,1);
+    if(k>=1){NFS.heroY=0;const q=P.pos.clone();nfAoe(q,3.5*R,dmg,sk,{knockFrom:q,stunX:.6});fxShock(q.x,q.z,3.8*R,col,.55);fxBurst(q.x,.5,q.z,2.2*R,col,.3,.6);
+      if(sk.E.id==='earth'||sk.E.id==='ice'){for(let j=0;j<7;j++){const a=j/7*TAU;spikeAt(q.x+Math.cos(a)*2*R,q.z+Math.sin(a)*2*R,sk.E.id==='ice'?ICEC:EARTHC,.28,1.1);}}else puffs(q.x,.3,q.z,C_DUST,6,2,.9);
+      elBurst(sk.e,q.x,.4,q.z,20);nfTwist(sk,q,3,dmg,nearest(q,3.5));shake=Math.max(shake,.3);return false;}return true;},end(){NFS.heroY=0;}});},
+  sk=>{const t=getTarget(10);return t&&t.pos.distanceTo(P.pos)>3?'ok':'target';},
+  (sk,m,pr)=>{fxShock(m.x,m.z,3.5,sk.E.color,.6);puffs(m.x,.3,m.z,C_DUST,5,2,.8);});
+// Крюк: притягивает первого врага (к боссу тянет тебя)
+nfAct('hook',(sk,A,i,dmg,R,col)=>{const d=nfDir(sk,A,12);if(i)d.applyAxisAngle(v2.set(0,1,0),i===1?.25:-.25);const hd=nfMesh('sphere',col,.95),ch=nfMesh('beam',col,.75);hd.scale.setScalar(.22);
+  const p=new THREE.Vector3(P.pos.x,1.1,P.pos.z),len=12*(sk.M.radius?1.3:1);let dist=0,tg=null,pt=0,back=false;const from=new THREE.Vector3();
+  nfEnt({up(dt){from.set(P.pos.x,1.1,P.pos.z);
+    if(!tg&&!back){const st=34*dt;p.addScaledVector(d,st);dist+=st;for(const en of ENEMIES){if(en.dead)continue;if(Math.hypot(en.pos.x-p.x,en.pos.z-p.z)<en.r+.5*R){tg=en;break;}}
+      if(tg){nfHit(tg,dmg,sk,{noKnock:true});stunEn(tg,.6+.25);fxBurst(tg.pos.x,1,tg.pos.z,.8,col,.2,.8);nfTwist(sk,tg.pos,1,dmg,tg);}else if(dist>len)back=true;}
+    else if(tg){pt+=dt;const k=Math.min(1,pt/.25);if(tg.boss||tg.remote){const q=tg.pos.clone();v1.set(q.x-P.pos.x,0,q.z-P.pos.z);const L=v1.length();if(L>tg.r+1){P.pos.addScaledVector(v1.normalize(),Math.min(L-tg.r-1,dt*30));P.prev.copy(P.pos);}}
+      else{const gx=P.pos.x+(tg.pos.x-P.pos.x)/Math.max(.1,tg.pos.distanceTo(P.pos))*(1.4+tg.r),gz=P.pos.z+(tg.pos.z-P.pos.z)/Math.max(.1,tg.pos.distanceTo(P.pos))*(1.4+tg.r);tg.pos.x=lerp(tg.pos.x,gx,Math.min(1,dt*14));tg.pos.z=lerp(tg.pos.z,gz,Math.min(1,dt*14));}
+      p.set(tg.pos.x,1.1,tg.pos.z);if(k>=1||tg.dead)return false;}
+    else{v1.set(from.x-p.x,0,from.z-p.z);const L=v1.length();if(L<1)return false;p.addScaledVector(v1.normalize(),Math.min(L,40*dt));}
+    hd.position.copy(p);ch.position.copy(from).add(p).multiplyScalar(.5);ch.lookAt(p);ch.scale.set(.07,.07,Math.max(.1,from.distanceTo(p)));emit(SPARK,p.x,p.y,p.z,0,0,0,col,.25,0,0);return true;},
+    end(){dropMesh(hd);dropMesh(ch);}});},null,
+  (sk,m,pr,from)=>{fxBeam(from,new THREE.Vector3(m.x,1.1,m.z),sk.E.color,.3,.08);});
+// Веер: дробь короткими снарядами
+nfAct('fan',(sk,A,i,dmg,R,col)=>{const d=nfDir(sk,A,8),n=7,spread=70*Math.PI/180*(sk.M.radius?1.2:1);for(let k=0;k<n;k++){const a=(k/(n-1)-.5)*spread+(i?rand(-.08,.08):0),dd=d.clone().applyAxisAngle(v2.set(0,1,0),a);
+  makeBolt(sk,new THREE.Vector3(P.pos.x,1.2,P.pos.z).addScaledVector(dd,.5),dd,null,dmg,1,{range:7*(sk.E.id==='wind'?1.2:1),size:.16,mini:true,speed:26});}
+  fxFan(P.pos.x,P.pos.z,Math.atan2(d.z,d.x),3,col,.25);const t=getTarget(7);if(t)nfTwist(sk,t.pos,2,dmg,t);},
+  sk=>getTarget(7)?'ok':'target',
+  (sk,m,pr)=>{fxFan(pr.pos.x,pr.pos.z,Math.atan2(m.z-pr.pos.z,m.x-pr.pos.x),5,sk.E.color,.3);});
+// виды призывов новых форм: приманка, турель, тень павшего
+Object.assign(SKIND,{
+  decoy:{n:1,hp:.3,spd:0,reach:0,cd:99,life:5,sz:1,fr:0,tau:1,own:1,lim:1,name:el=>'Приманка',d:'двойник перетягивает врагов на себя и взрывается',b:(sk,cx)=>bClone(sk,cx)},
+  turret:{n:1,hp:.5,spd:0,reach:10,cd:.7,life:12,sz:1,fr:0,ct:1,own:1,lim:2,name:el=>'Тотем',d:'стоит и стреляет снарядами стихии',b:sk=>bTotem(sk,0)},
+  thrall:{n:1,hp:.4,spd:5.8,reach:1.4,cd:.8,life:8,sz:1,fr:3,ct:1,own:1,lim:3,name:el=>'Тень павшего',d:'павший враг дерётся за тебя',b:sk=>bSkel(sk,0)}});
+UP.decoy=function(s,dt){s.mv=false;s.ab-=dt;if(s.ab<=0){s.ab=1;taunt(s,9,1.2);}if(Math.random()<.35)emit(SPARK,s.g.position.x+rand(-.4,.4),rand(.5,2),s.g.position.z+rand(-.4,.4),0,.6,0,s.col,.5,0,1);};
+UP.turret=function(s,dt,tg){s.mv=false;const p=s.g.position;if(!tg||Math.hypot(tg.pos.x-p.x,tg.pos.z-p.z)>10.5||s.atkCd>0)return;s.atkCd=s.def.cd*s.cdk;s.at=1;s.face=Math.atan2(tg.pos.x-p.x,tg.pos.z-p.z);
+  const from=new THREE.Vector3(p.x,2.2,p.z),dir=new THREE.Vector3(tg.pos.x-p.x,0,tg.pos.z-p.z).normalize();fxGlow(p.x,p.z,1,s.col,.15,.6);
+  if(s.ghost)fxBeam(from,new THREE.Vector3(tg.pos.x,1.1,tg.pos.z),s.col,.14,.08);else makeBolt(s.sk,from,dir,tg,s.dmg,1,{size:.22,range:14});};
+UP.thrall=function(s,dt,tg){aiMelee(s,dt,tg,(s,t)=>{sHitFx(s,t,0);sdmg(s,t,1);});if(Math.random()<.25)emit(PUFF,s.g.position.x,rand(.3,1.6),s.g.position.z,0,.4,0,s.col,.6,0,1);};
+// ---------- /общие активные ----------
+// ---------- общие пассивки (DESIGN-obraz 5А): у каждой свой повод, свой исход и свой вид ----------
+// агент пассивки a={sk,st,R,cd}: st — состояние, R — радиус (Размах), cd — множитель таймеров (Спешка)
+function nfCdK(sk){return sk.M.cd||1;}
+function nfDot(x,y,z,col,n){for(let k=0;k<n;k++)emit(SPARK,x+rand(-.15,.15),y,z+rand(-.15,.15),0,.2,0,col,.25,0,1);}
+function nfPip(a,n,mx,col){if(Math.random()>.45)return;for(let k=0;k<n;k++){const an=k/mx*TAU+time*.8;emit(SPARK,P.pos.x+Math.cos(an)*.75,.12,P.pos.z+Math.sin(an)*.75,0,.15,0,col,.22,0,1);}}
+function nfNoP(o){return o.np||o.dot||o.link||(o.depth|0)>1;}
+// Ореол: растёт с числом врагов внутри
+NFP.aura={build(a){a.m=nfMesh('ring',a.sk.E.color,.3);a.t=rand(0,.5);a.r=3;},drop(a){dropMesh(a.m);},
+  tick(a,dt){const sk=a.sk,n=countNear(P.pos,a.r*a.R);const tr=Math.min(6,3+.4*n)*a.R;a.r+=(tr/a.R-a.r)*Math.min(1,dt*3);a.m.position.set(P.pos.x,.09,P.pos.z);a.m.scale.set(a.r*a.R,1,a.r*a.R);a.m.rotation.y+=dt*.8;a.m.material.opacity=.22+Math.min(.45,n*.05)+.06*Math.sin(time*4);
+    a.t-=dt;if(a.t<=0){a.t+=1*nfCdK(sk);if(n){const d=skDmg(sk)*Math.min(2,1+.1*n);multi(sk,()=>nfAoe(P.pos,a.r*a.R,d,sk,{depth:1,np:1,noKnock:true}));if(FX.length<110)fxRing(P.pos.x,P.pos.z,a.r*a.R*.4,a.r*a.R,sk.E.color,.4,.25);}}},
+  hud(a){return null;}};
+// Стражи: три сферы сами срываются в подошедшего врага
+NFP.orbit={build(a){const n=3+(a.sk.M.count?2:0)+ST.orbitN;a.o=[];for(let k=0;k<n;k++){const m=nfMesh('sphere',a.sk.E.color.clone().lerp(WHITE,.25),.9);m.scale.setScalar(.2);a.o.push({m,rdy:1,g:0,f:null,ft:0,fx:0,fz:0});}},
+  drop(a){for(const o of a.o)dropMesh(o.m);},
+  tick(a,dt){const sk=a.sk,n=a.o.length,sp=sk.M.cd?3.6:2.4;let k=0;
+    for(const o of a.o){const an=time*sp+k*TAU/n,ox=P.pos.x+Math.cos(an)*1.7,oz=P.pos.z+Math.sin(an)*1.7;k++;
+      if(o.f){o.ft+=dt*3.3;const q=Math.min(1,o.ft),tx=o.f.pos.x,tz=o.f.pos.z;o.m.position.set(lerp(o.fx,tx,q),1.1+Math.sin(q*Math.PI)*1.5,lerp(o.fz,tz,q));emit(SPARK,o.m.position.x,o.m.position.y,o.m.position.z,0,0,0,sk.E.color,.3,0,0);
+        if(q>=1){const p=new THREE.Vector3(tx,0,tz);multi(sk,()=>nfAoe(p,2*a.R,skDmg(sk),sk,{depth:1,np:1,knockFrom:p}));fxBurst(tx,1,tz,1.3*a.R,sk.E.color,.25,.8);elBurst(sk.e,tx,1,tz,8);o.f=null;o.rdy=0;o.g=0;}continue;}
+      if(!o.rdy){o.g+=dt/(4*nfCdK(sk));o.m.scale.setScalar(.2*Math.min(1,o.g));if(o.g>=1)o.rdy=1;}
+      o.m.position.set(ox,1.1+Math.sin(time*3+k)*.15,oz);
+      if(o.rdy){const e=nearest(P.pos,3*a.R);if(e&&!a.o.some(x=>x.f===e)){o.f=e;o.ft=0;o.fx=ox;o.fz=oz;}}}},
+  hud(a){return {v:a.o.filter(o=>o.rdy&&!o.f).length};}};
+// Сцепка: два ближайших врага скованы цепью
+NFP.link={build(a){a.m=nfMesh('beam',a.sk.E.color,.6);a.m.visible=false;a.t=0;a.p=null;a.fl=0;},drop(a){dropMesh(a.m);},
+  tick(a,dt){a.t-=dt;if(a.t<=0||!a.p||a.p[0].dead||a.p[1].dead){a.t=.3;const L=nearestN(P.pos,10*a.R,2);a.p=L.length===2?L:null;}
+    if(a.p){const A_=a.p[0].pos,B=a.p[1].pos;a.m.visible=true;a.m.position.set((A_.x+B.x)/2,1.1,(A_.z+B.z)/2);a.m.lookAt(B.x,1.1,B.z);const w=.06+(a.fl>0?.08:0);a.m.scale.set(w,w,Math.max(.1,A_.distanceTo(B)));a.fl-=dt;a.m.material.opacity=.45+.25*Math.sin(time*12);}else a.m.visible=false;},
+  hit(a,en,d,el,o){if(!a.p||o.link||o.dot||d<1)return;const i=a.p.indexOf(en);if(i<0)return;const ot=a.p[1-i];if(ot.dead)return;a.fl=.12;
+    later(0,()=>dealDamage(ot,d*.4,a.sk.e,{sk:a.sk,depth:2,link:1,np:1,noKnock:true,noReact:true}));const m=a.m.position;emit(SPARK,m.x,1.1,m.z,rand(-2,2),1,rand(-2,2),a.sk.E.color,.3,0,1);}};
+// Клинки за спиной: растут по одному, все четыре летят в разных врагов
+NFP.volley={build(a){a.n=0;a.t=0;a.mx=a.sk.M.count?6:4;a.b=[];for(let k=0;k<a.mx;k++){const m=nfMesh('beam',a.sk.E.color.clone().lerp(WHITE,.3),.85);m.visible=false;a.b.push(m);}},drop(a){for(const m of a.b)dropMesh(m);},
+  tick(a,dt){const sk=a.sk;if(a.n<a.mx){a.t+=dt;if(a.t>=1.25*nfCdK(sk)){a.t=0;a.n++;}}
+    const f=P.face,bx=-Math.sin(f),bz=-Math.cos(f);
+    for(let k=0;k<a.mx;k++){const m=a.b[k];m.visible=k<a.n;if(!m.visible)continue;const an=f+Math.PI+(k-(a.mx-1)/2)*.42,x=P.pos.x+bx*.55+Math.sin(an)*.25,z=P.pos.z+bz*.55+Math.cos(an)*.25;
+      m.position.set(x,1.5+Math.cos((k-(a.mx-1)/2)*.42)*.45,z);m.rotation.set(0,an,(k-(a.mx-1)/2)*.42);m.scale.set(.06,.75,.12);}
+    if(a.n>=a.mx){const L=nearestN(P.pos,14,a.mx);if(L.length){a.n=0;for(let k=0;k<a.mx;k++){const e=L[k%L.length],m=a.b[k],from=m.position.clone(),dir=new THREE.Vector3(e.pos.x-from.x,0,e.pos.z-from.z).normalize();
+      later(k*.06,()=>{makeBolt(sk,from,dir,e,skDmg(sk)*(sk.M.echo?.6:1),a.R>1?1.4:1,{size:.2,range:18,mini:true,speed:30,depth:1});});}
+      if(sk.M.echo)later(.6,()=>{for(const e of nearestN(P.pos,14,a.mx))makeBolt(sk,new THREE.Vector3(P.pos.x,1.5,P.pos.z),new THREE.Vector3(e.pos.x-P.pos.x,0,e.pos.z-P.pos.z).normalize(),e,skDmg(sk)*.6,1,{size:.18,range:18,mini:true,depth:1});});
+      fxGlow(P.pos.x,P.pos.z,1.4,sk.E.color,.2,.6);}}},
+  hud(a){return {v:a.n,mx:a.mx};}};
+// Оберег: забирает первый удар целиком и разлетается осколками
+NFP.ward={build(a){a.m=nfMesh('rune',a.sk.E.color,.8);a.m.scale.set(.45,1,.45);a.t=0;a.rdy=1;},drop(a){dropMesh(a.m);},
+  tick(a,dt){const f=P.face;a.m.position.set(P.pos.x+Math.cos(f)*.6,2.3,P.pos.z-Math.sin(f)*.6);a.m.rotation.y+=dt*1.5;a.m.visible=!!a.rdy;
+    if(!a.rdy){a.t-=dt;if(a.t<=0){a.rdy=1;fxGlow(P.pos.x,P.pos.z,1.2,a.sk.E.color,.3,.6);}}else a.m.material.opacity=.6+.25*Math.sin(time*5);},
+  dmgIn(a,d,src,o){if(!a.rdy||o.dot||o.debt)return d;a.rdy=0;a.t=8*nfCdK(a.sk);const sk=a.sk,p=a.m.position.clone();
+    const L=nearestN(P.pos,12,5);for(let k=0;k<5;k++){const e=L[k%Math.max(1,L.length)],an=k/5*TAU,dir=e?new THREE.Vector3(e.pos.x-p.x,0,e.pos.z-p.z).normalize():new THREE.Vector3(Math.cos(an),0,Math.sin(an));
+      makeBolt(sk,p.clone(),dir,e||null,skDmg(sk),1,{size:.16,range:12,mini:true,speed:26,depth:1});}
+    fxBurst(p.x,p.y,p.z,1,sk.E.color,.25,.9);shards(sk.e,p.x,p.y,p.z,8,6);float(P.pos,'Оберег','#cfe0ff',14);return 0;},
+  hud(a){return a.rdy?{v:'✓'}:{t:1-a.t/(8*nfCdK(a.sk))};}};
+// Отбойник: снаряд врага разворачивается в стрелка
+NFP.deflect={build(a){a.t=0;a.rdy=1;a.sh=0;},
+  tick(a,dt){if(!a.rdy){a.t-=dt;if(a.t<=0)a.rdy=1;}else{a.sh-=dt;if(a.sh<=0){a.sh=2;fx('ring',a.sk.E.color,.35,m=>{m.position.set(P.pos.x,1,P.pos.z);m.scale.set(.9,1,.9);m.rotation.x=0;},(m,k)=>{m.position.set(P.pos.x,1,P.pos.z);m.scale.set(.9+k*.5,1,.9+k*.5);m.material.opacity=.6*(1-k);});}}},
+  eproj(a,p,i){if(!a.rdy)return false;const g=p.o.g;if(Math.hypot(g.position.x-P.pos.x,g.position.z-P.pos.z)>1.3)return false;
+    a.rdy=0;a.t=6*nfCdK(a.sk);const sk=a.sk,src=p.src&&!p.src.dead?p.src:nearest(P.pos,16);fxBurst(g.position.x,g.position.y,g.position.z,.9,WHITE,.2,1);colBurst(sk.E.color,g.position.x,g.position.y,g.position.z,10,5,.3,2);
+    if(src){const dir=new THREE.Vector3(src.pos.x-g.position.x,0,src.pos.z-g.position.z).normalize();spawnProj({pos:g.position.clone(),dir,speed:26,dmg:(p.dmg||10)*2+skDmg(sk),el:sk.e,sk,depth:1,target:src,size:.26,range:24,hit:new Set()});}
+    dropProjVis(p.o);EPROJ.splice(i,1);float(P.pos,'Отбит!','#dfe8ff',13);return true;},
+  hud(a){return a.rdy?{v:'✓'}:{t:1-a.t/(6*nfCdK(a.sk))};}};
+// Перегрев: каждая чара — деление, на полной следующая чара почти вдвое сильнее
+NFP.surge={build(a){a.n=0;a.mx=a.sk.M.cd?3:4;a.bs=-1;a.bt=0;},
+  tick(a,dt){if(a.n>=a.mx){if(Math.random()<.5)heroColor(a.sk.E.color);if(Math.random()<.4)emit(SPARK,P.pos.x+rand(-.4,.4),rand(.3,1.8),P.pos.z+rand(-.4,.4),0,1.2,0,a.sk.E.color,.5,-1,1);}else nfPip(a,a.n,a.mx,a.sk.E.color);},
+  cast(a,sk){if(a.n>=a.mx){a.n=0;a.bs=sk.id;a.bt=time+2.5;fxShock(P.pos.x,P.pos.z,3,a.sk.E.color,.4);mpPE('s',a.sk.id,P.pos.x,P.pos.z,3);}else{a.n++;if(a.n>=a.mx){fxPillar(P.pos.x,P.pos.z,.7,3,a.sk.E.color,.4);float(P.pos,'Перегрев!',a.sk.E.hex,14);}}},
+  dmgOut(a,en,el,o){return o.sk&&o.sk.id===a.bs&&time<a.bt?1+.8*(a.sk.M.dmg||1)*(a.sk.M.count?1.15:1):1;},
+  hud(a){return {v:a.n,mx:a.mx};}};
+// Двойник: каждую пятую чару повторяет призрачный двойник
+NFP.twin={build(a){a.n=0;a.mx=a.sk.M.cd?4:5;},
+  cast(a,sk,A){if(NFS.inTwin||!(NF_TWIN_OK[sk.F.id]||sk.F.cl))return;a.n++;if(a.n<a.mx)return;a.n=0;const side=rand(0,1)<.5?1:-1,f=P.face,x=P.pos.x+Math.cos(f)*1.6*side,z=P.pos.z-Math.sin(f)*1.6*side;
+    const md=takeModel('twin|'+CLS.id,()=>bClone(a.sk,CLS.id));md.g.position.set(x,0,z);md.g.rotation.y=P.face;md.g.scale.setScalar(.95);scene.add(md.g);fxPillar(x,z,.6,2.6,a.sk.E.color,.4);
+    const go=()=>{const op=P.pos.clone(),of=P.face,ot=target;P.pos.set(x,0,z);NFS.inTwin=1;try{cast(sk,A,true);if(a.sk.M.count)later(.25,()=>{const o2=P.pos.clone();P.pos.set(x,0,z);NFS.inTwin=1;try{cast(sk,A,true);}finally{P.pos.copy(o2);NFS.inTwin=0;}});}finally{P.pos.copy(op);P.face=of;target=ot;NFS.inTwin=0;}};
+    later(.3,go);let t=0;nfEnt({up(dt){t+=dt;md.g.position.y=Math.sin(t*6)*.05;if(t>.9){md.g.scale.setScalar(Math.max(.01,.95*(1.3-t)/.4));}if(Math.random()<.4)emit(PUFF,x,rand(.4,1.8),z,0,.4,0,a.sk.E.color,.5,0,1);return t<1.3;},
+      end(){scene.remove(md.g);(SPOOL['twin|'+CLS.id]||(SPOOL['twin|'+CLS.id]=[])).push(md);}});},
+  hud(a){return {v:a.n,mx:a.mx};}};
+// Клеймо: пятый знак взрывает врага и раскидывает знаки по соседям
+function nfBrandAdd(a,en,n){if(en.dead)return;const b=en.nfBr&&time<en.nfBr.t?en.nfBr:(en.nfBr={n:0,t:0});b.n+=n;b.t=time+5;b.sk=a.sk;
+  if(b.n>=5&&procBudget>0){procBudget--;b.n=0;b.t=0;const sk=a.sk,p=en.pos.clone(),R=2.5*a.R;later(.05,()=>{multi(sk,()=>nfAoe(p,R,skDmg(sk),sk,{depth:1,np:1,knockFrom:p}));fxRune(p.x,p.z,R*1.2,sk.E.color,.6);fxBurst(p.x,1,p.z,R*.7,sk.E.color,.3,.85);elBurst(sk.e,p.x,1,p.z,12);
+    for(const o of nfFoes(p,R+1.5,en))nfBrandAdd(a,o,1);});mpPE('b',sk.id,p.x,p.z,R);}}
+NFP.brand={build(a){a.v=0;},tick(a,dt){a.v-=dt;if(a.v>0)return;a.v=.2;let c=0;for(const en of ENEMIES){if(c>=10)break;const b=en.nfBr;if(en.dead||!b||b.n<1||time>b.t||b.sk!==a.sk)continue;c++;
+    for(let k=0;k<b.n;k++){const an=k/5*TAU+time*2;emit(SPARK,en.pos.x+Math.cos(an)*.55,(en.hy||2)+.2,en.pos.z+Math.sin(an)*.55,0,.1,0,a.sk.E.color,.22,0,0);}}},
+  hit(a,en,d,el,o){if(nfNoP(o))return;nfBrandAdd(a,en,a.sk.M.count&&Math.random()<.35?2:1);}};
+// Таран: каждый третий удар вблизи отбрасывает врага в его соседей
+NFP.combo={build(a){a.n=0;a.mx=a.sk.M.cd?2:3;},
+  tick(a,dt){nfPip(a,a.n,a.mx,a.sk.E.color);const f=a.fly;if(f){f.t-=dt;if(f.t<=0||f.e.dead){a.fly=null;return;}emit(PUFF,f.e.pos.x,.6,f.e.pos.z,0,.5,0,C_DUST,.5,0,1);
+    for(const o of nfFoes(f.e.pos,.9,f.e)){if(f.h.has(o))continue;f.h.add(o);nfHit(o,f.d*.5,a.sk,{np:1,depth:1,stunX:.6,knockFrom:f.e.pos.clone()});fxBurst(o.pos.x,1,o.pos.z,.8,a.sk.E.color,.2,.7);}}},
+  hit(a,en,d,el,o){if(nfNoP(o)||o.splash)return;const near=Math.hypot(en.pos.x-P.pos.x,en.pos.z-P.pos.z)<4.2;if(!near||!(o.basic||o.sk&&o.sk.active))return;if(a.lt===time)return;a.lt=time;a.n++;if(a.n<a.mx)return;a.n=0;
+    if(en.boss)return;v1.set(en.pos.x-P.pos.x,0,en.pos.z-P.pos.z).normalize();en.kb.addScaledVector(v1,22/(en.mass||1));stunEn(en,.5);a.fly={e:en,t:.45,h:new Set([en]),d:Math.max(d,skDmg(a.sk))};
+    fxSlash(en.pos.x,en.pos.z,Math.atan2(v1.z,v1.x),2.2,a.sk.E.color);shake=Math.max(shake,.1);float({x:en.pos.x,y:2.4,z:en.pos.z},'Таран','#ffd0a0',13);},
+  hud(a){return {v:a.n,mx:a.mx};}};
+// Батарея: полная — кнопка-молния, разряд по всем вокруг
+NFP.battery={build(a){a.c=0;a.cap=0;a.cpT=0;},
+  tick(a,dt){a.cpT-=dt;if(a.cpT<=0){a.cpT=2;a.cap=Math.max(60,buildPower().all*13*(a.sk.M.cd?.7:1));}
+    if(a.c>=a.cap){if(Math.random()<.5){const an=rand(0,TAU);emit(SPARK,P.pos.x+Math.cos(an)*.8,rand(.4,2),P.pos.z+Math.sin(an)*.8,0,1,0,a.sk.E.color,.3,0,1);}
+      if(S.auto&&(countNear(P.pos,10)>=6||(BOSS&&!BOSS.dead&&BOSS.pos.distanceTo(P.pos)<14)))nfBattery(a);}},
+  hit(a,en,d,el,o){if(o.np||o.battery)return;if(a.c<a.cap)a.c=Math.min(a.cap,a.c+d);},
+  hud(a){return {t:a.cap?a.c/a.cap:0,btn:a.c>=a.cap&&a.cap>0};}};
+function nfBattery(a){if(!a||a.c<a.cap||!a.cap)return;a.c=0;const sk=a.sk,R=10*a.R,from=new THREE.Vector3(P.pos.x,1.3,P.pos.z);fxBurst(P.pos.x,1,P.pos.z,R*.5,sk.E.color,.35,.7);fxShock(P.pos.x,P.pos.z,R,sk.E.color,.5);fxGlow(P.pos.x,P.pos.z,R*.8,WHITE,.3,.6);
+  let n=0;for(const en of nfFoes(P.pos,R)){if(n<12)zigzag(from,new THREE.Vector3(en.pos.x,1,en.pos.z),sk.E.color);n++;nfHit(en,skDmg(sk),sk,{np:1,battery:1,stunX:.5,knockFrom:P.pos.clone()});}
+  shake=Math.max(shake,.25);float(P.pos,'Разряд!',sk.E.hex,17);mpPE('s',sk.id,P.pos.x,P.pos.z,R);}
+// Провал: крит открывает под врагом чёрную воронку
+NFP.rift={build(a){a.cd=0;},tick(a,dt){a.cd-=dt;},
+  hit(a,en,d,el,o,crit){if(!crit||a.cd>0||nfNoP(o))return;a.cd=1.5*nfCdK(a.sk);const sk=a.sk,c=en.pos.clone(),r=3.5*a.R,dk=nfMesh('disc',new THREE.Color(0x0a0612),.0),rg=nfMesh('ring2',sk.E.color,.6);
+    dk.material.blending=THREE.NormalBlending;dk.position.set(c.x,.07,c.z);rg.position.set(c.x,.08,c.z);let t=0;
+    nfEnt({up(dt){t+=dt;const k=Math.min(1,t*5);dk.scale.set(r*.7*k,1,r*.7*k);dk.material.opacity=.6*k;rg.scale.set(r*k,1,r*k);rg.rotation.y+=dt*6;
+      for(let q=0;q<2;q++){const an=rand(0,TAU),rr=r*rand(.6,1);emit(SPARK,c.x+Math.cos(an)*rr,.4,c.z+Math.sin(an)*rr,-Math.cos(an)*rr*2,.2,-Math.sin(an)*rr*2,sk.E.color,.45,0,0);}
+      for(const e of nfFoes(c,r)){if(e.boss||e.remote)continue;const dx=c.x-e.pos.x,dz=c.z-e.pos.z,L=Math.hypot(dx,dz);if(L>.4){e.pos.x+=dx/L*Math.min(L,5*dt);e.pos.z+=dz/L*Math.min(L,5*dt);}}
+      if(t>=1){multi(sk,()=>nfAoe(c,r*.8,skDmg(sk),sk,{np:1,depth:1,knockFrom:c}));fxShock(c.x,c.z,r,sk.E.color,.4);fxBurst(c.x,.6,c.z,r*.5,sk.E.color,.3,.8);return false;}return true;},
+      end(){dk.material.blending=THREE.AdditiveBlending;dropMesh(dk);dropMesh(rg);}});},
+  hud(a){return a.cd>0?{t:1-a.cd/(1.5*nfCdK(a.sk))}:null;}};
+// Цепная детонация: взрыв убитого добивает соседа — взрывается и он
+NFP.doom={kill(a,en,el,o,lo){if(procBudget<=0)return;const k=lo&&lo.chainS===a.sk.id?(lo.chainK|0):0;if(k>=6)return;procBudget--;const sk=a.sk,p=en.pos.clone(),R=3*a.R,d=skDmg(sk)*(1+.15*k);
+    later(k?.15:0,()=>{multi(sk,()=>nfAoe(p,R,d,sk,{depth:1,np:1,chainS:sk.id,chainK:k+1,knockFrom:p}));fxBurst(p.x,1,p.z,R*.7,sk.E.color,.35,.85);fxRing(p.x,p.z,.4,R+.4,sk.E.color,.4);elBurst(sk.e,p.x,.8,p.z,12);
+      if(k)float({x:p.x,y:2.6,z:p.z},'×'+(k+1),sk.E.hex,15+k);});mpPE('d',sk.id,p.x,p.z,R);}};
+// Свита павших: каждый пятый убитый встаёт тенью на твою сторону
+NFP.thrall={build(a){a.n=0;a.mx=a.sk.M.cd?4:5;},
+  kill(a,en){if(en.boss||en.elite||en.champ)return;a.n++;if(a.n<a.mx)return;a.n=0;const x=en.pos.x,z=en.pos.z;fxDisc(x,z,1.4,new THREE.Color(0x2a1840),.8,.6);
+    const fk=Object.create(a.sk);fk.kindO='thrall';later(.25,()=>{const n0=SUMMONS.length;spawnSummon(fk,{at:{x,z}});const s=SUMMONS[SUMMONS.length-1];if(SUMMONS.length>n0&&s){s.g.position.set(x,0,z);}});
+    fxPillar(x,z,.6,3,a.sk.E.color,.5);puffs(x,.3,z,new THREE.Color(0x221133),6,1.2,1);},
+  hud(a){return {v:a.n,mx:a.mx};}};
+// Искры жизни: убитые роняют искры, они летят к тебе
+NFP.harvest={kill(a,en){const sk=a.sk,n=(sk.M.count?3:1)+(en.elite||en.boss?2:0)+(Math.random()<.5?1:0);if(((NFS.hv|0))>16)return;
+    for(let k=0;k<n;k++){const p=new THREE.Vector3(en.pos.x,1,en.pos.z),v=new THREE.Vector3(rand(-3,3),rand(4,6),rand(-3,3));let t=0;NFS.hv=(NFS.hv|0)+1;
+      nfEnt({up(dt){t+=dt;if(t>.35){v1.set(P.pos.x-p.x,1.2-p.y,P.pos.z-p.z);const L=v1.length();if(L<.7){heal(P.maxHp*.015*(sk.M.dmg||1));P.mp=Math.min(P.maxMp,P.mp+3);fxGlow(P.pos.x,P.pos.z,.8,sk.E.color,.2,.6);return false;}
+          v.lerp(v1.multiplyScalar(14/L),Math.min(1,dt*5));}else v.y-=dt*12;p.addScaledVector(v,dt);emit(SPARK,p.x,p.y,p.z,0,0,0,sk.E.color,.3,0,0);if(Math.random()<.5)emit(SPARK,p.x,p.y,p.z,0,0,0,WHITE,.2,0,0);return t<4;},end(){NFS.hv--;}});}}};
+// Трофей: элита роняет трофей, подбери — три чары бесплатны
+NFP.trophy={build(a){a.n=0;},kill(a,en){if(!(en.elite||en.boss||en.champ))return;const x=en.pos.x,z=en.pos.z,m=nfMesh('oct',GOLD,.95),bm=nfMesh('pillar',GOLD,.35);m.scale.set(.35,.55,.35);bm.position.set(x,0,z);bm.scale.set(.12,6,.12);let t=0;const N=en.boss?5:3;
+    nfEnt({up(dt){t+=dt;m.position.set(x,1+Math.sin(time*3)*.15,z);m.rotation.y+=dt*3;const d=Math.hypot(P.pos.x-x,P.pos.z-z);
+      if(d<4){m.position.lerp(v1.set(P.pos.x,1.2,P.pos.z),Math.min(1,(4-d)/4));}if(d<1.2){a.n+=N;fxPillar(P.pos.x,P.pos.z,.8,4,GOLD,.6);colBurst(GOLD,P.pos.x,1.4,P.pos.z,16,4,.6,-1);float(P.pos,'Трофей: '+N+' чары бесплатно',`#ffd36b`,14);return false;}return t<15;},
+      end(){dropMesh(m);dropMesh(bm);}});},
+  tick(a){if(a.n>0&&Math.random()<.4)for(let k=0;k<Math.min(3,a.n);k++)emit(SPARK,P.pos.x+(k-1)*.3,2.6,P.pos.z,0,0,0,GOLD,.22,0,0);},
+  cast(a,sk){if(a.n<=0||NFS.inTwin)return;a.n--;P.mp=Math.min(P.maxMp,P.mp+skMana(sk));P.cds[sk.id]=0;colBurst(GOLD,P.pos.x,2,P.pos.z,6,2,.4,-1);},
+  hud(a){return a.n?{v:a.n}:null;}};
+// Ускользание: удар не проходит, ты в пяти метрах позади, силуэт взрывается
+NFP.slip={build(a){a.t=0;a.rdy=1;},tick(a,dt){if(!a.rdy){a.t-=dt;if(a.t<=0)a.rdy=1;}},
+  dmgIn(a,d,src,o){if(!a.rdy||o.dot||o.debt)return d;a.rdy=0;a.t=10*nfCdK(a.sk);const sk=a.sk,s0=P.pos.clone();
+    v1.set(src&&src.pos?P.pos.x-src.pos.x:-Math.sin(P.face),0,src&&src.pos?P.pos.z-src.pos.z:-Math.cos(P.face));if(v1.lengthSq()<1e-4)v1.set(1,0,0);v1.normalize();
+    const e=s0.clone().addScaledVector(v1,5);collide(e,.4);for(let k=0;k<12;k++){const f=k/12;emit(PUFF,lerp(s0.x,e.x,f),rand(.4,1.6),lerp(s0.z,e.z,f),0,.3,0,sk.E.color,.45,0,1);}
+    P.pos.copy(e);P.prev.copy(e);hero.g.position.copy(e);P.invulnT=Math.max(P.invulnT,.3);
+    const md=takeModel('twin|'+CLS.id,()=>bClone(sk,CLS.id));md.g.position.set(s0.x,0,s0.z);md.g.rotation.y=P.face;md.g.scale.setScalar(1);scene.add(md.g);let t=0;
+    nfEnt({up(dt){t+=dt;if(Math.random()<.5)emit(SPARK,s0.x+rand(-.3,.3),rand(.4,1.8),s0.z+rand(-.3,.3),0,.5,0,sk.E.color,.4,0,1);
+      if(t>=1){multi(sk,()=>nfAoe(s0,3*a.R,skDmg(sk),sk,{np:1,depth:1,knockFrom:s0}));novaFx(sk,s0.x,s0.z,3*a.R);return false;}return true;},
+      end(){scene.remove(md.g);(SPOOL['twin|'+CLS.id]||(SPOOL['twin|'+CLS.id]=[])).push(md);}});float(e,'Ускользнул','#d8f0ff',13);return 0;},
+  hud(a){return a.rdy?{v:'✓'}:{t:1-a.t/(10*nfCdK(a.sk))};}};
+// Отсрочка: половина урона приходит не сразу, убийства сжигают долг
+NFP.stagger={build(a){a.debt=0;},
+  dmgIn(a,d,src,o){if(o.debt||o.dot&&!src)return d;const k=a.sk.M.dmg>1?.6:.5,h=d*k;a.debt+=h;return d-h;},
+  tick(a,dt){if(a.debt<=0)return;const pay=Math.min(a.debt,Math.max(a.debt/3,P.maxHp*.01)*dt*(a.sk.M.cd?1.3:1));a.debt-=pay;
+    if(P.hp-pay<1){const r=a.debt+pay;a.debt=0;hurtPlayer(r,null,{debt:1,dot:true});}else P.hp-=pay;
+    if(Math.random()<.5)emit(PUFF,P.pos.x+rand(-.3,.3),rand(.5,1.7),P.pos.z+rand(-.3,.3),0,.2,0,new THREE.Color(0x3a1020),.5,0,1);},
+  kill(a){if(a.debt>0){a.debt*=2/3;colBurst(a.sk.E.color,P.pos.x,1.2,P.pos.z,4,2,.3,0);}},
+  hud(a){return a.debt>=1?{v:Math.round(a.debt)}:null;}};
+// На краю: мало здоровья — время вокруг замедляется
+NFP.brink={build(a){a.t=0;a.on=0;},
+  tick(a,dt){if(a.on>0){a.on-=dt;for(const en of ENEMIES)if(!en.dead)nfSlow(en,.3);NFS.brinkOn=Math.max(NFS.brinkOn||0,a.on);
+      if(!a.m){a.m=nfMesh('sphere',a.sk.E.color,.08);}a.m.position.set(P.pos.x,1,P.pos.z);a.m.scale.setScalar(3.2);a.m.material.opacity=.08+.04*Math.sin(time*5);
+      if(Math.random()<.6){const an=rand(0,TAU),r=rand(.5,3);emit(SPARK,P.pos.x+Math.cos(an)*r,rand(.3,2.4),P.pos.z+Math.sin(an)*r,0,0,0,a.sk.E.color,1,0,5);}
+      if(a.on<=0&&a.m){dropMesh(a.m);a.m=null;}return;}
+    if(a.t>0){a.t-=dt;return;}if(P.hp<P.maxHp/3&&!P.dead&&countNear(P.pos,12)>0){a.on=3*(a.sk.M.dmg>1?1.3:1);a.t=40*nfCdK(a.sk);fxShock(P.pos.x,P.pos.z,6,a.sk.E.color,.7);float(P.pos,'Время замедлилось','#cfe0ff',15);}},
+  eproj(a,p,i,dt){if(a.on>0){p.o.g.position.addScaledVector(p.dir,-p.speed*dt*.8);p.life+=dt*.8;}return false;},
+  drop(a){if(a.m)dropMesh(a.m);},
+  hud(a){return a.on>0?{v:a.on.toFixed(1)}:a.t>0?{t:1-a.t/(40*nfCdK(a.sk))}:null;}};
+// Вторая жизнь: смертельный удар не убивает
+NFP.rebirth={build(a){a.t=0;},tick(a,dt){if(a.t>0)a.t-=dt;},
+  dmgIn(a,d,src,o){if(a.t>0||d<P.hp||P.dead)return d;a.t=90*nfCdK(a.sk);const sk=a.sk;P.hp=Math.max(P.hp,P.maxHp*.4*(sk.M.dmg>1?1.25:1));P.invulnT=Math.max(P.invulnT,1);
+    later(0,()=>{nfAoe(P.pos,6*a.R,skDmg(sk),sk,{np:1,knockFrom:P.pos.clone()});});fxPillar(P.pos.x,P.pos.z,1.4,10,sk.E.color,.8);fxShock(P.pos.x,P.pos.z,6*a.R,sk.E.color,.6);fxRing(P.pos.x,P.pos.z,.5,6*a.R,GOLD,.6);colBurst(sk.E.color,P.pos.x,1,P.pos.z,30,6,.8,-1);
+    float(P.pos,'Вторая жизнь!','#ffe9a0',18);shake=Math.max(shake,.4);mpPE('s',sk.id,P.pos.x,P.pos.z,6);return 0;},
+  hud(a){return a.t>0?{t:1-a.t/(90*nfCdK(a.sk))}:{v:'✓'};}};
+// Шар силы: растёт, пока стоишь, срывается при шаге
+NFP.focus={build(a){a.c=0;a.m=nfMesh('sphere',a.sk.E.color,.85);a.m.scale.setScalar(.01);},drop(a){dropMesh(a.m);},
+  tick(a,dt){const sk=a.sk;if(!P.moving){a.c=Math.min(1,a.c+dt/(3*(sk.M.cd?.7:1)));}else if(a.c>.15){const e=nearest(P.pos,16);if(e){const c=a.c,p=new THREE.Vector3(P.pos.x,2.6,P.pos.z),tg=e,R=(1.5+2*c)*a.R,d=skDmg(sk)*(1+3.5*c);let t=0;const m=nfMesh('sphere',sk.E.color,.9);m.scale.setScalar(.25+.35*c);
+      nfEnt({up(dt){t+=dt*2.5;const q=Math.min(1,t);m.position.set(lerp(p.x,tg.pos.x,q),lerp(p.y,1,q)+Math.sin(q*Math.PI)*1.2,lerp(p.z,tg.pos.z,q));emit(SPARK,m.position.x,m.position.y,m.position.z,0,0,0,sk.E.color,.3,0,0);
+        if(q>=1){const z=tg.pos.clone();multi(sk,()=>nfAoe(z,R,d,sk,{np:1,depth:1,knockFrom:z}));fxBurst(z.x,1,z.z,R*.6,sk.E.color,.3,.9);fxShock(z.x,z.z,R,sk.E.color,.45);elBurst(sk.e,z.x,1,z.z,16);return false;}return true;},end(){dropMesh(m);}});}a.c=0;}else a.c=0;
+    const s=.08+.42*a.c;a.m.scale.setScalar(a.c>.02?s:.01);a.m.position.set(P.pos.x,2.6+Math.sin(time*3)*.05,P.pos.z);a.m.material.opacity=.5+.4*a.c;if(a.c>=1&&Math.random()<.4)emit(SPARK,P.pos.x,2.6,P.pos.z,rand(-1,1),rand(-.5,1),rand(-1,1),sk.E.color,.3,0,1);},
+  hud(a){return a.c>.02?{t:a.c}:null;}};
+// Кокон: окружили — кристалл, неуязвимость и осколки
+NFP.shell={build(a){a.t=0;a.on=0;},drop(a){if(a.m)dropMesh(a.m);},
+  tick(a,dt){const sk=a.sk;if(a.on>0){a.on-=dt;P.invulnT=Math.max(P.invulnT,.1);a.m.position.set(P.pos.x,1,P.pos.z);a.m.rotation.y+=dt;a.m.material.opacity=.32+.08*Math.sin(time*8);
+      if(a.on<=0){dropMesh(a.m);a.m=null;const p=P.pos.clone();multi(sk,()=>nfAoe(p,4.5*a.R,skDmg(sk),sk,{np:1,knockFrom:p}));shards(sk.e,p.x,1,p.z,16,8);fxShock(p.x,p.z,4.5*a.R,sk.E.color,.5);fxBurst(p.x,1,p.z,2,sk.E.color,.3,.9);shake=Math.max(shake,.2);}return;}
+    if(a.t>0){a.t-=dt;return;}if(countNear(P.pos,4)>=5){a.on=2;a.t=15*nfCdK(sk);a.m=nfMesh('sphere',sk.E.color.clone().lerp(WHITE,.3),.35);a.m.scale.set(1.2,1.6,1.2);fxPillar(P.pos.x,P.pos.z,1,3,sk.E.color,.4);float(P.pos,'Кокон','#e0f4ff',14);}},
+  hud(a){return a.on>0?{v:a.on.toFixed(1)}:a.t>0?{t:1-a.t/(15*nfCdK(a.sk))}:null;}};
+// Дитя стихий: реакция стихий рождает духа
+NFP.sprite={build(a){a.n=0;},
+  hit(a,en,d,el,o,crit,R){if(!R||o.np)return;if(a.n>=(a.sk.M.count?4:3))return;a.n++;const sk=a.sk,c1=ELEMENTS[R.a].color,c2=ELEMENTS[R.b].color,ph=rand(0,TAU);let t=0,cd=.4;const p=new THREE.Vector3(en.pos.x,1.6,en.pos.z);
+    nfEnt({up(dt){t+=dt;const tx=P.pos.x+Math.cos(time*1.3+ph)*2,tz=P.pos.z+Math.sin(time*1.3+ph)*2;p.x=lerp(p.x,tx,Math.min(1,dt*3));p.z=lerp(p.z,tz,Math.min(1,dt*3));p.y=1.8+Math.sin(time*4+ph)*.2;
+      const an=time*9;emit(SPARK,p.x+Math.cos(an)*.22,p.y,p.z+Math.sin(an)*.22,0,0,0,c1,.25,0,0);emit(SPARK,p.x-Math.cos(an)*.22,p.y,p.z-Math.sin(an)*.22,0,0,0,c2,.25,0,0);
+      cd-=dt;if(cd<=0){const e=nearest(p,8);if(e){cd=.8*nfCdK(sk);const to=new THREE.Vector3(e.pos.x,1,e.pos.z);if(R.type==='aoe')fxBurst(e.pos.x,1,e.pos.z,1,c1,.2,.8);zigzag(p.clone(),to,t%2<1?c1:c2);dealDamage(e,skDmg(sk),t%2<1?R.a:R.b,{sk,depth:2,np:1,noReact:true,noKnock:true});}}
+      return t<6;},end(){a.n--;}});fxBurst(p.x,p.y,p.z,.6,c1,.3,.8);float({x:p.x,y:2.4,z:p.z},'Дитя стихий',sk.E.hex,12);},
+  hud(a){return a.n?{v:a.n}:null;}};
+// Казнь: добивает врага на последних каплях здоровья
+NFP.execute={build(a){a.v=0;},
+  tick(a,dt){a.v-=dt;if(a.v>0)return;a.v=.25;let c=0;for(const en of ENEMIES){if(en.dead||c>=10)continue;const th=en.boss?.2:en.elite||en.champ?.12:.2;if(en.hp/en.maxHp<th){c++;emit(SPARK,en.pos.x,(en.hy||2)*.6,en.pos.z,0,.6,0,RED,.35,0,1);}}},
+  dmgOut(a,en,el,o,d){if(o.dot||!d)return 1;const th=(en.boss?.2:en.elite||en.champ?.12:.2)*(a.sk.M.dmg>1?1.2:1);if((en.hp-d)/en.maxHp>=th)return 1;if(en.boss)return 1.5;
+    a.ex=en;return Math.max(1,(en.hp+5)/Math.max(1,d)*8);},
+  hit(a,en){if(a.ex!==en)return;a.ex=null;fxSlash(en.pos.x,en.pos.z,rand(0,TAU),2.4,RED);fxBurst(en.pos.x,1.2,en.pos.z,.9,RED,.2,.9);float({x:en.pos.x,y:2.6,z:en.pos.z},'Казнь','#ff6a6a',15);for(const k in P.cds)P.cds[k]-=.5;}};
+// ---------- /общие пассивки ----------
+// ---------- хуки части A: пассивки и сущности ----------
+var NF_PRIO={ward:0,slip:1,stagger:5,rebirth:9};
+function nfPassOwn(sk,i){if(!NFP[sk.F.id])return false;(NFS.pn||(NFS.pn=[])).push(sk);return true;}
+function nfPassBuilt(){const old=NFS.pa||[],nw=NFS.pn||[];NFS.pn=[];const keep=[];
+  for(const a of old){if(nw.some(s=>s.id===a.sk.id)&&!keep.includes(a))keep.push(a);else nfPassDrop(a);}
+  NFS.pa=[];for(const sk of nw){let a=keep.find(x=>x.sk.id===sk.id&&NFS.pa.indexOf(x)<0);if(!a){a={sk,st:{},R:skR(sk)};const p=NFP[sk.F.id];if(p.build)p.build(a);}else a.R=skR(sk);NFS.pa.push(a);}
+  NFS.pa.sort((x,y)=>(NF_PRIO[x.sk.F.id]|0)-(NF_PRIO[y.sk.F.id]|0));NFS.hudK='';}
+function nfPassDrop(a){const p=NFP[a.sk.F.id];try{if(p&&p.drop)p.drop(a);}catch(e){}}
+function nfEach(ev){const r=[];for(const a of NFS.pa||[]){const p=NFP[a.sk.F.id];if(p&&p[ev])r.push([p[ev],a]);}return r;}
+function nfOnCast(sk,A){for(const a of NFS.pa||[]){const p=NFP[a.sk.F.id];if(p.cast)p.cast(a,sk,A);}if(NFS.ents)for(const e of NFS.ents)if(e.cast)e.cast(sk,A);}
+function nfDmgOut(en,el,o,d){let m=1;for(const a of NFS.pa||[]){const p=NFP[a.sk.F.id];if(p.dmgOut)m*=p.dmgOut(a,en,el,o,d*m);}if(NFS.ents)for(const e of NFS.ents)if(e.dmgOut)m*=e.dmgOut(en,el,o,d*m);return m;}
+function nfOnHit(en,d,el,o,crit,R){if(en.hp<=0)en.nfLastO=o;for(const a of NFS.pa||[]){const p=NFP[a.sk.F.id];if(p.hit)p.hit(a,en,d,el,o,crit,R);}if(NFS.ents)for(const e of NFS.ents)if(e.hit)e.hit(en,d,el,o,crit,R);}
+function nfOnKill(en,el,o){if(o&&o.fromG)return;const lo=en.nfLastO;for(const a of NFS.pa||[]){const p=NFP[a.sk.F.id];if(p.kill)p.kill(a,en,el,o||{},lo);}if(NFS.ents)for(const e of NFS.ents)if(e.kill)e.kill(en,el,o||{},lo);}
+function nfDmgIn(d,src,o){if(d<=0)return d;if(NFS.ents)for(const e of NFS.ents){if(e.dmgIn){d=e.dmgIn(d,src,o);if(d<=0)return 0;}}
+  for(const a of NFS.pa||[]){const p=NFP[a.sk.F.id];if(p.dmgIn){d=p.dmgIn(a,d,src,o);if(d<=0)return 0;}}return d;}
+function nfOnBasic(tg){for(const a of NFS.pa||[]){const p=NFP[a.sk.F.id];if(p.basic)p.basic(a,tg);}}
+function nfEProj(p,i,dt){if(NFS.ents)for(const e of NFS.ents){if(e.eproj&&e.eproj(p,i,dt))return true;}for(const a of NFS.pa||[]){const q=NFP[a.sk.F.id];if(q.eproj&&q.eproj(a,p,i,dt))return true;}return false;}
+function nfAI(en,dt,dx,dz,dist){if(NFS.ents)for(const e of NFS.ents){if(e.ai&&e.ai(en,dt,dx,dz,dist))return true;}return false;}
+function nfTick(dt){if(!S||!CLS)return;
+  if(NFS.lv!==S.lvl){if(NFS.lv!=null&&S.lvl>NFS.lv)S.scrL=0;NFS.lv=S.lvl;}
+  const sa=activeSlots(),sp=passiveSlots();if(NFS.sa!=null&&(sa>NFS.sa||sp>NFS.sp)&&!S.sandbox){const t=sa>NFS.sa?'Активный слот '+sa:'Пассивный слот '+sp;
+    banner('Открыт слот',t+' — можно поставить ещё одну чару');fxPillar(P.pos.x,P.pos.z,1.3,8,GOLD,1);fxRing(P.pos.x,P.pos.z,.6,5,GOLD,.8);colBurst(GOLD,P.pos.x,1.4,P.pos.z,24,4,.8,-1);nfFillSlots();}
+  NFS.sa=sa;NFS.sp=sp;if(S.needBest){delete S.needBest;applyBestBuild();}
+  if(NFS.ents&&NFS.ents.length){const E=NFS.ents;for(let i=E.length-1;i>=0;i--){const e=E[i];let k;try{k=e.up?e.up(dt):true;}catch(err){k=false;console.error(err);}if(k===false){const j=E.indexOf(e);if(j>=0)E.splice(j,1);try{if(e.end)e.end();}catch(_){}}}}
+  NFS.brinkOn=0;for(const a of NFS.pa||[]){const p=NFP[a.sk.F.id];if(p.tick)p.tick(a,dt);}
+  for(const en of ENEMIES){const w=en.tkW;en.tk=w!=null&&w<1?w:1;en.tkW=1;}
+  if(NFS.heroY>0&&hero)hero.g.position.y=NFS.heroY;
+  nfGamepad();NFS.hudT=(NFS.hudT||0)-dt;if(NFS.hudT<=0){NFS.hudT=.15;nfHud();}
+  if(NFS.brEl){const o=NFS.brinkOn>0?'1':'0';if(NFS.brEl.style.opacity!==o)NFS.brEl.style.opacity=o;}}
+function nfReset(){nfClr();NFS.heroY=0;if(hero)hero.g.position.y=0;for(const a of NFS.pa||[]){nfPassDrop(a);a.st={};const p=NFP[a.sk.F.id];if(p.build)p.build(a);}
+  NFS.lv=S.lvl;NFS.sa=activeSlots();NFS.sp=passiveSlots();NFS.hudK='';nfHudInit();
+  if(NFS.mig&&NFS.mig.length){const m=NFS.mig;NFS.mig=null;setTimeout(()=>toast('Чары классов обновлены: у каждого героя свои формы и фирменные чары. Прежние чары — в книге, их можно распылить. Пассивки стали другими — загляни в книгу. Фирменные открываются на 1, 12 и 20 уровне.',9000),1200);}}
+var nfCW0=clearWorld;clearWorld=function(){nfClr();NFS.heroY=0;return nfCW0.apply(this,arguments);};
+// новый слот открылся — ставим туда лучшую изученную чару
+function nfFillSlots(){let ch=0;for(const act of [true,false]){const arr=act?S.active:S.passive,n=act?activeSlots():passiveSlots();
+    for(let i=0;i<n;i++){if(arr[i]!=null)continue;let b=null,bp=-1;for(const id of LEARNED){if(EQUIPPED.has(id)||arr.includes(id))continue;const sk=SKILLS[id];if(!sk||sk.active!==act||!CLS.pool.has(id))continue;
+        if(baseSlot(sk)!=null||(act&&formSlot(sk)!=null))continue;const p=pwr(sk);if(p>bp){bp=p;b=id;}}if(b!=null){arr[i]=b;ch++;EQUIPPED.add(b);}}}
+  if(ch){onBuildChanged();toast('В открытый слот встала '+(ch>1?ch+' чары':'чара')+' из изученных');}}
+// окно «Усиление»: все чары изучены — ранг +1 чаре из билда
+function nfBoostChoices(){const a=[...EQUIPPED].filter(id=>rk(id)<5).map(id=>SKILLS[id]);for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a.slice(0,3);}
+function nfBoostPick(){return nfBoostChoices()[0]||null;}
+// ---------- полоса пассивок у HUD, кнопка «Батареи», дымка «На краю» ----------
+function nfHudInit(){if(NFS.hud&&document.body.contains(NFS.hud))return;const host=document.querySelector('#hud .bars');if(!host)return;
+  if(!document.getElementById('nfpbCss')){const st=document.createElement('style');st.id='nfpbCss';st.textContent='#nfpb{display:flex;gap:4px;flex-wrap:wrap;pointer-events:none;min-height:0}#nfpb:empty{display:none}#nfpb .b{position:relative;width:28px;height:28px;border-radius:8px;background:rgba(10,12,22,.6);border:1px solid var(--c);display:grid;place-items:center;color:var(--c);overflow:visible}#nfpb svg{width:18px;height:18px;position:relative;z-index:1}#nfpb .n{position:absolute;right:-4px;bottom:-5px;z-index:2;font:700 10px/1 system-ui,sans-serif;color:#fff;text-shadow:0 1px 2px #000;background:rgba(0,0,0,.6);border-radius:6px;padding:1px 3px}#nfpb .tm{position:absolute;inset:0;border-radius:7px;background:conic-gradient(rgba(0,0,0,.65) var(--p),transparent 0)}#nfpb .b.on{pointer-events:auto;cursor:pointer;animation:nfpu .5s infinite alternate;box-shadow:0 0 12px var(--c)}@keyframes nfpu{to{transform:scale(1.15)}}#nfbrink{position:fixed;inset:0;pointer-events:none;opacity:0;transition:opacity .35s;background:radial-gradient(ellipse at center,transparent 42%,rgba(80,110,170,.5));z-index:4}';document.head.appendChild(st);}
+  const d=document.createElement('div');d.id='nfpb';host.appendChild(d);NFS.hud=d;
+  d.addEventListener('pointerdown',e=>{const b=e.target.closest('.b.on');if(!b)return;e.preventDefault();e.stopPropagation();nfBattery((NFS.pa||[]).find(a=>a.sk.F.id==='battery'&&a.c>=a.cap));});
+  if(!NFS.brEl){const o=document.createElement('div');o.id='nfbrink';document.body.appendChild(o);NFS.brEl=o;}}
+function nfHud(){const d=NFS.hud;if(!d)return;let h='';let n=0;
+  for(const a of NFS.pa||[]){const p=NFP[a.sk.F.id];if(!p.hud||n>=7)continue;const r=p.hud(a);if(!r)continue;n++;
+    const txt=r.v!=null?String(r.v)+(r.mx?'/'+r.mx:''):'';const tm=r.t!=null&&!r.btn?`<i class="tm" style="--p:${Math.round((1-Math.max(0,Math.min(1,r.t)))*100)}%"></i>`:'';
+    h+=`<span class="b${r.btn?' on':''}" style="--c:${a.sk.E.hex}" title="${a.sk.base}">${tm}${svg(a.sk.F.id,'currentColor')}${txt?'<i class="n">'+txt+'</i>':''}</span>`;}
+  if(h!==NFS.hudK){NFS.hudK=h;d.innerHTML=h;}}
+document.addEventListener('keydown',e=>{if(e.code!=='KeyR'||mode!=='game'||e.repeat)return;const t=e.target;if(t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'))return;nfBattery((NFS.pa||[]).find(a=>a.sk.F.id==='battery'&&a.c>=a.cap));});
+function nfGamepad(){if(!(NFS.pa||[]).some(a=>a.sk.F.id==='battery'))return;let pr=false;try{const gp=navigator.getGamepads?navigator.getGamepads():[];for(const g of gp)if(g&&g.buttons[10]&&g.buttons[10].pressed)pr=true;}catch(e){}
+  if(pr&&!NFS.gpB)nfBattery((NFS.pa||[]).find(a=>a.sk.F.id==='battery'&&a.c>=a.cap));NFS.gpB=pr;}
+// ---------- книга: прежние чары ----------
+function nfLegIds(){if(!CLS||!CLS.legacy)return [];return [...new Set([...(S.legacy||[]),...[...BOOK].filter(id=>CLS.legacy.has(id))])].filter(id=>SKILLS[id]);}
+function nfLegVal(id){let ref=0;const r=S.ranks[id]|0;for(let i=1;i<r;i++)ref+=rankCost(i);return Math.round(DUST[0]*1.5)+ref;}
+function renderLegacy(){if(pending&&pending.type)return;if(F_.type!=='learned'&&F_.type!=='all')return;const ids=nfLegIds();if(!ids.length)return;const val=ids.reduce((v,id)=>v+nfLegVal(id),0);
+  listEl.insertAdjacentHTML('afterbegin',`<details class="nfleg" style="margin:4px 0 10px;padding:8px 10px;border:1px dashed rgba(255,255,255,.2);border-radius:12px;opacity:.85"><summary style="cursor:pointer"><b>Прежние чары (${ids.length})</b> — их больше нет у героя</summary><p class="hint" style="margin:6px 0 8px">После обновления у каждого героя свои формы. Старые чары остались здесь — распыли их в эссенцию.</p><button type="button" class="chip" data-legdust="1">Распылить прежние: +${val} эссенции</button><div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">${ids.slice(0,40).map(id=>{const sk=SKILLS[id];return `<span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;opacity:.7;color:${sk.E.hex}"><span style="width:16px;height:16px;display:inline-block">${svg(sk.F.id,sk.E.hex)}</span>${sk.base}</span>`;}).join('')}${ids.length>40?'<span style="font-size:12px;opacity:.6">…ещё '+(ids.length-40)+'</span>':''}</div></details>`);}
+listEl.addEventListener('click',e=>{const b=e.target.closest('[data-legdust]');if(!b)return;e.stopPropagation();const ids=nfLegIds();let v=0;for(const id of ids){v+=nfLegVal(id);delete S.ranks[id];BOOK.delete(id);}
+  S.legacy=[];S.book=S.book.filter(id=>!CLS.legacy.has(id));if(!S.sandbox)S.ess+=v;onBuildChanged();saveSoon();renderList();toast('Распылено прежних чар: '+ids.length+', +'+v+' эссенции');});
+// ---------- тестовые ручки: window.__tc.nf ----------
+window.__tc.nf={
+  give(f,el,mod,slot){const F=FORMS[FORM[f]];if(!F)return null;const e=F.els?F.els[0]:(el||CLS.p);const id=sid(e,f,mod||'mighty'),sk=SKILLS[id];if(!sk)return null;learn(id,false);
+    const arr=sk.active?S.active:S.passive;const n=sk.active?activeSlots():passiveSlots();for(let i=0;i<arr.length;i++)if(arr[i]===id)arr[i]=null;const ix=slot!=null?slot:0;arr[Math.min(ix,n-1)]=id;onBuildChanged();return {id,slot:Math.min(ix,n-1),name:skName(sk)};},
+  pass(f,el,mod){return this.give(f,el,mod,0);},
+  state(){return {ents:(NFS.ents||[]).length,pa:(NFS.pa||[]).map(a=>a.sk.F.id),hud:NFS.hud?NFS.hud.children.length:0,fx:FX.length,slots:[activeSlots(),passiveSlots()],boost:!!NFS.boost};},
+  trigger(f){const e=nearest(P.pos,30);switch(f){
+    case 'hurt':hurtPlayer(Math.max(5,P.maxHp*.08),e,{});break;case 'lethal':hurtPlayer(P.hp+50,e,{});break;case 'low':P.hp=P.maxHp*.25;break;
+    case 'crit':if(e)dealDamage(e,20,CLS?EL[CLS.p]:0,{pre:true,crit:true,depth:0});break;
+    case 'react':if(e){dealDamage(e,5,EL.fire,{depth:0});dealDamage(e,5,EL.ice,{depth:0});}break;
+    case 'kill':if(e)dealDamage(e,e.hp+10,-1,{depth:0});break;
+    case 'elite':{const x=P.pos.x+3,z=P.pos.z;const en=spawnEnemy('slime',x,z,S.lvl,{elite:true,aggro:true});if(en)dealDamage(en,en.hp+10,-1,{depth:0});break;}
+    case 'crowd':ENEMIES.forEach((en,i)=>{if(en.dead||i>8)return;en.pos.set(P.pos.x+2*Math.cos(i*1.1),0,P.pos.z+2*Math.sin(i*1.1));});break;
+    case 'proj':if(e)shootAt(e,'orb');break;}
+    return this.state();}};
+//
+//
+//
+// ----- A-фирменные-1 (свой подблок: только NFRUN/NFCAN/NFPEER/NFP/SKIND/UP своих героев) -----
+// ----- /A-фирменные-1 -----
+//
+//
+//
+// ----- A-фирменные-2 (свой подблок: только NFRUN/NFCAN/NFPEER/NFP/SKIND/UP своих героев) -----
+// ----- /A-фирменные-2 -----
+//
+//
+//
+// ----- A-фирменные-3 (свой подблок: только NFRUN/NFCAN/NFPEER/NFP/SKIND/UP своих героев) -----
+// ----- /A-фирменные-3 -----
+//
+//
+//
+// ----- A: страховка — у каждой формы есть механика (фирменные, которых ещё нет, бьют простой вспышкой) -----
+for(const F of FORMS){if(F.kind==='active'&&F.sig&&!NFRUN[F.id])NFRUN[F.id]=(sk,A,i,dmg,R,col)=>{const p=nfPt(sk,A,2,6);nfAoe(p,3*R,dmg,sk,{knockFrom:p});novaFx(sk,p.x,p.z,3*R);};
+  if(F.kind==='passive'&&!NFP[F.id]&&F.id!=='revenge'&&F.id!=='trail')NFP[F.id]={};}
 // ===== /НОВЫЕ ФОРМЫ =====
 //
 // разделитель: не трогать
