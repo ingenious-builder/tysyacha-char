@@ -1,0 +1,134 @@
+[
+ {
+  "msStep": 1.138,
+  "fxAvg": 51.8,
+  "fxMax": 123,
+  "partFrame": 51,
+  "rar": "0/0/4/7/2",
+  "kills": 87,
+  "dir": "tc-wt-rarfeel0",
+  "cls": "pyro",
+  "errs": 0
+ },
+ {
+  "msStep": 0.712,
+  "fxAvg": 44.7,
+  "fxMax": 116,
+  "partFrame": 40,
+  "rar": "0/0/4/7/2",
+  "kills": 100,
+  "dir": "tc-wt-rarfeel",
+  "cls": "pyro",
+  "errs": 0
+ },
+ {
+  "msStep": 0.956,
+  "fxAvg": 50.5,
+  "fxMax": 130,
+  "partFrame": 67,
+  "rar": "0/0/4/7/2",
+  "kills": 106,
+  "dir": "tc-wt-rarfeel",
+  "cls": "pyro",
+  "errs": 0
+ },
+ {
+  "msStep": 0.799,
+  "fxAvg": 41.8,
+  "fxMax": 106,
+  "partFrame": 42,
+  "rar": "0/0/4/7/2",
+  "kills": 72,
+  "dir": "tc-wt-rarfeel0",
+  "cls": "pyro",
+  "errs": 0
+ },
+ {
+  "msStep": 0.873,
+  "fxAvg": 14.5,
+  "fxMax": 68,
+  "partFrame": 10,
+  "rar": "0/0/1/10/2",
+  "kills": 56,
+  "dir": "tc-wt-rarfeel0",
+  "cls": "necro",
+  "errs": 0
+ },
+ {
+  "msStep": 0.766,
+  "fxAvg": 21.6,
+  "fxMax": 110,
+  "partFrame": 13,
+  "rar": "0/0/1/10/2",
+  "kills": 65,
+  "dir": "tc-wt-rarfeel",
+  "cls": "necro",
+  "errs": 0
+ },
+ {
+  "msStep": 0.729,
+  "fxAvg": 17.8,
+  "fxMax": 86,
+  "partFrame": 11,
+  "rar": "0/0/1/10/2",
+  "kills": 33,
+  "dir": "tc-wt-rarfeel",
+  "cls": "necro",
+  "errs": 0
+ },
+ {
+  "msStep": 0.762,
+  "fxAvg": 16.4,
+  "fxMax": 79,
+  "partFrame": 16,
+  "rar": "0/0/1/10/2",
+  "kills": 51,
+  "dir": "tc-wt-rarfeel0",
+  "cls": "necro",
+  "errs": 0
+ },
+ {
+  "msStep": 0.667,
+  "fxAvg": 9,
+  "fxMax": 20,
+  "partFrame": 24,
+  "rar": "0/0/2/9/2",
+  "kills": 54,
+  "dir": "tc-wt-rarfeel0",
+  "cls": "monk",
+  "errs": 0
+ },
+ {
+  "msStep": 0.815,
+  "fxAvg": 13.1,
+  "fxMax": 29,
+  "partFrame": 31,
+  "rar": "0/0/2/9/2",
+  "kills": 61,
+  "dir": "tc-wt-rarfeel",
+  "cls": "monk",
+  "errs": 0
+ },
+ {
+  "msStep": 0.761,
+  "fxAvg": 10.8,
+  "fxMax": 39,
+  "partFrame": 29,
+  "rar": "0/0/2/9/2",
+  "kills": 63,
+  "dir": "tc-wt-rarfeel",
+  "cls": "monk",
+  "errs": 0
+ },
+ {
+  "msStep": 0.748,
+  "fxAvg": 9.7,
+  "fxMax": 27,
+  "partFrame": 21,
+  "rar": "0/0/2/9/2",
+  "kills": 49,
+  "dir": "tc-wt-rarfeel0",
+  "cls": "monk",
+  "errs": 0
+ }
+]
