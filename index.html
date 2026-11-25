@@ -2616,7 +2616,7 @@ function talQ(sk){if(TQ.raw||!S||!CLS||!TQ.sig&&!tqOn())return 1;
 function powerBreak(sk){const I=rarInfo();rarK(sk);const base=I.B[sk.id],rm=rkMul(sk.id),cur=skParts(sk,false).pw;
   const kt=S.talents;let lv=cur;S.talents={};computeStats();TQ.raw++;try{lv=skParts(sk,false).pw;}finally{TQ.raw--;S.talents=kt;computeStats();}
   const re=resoMul(sk),rv=reactVal(sk.e,RESO_N),n=RESO_N[sk.e]+(EQUIPPED.has(sk.id)?0:1),im=isImp(sk.id)?(sk.active?IMP.dmg/IMP.cd:IMP.pdmg)*IMP.fl:1,sb=slotBoost(),lk=sb===1?1:lvTab(RAR_LVK,S.lvl);
-  // особенность класса (CT_AFF: «Пиромант — огонь ×1,2») входит в силу чары (обёртка skPower) — и в разбор, иначе «Сила» разбора была меньше книги
+  // особенность класса (ctAff: основная стихия и формы героя) — тот же множитель, что в «Силе» строки характеристик (pwr → skPower)
   const af=typeof ctAff==='function'?ctAff(sk):1;
   return {r:rarOf(sk),base,rank:rm,imp:im,slot:sb,slotS:sb/lk,lvk:lk,lvl:lv/(base*rm*im*sb),tal:cur/lv,cap:talQ(sk),aff:af,reso:re,react:rv,total:cur*re*rv*af,same:n};}
 const slotNm=(act,i)=>(act?'слоте ':'пассивном слоте ')+(i+1);
