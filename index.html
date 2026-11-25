@@ -435,6 +435,7 @@ html[data-ui=tab] #mm{top:calc(var(--m) + var(--sat) + 70px);width:calc(92px * v
 .tn.lk{opacity:.42}
 .tn.sel{box-shadow:0 0 0 2px rgba(238,240,255,.28)}.tn.mx.sel{box-shadow:inset 0 0 0 1px rgba(242,196,107,.35),0 0 0 2px rgba(238,240,255,.28)}
 .tn.bump{animation:tbump .18s ease-out}
+.tn{transition:box-shadow .45s ease-out}.tn.ag,.tn.mx.ag{box-shadow:0 0 0 2px var(--c),0 0 16px color-mix(in srgb,var(--c) 65%,transparent)}
 @keyframes tbump{50%{transform:scale(.94)}}
 .tn .pop{position:absolute;right:8px;bottom:6px;font:700 16px/1 var(--f-ui);color:var(--gold);text-shadow:0 1px 3px #000;pointer-events:none;animation:tpop .75s ease-out forwards}
 @keyframes tpop{0%{opacity:0;transform:translateY(8px) scale(.7)}25%{opacity:1;transform:translateY(0) scale(1.15)}100%{opacity:0;transform:translateY(-18px) scale(1)}}
@@ -1150,7 +1151,7 @@ html[data-ui=tab] #layPan{width:min(460px,calc(100% - 40px));padding:16px 18px;g
     <section id="tal" class="pane" hidden>
       <div class="tl">
         <div class="tl-pts" id="tpPts">Очки: <b id="tpFree">0</b></div>
-        <button class="btn gold" id="tpAuto" type="button" aria-label="Раскидать все свободные очки по классу">Авто</button>
+        <button class="btn gold" id="tpAuto" type="button" aria-label="Вложить свободные очки туда, где герою сейчас не хватает">Авто</button>
         <button class="btn warn" id="tpReset" type="button">Сброс</button>
         <div class="tg" id="branches" role="group" aria-label="Таланты"></div>
         <p class="tl-hint" id="tpHint" aria-live="polite"></p>
@@ -2662,16 +2663,14 @@ const RUNF=['lvl','xp','ess','ranks','talents','active','passive','learned'];
 const startLvlFor=el=>Math.max(1,el-2);
 function runSnap(fresh){const o={fresh:!!fresh};for(const k of RUNF)o[k]=JSON.parse(JSON.stringify(S[k]));return JSON.stringify(o);}
 function runRestore(js){const o=JSON.parse(js);for(const k of RUNF)S[k]=o[k];LEARNED=new Set(S.learned);return o;}
-function autoTalents(){const ord=[0,1,0,1,2];let n=tpTotal()-tpSpent()-mastTp(),g=0;
-  while(n>0&&g++<200){let done=false;for(let q=0;q<ord.length&&!done;q++){const b=ord[(g+q)%ord.length];
-    const list=TALENTS.filter(t=>t.b===b);for(let k=0;k<list.length;k++){const t=list[k];if(T(t.id)<t.max&&branchPts(b)>=k*2){S.talents[t.id]=T(t.id)+1;n--;done=true;break;}}}
-    if(!done)break;}}
+// таланты на старте забега — умным «Авто» (как кнопка) против врагов уровня забега; очки мастерства остаются игроку
+function autoTalents(foe){const n=tpTotal()-tpSpent()-mastTp();if(n>0)talSmart(n,foe);}
 function runFresh(l0){const f=newChar(CLS);S.lvl=1;S.xp=0;S.ess=0;S.ranks={};S.talents={};
   if(!S.sandbox){S.active=f.active;S.passive=f.passive;S.learned=f.learned;}
   LEARNED=new Set(S.learned);for(const id of S.learned)if(!BOOK.has(id)){BOOK.add(id);S.book.push(id);}
   computeStats();EQUIPPED=new Set(equippedIds());
   if(!S.sandbox)for(let l=2;l<=l0;l++){S.lvl=l;const pool=rollPool();if(pool.length)learn(wpick(pool).id,true);}
-  S.lvl=Math.max(1,l0);if(!S.sandbox)autoTalents();S.ess=40*(S.lvl-1);}
+  S.lvl=Math.max(1,l0);if(!S.sandbox)autoTalents(S.lvl+2);S.ess=40*(S.lvl-1);}
 function runApply(){computeStats();recalcStats();P.hp=P.maxHp;P.mp=P.maxMp;onBuildChanged();luQueue=0;luOpen=false;$('#lvlup').hidden=true;}
 function runPicks(fresh){if(fresh&&!S.sandbox){const n=startPicks();if(n){luQueue+=n;luDelay=1.6;}}}
 function beginRun(kind,key,el){
@@ -4685,7 +4684,7 @@ function renderTalents(){const free=tpFree(),box=$('#branches'),ae=document.acti
   box.innerHTML=BRANCHES.map((b,bi)=>{const bp=branchPts(bi);
     return `<div class="tb" style="--c:${b.c}">${b.name}<i class="${bp?'on':''}">${bp}</i></div>`+TALENTS.filter(t=>t.b===bi).map(t=>{const v=T(t.id),lk=talLocked(t),mx=v>=t.max,can=!lk&&!mx&&free>0;
       const top=lk?tsvg('lock'):mx?'МАКС':Array.from({length:t.max},(_,i)=>i<v?'<i class="f"></i>':'<i></i>').join('');
-      return `<button type="button" class="tn${can?' can':''}${mx?' mx':''}${lk?' lk':''}${tpSel===t.id?' sel':''}" style="--c:${b.c}" data-t="${t.id}" aria-label="${t.name}: ${v} из ${t.max}${lk?', закрыт':''}">`+
+      return `<button type="button" class="tn${can?' can':''}${mx?' mx':''}${lk?' lk':''}${tpSel===t.id?' sel':''}${tpGlow.has(t.id)?' ag':''}" style="--c:${b.c}" data-t="${t.id}" aria-label="${t.name}: ${v} из ${t.max}${lk?', закрыт':''}">`+
         `<span class="ti">${tsvg(t.ic)}</span><span class="td">${top}</span><b>${t.sn||t.name}</b><span class="tv${v||lk?'':' z'}">${lk?'ещё '+(talNeed(t)-bp):t.s(v)}</span></button>`;}).join('');}).join('');
   if(fid){const nb=box.querySelector(`[data-t="${fid}"]`);if(nb)nb.focus({preventScroll:true});}
   talHint();}
@@ -4698,10 +4697,12 @@ function talHint(id){const h=$('#tpHint'),t=TAL_BY[id||tpSel];
   else if(v>=t.max)s+=' · <em>максимум</em>';
   else{if(v)s+=' · след. очко: '+t.s(v+1);if(!tpFree())s+=' · нет свободных очков';}
   h.innerHTML=s;}
+let tpGlow=new Set(),tpGlowT=0;
+function talGlow(ids){tpGlow=new Set(ids);clearTimeout(tpGlowT);tpGlowT=setTimeout(()=>{tpGlow.clear();$('#branches').querySelectorAll('.tn.ag').forEach(x=>x.classList.remove('ag'));},1600);}
 function talMark(){$('#branches').querySelectorAll('.tn').forEach(x=>x.classList.toggle('sel',x.dataset.t===tpSel));}
 function talPop(id,txt){const b=$('#branches').querySelector(`[data-t="${id}"]`);if(!b)return;b.classList.remove('bump');void b.offsetWidth;b.classList.add('bump');
   if(!txt)return;const p=document.createElement('span');p.className='pop';p.textContent=txt;b.appendChild(p);setTimeout(()=>p.remove(),800);}
-// рекомендованная раскладка по роли героя: шаги «талант:до уровня»; если талант ещё закрыт, недостающие очки ветки идут в её лучший открытый талант
+// план роли — только порядок «про запас»: куда класть очки, когда ни одна потребность уже не растёт (всё на максимуме или таланту нечего усиливать)
 const TAL_PLAN={
  'Маг':'power:2 cdr:2 power:5 cdr:5 mana:3 crit:3 vit:2 mana:5 crit:5 reso:3 react:3 vit:5 armor:3',
  'Призыватель':'mana:2 summ:3 vit:3 mana:5 power:3 vit:5 cdr:3 luck:2 cascade:3 orbit:3 armor:3 power:5 cdr:5',
@@ -4710,15 +4711,97 @@ const TAL_PLAN={
  'Боец':'vit:2 armor:2 vit:4 armor:4 wrath:3 leech:3 power:3 vit:5 armor:5 regen:3 power:5 cdr:3',
  'Танк':'vit:3 armor:3 vit:5 armor:5 wrath:3 regen:3 leech:3 power:3 cdr:3 power:5',
 };
-function talAuto(role){const plan=(TAL_PLAN[role]||TAL_PLAN['Маг']).split(' ').map(x=>x.split(':')),rank={};
-  plan.forEach(([id],i)=>{if(!(id in rank))rank[id]=i;});
-  const best=(a,b)=>((a.id in rank?rank[a.id]:99)-(b.id in rank?rank[b.id]:99))||TAL_K[a.id]-TAL_K[b.id];
-  const put=t=>{S.talents[t.id]=T(t.id)+1;};let g=0;
-  for(const [id,lv] of plan){const t=TAL_BY[id];
-    while(tpFree()>0&&T(id)<Math.min(+lv,t.max)&&g++<300){
-      if(talOpen(t)){put(t);continue;}
-      const f=TALENTS.filter(x=>x.b===t.b&&x!==t&&talOpen(x)).sort(best)[0];if(!f)break;put(f);}}
-  while(tpFree()>0&&g++<600){const f=TALENTS.filter(talOpen).sort(best)[0];if(!f)break;put(f);}}
+// ---- умное «Авто» (25.11): очко идёт туда, чего герою сейчас меньше всего хватает ----
+// Потребности считаются из чисел героя против врагов его уровня и региона; c — «покрытие» (1 = хватает):
+//  hp   — здоровье с бронёй: maxHp/броня против удара врага × сколько ударов должна держать роль (hits);
+//  heal — лечение в секунду (реген, вампиризм, тень/свет с попаданий, щит, тотем) против входящего урона (inc ударов/с);
+//  mana — приход маны (реген + запас на бой TAL_C.fight с) против расхода билда, если жать все чары по перезарядке;
+//  dmg  — урон билда в секунду (крит, нехватка маны, лимит призывов) × TAL_C.ttk с против здоровья стаи врагов.
+// Очко кладётся в талант с наибольшим приростом U = Σ w·f(c), f(c) = −1/(2c²): чем слабее потребность, тем дороже её рост.
+// Закрытая плитка — «путь»: недостающие очки ветки + очко в неё; прирост пути делится на всю цену.
+// Роль задаёт веса w, цели hits/inc и like — во сколько раз ценить урон призывов/спутников (TAL_ROLE). ТОЧКА РАСШИРЕНИЯ для классовых талантов: TAL_CLASS[id класса] = {w:{…}, hits, inc,
+// like:{…}, needs:[{id,why,c:x=>покрытие}]} — поверх роли; x — итог talCtx (свои числа таланта добавить туда же и в computeStats).
+const TAL_ROLE={
+ 'Маг':        {w:{hp:1,   heal:.45,mana:1.1, dmg:1.25},hits:8, inc:.9},
+ 'Призыватель':{w:{hp:.95, heal:.45,mana:1.1, dmg:1.2}, hits:8, inc:.8,like:{summon:1.5,orbit:1.25}},
+ 'Стрелок':    {w:{hp:1,   heal:.45,mana:1,   dmg:1.3}, hits:8, inc:.9},
+ 'Ловкач':     {w:{hp:1.1, heal:.65,mana:.9,  dmg:1.25},hits:10,inc:1.5},
+ 'Боец':       {w:{hp:1.25,heal:.75,mana:.85, dmg:1.1}, hits:12,inc:1.8},
+ 'Танк':       {w:{hp:1.4, heal:.85,mana:.75, dmg:.95}, hits:15,inc:2},
+};
+const TAL_CLASS={};
+const TAL_C={fight:25,ttk:2.5,pack:3,heal:1,slife:14};   // бой 25 с; стая из 3 за 2,5 с; лечение = входящему урону; жизнь призыва ~14 с
+const TAL_NEEDS=[
+ {id:'hp',  why:'мало здоровья',  c:x=>x.ehp/(x.hit*x.R.hits*(1-x.tank/2))},
+ {id:'heal',why:'мало лечения',   c:x=>x.heal/(x.hit*x.R.inc*(1-x.tank)*x.arm*TAL_C.heal)},
+ {id:'mana',why:'не хватает маны',c:x=>x.mDem>0?x.mSup/x.mDem:3},
+ {id:'dmg', why:'мало урона',     c:x=>x.dps*TAL_C.ttk/x.pack},
+];
+// подпись причины у отдельных талантов (что именно выросло)
+const TAL_WHY={armor:{hp:'мало защиты',heal:'мало защиты'},summ:{dmg:'слабые призывы'},orbit:{dmg:'слабые спутники'},wrath:{dmg:'урон вблизи'},cascade:{dmg:'ауры и ловушки'},luck:{dmg:'клейма'}};
+function talRole(){const r=TAL_ROLE[CLS.role]||TAL_ROLE['Маг'],c=TAL_CLASS[CLS.id]||{};
+  return {w:Object.assign({},r.w,c.w),hits:c.hits||r.hits,inc:c.inc||r.inc,like:Object.assign({},r.like,c.like),needs:c.needs?TAL_NEEDS.concat(c.needs):TAL_NEEDS};}
+// уровень врагов: ущелье — его уровень, мир — регион, где стоит герой (не ниже уровня героя)
+function talFoeLv(){let e=S.lvl;try{if(PLAY==='gorge'&&GZ)e=Math.max(e,GZ.lv|0);else if(P.pos)e=Math.max(e,enemyLvAt(P.pos.x,P.pos.z));}catch(_){}return e;}
+// средний враг региона (смесь ZONE_MIX) на уровне lv: удар и здоровье
+function talFoe(lv){let z=0;try{if(PLAY==='world'&&P.pos)z=zoneOf(P.pos.x,P.pos.z);}catch(_){}
+  const mix=ZONE_MIX[Math.min(z,ZONE_MIX.length-1)];let w=0,h=0,d=0;for(const [id,k] of mix){const t=MOBS[id];if(!t)continue;w+=k;h+=t.hp*k;d+=t.dmg*k;}
+  if(!w){w=1;h=48;d=10;}return {lv,hit:d/w*(1+.22*(lv-1))*.9,hp:h/w*(1+.42*(lv-1))*2.2};}
+// числа героя при нынешних S.talents (P не меняется: maxHp/mpRegen подставляются на время подсчёта силы чар)
+function talCtx(F,R){computeStats();const L=S.lvl;
+  const hpMax=(120+24*(L-1))*ST.hpMul*CLS.hp,mpMax=(100+10*(L-1))*ST.mana*CLS.mp,mpReg=(8+.4*(L-1))*ST.mana*CLS.mp;
+  let act=0,summ=0,pas=0,mDem=0,sN=0,cre=0,hA=0,hP=0,hFA=0,blood=0;const lk=R.like;
+  const keep=[P.mpRegen,P.maxHp];P.mpRegen=1e9;P.maxHp=hpMax;   // цикл чары = перезарядка; нехватку маны считаем общей ниже
+  try{for(const id of EQUIPPED){const sk=SKILLS[id],f=sk.F.id,rv=reactVal(sk.e,RESO_N);
+      const v=skPower(sk)*(1+(rv-1)*ST.react)/rv;
+      const lh=(sk.E.id==='shadow'?.12:sk.E.id==='light'?.08:0)+(sk.M.leech||0)+ST.leech;   // лечение с попаданий (призывы не лечат)
+      if(sk.E.id==='blood'&&f!=='summon')blood+=v;
+      if(sk.active){const cd=skCd(sk);mDem+=skMana(sk)/cd;
+        if(f==='summon'){const inf=summInfo(sk),life=inf.life||TAL_C.slife,up=Math.min(1,life/cd);summ+=v*(lk.summon||1);sN+=life/cd;
+          if(inf.k==='totem_heal')hFA+=hpMax*.05/1.6*up*.6;else if(!/^totem/.test(inf.k))cre+=up*inf.n;continue;}
+        if(f==='barrier')hFA+=(hpMax*.15+skDmg(sk)*1.6)/cd*.5;   // щит ловит примерно половину
+        if(f==='nova'&&sk.E.id==='light')hFA+=hpMax*.05/cd;
+        act+=v;hA+=v*lh;}
+      else{pas+=v*(f==='orbit'&&lk.orbit||1);hP+=v*lh;}}}
+  finally{P.mpRegen=keep[0];P.maxHp=keep[1];}
+  const mSup=mpReg+mpMax/TAL_C.fight,thr=mDem>0?Math.min(1,mSup/mDem):1,lim=sN>ST.summMax?ST.summMax/sN:1,cr=1+ST.crit;
+  const dps=((act+summ*lim)*thr+pas)*cr;
+  const heal=1.5+.25*L+ST.regen+(hA*thr+hP)*cr+hFA*thr+blood*thr*cr/F.hp*hpMax*.02;
+  const tank=Math.min(.45,.12*cre*lim*thr);   // призванные существа отвлекают врагов на себя
+  return {R,L,hit:F.hit,pack:TAL_C.pack*F.hp,ehp:hpMax/ST.armor,arm:ST.armor,heal,mSup,mDem,dps,thr,tank};}
+// вклад каждой потребности w·f(c); c ограничено, чтобы одна «закрытая» потребность не давала бесконечностей
+function talVec(F,R){const x=talCtx(F,R);return R.needs.map(nd=>{const c=Math.min(50,Math.max(.05,nd.c(x)||0));return -(R.w[nd.id]||0)/(2*c*c);});}
+function talCov(foe){const R=talRole(),x=talCtx(talFoe(foe||talFoeLv()),R),o={};for(const nd of R.needs)o[nd.id]=+(nd.c(x)||0).toFixed(2);computeStats();return o;}
+function talRank(){const r={};(TAL_PLAN[CLS.role]||TAL_PLAN['Маг']).split(' ').forEach((x,i)=>{const id=x.split(':')[0];if(!(id in r))r[id]=i;});
+  return t=>(t.id in r?r[t.id]:99)*20+TAL_K[t.id];}
+// n очков (по умолчанию все свободные) против врагов уровня foe (по умолчанию — где герой). Возвращает журнал [{id, why}] по очку.
+function talSmart(n,foe){if(n==null)n=tpFree();const R=talRole(),F=talFoe(foe||talFoeLv()),rank=talRank(),log=[];
+  const sum=v=>v.reduce((a,b)=>a+b,0),put=(id,d)=>{const v=T(id)+d;if(v)S.talents[id]=v;else delete S.talents[id];},
+    tryV=ids=>{for(const id of ids)put(id,1);const v=talVec(F,R);for(const id of ids)put(id,-1);return v;},
+    why=(v,b)=>{let k=0,bd=-1e18;v.forEach((x,i)=>{if(x-b[i]>bd){bd=x-b[i];k=i;}});return R.needs[k].id;};
+  let base=talVec(F,R),g=0;
+  try{while(n>0&&g++<200){const B=sum(base),gain={},vec={};let best=null;
+      for(const t of TALENTS){if(!talOpen(t))continue;const v=tryV([t.id]),d=sum(v)-B;gain[t.id]=d;vec[t.id]=v;
+        if(!best||d>best.d+1e-12)best={d,t,v};}
+      if(!best)break;const one=best.t;
+      for(const t of TALENTS){if(!talLocked(t))continue;const m=talNeed(t)-branchPts(t.b);if(m+1>n)continue;
+        const fill=TALENTS.filter(x=>x.b===t.b&&talOpen(x)).sort((a,b)=>gain[b.id]-gain[a.id]||rank(a)-rank(b)),add=[];let left=m;
+        for(const x of fill){const k=Math.min(left,x.max-T(x.id));for(let i=0;i<k;i++)add.push(x.id);left-=k;if(!left)break;}
+        if(left||!fill.length)continue;add.push(t.id);const d=(sum(tryV(add))-B)/(m+1);
+        if(d>best.d+1e-12)best={d,t:fill[0],v:vec[fill[0].id],via:fill[0]===one?null:t.id};}   // лучшая плитка и так — своя причина
+      if(best.d<=1e-9){const ok=TALENTS.filter(t=>talOpen(t)&&gain[t.id]>=-1e-9).sort((a,b)=>rank(a)-rank(b)),t=ok[0]||best.t;put(t.id,1);log.push({id:t.id,why:'reserve'});}
+      else{put(best.t.id,1);log.push({id:best.t.id,why:best.via?'open':why(best.v,base),via:best.via});}
+      base=talVec(F,R);n--;}}
+  finally{computeStats();}
+  return log;}
+const talWhyTxt=e=>e.why==='open'?'открыть «'+(TAL_BY[e.via].sn||TAL_BY[e.via].name)+'»':e.why==='reserve'?'про запас':
+  (TAL_WHY[e.id]&&TAL_WHY[e.id][e.why])||(TAL_NEEDS.find(nd=>nd.id===e.why)||{why:e.why}).why;
+// строка итога: «Авто: +3 Живучесть (мало здоровья), +2 Поток маны (не хватает маны)…» — больше очков вперёд, при равенстве — что вложено раньше
+function talAutoMsg(log){const g=new Map();log.forEach((e,i)=>{let o=g.get(e.id);if(!o)g.set(e.id,o={n:0,i,w:new Map()});o.n++;const w=talWhyTxt(e);o.w.set(w,(o.w.get(w)||0)+1);});
+  const arr=[...g.entries()].sort((a,b)=>b[1].n-a[1].n||a[1].i-b[1].i);
+  const part=([id,o])=>'+'+o.n+' '+(TAL_BY[id].sn||TAL_BY[id].name)+' ('+[...o.w.entries()].sort((a,b)=>b[1]-a[1])[0][0]+')';
+  const mk=k=>{const rest=arr.slice(k).reduce((a,e)=>a+e[1].n,0);return 'Авто: '+arr.slice(0,k).map(part).join(', ')+(rest?', ещё '+rest+' '+talPl(rest):'')+'.';};
+  let s=mk(3);if(s.length>100)s=mk(2);return s;}
 {const box=$('#branches');
   box.addEventListener('pointerdown',e=>{const b=e.target.closest('.tn');if(!b)return;tpMsg='';clearTimeout(tpMsgT);tpSel=b.dataset.t;talMark();talHint();
     tpHeld=false;clearTimeout(tpHold);tpHold=setTimeout(()=>{tpHeld=true;},420);});
@@ -4739,9 +4822,9 @@ function talAuto(role){const plan=(TAL_PLAN[role]||TAL_PLAN['Маг']).split(' '
     if(!tpFree()||!talOpen(t)){talMark();talHint();talPop(id,'');return;}
     S.talents[id]=T(id)+1;onTalentsChanged();talPop(id,'+1');});}
 $('#tpAuto').addEventListener('click',()=>{const free=tpFree();if(!free){talSay('Свободных очков нет.');return;}
-  const role=CLS&&CLS.role,before={...S.talents};talAuto(role);const n=free-tpFree();if(!n){talSay('Все таланты на максимуме.');return;}
-  onTalentsChanged();for(const t of TALENTS){const d=T(t.id)-(before[t.id]||0);if(d>0)talPop(t.id,'+'+d);}
-  talSay('Авто'+(TAL_PLAN[role]?' для роли «'+role+'»':'')+': вложено '+n+' '+talPl(n)+'.');});
+  const before={...S.talents},log=talSmart(free);const n=free-tpFree();if(!n){talSay('Все таланты на максимуме.');return;}
+  talGlow(log.map(e=>e.id));onTalentsChanged();for(const t of TALENTS){const d=T(t.id)-(before[t.id]||0);if(d>0)talPop(t.id,'+'+d);}
+  talSay(talAutoMsg(log));});
 let resetArm=0;
 const TAL_ARM='Нажми «Точно?» ещё раз — все очки вернутся.';
 $('#tpReset').addEventListener('click',e=>{const b=e.currentTarget;if(!resetArm){b.textContent='Точно?';talSay(TAL_ARM);
