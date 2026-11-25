@@ -363,6 +363,19 @@ html[data-ui=tab] #mm{top:calc(var(--m) + var(--sat) + 70px);width:calc(92px * v
 .btn{height:44px;min-height:44px;padding:0 14px;border-radius:11px;border:1px solid var(--line);background:var(--panel-solid);font:500 14px var(--f-ui)}
 .btn.gold{border:0;color:#2a1a05;background:linear-gradient(180deg,#ffe3a0,var(--gold))}
 .btn.ess{border-color:rgba(212,176,255,.6);color:var(--ess)}
+.btn.rankgo{flex:1 1 100%;order:-1;height:auto;min-height:48px;padding:7px 14px;line-height:1.25;text-wrap:balance;transition:transform .12s,box-shadow .2s}
+.btn.rankgo.can{border:0;color:#2a1a05;font-weight:700;background:linear-gradient(180deg,#ffe3a0,var(--gold));box-shadow:0 0 14px rgba(255,200,90,.5);animation:rkPulse 1.8s ease-in-out infinite}
+.btn.rankgo.need{border:1px dashed var(--gold);color:var(--gold);background:rgba(255,200,90,.08)}
+.btn.rankgo.done{border:1px solid rgba(120,220,150,.6);color:#9be8b2;background:rgba(120,220,150,.08)}
+.btn.rankgo.press{animation:none;transform:scale(.95);box-shadow:0 0 26px rgba(255,220,130,.9)}
+@keyframes rkPulse{50%{box-shadow:0 0 22px rgba(255,210,110,.85)}}
+.rankmsg{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 12px;margin:-4px 0 12px;padding:8px 12px;border-radius:10px;background:rgba(212,176,255,.08);border:1px solid rgba(212,176,255,.25);font-size:13.5px;line-height:1.4}
+.rankmsg .rm-t{flex:1 1 220px;color:var(--muted)}.rankmsg .rm-e{color:var(--ess);white-space:nowrap}
+.rankmsg.hit{border-color:var(--gold);background:rgba(255,200,90,.14);animation:rkMsg .5s}.rankmsg.hit .rm-t{color:var(--gold)}
+@keyframes rkMsg{0%{transform:scale(.97)}50%{transform:scale(1.02)}}
+.slot.rkup{animation:rkSlot 1.3s ease-out}
+@keyframes rkSlot{0%{box-shadow:0 0 0 0 rgba(255,220,130,.95);transform:scale(1.12)}60%{box-shadow:0 0 0 12px rgba(255,220,130,0)}100%{box-shadow:none;transform:none}}
+@media (prefers-reduced-motion:reduce){.btn.rankgo.can,.slot.rkup,.rankmsg.hit{animation:none}}
 .btn.warn{border-color:rgba(229,72,77,.6);color:#ff9a9d}
 .btn:disabled{opacity:.4;cursor:default}
 .toggle{display:flex;gap:12px;align-items:center;min-height:44px;font-size:14px;color:var(--muted);line-height:1.35}
@@ -1064,7 +1077,8 @@ html[data-ui=tab] #layPan{width:min(460px,calc(100% - 40px));padding:16px 18px;g
     </section>
     <section id="build" class="pane" hidden>
       <div class="bd">
-        <div class="bd-actions"><button class="btn gold" id="bestBuild" type="button">Лучший билд</button><button class="btn ess" id="rankBuild" type="button">Прокачать билд</button><button class="btn" id="randBuild" type="button">Случайный билд</button><button class="btn warn" id="clearBuild" type="button">Снять всё</button><button class="btn" id="undoBuild" type="button" hidden>↶ Отменить</button></div>
+        <div class="bd-actions"><button class="btn gold" id="bestBuild" type="button">Лучший билд</button><button class="btn ess rankgo" id="rankBuild" type="button">Прокачать билд</button><button class="btn" id="randBuild" type="button">Случайный билд</button><button class="btn warn" id="clearBuild" type="button">Снять всё</button><button class="btn" id="undoBuild" type="button" hidden>↶ Отменить</button></div>
+        <div class="rankmsg" id="rankMsg" aria-live="polite"><span class="rm-t" id="rankMsgT"></span><span class="rm-e">Эссенция: <b id="rankEss">0</b></span></div>
         <div class="bd-grid">
           <div>
             <section><h3>Активные <small id="actN"></small></h3><p class="hint">Кнопки справа на экране. Новые слоты открываются с уровнем.</p><div class="slots act" id="slotsA"></div></section>
@@ -4182,13 +4196,28 @@ const ROM=['','I','II','III','IV','V'];
 const rankBadge=id=>{const r=rk(id);return r>=5?'<i class="rkb mx" title="Ранг 5 — максимум">MAX</i>':'<i class="rkb" title="Ранг '+r+' из 5">'+ROM[r]+'</i>';};
 const slotRank=id=>{const r=rk(id);return r>=5?'<i class="rkb mx" title="Ранг 5 — максимум">МАКС</i>':'<i class="rkb" title="Ранг '+r+' из 5">Ранг '+r+'</i>';};
 function buildRankIds(){return [...EQUIPPED].filter(id=>rk(id)<5);}
-function upgradeBuildRanks(){let n=0,spent=0;
+function upgradeBuildRanks(){let n=0,spent=0;const ups={};
   for(;;){let best=null,bc=0,br=9;for(const id of EQUIPPED){const r=rk(id);if(r>=5)continue;const c=rankCost(r);if(c>S.ess)continue;if(r<br||(r===br&&id<best)){best=id;br=r;bc=c;}}
-    if(best==null)break;S.ess-=bc;S.ranks[best]=br+1;n++;spent+=bc;}
-  if(n){onBuildChanged();saveSoon();}return {n,spent};}
+    if(best==null)break;S.ess-=bc;S.ranks[best]=br+1;n++;spent+=bc;ups[best]=(ups[best]||0)+1;}
+  if(n){onBuildChanged();saveSoon();}return {n,spent,ups};}
+const plRk=(n,a,b,c)=>{const m=n%100,d=n%10;return n+' '+(m>10&&m<20?c:d===1?a:d>1&&d<5?b:c);};
+function rankPlan(){let ess=S.ess,n=0,spent=0;const rr=new Map();for(const id of EQUIPPED)rr.set(id,rk(id));
+  for(;;){let best=null,bc=0,br=9;for(const [id,r] of rr){if(r>=5)continue;const c=rankCost(r);if(c>ess)continue;if(r<br||(r===br&&id<best)){best=id;br=r;bc=c;}}
+    if(best==null)break;ess-=bc;rr.set(best,br+1);n++;spent+=bc;}
+  return {n,spent};}
+function updateRankBtn(){const b=$('#rankBuild');if(!b||!S)return;const ids=buildRankIds();let cls,t;
+  if(!EQUIPPED.size){cls='need';t='В билде нет чар';}
+  else if(!ids.length){cls='done';t='Всё на максимуме';}
+  else{const p=rankPlan();if(p.n){cls='can';t='Прокачать билд · '+plRk(p.n,'ранг','ранга','рангов')+' · '+p.spent+' эссенции';}
+    else{const need=Math.min(...ids.map(id=>rankCost(rk(id))));cls='need';t='Нужно ещё '+(need-S.ess)+' эссенции для следующего ранга';}}
+  b.className='btn ess rankgo '+cls;b.textContent=t;$('#rankEss').textContent=S.ess;if(!$('#rankMsgT').textContent)$('#rankMsgT').textContent='Ранг чары растёт за эссенцию: сила и урон выше.';}
+function rankSay(t,hit){const m=$('#rankMsg');if(!m)return;$('#rankMsgT').textContent=t;$('#rankEss').textContent=S.ess;m.classList.remove('hit');if(hit){void m.offsetWidth;m.classList.add('hit');}}
+function rankFeedback(r,pre){const names=Object.keys(r.ups).map(id=>SKILLS[id].base+' р.'+rk(+id));
+  rankSay(pre+'+'+plRk(r.n,'ранг','ранга','рангов')+': '+names.slice(0,3).join(', ')+(names.length>3?' и ещё '+(names.length-3):'')+' · −'+r.spent+' эссенции',true);
+  updateRankBtn();Object.keys(r.ups).forEach(id=>{const e=document.querySelector('#slotsA .slot[data-sid="'+id+'"],#slotsP .slot[data-sid="'+id+'"]');if(e){e.classList.remove('rkup');void e.offsetWidth;e.classList.add('rkup');}});}
 let rankToastAt=0,rankToastN=0,rankAutoAt=0;
 function autoRankTick(){if(!S||!S.autoRank||!EQUIPPED.size)return;const t=performance.now();if(t-rankAutoAt<1000)return;rankAutoAt=t;
-  const r=upgradeBuildRanks();if(r.n){rankToastN+=r.n;if(t-rankToastAt>4000){rankToastAt=t;toast('Автопрокачка: +'+rankToastN+' '+(rankToastN===1?'ранг':'рангов'));rankToastN=0;}}}
+  const r=upgradeBuildRanks();if(r.n&&bookOpen&&bookTab==='build')rankFeedback(r,'Автопрокачка: ');if(r.n){rankToastN+=r.n;if(t-rankToastAt>4000){rankToastAt=t;toast('Автопрокачка: +'+rankToastN+' '+(rankToastN===1?'ранг':'рангов'));rankToastN=0;}}}
 const pips=r=>`<span class="pips">${[1,2,3,4,5].map(i=>`<i class="${i<=r?'on':''}"></i>`).join('')}</span>`;
 const learnedVars=bk=>{let n=0;for(let m=0;m<NM;m++)if(isLearned(bk*NM+m))n++;return n;};
 function rankLine(sk,lv){const r=rk(sk.id),mx=r>=5,can=!mx&&S.ess>=rankCost(r);
@@ -4234,7 +4263,7 @@ listEl.addEventListener('click',e=>{const r=e.target.closest('.row');if(r)openSh
 function slotHtml(id,i,kind,unlocked,lvlNeed){
   if(!unlocked)return `<button type="button" class="slot lock${id!=null?' has':''}" data-k="${kind}" data-i="${i}" aria-label="Закрыт до уровня ${lvlNeed}">ур ${lvlNeed}</button>`;
   if(id==null)return `<button type="button" class="slot empty" data-k="${kind}" data-i="${i}" aria-label="Пустой слот">+</button>`;
-  const sk=SKILLS[id],r=rarOf(sk);return `<button type="button" class="slot" style="--c:${sk.E.hex}" data-r="${r}" data-k="${kind}" data-i="${i}" aria-label="${skName(sk)}, ${RARITY[r].n.toLowerCase()}, ранг ${rk(id)} из 5">${svg(sk.F.id)}${modBadge(sk)}${slotRank(id)}${rarDeco(r)}</button>`;}
+  const sk=SKILLS[id],r=rarOf(sk);return `<button type="button" class="slot" data-sid="${id}" style="--c:${sk.E.hex}" data-r="${r}" data-k="${kind}" data-i="${i}" aria-label="${skName(sk)}, ${RARITY[r].n.toLowerCase()}, ранг ${rk(id)} из 5">${svg(sk.F.id)}${modBadge(sk)}${slotRank(id)}${rarDeco(r)}</button>`;}
 function renderBuild(){
   const na=activeSlots(),np=passiveSlots();
   $('#slotsA').innerHTML=S.active.map((id,i)=>slotHtml(id,i,'a',i<na,activeLvl(i))).join('');
@@ -4247,12 +4276,15 @@ function renderBuild(){
   const R=REACT[rkey(EL[CLS.p],EL[CLS.s])];const has=RESO_N[R.a]>0&&RESO_N[R.b]>0;
   $('#reacts').innerHTML=`<div class="react${has?' ok':''}"><span class="pair"><i style="--c:${ELEMENTS[R.a].hex}"></i><i style="--c:${ELEMENTS[R.b].hex}"></i></span><span><b>${R.name}</b> · ${ELEMENTS[R.a].name} + ${ELEMENTS[R.b].name}: ${R.desc}.${has?'':' Возьми в билд чары обеих стихий.'}</span></div>`;
   $('#sandbox').checked=S.sandbox;$('#autoBest').checked=!!S.autoBest;$('#autoLu').checked=!!S.autoLu;$('#autoRank').checked=!!S.autoRank;
-  $('#undoBuild').hidden=!(BUNDO&&BUNDO.cls===CLS.id);const bp=buildPower();$('#bpow').textContent='Сила билда: '+Math.round(bp.all)+' (активные '+Math.round(bp.a)+', пассивные '+Math.round(bp.p)+'). Сила чары — условный урон в секунду с учётом перезарядки, маны, стихий и ранга.';}
+  updateRankBtn();$('#undoBuild').hidden=!(BUNDO&&BUNDO.cls===CLS.id);const bp=buildPower();$('#bpow').textContent='Сила билда: '+Math.round(bp.all)+' (активные '+Math.round(bp.a)+', пассивные '+Math.round(bp.p)+'). Сила чары — условный урон в секунду с учётом перезарядки, маны, стихий и ранга.';}
 $('#undoBuild').addEventListener('click',()=>{if(!BUNDO||BUNDO.cls!==CLS.id){BUNDO=null;renderBuild();return;}for(let i=0;i<8;i++)S.active[i]=BUNDO.a[i]??null;for(let i=0;i<42;i++)S.passive[i]=BUNDO.p[i]??null;BUNDO=null;onBuildChanged();renderBuild();toast('Билд возвращён');});
-$('#rankBuild').addEventListener('click',()=>{if(!EQUIPPED.size){toast('В билде нет чар');return;}
-  if(!buildRankIds().length){toast('Все чары билда на максимуме');return;}
-  const r=upgradeBuildRanks();toast(r.n?('Прокачано: '+r.n+' '+(r.n===1?'ранг':'рангов')+', осталось '+S.ess+' эссенции'):'Не хватает эссенции: нужно '+Math.min(...buildRankIds().map(id=>rankCost(rk(id))))+', есть '+S.ess);});
-$('#autoRank').addEventListener('change',e=>{S.autoRank=e.target.checked;saveSoon();toast(S.autoRank?'Автопрокачка билда включена':'Автопрокачка выключена');if(S.autoRank)rankAutoAt=0;});
+$('#rankBuild').addEventListener('click',()=>{const b=$('#rankBuild');b.classList.add('press');setTimeout(()=>b.classList.remove('press'),180);
+  if(!EQUIPPED.size){rankSay('В билде нет чар — сначала поставь чары в слоты.');toast('В билде нет чар');return;}
+  if(!buildRankIds().length){rankSay('Все чары билда на максимуме (ранг 5).');toast('Все чары билда на максимуме');return;}
+  const r=upgradeBuildRanks();
+  if(r.n){rankFeedback(r,'');toast('Прокачано: '+r.n+' '+(r.n===1?'ранг':'рангов')+', осталось '+S.ess+' эссенции');}
+  else{const need=Math.min(...buildRankIds().map(id=>rankCost(rk(id))));rankSay('Не хватает эссенции: нужно '+need+', есть '+S.ess+'.');toast('Не хватает эссенции: нужно '+need+', есть '+S.ess);}});
+$('#autoRank').addEventListener('change',e=>{S.autoRank=e.target.checked;saveSoon();toast(S.autoRank?'Автопрокачка билда включена':'Автопрокачка выключена');rankSay(S.autoRank?'Автопрокачка включена: ранги растут сами, как только хватает эссенции.':'Автопрокачка выключена.');if(S.autoRank)rankAutoAt=0;});
 $('#autoBest').addEventListener('change',e=>{S.autoBest=e.target.checked;saveSoon();toast(S.autoBest?'Сильные чары будут вставать сами':'Сильные чары — через плашку с вопросом');});
 $('#bestBuild').addEventListener('click',()=>{const r=applyBestBuild();toast(r.n?('Лучший билд: сила '+Math.round(r.before)+' → '+Math.round(r.after)+(r.before>0?' ('+(r.after>=r.before?'+':'')+pct(r.after/r.before-1)+'%)':'')):'Нет изученных чар для билда');});
 $('#upgYes').addEventListener('click',()=>{if(UPG==null)return;const sk=SKILLS[UPG],u=upgradeFor(sk);hideUpg();if(!u){toast('Уже не актуально');return;}applyUpgrade(sk,u);toast('«'+skName(sk)+'» вместо «'+skName(SKILLS[u.tgt])+'»');});
@@ -4526,7 +4558,7 @@ const r2=x=>Math.round(x*100)/100;
 function mpRng(seed){let a=seed>>>0;return()=>{a=(a+0x6D2B79F5)>>>0;let t=a;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296;};}
 function mpSeeded(seed,fn){if(!MPon){fn();return;}const old=Math.random;Math.random=mpRng(seed);try{fn();}finally{Math.random=old;}}
 
-const APP_BUILD='v13.9';window.APP_BUILD=APP_BUILD;// = VERSION в sw.js; при выпуске менять в обоих местах (кооператив сверяет сборки игроков)
+const APP_BUILD='v13.10';window.APP_BUILD=APP_BUILD;// = VERSION в sw.js; при выпуске менять в обоих местах (кооператив сверяет сборки игроков)
 const MP_APP='ingenious-builder/tysyacha-char/v1';
 const MP_RELAYS=['nos.lol','nostr.mom','nostr.sathoarder.com','relay.fountain.fm','multiplexer.huszonegy.world'].map(u=>'wss://'+u);
 // TURN убран: openrelay.metered.ca закрыт (DNS не резолвится, relay-кандидатов нет). STUN у Trystero свой (Google и др.).
@@ -5521,7 +5553,7 @@ if(H_&&H_.ready)H_.ready(start);else start((H_&&H_.data)||{});
 <script>
 // версия, проверка обновлений и диагностика экрана
 (function(){
-const CUR=window.APP_BUILD||'v13.9';let reg=null;
+const CUR=window.APP_BUILD||'v13.10';let reg=null;
 const $=id=>document.getElementById(id);
 function showUpd(v){if($('updBar'))return;const b=document.createElement('div');b.id='updBar';b.innerHTML='<span>Есть обновление '+v+'</span><button type="button">Обновить</button>';b.querySelector('button').onclick=async()=>{b.firstChild.textContent='Обновляю…';try{if(reg)await reg.update();}catch(e){}try{const ks=await caches.keys();await Promise.all(ks.filter(k=>k.startsWith('tysyacha-char-')).map(k=>caches.delete(k)));}catch(e){}try{if(reg&&reg.waiting)reg.waiting.postMessage('skip');}catch(e){}appUpdateNow();};($('app')||document.body).appendChild(b);}
 async function chk(){try{const r=await fetch('sw.js?'+Date.now(),{cache:'no-store'});const t=await r.text();const m=t.match(/VERSION\s*=\s*['"]([^'"]+)['"]/);if(m&&m[1]!==CUR)showUpd(m[1]);}catch(e){}}
