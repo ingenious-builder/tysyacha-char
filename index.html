@@ -6320,6 +6320,17 @@ Interp.prototype.at=function(delay,out){const b=this.b,n=b.length;if(!n)return f
     if(Math.hypot(B[1]-A[1],B[2]-A[2])>8){out.x=B[1];out.z=B[2];}else{out.x=A[1]+(B[1]-A[1])*k;out.z=A[2]+(B[2]-A[2])*k;}return true;}}
   out.x=b[0][1];out.z=b[0][2];return true;};
 const IP_OUT={x:0,z:0},PEER_DELAY=95,ENEMY_DELAY=110;
+// буфер плавности под сеть (25.11): сколько ждать следующий пакет = p95 от (промежуток между пакетами + опоздание этого пакета) + 5 мс.
+// Только уменьшает прежние 95/110 мс: при ровной сети (P2P) друг и враги видны раньше на 30–45 мс; при рваной — как было.
+function NetJit(lo,hi){this.lo=lo;this.hi=hi;this.d=hi;this.off=null;this.pts=null;this.w=[];this.n=0;}
+NetJit.prototype.push=function(ts){if(ts==null)return;if(this.pts!==null&&ts<=this.pts)return;const c=performance.now()-ts;
+  if(this.off===null||c<this.off)this.off=c;else this.off+=(c-this.off)*.02;
+  if(this.pts!==null){const gap=ts-this.pts;if(gap<1500){this.w.push(gap+Math.max(0,c-this.off));if(this.w.length>48)this.w.shift();}}
+  this.pts=ts;
+  if(++this.n%8===0&&this.w.length>=16){const a=this.w.slice().sort((x,y)=>x-y),need=a[Math.floor(a.length*.95)]+5,t=Math.max(this.lo,Math.min(this.hi,need));
+    this.d+=(t-this.d)*(t>this.d?.6:.25);}};
+NetJit.prototype.reset=function(){this.d=this.hi;this.off=null;this.pts=null;this.w.length=0;this.n=0;};
+const NJ={p:new NetJit(50,PEER_DELAY),s:new NetJit(50,ENEMY_DELAY)};
 
 // ---------- ник ----------
 function mpNick(){try{return localStorage.getItem(NICK_KEY)||'';}catch(e){return '';}}
@@ -6368,8 +6379,11 @@ function mpNetLine(){
 function mpNetDetail(){
   const L=[],n=mpDiag.nostr,rs=mpRel?mpRel.status():null;
   L.push('Канал: '+(mpVia()==='p2p'?'P2P':mpVia()==='relay'?'через сервер':'нет'));
-  L.push('Сервер связи (Supabase): '+(rs?(rs.joined?'подключён':'не подключён ('+rs.ws+(rs.lastErr?', '+rs.lastErr:'')+', попыток '+rs.tries+')')+(rs.rtt?', отклик '+Math.round(rs.rtt)+' мс':'')+', игроков в канале: '+rs.peers+', принято '+rs.rx+', отправлено '+rs.tx:'не запущен'));
-  if(MP.ping)L.push('Пинг туда-обратно: '+Math.round(MP.ping)+' мс (медиана из 5), в одну сторону примерно '+Math.round(MP.ping/2)+' мс'+(mpVia()==='relay'?'; через сервер сообщение идёт игрок → сервер → игрок, пинг считает дорогу туда и обратно: 4 участка':''));
+  L.push('Сервер связи (Supabase, Франкфурт): '+(rs?(rs.joined?'подключён':'не подключён ('+rs.ws+(rs.lastErr?', '+rs.lastErr:'')+', попыток '+rs.tries+')')+(rs.srvRtt?', до сервера и обратно '+rs.srvRtt+' мс':'')+', игроков в канале: '+rs.peers+', принято '+rs.rx+', отправлено '+rs.tx:'не запущен'));
+  if(MP.ping)L.push('Пинг до напарника туда-обратно: '+Math.round(MP.ping)+' мс (медиана из 5), в одну сторону примерно '+Math.round(MP.ping/2)+' мс'+(mpVia()==='relay'?'; через сервер сообщение идёт игрок → сервер → игрок, пинг считает дорогу туда и обратно: 4 участка':''));
+  if(mpVia()==='relay'&&rs&&rs.srvRtt)L.push('Через сервер пинг не меньше двух дорог «до сервера и обратно» (≈ '+2*rs.srvRtt+' мс): быстрее — только напрямую (P2P) или сервер ближе к вам. Очередь отправки: ~'+rs.qWait+' мс');
+  {const dn=mpDc&&mpDc.isOpen(MP.peerId)?mpDc.rttNet():0;if(dn)L.push('Сеть напрямую (WebRTC): '+dn+' мс туда-обратно; остальное в пинге — обработка сообщения в кадре у обоих телефонов');}
+  L.push('Буфер плавности: напарник '+Math.round(NJ.p.d)+' мс, враги '+Math.round(NJ.s.d)+' мс (подстраивается под сеть, не больше 95/110)');
   L.push('Реле nostr (поиск P2P): '+(n?(n.done<n.total?'проверяем… ':'')+n.ok+' из '+n.total+' отвечают':'не проверялись'));
   const di=mpDc?mpDc.info():null;
   if(di){L.push('Прямое соединение (свой WebRTC): '+({idle:'ждёт напарника',connecting:'соединяемся…',open:'открыто',failed:'не вышло'}[di.state]||di.state)+(di.state==='open'?'; пара ICE: '+(di.pair||'…')+(di.openMs?'; поднялось за '+(di.openMs/1000).toFixed(1)+' с':''):'')+(di.fails?'; неудач: '+di.fails:''));
@@ -6390,7 +6404,7 @@ async function mpOpen(role,code){
   if(gen!==mpOpenGen)return;
   const sid=lib&&lib.selfId?lib.selfId:Math.random().toString(36).slice(2,12)+Math.random().toString(36).slice(2,8);
   try{if(window.relayJoin){
-    mpRel=relayJoin({appId:MP_APP,roomId:code,selfId:sid,url:MP_SB.url,key:MP_SB.key});
+    mpRel=relayJoin({appId:MP_APP,roomId:code,selfId:sid,url:MP_SB.url,key:MP_SB.key,paced:true});
     const [rsend,rget]=mpRel.makeAction('m');mpRelSend=rsend;
     rget((d,id)=>mpOnMsg(d,id));mpRel.onPeerJoin(id=>mpChanJoin('srv',id));mpRel.onPeerLeave(id=>mpChanLeave('srv',id));}}catch(e){mpRel=null;mpRelSend=null;}
   mpProbeNostr();
@@ -6466,6 +6480,7 @@ function mpTick(){
       if(MPH)mpSendSnap();
       if(MP.pvDirty||now-(MP.pvAt||0)>5000){MP.pvDirty=false;MP.pvAt=now;mpSendPv();}
     }else if(now-MP.kaAt>2000||!MP.kaAt){MP.kaAt=now;mpSend({t:'ka'});}
+    if(mpRel&&mpRel.flush)mpRel.flush(); // всё, что накопилось за такт (позиция, снимок, удары, события кадров), — одним конвертом сейчас
     if(mpDc&&mpDc.isOpen(MP.peerId)){const r=mpDc.rtt();if(r)MP.ping=r;}else if(now-MP.pingAt>2500){MP.pingAt=now;try{const pr=mpP2P.has(MP.peerId)&&mpTry?mpTry:mpRel;if(pr)pr.ping(MP.peerId).then(ms=>{MP.pingRaw=ms;const q=MP.pingQ;q.push(ms);if(q.length>5)q.shift();MP.ping=q.slice().sort((a,b)=>a-b)[q.length>>1];}).catch(()=>{});}catch(e){}}
   }else if(MP.role&&MP.code&&mpRoom&&now-MP.t0>(MP.role==='guest'?25000:60000)){MP.t0=now;mpOpen(MP.role,MP.code);}
 }
@@ -6605,6 +6620,7 @@ function mpEndSession(){
   $('#mpHud').hidden=true;MP.down=false;$('#winWorld').hidden=false;
   if(MP.peerId)MP.status='lobby';}
 function mpSessionClear(){
+  NJ.p.reset();NJ.s.reset();
   MP.byUid.clear();MP.hitQ.length=0;MP.combo=0;MP.comboT=0;MP.revT=0;MP.down=false;MP.tBroken=false;MP.plCd=14;MP.plBoss=null;
   mpPlatesDrop();mpChestDrop();if(TCC)TCC.clear();if(MP.tether){scene.remove(MP.tether.g);MP.tether=null;}
   if(MP.rv){scene.remove(MP.rv.ring,MP.rv.disc);MP.rv=null;}
@@ -6686,7 +6702,7 @@ function mpGuestKill(m){
 function mpGuestRemove(m){const en=MP.byUid.get(m.u);if(!en)return;MP.byUid.delete(m.u);if(en===BOSS)BOSS=null;const i=ENEMIES.indexOf(en);if(i>=0)removeEnemy(i);}
 function mpOnSnap(m){
   if(!MPG)return;
-  const E=m.e,ts=m.ts!=null?m.ts:performance.now(),now=performance.now();
+  const E=m.e,ts=m.ts!=null?m.ts:performance.now(),now=performance.now();NJ.s.push(m.ts);
   // самолечение: снимок хоста — полный список живых врагов. Чего нет у нас — просим у хоста; что у нас есть, а в снимках нет — убираем
   let need=null;const seen=new Set();
   for(let i=0;i+6<E.length;i+=7){const u=E[i];seen.add(u);const en=MP.byUid.get(u);if(en)en.snapAt=now;else(need||(need=[])).push(u);}
@@ -6716,7 +6732,7 @@ function mpReconcile(E){
     if(now-en.missAt>1500){MP.byUid.delete(u);if(en===BOSS)BOSS=null;if(!en.dead){const k=ENEMIES.indexOf(en);if(k>=0)removeEnemy(k);}}}}
 function mpStepRemote(en,dt){
   en.flash-=dt;const t=en.tg;if(!t)return;
-  const ox=en.pos.x,oz=en.pos.z;if(en.ib&&en.ib.at(ENEMY_DELAY,IP_OUT)){en.pos.x=IP_OUT.x;en.pos.z=IP_OUT.z;}else{en.pos.x=t.x;en.pos.z=t.z;}
+  const ox=en.pos.x,oz=en.pos.z;if(en.ib&&en.ib.at(NJ.s.d,IP_OUT)){en.pos.x=IP_OUT.x;en.pos.z=IP_OUT.z;}else{en.pos.x=t.x;en.pos.z=t.z;}
   const d=Math.hypot(t.x-en.pos.x,t.z-en.pos.z);
   const f=t.fl;en.face=t.f;en.jy=t.jy;en.moving=!!(f&1)||Math.hypot(en.pos.x-ox,en.pos.z-oz)>.004;
   en.stun=(f&2)?.6:0;en.frozenT=(f&4)?1:0;en.burnT=(f&8)?1:0;en.poisT=(f&16)?1:0;en.slowT=(f&32)?1:0;
@@ -6781,14 +6797,14 @@ function mpSelfLabel(){
 function mpOnPos(m){
   const pr=MP.peer;if(!pr||!MP.active)return;
   if(!pr.on){/* напарник в игре — значит вошёл */pr.on=true;if(MP.active)mpPeerModelMake();}
-  pr.ib.push(m.ts!=null?m.ts:performance.now(),m.x,m.z);pr.tx=m.x;pr.tz=m.z;pr.tf=m.f;pr.hp=m.h;pr.maxHp=m.m;pr.mv=m.mv;pr.sw=m.sw;pr.sh=m.sh;pr.rp=m.rp;pr.lvl=m.l||pr.lvl;if(m.k!=null)pr.ctt=String(m.k);
+  pr.ib.push(m.ts!=null?m.ts:performance.now(),m.x,m.z);NJ.p.push(m.ts);pr.tx=m.x;pr.tz=m.z;pr.tf=m.f;pr.hp=m.h;pr.maxHp=m.m;pr.mv=m.mv;pr.sw=m.sw;pr.sh=m.sh;pr.rp=m.rp;pr.lvl=m.l||pr.lvl;if(m.k!=null)pr.ctt=String(m.k);
   if(m.c&&pr.castT<.1)pr.castT=.3;
   const wasDead=pr.dead;pr.dead=!!m.d;if(pr.dead&&!wasDead&&MP.active)hint(pr.nick+' упал — встань рядом на 3 секунды, чтобы поднять',5);
   if(!pr.placed){pr.pos.set(m.x,0,m.z);pr.placed=true;}}
 function mpUpdatePeer(dt){
   const pr=MP.peer;if(!pr||!pr.on||!pr.hero)return;const h=pr.hero;
   const ox=pr.pos.x,oz=pr.pos.z,k=1-Math.exp(-dt*16);
-  if(pr.ib&&pr.ib.at(PEER_DELAY,IP_OUT)){pr.pos.x=IP_OUT.x;pr.pos.z=IP_OUT.z;}else if(Math.hypot(pr.tx-ox,pr.tz-oz)>12){pr.pos.x=pr.tx;pr.pos.z=pr.tz;}else{pr.pos.x+=(pr.tx-ox)*k;pr.pos.z+=(pr.tz-oz)*k;}
+  if(pr.ib&&pr.ib.at(NJ.p.d,IP_OUT)){pr.pos.x=IP_OUT.x;pr.pos.z=IP_OUT.z;}else if(Math.hypot(pr.tx-ox,pr.tz-oz)>12){pr.pos.x=pr.tx;pr.pos.z=pr.tz;}else{pr.pos.x+=(pr.tx-ox)*k;pr.pos.z+=(pr.tz-oz)*k;}
   pr.vel.set((pr.pos.x-ox)/Math.max(dt,1e-3),0,(pr.pos.z-oz)/Math.max(dt,1e-3));
   h.g.position.set(pr.pos.x,pr.dead&&!h.mdl?.2:0,pr.pos.z);
   let a=pr.tf-h.g.rotation.y;a=Math.atan2(Math.sin(a),Math.cos(a));h.g.rotation.y+=a*Math.min(1,dt*14);h.g.rotation.z=pr.dead&&!h.mdl?1.4:0;

@@ -12,6 +12,10 @@
  * Хост — offerer. Ждём открытия 6 с, не вышло — остаёмся на сервере и пробуем снова через 20–30 с.
  * Сбой открытого канала: сначала перезапуск ICE (до 5 с), потом пересоздание. События (≤ 3 с), ушедшие по надёжному каналу
  * перед обрывом, отдаются в onClose — приложение досылает их через сервер (у событий есть номер _q, приёмник отсеивает дубли).
+ *
+ * Пинг (25.11): rtt() — медиана 5 последних замеров «пинг/понг» по каналу 'u' (раз в 1,5 с; это задержка игры: сеть + обработка
+ * сообщения в кадре у обоих); rttNet — медиана 5 замеров самой сети из статистики WebRTC (currentRoundTripTime выбранной пары ICE,
+ * раз в 3 с). Стоит в буфере 'u' больше 64 КБ (слабый аплинк) — новые p/s/ka не кладём: они устарели бы, пока дойдут.
  */
 (function (g) {
   'use strict';
@@ -27,6 +31,9 @@
     var peer = null, pc = null, chR = null, chU = null, cur = '', st = 'idle', openAt = 0, startAt = 0;
     var pend = [], timerFail = 0, timerRetry = 0, timerDisc = 0, timerKa = 0;
     var fails = 0, reason = '', pair = '', rttMs = 0, lastIn = 0, pings = {}, sent = [], cand = newCand();
+    var rttQ = [], netQ = [], kaN = 0, dropU = 0, BUF_MAX = 65536;
+    function med(a) { if (!a.length) return 0; var s = a.slice().sort(function (x, y) { return x - y; }); return s[s.length >> 1]; }
+    function addQ(q, v) { q.push(v); if (q.length > 5) q.shift(); }
 
     function log() { try { if (g.__P2PLOG) console.log.apply(console, ['[p2p]'].concat([].slice.call(arguments))); } catch (e) {} }
     function sig(m) { if (peer) try { sendSig(m, peer); } catch (e) {} }
@@ -36,7 +43,7 @@
       var c = pc; pc = null;
       try { if (chR) { chR.onopen = chR.onclose = chR.onmessage = null; } if (chU) { chU.onopen = chU.onclose = chU.onmessage = null; } } catch (e) {}
       try { if (c) { c.onicecandidate = c.onconnectionstatechange = c.oniceconnectionstatechange = c.ondatachannel = null; c.close(); } } catch (e) {}
-      chR = chU = null; pend = []; pair = ''; cand = newCand();
+      chR = chU = null; pend = []; pair = ''; cand = newCand(); rttQ = []; netQ = [];
     }
     function setClosed(why) {
       var was = st === 'open', lost = [];
@@ -116,8 +123,9 @@
         if (st !== 'open') return;
         var now = Date.now();
         if (now - lastIn > 4500) { fail('нет данных 4,5 с'); return; }
-        var n = rid(); pings[n] = now; rawU({ '~': 'pi', n: n });
-        for (var k in pings) if (now - pings[k] > 8000) delete pings[k];
+        var n = rid(), pn = performance.now(); pings[n] = pn; rawU({ '~': 'pi', n: n });
+        for (var k in pings) if (pn - pings[k] > 8000) delete pings[k];
+        if (++kaN % 2 === 0) readPair(); // пинг самой сети (WebRTC) раз в 3 с
       }, 1500);
       try { o.onOpen && o.onOpen(peer); } catch (e) {}
     }
@@ -132,6 +140,7 @@
         if (sel && pc === c) {
           var L = byId[sel.localCandidateId] || {}, R = byId[sel.remoteCandidateId] || {};
           pair = (L.candidateType || '?') + ' / ' + (R.candidateType || '?') + ' (' + (L.protocol || R.protocol || '?') + ')';
+          if (sel.currentRoundTripTime > 0) addQ(netQ, sel.currentRoundTripTime * 1000);
         }
       }).catch(function () {});
     }
@@ -140,7 +149,7 @@
       var d; try { d = JSON.parse(s); } catch (e) { return; }
       if (d && d['~']) {
         if (d['~'] === 'pi') rawU({ '~': 'po', n: d.n });
-        else if (d['~'] === 'po') { var t = pings[d.n]; if (t) { delete pings[d.n]; rttMs = Date.now() - t; } }
+        else if (d['~'] === 'po') { var t = pings[d.n]; if (t) { delete pings[d.n]; addQ(rttQ, performance.now() - t); rttMs = med(rttQ); } }
         return;
       }
       try { o.onMessage && o.onMessage(d, peer); } catch (e) { try { console.error(e); } catch (x) {} }
@@ -210,11 +219,13 @@
         var s; try { s = JSON.stringify(obj); } catch (e) { return false; }
         var u = obj && UNREL[obj.t] && s.length < 12000, ch = u ? chU : chR;
         if (!ch || ch.readyState !== 'open') return false;
+        if (u && ch.bufferedAmount > BUF_MAX) { dropU++; return true; } // устаревшее не копим: следующий p/s заменит
         try { ch.send(s); } catch (e) { return false; }
         if (!u) { var now = Date.now(); sent.push({ t: now, o: obj }); while (sent.length && (now - sent[0].t > 3500 || sent.length > 60)) sent.shift(); }
         return true;
       },
-      rtt: function () { return st === 'open' ? rttMs : 0; },
+      rtt: function () { return st === 'open' && rttQ.length ? Math.max(1, Math.round(rttMs)) : 0; },
+      rttNet: function () { return st === 'open' ? Math.round(med(netQ)) : 0; },
       kick: function () {
         // вернулись из фона: iOS мог убить канал — проверяем и при необходимости поднимаем заново
         if (closed || !peer) return;
@@ -224,7 +235,7 @@
       },
       info: function () {
         if (st === 'open' && !pair) readPair();
-        return { state: st, peer: peer, pair: pair, rtt: rttMs, fails: fails, reason: reason, openMs: openAt && startAt ? openAt - startAt : 0, summary: pc ? iceSummary() : '' };
+        return { state: st, peer: peer, pair: pair, rtt: rttMs, rttNet: Math.round(med(netQ)), dropU: dropU, buf: chU ? chU.bufferedAmount : 0, fails: fails, reason: reason, openMs: openAt && startAt ? openAt - startAt : 0, summary: pc ? iceSummary() : '' };
       },
       leave: function () { if (closed) return; closed = true; clearTimeout(timerRetry); clearInterval(timerKa); teardown(); st = 'idle'; peer = null; },
       _closeChannels: function () { try { if (chR) chR.close(); } catch (e) {} }
