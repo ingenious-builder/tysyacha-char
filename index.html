@@ -1132,25 +1132,25 @@ const FORMS=[
  {id:'hook',kind:'active',role:'Контроль',cd:8,mana:12,power:24,range:12,how:'Цепь 12 м: первого врага притягивает к тебе и оглушает, а к боссу тянет тебя',names:L('Огненный аркан,Ледяная цепь,Грозовой гарпун,Ядовитый хлыст,Хватка тьмы,Цепь света,Каменный крюк,Аркан ветра,Кровавая цепь,Арканная привязь')},
  {id:'fan',kind:'active',role:'Атака',cd:4,mana:14,power:18,range:7,how:'7 коротких снарядов веером: вблизи по одной цели попадают почти все',names:L('Веер искр,Ледяные осколки,Веер разрядов,Ядовитые брызги,Веер теней,Веер света,Каменная шрапнель,Веер ветра,Кровавые иглы,Звёздный веер')},
  // --- новые общие пассивки (раздел 5А) ---
- {id:'link',kind:'passive',role:'Всегда',trig:'always',power:0,names:nm('f','сцепка'),line:'Два ближайших врага скованы цепью: часть урона по одному достаётся второму; умер один — цепь перескакивает на следующего.',hint:'40% урона переходит второму, до 10 м'},
+ {id:'link',kind:'passive',role:'Всегда',trig:'always',power:20,names:nm('f','сцепка'),line:'Два ближайших врага скованы цепью: часть урона по одному достаётся второму; умер один — цепь перескакивает на следующего.',hint:'40% урона переходит второму, до 10 м'},
  {id:'volley',kind:'passive',role:'По таймеру',trig:'timer',power:18,names:nm('p','клинки'),line:'За спиной по одному вырастают четыре клинка; когда готовы все, они сами летят в четырёх разных врагов.',hint:'клинок раз в 1.25 с, полный залп раз в 5 с, 14 м'},
  {id:'ward',kind:'passive',role:'По таймеру',trig:'timer',power:12,names:nm('m','оберег'),line:'Над плечом висит оберег: первый удар по тебе он забирает целиком и разлетается осколками во врагов, потом вырастает снова.',hint:'раз в 8 с, 5 осколков'},
  {id:'deflect',kind:'passive',role:'По таймеру',trig:'timer',power:20,names:nm('m','отбойник'),line:'Раз в несколько секунд первый вражеский снаряд, летящий в тебя, разворачивается в стрелка и бьёт его вдвое.',hint:'раз в 6 с, урон снаряда ×2 и сверху сила чары'},
- {id:'twin',kind:'passive',role:'Касты',trig:'casts',power:0,names:nm('m','двойник'),line:'Каждую пятую чару за тобой повторяет призрачный двойник: появляется рядом, колдует то же самое и тает.',hint:'через 0.3 с, 70% силы, бесплатно'},
+ {id:'twin',kind:'passive',role:'Касты',trig:'casts',power:20,names:nm('m','двойник'),line:'Каждую пятую чару за тобой повторяет призрачный двойник: появляется рядом, колдует то же самое и тает.',hint:'через 0.3 с, 70% силы, бесплатно'},
  {id:'combo',kind:'passive',role:'Попадания вблизи',trig:'hits',power:20,names:nm('m','таран'),line:'Каждый третий удар вблизи — тяжёлый: враг отлетает и сбивает всех, в кого врезался.',hint:'отброс 6 м, сбитым урон и оглушение 0.6 с'},
  {id:'battery',kind:'passive',role:'Попадания',trig:'hits',power:120,names:nm('f','батарея'),line:'Твой урон заряжает батарею; полная — загорается кнопка-молния: нажми, и разряд бьёт всех вокруг.',hint:'кнопка у HUD или клавиша R; разряд 10 м, оглушение 0.5 с; в автобое срабатывает сама'},
  {id:'rift',kind:'passive',role:'Крит',trig:'crit',power:30,names:nm('m','провал'),line:'Критический удар открывает под врагом маленькую чёрную воронку: она стягивает соседей и через секунду схлопывается.',hint:'3.5 м, не чаще раза в 1.5 с'},
  {id:'thrall',kind:'passive',role:'Убийство',trig:'kill',power:15,names:nm('f','свита'),line:'Каждый пятый убитый враг встаёт на твою сторону тенью себя и дерётся восемь секунд.',hint:'не больше 3 сразу; элиты и боссы не встают'},
- {id:'harvest',kind:'passive',role:'Убийство',trig:'kill',power:0,names:nm('p','искры жизни'),line:'Убитые роняют искры, и те сами летят к тебе: каждая чуть лечит и даёт ману.',hint:'искра: 1.5% здоровья и 3 маны, притягивается с 8 м'},
- {id:'trophy',kind:'passive',role:'Убийство элиты',trig:'elite',power:0,names:nm('m','трофей'),line:'Убитая элита роняет трофей; подбери — и три следующие чары бесплатны и без перезарядки.',hint:'трофей лежит 15 с; с босса — 5 чар'},
+ {id:'harvest',kind:'passive',role:'Убийство',trig:'kill',power:20,names:nm('p','искры жизни'),line:'Убитые роняют искры, и те сами летят к тебе: каждая чуть лечит и даёт ману.',hint:'искра: 1.5% здоровья и 3 маны, притягивается с 8 м'},
+ {id:'trophy',kind:'passive',role:'Убийство элиты',trig:'elite',power:20,names:nm('m','трофей'),line:'Убитая элита роняет трофей; подбери — и три следующие чары бесплатны и без перезарядки.',hint:'трофей лежит 15 с; с босса — 5 чар'},
  {id:'slip',kind:'passive',role:'Удар по тебе',trig:'hurt',power:30,names:nm('n','ускользание'),line:'Когда тебя бьют, ты исчезаешь и появляешься в пяти метрах позади, а на старом месте остаётся силуэт и взрывается.',hint:'раз в 10 с, этот удар не проходит'},
- {id:'stagger',kind:'passive',role:'Удар по тебе',trig:'hurt',power:0,names:nm('f','отсрочка'),line:'Половина урона по тебе приходит не сразу, а растягивается на три секунды; каждое убийство сжигает часть долга.',hint:'убийство снимает треть долга'},
- {id:'brink',kind:'passive',role:'Мало здоровья',trig:'brink',power:0,names:L('Тлеющий миг,Застывший миг,Миг молнии,Вязкий миг,Миг тьмы,Светлый миг,Каменный миг,Миг ветра,Кровавый миг,Остановленный миг'),line:'Здоровья меньше трети — время вокруг замедляется: враги и их снаряды еле движутся, а ты нет.',hint:'3 с, раз в 40 с'},
+ {id:'stagger',kind:'passive',role:'Удар по тебе',trig:'hurt',power:20,names:nm('f','отсрочка'),line:'Половина урона по тебе приходит не сразу, а растягивается на три секунды; каждое убийство сжигает часть долга.',hint:'убийство снимает треть долга'},
+ {id:'brink',kind:'passive',role:'Мало здоровья',trig:'brink',power:20,names:L('Тлеющий миг,Застывший миг,Миг молнии,Вязкий миг,Миг тьмы,Светлый миг,Каменный миг,Миг ветра,Кровавый миг,Остановленный миг'),line:'Здоровья меньше трети — время вокруг замедляется: враги и их снаряды еле движутся, а ты нет.',hint:'3 с, раз в 40 с'},
  {id:'rebirth',kind:'passive',role:'Смертельный удар',trig:'brink',power:50,names:L('Возрождение из пепла,Ледяной сон,Второй разряд,Живучесть чумы,Филактерия,Благословение,Каменное сердце,Второе дыхание,Неистощимая кровь,Отмотка времени'),line:'Раз в полторы минуты смертельный удар не убивает: ты вспыхиваешь, встаёшь с частью здоровья и отбрасываешь всех вокруг.',hint:'40% здоровья, раз в 90 с'},
  {id:'focus',kind:'passive',role:'Стоишь',trig:'stand',power:20,names:L('Шар пламени,Шар льда,Шар грозы,Шар яда,Шар тьмы,Шар света,Шар камня,Шар ветра,Шар крови,Шар чар'),line:'Пока стоишь, над головой растёт шар силы; сделал шаг — шар срывается в ближайшего врага: чем дольше стоял, тем сильнее.',hint:'полный шар за 3 с — урон вчетверо больше'},
  {id:'shell',kind:'passive',role:'Окружили',trig:'crowd',power:45,names:nm('m','кокон'),line:'Окружили — вокруг тебя на две секунды вырастает кристалл: тебя не ранят, а потом он разлетается осколками во все стороны.',hint:'5 врагов в 4 м, раз в 15 с'},
  {id:'sprite',kind:'passive',role:'Реакция стихий',trig:'react',power:12,names:L('Дитя огня,Дитя льда,Дитя грозы,Дитя яда,Дитя тьмы,Дитя света,Дитя камня,Дитя ветра,Дитя крови,Дитя чар'),line:'Каждая реакция двух стихий рождает маленького духа; он шесть секунд летает рядом и бьёт врагов.',hint:'до 3 духов'},
- {id:'execute',kind:'passive',role:'Добивание',trig:'finish',power:0,names:nm('f','казнь'),line:'Враг на последних каплях здоровья светится красным, и твой удар добивает его сразу.',hint:'обычный враг ниже 20%, элита ниже 12%; по боссу ниже 20% урон больше'});
+ {id:'execute',kind:'passive',role:'Добивание',trig:'finish',power:20,names:nm('f','казнь'),line:'Враг на последних каплях здоровья светится красным, и твой удар добивает его сразу.',hint:'обычный враг ниже 20%, элита ниже 12%; по боссу ниже 20% урон больше'});
  // --- старые пассивки: id те же, новые имена и строки (раздел 5А.2) ---
  const OLDP={aura:{role:'Всегда',trig:'always',names:nm('m','ореол'),line:'Круг у ног жжёт всех, кто в него зашёл; чем больше врагов внутри, тем он шире и ярче.',hint:'3 м и шире с каждым врагом, до 6 м'},
   orbit:{role:'Всегда',trig:'always',power:14,names:nm('p','стражи'),line:'Вокруг тебя кружат три сферы; враг подошёл ближе трёх метров — сфера сама срывается в него и потом вырастает снова.',hint:'сфера отрастает за 4 с'},
@@ -1168,7 +1168,7 @@ const FORMS=[
  SG('pyro','s_ash','fire','passive',12,'Пепел',{power:20,trig:'kill',line:'Горящий враг, умирая, оставляет угли: врагов они жгут, а тебя на углях ускоряют и усиливают.',hint:'угли 1.5 м на 4 с; на углях +25% бега и +15% урона'}),
  SG('pyro','s_supernova','fire','active',20,'Сверхновая',{ult:true,cd:40,mana:60,power:120,range:9,how:'Над головой растёт огненный шар и взрывается на 9 м: раскалённые враги получают больше и тут же вспыхивают'}),
  SG('cryo','s_tomb','ice','active',1,'Ледяная гробница',{cd:10,mana:24,power:50,range:12,how:'Цель и все рядом вмерзают в глыбу на 2.5 с, потом глыба раскалывается осколками'}),
- SG('cryo','s_winterheart','ice','passive',12,'Сердце зимы',{power:0,trig:'react',line:'Тебя нельзя замедлить и заморозить, а каждый раскол замороженного возвращает ману и ускоряет чары.',hint:'раскол: +4 маны и −0.3 с ко всем перезарядкам'}),
+ SG('cryo','s_winterheart','ice','passive',12,'Сердце зимы',{power:20,trig:'react',line:'Тебя нельзя замедлить и заморозить, а каждый раскол замороженного возвращает ману и ускоряет чары.',hint:'раскол: +4 маны и −0.3 с ко всем перезарядкам'}),
  SG('cryo','s_zero','ice','active',20,'Абсолютный ноль',{ult:true,cd:45,mana:60,power:70,range:9,how:'3 с вокруг растёт метель до 9 м, а в конце все в ней замерзают и раскалываются'}),
  SG('storm','s_ballstorm','storm','active',1,'Шаровая гроза',{cd:8,mana:22,power:14,range:14,how:'Шаровая молния 4 с плывёт к цели и бьёт молниями трёх ближайших врагов'}),
  SG('storm','s_rod','storm','passive',12,'Громоотвод',{power:30,trig:'hurt',line:'Когда тебя бьют, в ударившего иногда сама бьёт молния и даёт заряды.',hint:'шанс 30%, не чаще раза в 0.5 с'}),
@@ -1177,19 +1177,19 @@ const FORMS=[
  SG('geo','s_debris','earth','passive',12,'Обломки',{power:18,trig:'kill',line:'Враг, убитый земляной чарой, разлетается тремя камнями в соседей.',hint:'камни летят во врагов в 6 м'}),
  SG('geo','s_earthquake','earth','active',20,'Землетрясение',{ult:true,cd:45,mana:60,power:30,range:9,how:'4 с от тебя каждые полсекунды расходится ударная волна 9 м и оглушает врагов'}),
  SG('plague','s_lantern','poison','active',1,'Чумной фонарь',{cd:12,mana:22,power:8,range:10,how:'Фонарь на 8 с: туман вокруг травит врагов, а тебя внутри лечит'}),
- SG('plague','s_immune','poison','passive',12,'Иммунитет',{power:0,trig:'hurt',line:'Яд врагов и их лужи на тебя не действуют, а отравленные враги бьют тебя слабее.',hint:'урон от отравленных −15%'}),
+ SG('plague','s_immune','poison','passive',12,'Иммунитет',{power:20,trig:'hurt',line:'Яд врагов и их лужи на тебя не действуют, а отравленные враги бьют тебя слабее.',hint:'урон от отравленных −15%'}),
  SG('plague','s_pandemic','poison','active',20,'Пандемия',{ult:true,cd:40,mana:55,power:30,range:20,how:'Весь яд на врагах вокруг срабатывает разом и удваивается, а от каждого отравленного к тебе тянется лечащая нить'}),
  SG('hemo','s_bloodlet','blood','active',1,'Кровопускание',{cd:9,mana:0,hpCost:.08,power:18,range:12,how:'Четыре врага 3 с истекают кровью по нитям к тебе — вся она тебя лечит, а в конце из них бьют шипы'}),
- SG('hemo','s_threads','blood','passive',12,'Кровавые нити',{power:0,trig:'brink',line:'Когда здоровья меньше трети, от врагов рядом к тебе тянутся кровавые нити и пьют их здоровье для тебя.',hint:'до 5 нитей, 8 м; каждая — 1% здоровья в секунду'}),
+ SG('hemo','s_threads','blood','passive',12,'Кровавые нити',{power:20,trig:'brink',line:'Когда здоровья меньше трети, от врагов рядом к тебе тянутся кровавые нити и пьют их здоровье для тебя.',hint:'до 5 нитей, 8 м; каждая — 1% здоровья в секунду'}),
  SG('hemo','s_pact','blood','active',20,'Багровый пакт',{ult:true,cd:45,mana:0,power:60,range:10,how:'Жертвует почти треть здоровья: волна крови 10 м бьёт вчетверо от отданного и возвращает тебе половину урона'}),
  SG('arcan','s_missiles','arcane','active',1,'Чародейские ракеты',{cd:4,mana:16,power:16,range:16,how:'6 самонаводящихся ракет летят в 6 разных врагов и возвращают ману'}),
- SG('arcan','s_resonator','arcane','passive',12,'Резонатор',{power:0,trig:'casts',line:'Каждые 150 потраченной маны следующая чара сильнее в полтора раза и перезаряжается вдвое быстрее.',hint:'3 руны вокруг тебя показывают заряд'}),
+ SG('arcan','s_resonator','arcane','passive',12,'Резонатор',{power:20,trig:'casts',line:'Каждые 150 потраченной маны следующая чара сильнее в полтора раза и перезаряжается вдвое быстрее.',hint:'3 руны вокруг тебя показывают заряд'}),
  SG('arcan','s_rift','arcane','active',20,'Разлом реальности',{ult:true,cd:50,mana:40,power:0,range:0,how:'4 с над тобой висит портал и бесплатно повторяет каждую твою чару'}),
  SG('alch','s_mutagen','poison','active',1,'Мутаген',{cd:15,mana:20,power:12,range:3,how:'Выпивает колбу на 8 с: по последнему реагенту — ядовитое дыхание, быстрые чары или огненные колбы'}),
- SG('alch','s_fumes','poison','passive',12,'Летучие пары',{power:0,trig:'always',line:'Твои облака и лужи сами ползут к ближайшему врагу и живут дольше.',hint:'живут на 50% дольше'}),
+ SG('alch','s_fumes','poison','passive',12,'Летучие пары',{power:20,trig:'always',line:'Твои облака и лужи сами ползут к ближайшему врагу и живут дольше.',hint:'живут на 50% дольше'}),
  SG('alch','s_philstone','poison','active',20,'Философский камень',{ult:true,cd:50,mana:50,power:0,range:0,how:'10 с все броски тройные: колбы, веер, бомбы и мины летят тремя копиями'}),
  SG('necro','s_raise','shadow','active',1,'Поднять мёртвых',{cd:12,mana:28,power:15,range:12,sk:'raised',how:'Из свежих трупов вокруг встают скелеты-воины и дерутся 10 с'}),
- SG('necro','s_souls','shadow','passive',12,'Жатва душ',{power:0,trig:'kill',line:'Собрав двадцать душ, следующая чара тратит их все: бьёт вдвое и лечит твоих слуг.',hint:'огоньки на поясе сливаются в шар над головой'}),
+ SG('necro','s_souls','shadow','passive',12,'Жатва душ',{power:20,trig:'kill',line:'Собрав двадцать душ, следующая чара тратит их все: бьёт вдвое и лечит твоих слуг.',hint:'огоньки на поясе сливаются в шар над головой'}),
  SG('necro','s_bonestorm','shadow','active',20,'Костяная буря',{ult:true,cd:45,mana:50,power:30,range:12,how:'Все твои слуги взрываются костями и тут же встают снова целыми'}),
  SG('druid','s_bearform','earth','active',1,'Медвежья шкура',{cd:18,mana:25,power:20,range:3,how:'На 10 с становишься медведем: больше здоровья, тяжёлые удары лапой и рёв, который оглушает'}),
  SG('druid','s_spores','poison','passive',12,'Споры',{power:20,trig:'kill',line:'Враг, умерший с ядом, выпускает споры: они сами летят к врагам и оставляют лужу.',hint:'2 споры с каждого'}),
@@ -1198,10 +1198,10 @@ const FORMS=[
  SG('shaman','s_ancestors','storm','passive',12,'Голос предков',{power:15,trig:'casts',line:'Каждая пятая чара бесплатно зовёт волка-духа на шесть секунд.',hint:'волк-дух живёт 6 с'}),
  SG('shaman','s_elemlord','storm','active',20,'Великий элементаль',{ult:true,cd:50,mana:60,power:30,range:12,sk:'bigelem',how:'Огромный элементаль бури 15 с бьёт цепными молниями по шести врагам, а умирая — оставляет грозу'}),
  SG('lock','s_hellgate','fire','active',1,'Врата ада',{cd:14,mana:30,power:15,range:12,how:'Портал 8 с выпускает бесов, они бегут к проклятым и горящим врагам и взрываются'}),
- SG('lock','s_darkdeal','fire','passive',12,'Тёмная сделка',{power:0,trig:'casts',line:'Когда маны мало, чары берут недостающее здоровьем.',hint:'3% здоровья за чару, не ниже 15%'}),
+ SG('lock','s_darkdeal','fire','passive',12,'Тёмная сделка',{power:20,trig:'casts',line:'Когда маны мало, чары берут недостающее здоровьем.',hint:'3% здоровья за чару, не ниже 15%'}),
  SG('lock','s_pactdemon','fire','active',20,'Сделка с демоном',{ult:true,cd:60,mana:50,power:40,range:10,how:'Приносит слуг в жертву ради силы, и с неба падает Инфернал на 15 с'}),
  SG('windr','s_galearrow','wind','active',1,'Ураганная стрела',{cd:7,mana:18,power:40,range:20,how:'Стрела-вихрь пронзает всех на линии 20 м и стягивает пронзённых в вихрь'}),
- SG('windr','s_feather','wind','passive',12,'Лёгкость пера',{power:0,trig:'run',line:'На полном попутном ветре ты не касаешься земли: лужи, ловушки и замедления на тебя не действуют.',hint:'перья за спиной — признак'}),
+ SG('windr','s_feather','wind','passive',12,'Лёгкость пера',{power:20,trig:'run',line:'На полном попутном ветре ты не касаешься земли: лужи, ловушки и замедления на тебя не действуют.',hint:'перья за спиной — признак'}),
  SG('windr','s_arrowstorm','wind','active',20,'Буря стрел',{ult:true,cd:40,mana:40,power:14,range:14,how:'4 с ты сам стреляешь шесть стрел в секунду в ближайших врагов, можно бегать'}),
  SG('hunter','s_net','ice','active',1,'Ледяная сеть',{cd:9,mana:18,power:14,range:12,how:'Сеть 4 м падает в точку: все внутри обездвижены на 2 с и получают больше урона'}),
  SG('hunter','s_instinct','ice','passive',12,'Чутьё',{power:20,trig:'hurt',line:'Дальний враг, который целится в тебя, загорается знаком «!», и твой следующий выстрел сам летит в него.',hint:'раз в 4 с; сбивает его выстрел и делает добычей: +25% урона по ней 12 с'}),
@@ -1213,16 +1213,16 @@ const FORMS=[
  SG('bers','s_bloodpool','blood','passive',12,'Кровавая лужа',{power:6,trig:'kill',line:'Враг, убитый вблизи, оставляет лужу крови: в ней ты лечишься, а враги кровоточат.',hint:'лужа 2 м на 6 с'}),
  SG('bers','s_carnage','blood','active',20,'Кровавая бойня',{ult:true,cd:50,mana:0,power:0,range:3,how:'5 с тебя не убить, каждый удар рубит по кругу, а в конце бойня тебя лечит'}),
  SG('monk','s_hundred','wind','active',1,'Сто кулаков',{cd:6,mana:14,power:10,range:4,how:'1.2 с двенадцать ударов по врагу перед тобой, последний отбрасывает далеко'}),
- SG('monk','s_calm','wind','passive',12,'Внутренний покой',{power:0,trig:'stand',line:'Если три секунды тебя не ранили, следующий удар двойной и лечит.',hint:'ладони светятся, пока удар заряжен'}),
+ SG('monk','s_calm','wind','passive',12,'Внутренний покой',{power:20,trig:'stand',line:'Если три секунды тебя не ранили, следующий удар двойной и лечит.',hint:'ладони светятся, пока удар заряжен'}),
  SG('monk','s_windpath','wind','active',20,'Путь ветра',{ult:true,cd:45,mana:40,power:24,range:10,how:'4 с ты неуязвим и сам носишься между врагами, а в конце волна света лечит'}),
  SG('inq','s_pyre','light','active',1,'Костёр',{cd:10,mana:22,power:70,range:15,how:'Печать над целью, и через секунду столп святого огня: по виновным вдвое'}),
- SG('inq','s_unshaken','light','passive',12,'Непоколебимость',{power:0,trig:'hurt',line:'Тебя не оглушить и не замедлить, а каждая такая попытка злит тебя и усиливает.',hint:'+10% урона на 3 с за попытку, до трёх'}),
+ SG('inq','s_unshaken','light','passive',12,'Непоколебимость',{power:20,trig:'hurt',line:'Тебя не оглушить и не замедлить, а каждая такая попытка злит тебя и усиливает.',hint:'+10% урона на 3 с за попытку, до трёх'}),
  SG('inq','s_inquisition','light','active',20,'Инквизиция',{ult:true,cd:45,mana:45,power:22,range:15,how:'5 с из арбалета летят святые болты по виновным, каждый делает цель виновной'}),
  SG('paladin','s_consecrate','light','active',1,'Освящённая земля',{cd:14,mana:24,power:10,range:5,how:'Круг 5 м на 6 с под тобой: тебя и напарника лечит, врагов жжёт и слепит'}),
- SG('paladin','s_faith','light','passive',12,'Щит веры',{power:0,trig:'hurt',line:'Каждый четвёртый удар по тебе полностью гасит щит веры.',hint:'блок даёт правосудие'}),
+ SG('paladin','s_faith','light','passive',12,'Щит веры',{power:20,trig:'hurt',line:'Каждый четвёртый удар по тебе полностью гасит щит веры.',hint:'блок даёт правосудие'}),
  SG('paladin','s_skyhammer','light','active',20,'Молот небес',{ult:true,cd:45,mana:45,power:200,range:8,how:'Молот падает с неба перед тобой, оглушает всех и тянет врагов на себя'}),
  SG('dk','s_gravecall','shadow','active',1,'Зов могилы',{cd:12,mana:22,power:30,range:6,how:'Руки мертвецов из-под земли хватают всех вокруг, каждый схваченный лечит тебя'}),
- SG('dk','s_icearmor','ice','passive',12,'Ледяная броня',{power:0,trig:'brink',line:'Когда здоровья мало, на тебе вырастает ледяной панцирь, а враги рядом замерзают.',hint:'раз в 30 с, панцирь на 30% здоровья'}),
+ SG('dk','s_icearmor','ice','passive',12,'Ледяная броня',{power:20,trig:'brink',line:'Когда здоровья мало, на тебе вырастает ледяной панцирь, а враги рядом замерзают.',hint:'раз в 30 с, панцирь на 30% здоровья'}),
  SG('dk','s_desecrate','shadow','active',20,'Осквернение',{ult:true,cd:45,mana:40,power:12,range:6,how:'8 с за тобой ходит тёмный круг: враги в нём вязнут и гибнут, а ты пьёшь из них жизнь'}));
 }
 // ----- /A данные -----
@@ -1535,8 +1535,8 @@ function computeStats(){
   ST.mana=1+.1*T('mana');ST.summDmg=1+.2*T('summ');ST.summMax=3+T('summ');ST.luck=.03*T('luck');ST.cascade=1+.15*T('cascade');ST.orbitN=T('orbit');ST.orbitDmg=1+.15*T('orbit');cfStats();}
 const WRATH=new Set(['strike','blink','revenge','whirl']),CASC=new Set(['doom','aura','trail','trap']);
 // PASS_K: пассивок в билде 8, а не 21 — каждая сильнее. slotBoost: пока слотов мало, чары сильнее (сводится к 1 у 100-го уровня)
-const PASS_K=1.9,SLOT_BOOST=[[1,1],[10,1.15],[20,1.4],[30,1.55],[45,1.6],[60,1.5],[80,1.3],[100,1.1],[140,1]];
-const slotBoost=()=>{if(!S||S.sandbox)return 1;const L=S.lvl;for(let i=1;i<SLOT_BOOST.length;i++){const a=SLOT_BOOST[i-1],b=SLOT_BOOST[i];if(L<=b[0])return a[1]+(b[1]-a[1])*(L-a[0])/(b[0]-a[0]);}return 1;};
+const PASS_K=1.7,SLOT_BOOST=[[1,1.15],[5,1.25],[10,1.5],[15,1.6],[20,1.5],[25,1.4],[30,1.38],[40,1.3],[50,1.25],[60,1.24],[70,1.2],[80,1.2],[90,1.15],[100,1.1],[999,1.1]];
+const slotBoost=()=>{if(!S||S.sandbox)return 1;const L=S.lvl;for(let i=1;i<SLOT_BOOST.length;i++){const a=SLOT_BOOST[i-1],b=SLOT_BOOST[i];if(L<=b[0])return a[1]+(b[1]-a[1])*(L-a[0])/(b[0]-a[0]);}return 1.1;};
 function skDmg(sk){const f=sk.F.id;let m=1;if(WRATH.has(f))m=ST.wrath;else if(CASC.has(f))m=ST.cascade;else if(f==='summon')m=ST.summDmg;else if(f==='orbit')m=ST.orbitDmg;
   return sk.F.power*(sk.M.dmg||1)*(sk.E.dmg||1)*lvlScale()*ST.dmg*(1+.2*(rk(sk.id)-1))*m*(sk.active?1:PASS_K)*slotBoost();}
 const skCd=sk=>(sk.F.cd||1)*(sk.M.cd||1)*ST.cdr*(1-.04*(rk(sk.id)-1));
@@ -1588,11 +1588,11 @@ Object.assign(FP,{
  s_roar:{ph:4,u:1.3,cat:'def'},s_carnage:{cat:'def',av:(sk,d,r,intr)=>(intr?40:P.maxHp*.5)*1.3},s_hundred:{ph:12,cat:'atk'},s_windpath:{ph:16,u:1.3,cat:'mov'},
  s_pyre:{ph:3,u:1.1,cat:'area'},s_inquisition:{ph:25,u:1.3,cat:'atk'},s_consecrate:{ph:24,u:1.15,cat:'def'},s_skyhammer:{ph:4,u:1.3,cat:'area'},
  s_gravecall:{ph:4,u:1.2,cat:'ctl'},s_desecrate:{ph:32,u:1.3,cat:'def'},
- s_ash:{cat:'pas',pv:(sk,d,r)=>d*2.4*R2(r)},s_winterheart:{cat:'pas',pv:(sk,d,r)=>16*R2(r)},s_rod:{cat:'pas',pv:(sk,d,r)=>d*.9*MK(sk)*R2(r)},
- s_debris:{cat:'pas',pv:(sk,d,r)=>d*2*R2(r)},s_immune:{cat:'pas',pv:()=>18},s_threads:{cat:'pas',pv:()=>17},s_resonator:{cat:'pas',pv:(sk,d,r,intr)=>(intr?1:castRate())*16},
- s_fumes:{cat:'pas',pv:()=>16},s_souls:{cat:'pas',pv:()=>17},s_spores:{cat:'pas',pv:(sk,d,r)=>d*2.2*R2(r)},s_ancestors:{cat:'pas',pv:(sk,d,r,intr)=>(intr?1:castRate())/5*d*8},
- s_darkdeal:{cat:'pas',pv:()=>15},s_feather:{cat:'pas',pv:()=>16},s_instinct:{cat:'pas',pv:(sk,d,r)=>d*1.2*R2(r)},s_poisonblades:{cat:'pas',pv:(sk,d,r)=>d*3*R2(r)},
- s_bloodpool:{cat:'pas',pv:(sk,d,r)=>d*3.5*R2(r)},s_calm:{cat:'pas',pv:()=>17},s_unshaken:{cat:'pas',pv:()=>16},s_faith:{cat:'pas',pv:()=>18},s_icearmor:{cat:'pas',pv:()=>17}});
+ s_ash:{cat:'pas',pv:(sk,d,r)=>d*2.4*R2(r)},s_winterheart:{cat:'pas',pv:(sk,d,r)=>d*2*R2(r)},s_rod:{cat:'pas',pv:(sk,d,r)=>d*.9*MK(sk)*R2(r)},
+ s_debris:{cat:'pas',pv:(sk,d,r)=>d*2*R2(r)},s_immune:{cat:'pas',pv:(sk,d)=>d*2.2},s_threads:{cat:'pas',pv:(sk,d)=>d*2},s_resonator:{cat:'pas',pv:(sk,d,r,intr)=>d*(intr?1:castRate())*1.6},
+ s_fumes:{cat:'pas',pv:(sk,d)=>d*2},s_souls:{cat:'pas',pv:(sk,d)=>d*2.2},s_spores:{cat:'pas',pv:(sk,d,r)=>d*2.2*R2(r)},s_ancestors:{cat:'pas',pv:(sk,d,r,intr)=>(intr?1:castRate())/5*d*8},
+ s_darkdeal:{cat:'pas',pv:(sk,d)=>d*1.8},s_feather:{cat:'pas',pv:(sk,d)=>d*2},s_instinct:{cat:'pas',pv:(sk,d,r)=>d*1.2*R2(r)},s_poisonblades:{cat:'pas',pv:(sk,d,r)=>d*3*R2(r)},
+ s_bloodpool:{cat:'pas',pv:(sk,d,r)=>d*3.5*R2(r)},s_calm:{cat:'pas',pv:(sk,d)=>d*2.2},s_unshaken:{cat:'pas',pv:(sk,d)=>d*2},s_faith:{cat:'pas',pv:(sk,d)=>d*2.3},s_icearmor:{cat:'pas',pv:(sk,d)=>d*2.1}});
 ['vortex','beacon','wall','stasis','quake','glyph','s_supernova','s_zero','s_ballstorm','s_skywrath','s_earthquake','s_lantern','s_pandemic','s_pact','s_awaken','s_boltrain','s_skyhammer','s_desecrate','s_consecrate','s_pyre'].forEach(f=>AREAF.add(f));
 ['rush','leap','hook'].forEach(f=>WRATH.add(f));['glyph','wall','totem'].forEach(f=>CASC.add(f));}
 Object.assign(ICON,{
@@ -1738,7 +1738,7 @@ function weakest(act,oc){const key=(act?'a':'p')+(oc||'');if(WKC&&WKC[key]!==und
   const arr=act?S.active:S.passive,n=act?activeSlots():passiveSlots();let b=null,bp=1e18;
   // единственную защитную или мобильную чару в билде не трогаем, если новая — другой категории
   const cc={};if(act)for(let i=0;i<n;i++){const id=arr[i];if(id!=null){const c=FP[SKILLS[id].F.id].cat;cc[c]=(cc[c]||0)+1;}}
-  for(let i=0;i<n;i++){const id=arr[i];if(id==null)continue;const c=FP[SKILLS[id].F.id].cat;if(act&&(c==='def'||c==='mov')&&cc[c]===1&&c!==oc)continue;const p=pwr(SKILLS[id]);if(p<bp){bp=p;b=id;}}
+  for(let i=0;i<n;i++){const id=arr[i];if(id==null)continue;const c=FP[SKILLS[id].F.id].cat;if(act&&(c==='def'||c==='mov')&&cc[c]===1&&c!==oc)continue;const p=pwr(SKILLS[id])*(SKILLS[id].F.sig?1.4:1);if(p<bp){bp=p;b=id;}}
   return WKC[key]=b==null?null:b;}
 // чем заменить: тот же вид -> иначе слабейшая того же типа (если у формы уже две — слабейшая из них). null — места хватает или замена не выгодна
 function upgradeFor(sk,hyp){
@@ -1746,8 +1746,8 @@ function upgradeFor(sk,hyp){
   const act=sk.active,arr=act?S.active:S.passive,n=act?activeSlots():passiveSlots(),free=arr.findIndex((v,i)=>i<n&&v==null)>=0;
   let tgt=baseSlot(sk);
   if(tgt==null){
-    if(act){const same=[];for(let i=0;i<n;i++){const v=arr[i];if(v!=null&&SKILLS[v].f===sk.f)same.push(v);}
-      if(same.length>=2||(same.length&&free))tgt=same.reduce((a,b)=>pwr(SKILLS[a])<=pwr(SKILLS[b])?a:b);}
+    {const same=[];for(let i=0;i<n;i++){const v=arr[i];if(v!=null&&SKILLS[v].f===sk.f)same.push(v);}
+      if(same.length>=2||(act&&same.length&&free))tgt=same.reduce((a,b)=>pwr(SKILLS[a])<=pwr(SKILLS[b])?a:b);}
     if(tgt==null){if(free)return null;tgt=weakest(act,FP[sk.F.id].cat);}}
   if(tgt==null)return null;
   const T_=SKILLS[tgt],cnt=RESO_N.slice();cnt[T_.e]--;cnt[sk.e]++;
@@ -1765,7 +1765,8 @@ function bestBuildPlan(){
     const pick=cf=>{let best=null,bs=-1;
       for(const sk of list){if(usedB.has(sk.bk))continue;const ct=FP[sk.F.id].cat;if(cf&&ct!==cf)continue;const fc=formN[sk.f]||0;if(fc>=2)continue;
         cnt[sk.e]++;let sc=skPower(sk,cnt);cnt[sk.e]--;
-        if(fc)sc*=Math.pow(.82,fc);if(act&&!cats[ct])sc*=CATB[ct]||1;
+        if(fc)sc*=Math.pow(.82,fc);if(act&&!cats[ct])sc*=CATB[ct]||1;if(sk.F.sig)sc*=1.4; // фирменные — лицо героя: в «Лучшем билде» в приоритете
+        
         if(sc>bs){bs=sc;best=sk;}}
       if(!best)return false;res.push(best.id);usedB.add(best.bk);formN[best.f]=(formN[best.f]||0)+1;cnt[best.e]++;cats[FP[best.F.id].cat]=1;return true;};
     // обязательные слоты: защита и движение (если изучены и есть место для атаки)
@@ -2561,9 +2562,10 @@ function updateLoot(dt){for(let i=LOOT.length-1;i>=0;i--){const l=LOOT[i],p=l.g.
   essAccT-=dt;if(essAcc>0&&essAccT<=0){float(P.pos,'+'+essAcc+' эссенции','#d4b0ff',13);essAcc=0;essAccT=.5;}}
 function dropLoot(en){const tot=Math.max(1,Math.round(en.xp*.55));const n=en.boss?12:en.elite?5:tot>6?2:1,rw=en.rw||1;
   for(let i=0;i<n;i++)dropItem('ess',en.pos.x,en.pos.z,Math.max(1,Math.round(tot/n)));
-  let sc=en.boss?3:en.champ?2:Math.random()<Math.min(.9,(en.elite?.45:.04)*Math.min(3,rw))?1:0;if(rw>=1.6&&(en.boss||en.elite)&&Math.random()<Math.min(.9,.3*rw))sc++;if(sc&&!en.boss&&!en.elite&&!en.champ&&!en.guard){if((S.scrL|0)>=2)sc=0;else S.scrL=(S.scrL|0)+1;}if(en.guard)sc+=2;for(let i=0;i<sc;i++)dropItem('scroll',en.pos.x,en.pos.z);
+  let sc=en.boss?3:en.champ?2:Math.random()<Math.min(.9,(en.elite?.45:.04)*Math.min(3,rw))?1:0;if(rw>=1.6&&(en.boss||en.elite)&&Math.random()<Math.min(.9,.3*rw))sc++;if(sc&&!en.boss&&!en.elite&&!en.champ&&!en.guard){if((S.scrL|0)>=(S.lvl<30?2:1))sc=0;else S.scrL=(S.scrL|0)+1;}if(en.guard)sc+=2;for(let i=0;i<sc;i++)dropItem('scroll',en.pos.x,en.pos.z);
   if(en.boss||en.elite||Math.random()<.1)dropItem('hp',en.pos.x,en.pos.z);}
-const formSlot=sk=>{if(!sk.active)return null;for(const v of S.active)if(v!=null&&v!==sk.id&&SKILLS[v].f===sk.f)return v;return null;};
+// активная: одна на форму при автоматической установке; пассивная: не больше двух одной формы
+const formSlot=sk=>{let n=0,last=null;for(const v of (sk.active?S.active:S.passive))if(v!=null&&v!==sk.id&&SKILLS[v].f===sk.f){n++;last=v;if(sk.active)return v;}return n>=2?last:null;};
 function pickDistinct(ids,n,usedF,usedB){const c=ids.slice(),r=[];for(let i=c.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[c[i],c[j]]=[c[j],c[i]];}
   usedF=usedF||new Set();usedB=usedB||new Set();for(const id of c){if(r.length>=n)break;const k=SKILLS[id];if(usedF.has(k.f)||usedB.has(k.bk))continue;usedF.add(k.f);usedB.add(k.bk);r.push(id);}
   for(const id of c){if(r.length>=n)break;const k=SKILLS[id];if(usedB.has(k.bk))continue;usedB.add(k.bk);r.push(id);}return r;}
@@ -4449,7 +4451,7 @@ function renderBuild(){
   $('#slotsP').innerHTML=S.passive.slice(0,PAS_AT.length).map((id,i)=>slotHtml(id,i,'p',i<np,passiveLvl(i))).join('');
   const ca=S.active.slice(0,na).filter(v=>v!=null).length,cp=S.passive.slice(0,np).filter(v=>v!=null).length;
   $('#actN').textContent=ca+' / '+na+(na<8?' (всего 8)':'');$('#pasN').textContent=cp+' / '+np+(np<PAS_AT.length?' (всего '+PAS_AT.length+')':'');
-  $('#resoHint').textContent='Каждые чары стихии в билде дают ей +'+Math.round(ST.resoPer*100)+'% урона.';
+  $('#resoHint').textContent='Каждые чары стихии в билде дают ей +'+Math.round(ST.resoPer*100)+'% урона.'+(!S.sandbox&&S.lvl<100&&slotBoost()>1.02?' Пока слотов мало, каждая чара сильнее: +'+Math.round((slotBoost()-1)*100)+'%.':'');
   const rs=ELEMENTS.map((e,i)=>({e,i,n:RESO_N[i]})).filter(x=>x.n>0).sort((a,b)=>b.n-a.n);
   $('#reso').innerHTML=rs.length?rs.map(x=>`<span class="rchip" style="--c:${x.e.hex}"><span class="dot"></span>${x.e.name} ×${x.n} <b>+${Math.round(x.n*ST.resoPer*100)}%</b></span>`).join(''):'<p class="hint">Пока пусто.</p>';
   const R=REACT[rkey(EL[CLS.p],EL[CLS.s])];const has=RESO_N[R.a]>0&&RESO_N[R.b]>0;
@@ -6130,6 +6132,7 @@ function nfTick(dt){if(!S||!CLS)return;
   NFS.brinkOn=0;for(const a of NFS.pa||[]){const p=NFP[a.sk.F.id];if(p.tick)p.tick(a,dt);}
   for(const en of ENEMIES){const w=en.tkW;en.tk=w!=null&&w<1?w:1;en.tkW=1;}
   if(NFS.heroY>0&&hero)hero.g.position.y=NFS.heroY;
+  if(!NFS.s2w&&typeof s2W==='function'&&(CLS.id==='necro'||CLS.id==='alch'))s2W();
   nfGamepad();NFS.hudT=(NFS.hudT||0)-dt;if(NFS.hudT<=0){NFS.hudT=.15;nfHud();}
   if(NFS.brEl){const o=NFS.brinkOn>0?'1':'0';if(NFS.brEl.style.opacity!==o)NFS.brEl.style.opacity=o;}}
 function nfReset(){nfClr();NFS.heroY=0;if(hero)hero.g.position.y=0;for(const a of NFS.pa||[]){nfPassDrop(a);a.st={};const p=NFP[a.sk.F.id];if(p.build)p.build(a);}
@@ -6139,7 +6142,7 @@ var nfCW0=clearWorld;clearWorld=function(){nfClr();NFS.heroY=0;return nfCW0.appl
 // новый слот открылся — ставим туда лучшую изученную чару
 function nfFillSlots(){let ch=0;for(const act of [true,false]){const arr=act?S.active:S.passive,n=act?activeSlots():passiveSlots();
     for(let i=0;i<n;i++){if(arr[i]!=null)continue;let b=null,bp=-1;for(const id of LEARNED){if(EQUIPPED.has(id)||arr.includes(id))continue;const sk=SKILLS[id];if(!sk||sk.active!==act||!CLS.pool.has(id))continue;
-        if(baseSlot(sk)!=null||(act&&formSlot(sk)!=null))continue;const p=pwr(sk);if(p>bp){bp=p;b=id;}}if(b!=null){arr[i]=b;ch++;EQUIPPED.add(b);}}}
+        if(baseSlot(sk)!=null||formSlot(sk)!=null)continue;const p=pwr(sk);if(p>bp){bp=p;b=id;}}if(b!=null){arr[i]=b;ch++;EQUIPPED.add(b);}}}
   if(ch){onBuildChanged();toast('В открытый слот встала '+(ch>1?ch+' чары':'чара')+' из изученных');}}
 // окно «Усиление»: все чары изучены — ранг +1 чаре из билда
 function nfBoostChoices(){const a=[...EQUIPPED].filter(id=>rk(id)<5).map(id=>SKILLS[id]);for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a.slice(0,3);}
