@@ -45,6 +45,12 @@
 "v": 3
 }
 ],
+"hit_f#src": [
+"kenney_impact-sounds/x/Audio/impactPunch_medium_000.ogg",
+"kenney_impact-sounds/x/Audio/impactPunch_medium_001.ogg",
+"kenney_impact-sounds/x/Audio/impactPunch_medium_002.ogg",
+"kenney_impact-sounds/x/Audio/impactPunch_medium_003.ogg"
+],
 "hit_f#synth": {
 "K": -14.01,
 "P": -15.43,
@@ -53,37 +59,45 @@
 "hurt": [
 {
 "K": -16.6,
-"P": -22.02,
+"P": -21.53,
 "Kt": -16.6,
 "Pt": -21.34,
-"gm": 4.6,
-"body": 0.0,
+"gm": 3.1,
+"body": 0.9,
 "pk": -2.0,
-"dur": 0.605,
+"dur": 0.665,
 "v": 0
 },
 {
 "K": -16.6,
-"P": -22.82,
+"P": -21.62,
 "Kt": -16.6,
 "Pt": -21.34,
-"gm": 3.3,
-"body": 0.2,
+"gm": 2.5,
+"body": 0.9,
 "pk": -2.0,
-"dur": 0.435,
+"dur": 0.51,
 "v": 1
 },
 {
 "K": -16.6,
-"P": -21.97,
+"P": -21.14,
 "Kt": -16.6,
 "Pt": -21.34,
-"gm": 4.0,
-"body": 0.0,
+"gm": 1.9,
+"body": 0.9,
 "pk": -2.0,
-"dur": 0.51,
+"dur": 0.56,
 "v": 2
 }
+],
+"hurt#src": [
+"kenney_impact-sounds/x/Audio/impactPunch_heavy_000.ogg",
+"kenney_impact-sounds/x/Audio/impactPunch_heavy_002.ogg",
+"kenney_impact-sounds/x/Audio/impactPunch_heavy_004.ogg",
+"kenney_impact-sounds/x/Audio/impactSoft_medium_000.ogg",
+"kenney_impact-sounds/x/Audio/impactSoft_medium_002.ogg",
+"kenney_impact-sounds/x/Audio/impactSoft_medium_004.ogg"
 ],
 "hurt#synth": {
 "K": -16.6,
@@ -125,6 +139,11 @@
 "v": 2
 }
 ],
+"hit_p#src": [
+"kenney_impact-sounds/x/Audio/impactGeneric_light_000.ogg",
+"kenney_impact-sounds/x/Audio/impactGeneric_light_002.ogg",
+"kenney_impact-sounds/x/Audio/impactGeneric_light_004.ogg"
+],
 "hit_p#synth": {
 "K": -21.65,
 "P": -23.75,
@@ -164,6 +183,11 @@
 "dur": 0.155,
 "v": 2
 }
+],
+"crit#src": [
+"kenney_impact-sounds/x/Audio/impactMetal_light_000.ogg",
+"kenney_impact-sounds/x/Audio/impactMetal_light_001.ogg",
+"kenney_impact-sounds/x/Audio/impactMetal_light_004.ogg"
 ],
 "crit#synth": {
 "K": -12.55,
@@ -205,6 +229,11 @@
 "v": 2
 }
 ],
+"shield_hit#src": [
+"kenney_impact-sounds/x/Audio/impactMetal_medium_000.ogg",
+"kenney_impact-sounds/x/Audio/impactMetal_medium_001.ogg",
+"kenney_impact-sounds/x/Audio/impactMetal_medium_003.ogg"
+],
 "shield_hit#synth": {
 "K": -15.77,
 "P": -15.76,
@@ -245,6 +274,14 @@
 "v": 2
 }
 ],
+"th#src": [
+"kenney_impact-sounds/x/Audio/impactPlate_heavy_000.ogg",
+"kenney_impact-sounds/x/Audio/impactPlate_heavy_001.ogg",
+"kenney_impact-sounds/x/Audio/impactPlate_heavy_003.ogg",
+"kenney_impact-sounds/x/Audio/impactSoft_heavy_000.ogg",
+"kenney_impact-sounds/x/Audio/impactSoft_heavy_002.ogg",
+"kenney_impact-sounds/x/Audio/impactSoft_heavy_004.ogg"
+],
 "th#synth": {
 "K": -17.45,
 "P": -23.16,
@@ -273,6 +310,12 @@
 "dur": 0.565,
 "v": 1
 }
+],
+"d_big#src": [
+"kenney_impact-sounds/x/Audio/impactPlank_medium_001.ogg",
+"kenney_impact-sounds/x/Audio/impactPlank_medium_003.ogg",
+"kenney_impact-sounds/x/Audio/impactSoft_heavy_001.ogg",
+"kenney_impact-sounds/x/Audio/impactSoft_heavy_003.ogg"
 ],
 "d_big#synth": {
 "K": -16.54,
@@ -314,6 +357,16 @@
 "v": 2
 }
 ],
+"d_stone#src": [
+"kenney_impact-sounds/x/Audio/footstep_snow_001.ogg",
+"kenney_impact-sounds/x/Audio/footstep_snow_002.ogg",
+"kenney_impact-sounds/x/Audio/footstep_snow_004.ogg",
+"kenney_impact-sounds/x/Audio/impactMining_000.ogg",
+"kenney_impact-sounds/x/Audio/impactMining_001.ogg",
+"kenney_impact-sounds/x/Audio/impactMining_002.ogg",
+"kenney_impact-sounds/x/Audio/impactMining_003.ogg",
+"kenney_impact-sounds/x/Audio/impactMining_004.ogg"
+],
 "d_stone#synth": {
 "K": -18.87,
 "P": -23.26,
@@ -353,6 +406,13 @@
 "dur": 0.295,
 "v": 2
 }
+],
+"d_bone#src": [
+"kenney_impact-sounds/x/Audio/impactWood_light_000.ogg",
+"kenney_impact-sounds/x/Audio/impactWood_light_001.ogg",
+"kenney_impact-sounds/x/Audio/impactWood_light_002.ogg",
+"kenney_impact-sounds/x/Audio/impactWood_light_003.ogg",
+"kenney_impact-sounds/x/Audio/impactWood_light_004.ogg"
 ],
 "d_bone#synth": {
 "K": -18.22,
@@ -405,6 +465,13 @@
 "v": 3
 }
 ],
+"d_flesh#src": [
+"kenney_impact-sounds/x/Audio/impactPunch_medium_000.ogg",
+"kenney_impact-sounds/x/Audio/impactPunch_medium_001.ogg",
+"kenney_impact-sounds/x/Audio/impactPunch_medium_003.ogg",
+"kenney_impact-sounds/x/Audio/impactPunch_medium_004.ogg",
+"oga_monster-snarls/monster-snarl-5.ogg"
+],
 "d_flesh#synth": {
 "K": -13.36,
 "P": -16.36,
@@ -433,6 +500,10 @@
 "dur": 0.6,
 "v": 1
 }
+],
+"d_slime#src": [
+"oga_monster-or-beast-sounds/x/Monsters or Beasts/Yucky Beast 2.wav",
+"oga_monster-or-beast-sounds/x/Monsters or Beasts/Yucky Beast.wav"
 ],
 "d_slime#synth": {
 "K": -16.67,
@@ -474,6 +545,11 @@
 "v": 2
 }
 ],
+"d_beast#src": [
+"oga_monster-or-beast-sounds/x/Monsters or Beasts/Beast Growl.wav",
+"oga_monster-or-beast-sounds/x/Monsters or Beasts/Dieing Beast.wav",
+"oga_monster-snarls/monster-snarl-5.ogg"
+],
 "d_beast#synth": {
 "K": -14.2,
 "P": -14.4,
@@ -503,6 +579,10 @@
 "v": 1
 }
 ],
+"d_bat#src": [
+"oga_monster-or-beast-sounds/x/Monsters or Beasts/Dieing pixie.wav",
+"oga_monster-or-beast-sounds/x/Monsters or Beasts/Pixie.wav"
+],
 "d_bat#synth": {
 "K": -11.48,
 "P": -11.47,
@@ -520,6 +600,9 @@
 "dur": 2.14,
 "v": 0
 }
+],
+"d_ghost#src": [
+"oga_monster-or-beast-sounds/x/Monsters or Beasts/Spirit Shout.wav"
 ],
 "d_ghost#synth": {
 "K": -7.86,
@@ -572,6 +655,9 @@
 "v": 3
 }
 ],
+"tw#src": [
+"oga_monster-snarls/monster-snarl-attack.ogg"
+],
 "tw#synth": {
 "K": -15.71,
 "P": -18.91,
@@ -612,6 +698,9 @@
 "v": 2
 }
 ],
+"twb#src": [
+"oga_big-scary-troll-sounds/troll-roars_0.ogg"
+],
 "twb#synth": {
 "K": -14.89,
 "P": -15.17,
@@ -629,6 +718,10 @@
 "dur": 2.995,
 "v": 0
 }
+],
+"b_roar#src": [
+"oga_big-scary-troll-sounds/troll-roars_0.ogg",
+"oga_monster-or-beast-sounds/x/Monsters or Beasts/Beast Growl 5.wav"
 ],
 "b_roar#synth": {
 "K": -14.31,
@@ -648,6 +741,11 @@
 "v": 0
 }
 ],
+"b_phase#src": [
+"kenney_impact-sounds/x/Audio/impactPlate_heavy_001.ogg",
+"kenney_impact-sounds/x/Audio/impactSoft_heavy_002.ogg",
+"oga_big-scary-troll-sounds/troll-roars_0.ogg"
+],
 "b_phase#synth": {
 "K": -16.46,
 "P": -17.21,
@@ -665,6 +763,9 @@
 "dur": 3.305,
 "v": 0
 }
+],
+"b_death#src": [
+"oga_monster-or-beast-sounds/x/Monsters or Beasts/Dieing Beast.wav"
 ],
 "b_death#synth": {
 "K": -14.67,
@@ -694,6 +795,17 @@
 "dur": 0.39,
 "v": 1
 }
+],
+"shield_break#src": [
+"kenney_impact-sounds/x/Audio/impactGlass_heavy_000.ogg",
+"kenney_impact-sounds/x/Audio/impactGlass_heavy_002.ogg",
+"kenney_impact-sounds/x/Audio/impactGlass_light_000.ogg",
+"kenney_impact-sounds/x/Audio/impactGlass_light_001.ogg",
+"kenney_impact-sounds/x/Audio/impactGlass_light_002.ogg",
+"kenney_impact-sounds/x/Audio/impactGlass_light_003.ogg",
+"kenney_impact-sounds/x/Audio/impactGlass_light_004.ogg",
+"kenney_impact-sounds/x/Audio/impactGlass_medium_001.ogg",
+"kenney_impact-sounds/x/Audio/impactGlass_medium_003.ogg"
 ],
 "shield_break#synth": {
 "K": -13.34,
@@ -735,6 +847,14 @@
 "v": 2
 }
 ],
+"h_ice#src": [
+"kenney_impact-sounds/x/Audio/footstep_snow_000.ogg",
+"kenney_impact-sounds/x/Audio/footstep_snow_001.ogg",
+"kenney_impact-sounds/x/Audio/footstep_snow_003.ogg",
+"kenney_impact-sounds/x/Audio/impactGlass_light_000.ogg",
+"kenney_impact-sounds/x/Audio/impactGlass_light_002.ogg",
+"kenney_impact-sounds/x/Audio/impactGlass_light_004.ogg"
+],
 "h_ice#synth": {
 "K": -15.82,
 "P": -15.82,
@@ -775,6 +895,11 @@
 "v": 2
 }
 ],
+"h_earth#src": [
+"kenney_impact-sounds/x/Audio/impactMining_000.ogg",
+"kenney_impact-sounds/x/Audio/impactMining_002.ogg",
+"kenney_impact-sounds/x/Audio/impactMining_004.ogg"
+],
 "h_earth#synth": {
 "K": -15.82,
 "P": -24.76,
@@ -804,6 +929,10 @@
 "v": 1
 }
 ],
+"h_light#src": [
+"kenney_impact-sounds/x/Audio/impactBell_heavy_000.ogg",
+"kenney_impact-sounds/x/Audio/impactBell_heavy_001.ogg"
+],
 "h_light#synth": {
 "K": -9.7,
 "P": -9.69,
@@ -812,26 +941,29 @@
 "h_arcane": [
 {
 "K": -9.69,
-"P": -9.73,
+"P": -9.71,
 "Kt": -9.69,
 "Pt": -9.69,
-"gm": 0.9,
+"gm": 0.5,
 "body": 0.0,
-"pk": -2.0,
-"dur": 0.5,
+"pk": -2.47,
+"dur": 0.58,
 "v": 0
 },
 {
 "K": -9.69,
-"P": -9.77,
+"P": -9.7,
 "Kt": -9.69,
 "Pt": -9.69,
-"gm": 2.1,
+"gm": 0.6,
 "body": 0.0,
 "pk": -2.0,
-"dur": 0.5,
+"dur": 0.58,
 "v": 1
 }
+],
+"h_arcane#src": [
+"oga_magic-spell-sfx/magical_2.ogg"
 ],
 "h_arcane#synth": {
 "K": -9.69,
@@ -852,15 +984,18 @@
 },
 {
 "K": -18.51,
-"P": -18.64,
+"P": -19.49,
 "Kt": -18.51,
 "Pt": -19.65,
 "gm": 0.5,
 "body": 0.0,
-"pk": -8.69,
+"pk": -8.48,
 "dur": 0.75,
 "v": 1
 }
+],
+"h_shadow#src": [
+"oga_magic-spell-sfx/magical_6_0.ogg"
 ],
 "h_shadow#synth": {
 "K": -18.51,
@@ -891,6 +1026,10 @@
 "v": 1
 }
 ],
+"sw_blade#src": [
+"kenney_rpg-audio/x/Audio/knifeSlice.ogg",
+"kenney_rpg-audio/x/Audio/knifeSlice2.ogg"
+],
 "sw_blade#synth": {
 "K": -16.5,
 "P": -16.5,
@@ -919,6 +1058,10 @@
 "dur": 0.175,
 "v": 1
 }
+],
+"sw_light#src": [
+"kenney_rpg-audio/x/Audio/knifeSlice.ogg",
+"kenney_rpg-audio/x/Audio/knifeSlice2.ogg"
 ],
 "sw_light#synth": {
 "K": -16.7,
@@ -949,6 +1092,10 @@
 "v": 1
 }
 ],
+"sw_heavy#src": [
+"kenney_rpg-audio/x/Audio/knifeSlice.ogg",
+"kenney_rpg-audio/x/Audio/knifeSlice2.ogg"
+],
 "sw_heavy#synth": {
 "K": -17.07,
 "P": -17.82,
@@ -966,6 +1113,9 @@
 "dur": 0.795,
 "v": 0
 }
+],
+"r_epic#src": [
+"oga_magic-spell-sfx/magical_7_0.ogg"
 ],
 "r_epic#synth": {
 "K": -11.56,
@@ -985,6 +1135,9 @@
 "v": 0
 }
 ],
+"r_leg#src": [
+"oga_magic-spell-sfx/magical_3.ogg"
+],
 "r_leg#synth": {
 "K": -10.41,
 "P": -10.41,
@@ -1002,6 +1155,9 @@
 "dur": 1.62,
 "v": 0
 }
+],
+"c_summon#src": [
+"oga_magic-spell-sfx/magical_4.ogg"
 ],
 "c_summon#synth": {
 "K": -12.77,
@@ -1021,6 +1177,9 @@
 "v": 0
 }
 ],
+"c_barrier#src": [
+"oga_magic-spell-sfx/magical_1_0.ogg"
+],
 "c_barrier#synth": {
 "K": -15.62,
 "P": -15.69,
@@ -1039,6 +1198,9 @@
 "v": 0
 }
 ],
+"heal#src": [
+"oga_magic-spell-sfx/magical_5.ogg"
+],
 "heal#synth": {
 "K": -9.4,
 "P": -9.39,
@@ -1056,6 +1218,9 @@
 "dur": 1.08,
 "v": 0
 }
+],
+"ui_lu#src": [
+"oga_magic-spell-sfx/magical_2.ogg"
 ],
 "ui_lu#synth": {
 "K": -11.9,
@@ -1086,6 +1251,10 @@
 "v": 1
 }
 ],
+"ui_click#src": [
+"kenney_impact-sounds/x/Audio/impactWood_light_000.ogg",
+"kenney_impact-sounds/x/Audio/impactWood_light_002.ogg"
+],
 "ui_click#synth": {
 "K": -20.34,
 "P": -20.33,
@@ -1103,6 +1272,10 @@
 "dur": 0.735,
 "v": 0
 }
+],
+"ui_book#src": [
+"kenney_rpg-audio/x/Audio/bookFlip1.ogg",
+"kenney_rpg-audio/x/Audio/bookOpen.ogg"
 ],
 "ui_book#synth": {
 "K": -16.64,
@@ -1122,6 +1295,9 @@
 "v": 0
 }
 ],
+"ui_bookc#src": [
+"kenney_rpg-audio/x/Audio/bookClose.ogg"
+],
 "ui_bookc#synth": {
 "K": -15.35,
 "P": -16.0,
@@ -1139,6 +1315,11 @@
 "dur": 1.335,
 "v": 0
 }
+],
+"chest#src": [
+"kenney_rpg-audio/x/Audio/creak1.ogg",
+"kenney_rpg-audio/x/Audio/handleCoins.ogg",
+"kenney_rpg-audio/x/Audio/metalLatch.ogg"
 ],
 "chest#synth": {
 "K": -11.22,
@@ -1169,6 +1350,10 @@
 "v": 1
 }
 ],
+"ess#src": [
+"kenney_interface-sounds/x/Audio/glass_001.ogg",
+"kenney_interface-sounds/x/Audio/glass_005.ogg"
+],
 "ess#synth": {
 "K": -10.66,
 "P": -10.65,
@@ -1186,6 +1371,11 @@
 "dur": 0.81,
 "v": 0
 }
+],
+"ess_big#src": [
+"kenney_interface-sounds/x/Audio/glass_001.ogg",
+"kenney_interface-sounds/x/Audio/glass_004.ogg",
+"kenney_interface-sounds/x/Audio/glass_006.ogg"
 ],
 "ess_big#synth": {
 "K": -9.35,
@@ -1205,6 +1395,9 @@
 "v": 0
 }
 ],
+"scroll#src": [
+"kenney_rpg-audio/x/Audio/bookFlip2.ogg"
+],
 "scroll#synth": {
 "K": -13.73,
 "P": -13.72,
@@ -1222,6 +1415,9 @@
 "dur": 0.125,
 "v": 0
 }
+],
+"w_tick#src": [
+"kenney_impact-sounds/x/Audio/impactWood_light_000.ogg"
 ],
 "w_tick#synth": {
 "K": -19.05,

@@ -13,7 +13,7 @@ const FOEJS_V='2';
 const HEROJS_V='2';
 // звук: audio.js — в CORE (код меняется с игрой); записи assets/audio/ (музыка босса и боя, звуки sfx1/sfx2.mp3) — свой кэш tc-audio, версия ?av= (AUDIO_V = AV в audio.js)
 // грузятся после первого касания (не при установке), дальше — из кэша, офлайн
-const AUDIO_V='3',ACACHE='tc-audio';
+const AUDIO_V='4',ACACHE='tc-audio';
 const isAudio=p=>p.includes('/assets/audio/');
 const isModel=p=>p.includes('/assets/models/')||p.endsWith('/vendor/GLTFLoader.js')||p.endsWith('/hero-models.js')||p.endsWith('/foe-models.js')||p.endsWith('/env-models.js');
 const CORE=['./','index.html','net-relay.js','campaign.js','net-p2p.js','audio.js','manifest.webmanifest','vendor/three.min.js','vendor/trystero-nostr-0.21.5.js','icons/icon-192.png','icons/icon-512.png','icons/maskable-512.png','icons/apple-touch-icon.png'];

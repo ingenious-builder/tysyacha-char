@@ -54,9 +54,9 @@ async function main(){
       R.bat2=await p.evaluate(()=>{const s=window.TCSND.state();return {mus:s.mus,batRec:s.batRec,batPos:window.TCSND.dbg.rec().batPos};});
       await p.evaluate(()=>window.TCSND.dbg.force(''));
       // 3) шов петли в браузерном декодере: тот же файл, тот же разбор, рендер 2 с через loopEnd
-      R.seam=await p.evaluate(async()=>{const ab=await (await fetch('assets/audio/battle.mp3?av=3')).arrayBuffer();
+      R.seam=await p.evaluate(async()=>{const _s=await (await fetch('audio.js')).text(),AV=_s.match(/const AV=(\d+)/)[1],BP=+_s.match(/BAT=\{[^}]*?P:([\d.]+)/)[1];const ab=await (await fetch('assets/audio/battle.mp3?av='+AV)).arrayBuffer();
         const dec=await new Promise((ok,no)=>{const c=new OfflineAudioContext(1,1,32000);c.decodeAudioData(ab,ok,no);});
-        const x=dec.getChannelData(0);let mi=0,mv=0;for(let i=0;i<6400;i++){const v=Math.abs(x[i]);if(v>mv){mv=v;mi=i;}}const off=.25+(mi/32000-.05),P=153.54;
+        const x=dec.getChannelData(0);let mi=0,mv=0;for(let i=0;i<6400;i++){const v=Math.abs(x[i]);if(v>mv){mv=v;mi=i;}}const off=.25+(mi/32000-.05),P=BP;
         const oc=new OfflineAudioContext(1,64000,32000),s=oc.createBufferSource();s.buffer=dec;s.loop=true;s.loopStart=off;s.loopEnd=off+P;s.connect(oc.destination);s.start(0,off+P-1);
         const y=(await oc.startRendering()).getChannelData(0);const d=[];for(let i=1;i<y.length;i++)d.push(Math.abs(y[i]-y[i-1]));
         const near=Math.max(...d.slice(32000-80,32000+80)),srt=d.slice().sort((a,b)=>a-b),p99=srt[Math.floor(srt.length*.99)];
@@ -64,7 +64,7 @@ async function main(){
         let worst=0;for(let i=32000-40;i<32000+40;i++){const a=Math.abs(y[i+1]-2*y[i]+y[i-1]);let e=0,n=0;for(let k=i-200;k<i+200;k++){if(Math.abs(k-i)<3)continue;const b=y[k+1]-2*y[k]+y[k-1];e+=b*b;n++;}worst=Math.max(worst,a/Math.sqrt(e/n));}
         return {markShiftMs:+((mi/32000-.05)*1000).toFixed(2),decSr:dec.sampleRate,decDur:+dec.duration.toFixed(3),maxStepSeam:+near.toFixed(4),p99Step:+p99.toFixed(4),worstD2Ratio:+worst.toFixed(1)};});
       // 4) метка у спрайтов в браузере (сдвиг декодера) и частота нарезки
-      R.sprites=await p.evaluate(async()=>{const out={};for(const f of ['sfx1.mp3','sfx2.mp3']){const ab=await (await fetch('assets/audio/'+f+'?av=3')).arrayBuffer();
+      R.sprites=await p.evaluate(async()=>{const _s=await (await fetch('audio.js')).text(),AV=_s.match(/const AV=(\d+)/)[1],BP=+_s.match(/BAT=\{[^}]*?P:([\d.]+)/)[1];const out={};for(const f of ['sfx1.mp3','sfx2.mp3']){const ab=await (await fetch('assets/audio/'+f+'?av='+AV)).arrayBuffer();
         const dec=await new Promise((ok,no)=>{const c=new OfflineAudioContext(1,1,24000);c.decodeAudioData(ab,ok,no);});const x=dec.getChannelData(0);let mi=0,mv=0;for(let i=0;i<4800;i++){const v=Math.abs(x[i]);if(v>mv){mv=v;mi=i;}}
         out[f]={sr:dec.sampleRate,dur:+dec.duration.toFixed(3),markShiftMs:+((mi/24000-.05)*1000).toFixed(2),mark:+mv.toFixed(2)};}return out;});
       // 5) толпа 20 с: голоса, ошибки, NaN

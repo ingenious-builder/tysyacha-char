@@ -91,13 +91,21 @@ def apply_fx(x, fxs):
         else: raise ValueError(k)
     return x
 
+def glide(x, r0, r1):
+    """скорость меняется линейно r0 → r1 (взлёт высоты при r1 > r0); вход заранее срезан выше SR/2/max(r) — без наложения частот"""
+    rm = max(r0, r1)
+    if rm > 1: x = filt(x, 'low', SR / 2 / rm * .9, 8)
+    N = int((len(x) - 2) * 2 / (r0 + r1)); r = np.linspace(r0, r1, N); p = np.concatenate([[0], np.cumsum(r[:-1])])
+    return np.interp(p, np.arange(len(x)), x)
+
 def layer(L):
-    """L: f файл, a/b — кусок (с), r — скорость, len — длина после скорости (с, с плавным концом fo), t — сдвиг (с), g — дБ, fx — обработка"""
+    """L: f файл, a/b — кусок (с), r — скорость, gl — (r0, r1) скорость меняется по ходу (взлёт), len — длина после скорости (с, с плавным концом fo), t — сдвиг (с), g — дБ, fx — обработка"""
     x = load(L['f'])
     a = L.get('a', 0); b = L.get('b')
     x = x[int(a * SR):(int(b * SR) if b else None)]
     if L.get('trim', True): x = lead_trim(x)
     if 'r' in L: x = rs(x, L['r'])
+    if 'gl' in L: x = glide(x, *L['gl'])
     if 'len' in L: x = fade(x[:int(L['len'] * SR)], L.get('fi', .001), L.get('fo', .08))
     x = apply_fx(x, L.get('fx', []))
     return x * 10 ** (L.get('g', 0) / 20), L.get('t', 0)
@@ -187,7 +195,8 @@ def bones(seq):
 R = {
  # удары и попадания (Kenney Impact Sounds)
  'hit_f': {'s': 1, 'v': [[one(KI + 'impactPunch_medium_00%d.ogg' % i, fx=[('hp', 110), ('pk', 1100, 6, .8), ('pk', 2500, 3, 1.0)])] for i in (0, 1, 2, 3)], 'o': {'a0': .9}},   # «шлепок» 1–3 кГц и гармоники низа: слышно на динамике телефона
- 'hurt': {'s': 1, 'v': [[one(KI + 'impactPunch_heavy_00%d.ogg' % i)] for i in (0, 2, 4)]},
+ 'hurt': {'s': 1, 'v': [[one(KI + 'impactSoft_medium_00%d.ogg' % i), one(KI + 'impactPunch_heavy_00%d.ogg' % j, r=.84, g=-3, t=.004)] for i, j in ((0, 0), (2, 2), (4, 4))],
+          'fx': [('lp', 2000, 2)], 'o': {'a0': .9}},   # 26.11 рецензия: рана героя и свой удар были из одного семейства — рана теперь глухая, темнее (без 1–3 кГц «шлепка»)
  'hit_p': {'s': 1, 'v': [[one(KI + 'impactGeneric_light_00%d.ogg' % i)] for i in (0, 2, 4)]},
  'crit': {'s': 1, 'v': [[one(KI + 'impactMetal_light_00%d.ogg' % i, len=.32, fo=.12)] for i in (0, 1, 4)]},
  'shield_hit': {'s': 1, 'v': [[one(KI + 'impactMetal_medium_00%d.ogg' % i)] for i in (0, 1, 3)]},
@@ -221,9 +230,10 @@ R = {
  'h_ice': {'s': 1, 'v': [[one(KI + 'impactGlass_light_00%d.ogg' % i), one(KI + 'footstep_snow_00%d.ogg' % j, g=-4, r=1.25)] for i, j in ((0, 0), (2, 3), (4, 1))]},
  'h_earth': {'s': 1, 'v': [[one(KI + 'impactMining_00%d.ogg' % i, len=.4, fo=.18)] for i in (0, 2, 4)]},
  'h_light': {'s': 1, 'v': [[one(KI + 'impactBell_heavy_00%d.ogg' % i, r=2.0, len=.6, fo=.3, fx=[('hp', 400)])] for i in (0, 1)]},
- 'h_arcane': {'s': 1, 'v': [[one(MS + 'magical_3.ogg', len=.5, fo=.25)], [one(MS + 'magical_1_0.ogg', a=.1, len=.5, fo=.25)]]},
+ 'h_arcane': {'s': 1, 'v': [[one(MS + 'magical_2.ogg', a=.12, trim=False, fi=.006, gl=(1.25, 1.6), len=.48, fo=.22, fx=[('hp', 380), ('pk', 2400, 3, 1.0), ('rev', .45, .18, 5000)])],
+                            [one(MS + 'magical_2.ogg', a=.2, trim=False, fi=.006, gl=(1.4, 1.85), len=.44, fo=.2, fx=[('hp', 450), ('pk', 2800, 3, 1.0), ('rev', .45, .18, 5000)])]], 'o': {'maxlen': .58, 'fo': .18}},   # «звонкий колокол со взлётом»: кусок magical_2 выше и с подъёмом высоты; ui_lu (окно чар, игра на паузе) — тот же файл целиком
  'h_shadow': {'s': 1, 'v': [[one(MS + 'magical_6_0.ogg', a=.36, trim=False, fi=.02, r=.5, len=.55, fo=.3, fx=[('lp', 1400), ('rev', .5, .3, 1500)])],
-                            [one(MS + 'magical_1_0.ogg', a=.52, trim=False, fi=.02, r=.55, len=.55, fo=.3, fx=[('lp', 1200), ('rev', .5, .3, 1500)])]], 'o': {'maxlen': .75, 'fo': .25}},
+                            [one(MS + 'magical_6_0.ogg', a=.2, trim=False, fi=.02, r=.6, len=.55, fo=.3, fx=[('lp', 1100), ('rev', .5, .3, 1500)])]], 'o': {'maxlen': .75, 'fo': .25}},
  # взмахи (Kenney RPG Audio: knifeSlice)
  'sw_blade': {'s': 1, 'v': [[one(KR + 'knifeSlice.ogg', a=.14, trim=False, fi=.01, len=.3, fo=.1)], [one(KR + 'knifeSlice2.ogg', a=.21, trim=False, fi=.01, len=.25, fo=.1)]], 'o': {'dK': -1}},   # пик взмаха ~0,09 с после удара; на 1 дБ тише синтеза — удар по врагу слышнее взмаха
  'sw_light': {'s': 1, 'v': [[one(KR + 'knifeSlice.ogg', a=.14, trim=False, fi=.008, r=1.35, len=.22, fo=.08)], [one(KR + 'knifeSlice2.ogg', a=.21, trim=False, fi=.008, r=1.35, len=.19, fo=.08)]], 'o': {'dK': -1}},
@@ -253,6 +263,7 @@ def build():
         for vi, layers in enumerate(rc['v']):
             y, gm, m = finish(mix(layers, rc.get('fx', ())), k, tgt, opt); out.append((y, gm)); m['v'] = vi; rep.setdefault(k, []).append(m)
             write_wav(CHK + 'wav/' + k + '_' + str(vi) + '.wav', y * gm / max(1.0, float(np.abs(y * gm).max()) / .89), SRO)
+        rep[k + '#src'] = sorted({L['f'] for layers in rc['v'] for L in layers})
         clips[k] = (rc['s'], out); rep[k + '#synth'] = dict(K=round(tgt[0], 2), P=round(tgt[1], 2), dur=round(tgt[2], 3))
     return clips, rep
 
@@ -261,12 +272,15 @@ def write_wav(p, y, sr):
     wf.write(p, sr, np.clip(y * 32767, -32768, 32767).astype('<i2'))
 
 MARK_T = .05; HEAD = .25; GAP = .12
-def sprite(name, items):
-    """метка (одиночный отсчёт) на 0,05 с, клипы с 0,25 с через 0,12 с тишины; отдаёт смещения (с) — их audio.js поправит по метке"""
+GRAN = 576; PHASE = 24    # гранула mp3 (24 кГц) и фаза начала клипа в ней: подобрана по предэху (tools/phase.py) — без неё перед резким ударом
+                          # (th, h_ice) в окно нарезки попадал «размаз» mp3 до −40 дБ к пику; с фазой 24 — худший −54 дБ
+def sprite(name, items, ph=PHASE):
+    """метка (одиночный отсчёт) на 0,05 с, клипы с 0,25 с через 0,12 с тишины (начало клипа — на фазе ph гранулы mp3); отдаёт смещения (с) — их audio.js поправит по метке"""
     parts = []; t = HEAD; man = {}
     for k, vs in items:
         man[k] = []
         for y, gm in vs:
+            if ph is not None: n0 = int(round(t * SRO)); t = (n0 + (ph - n0) % GRAN) / SRO
             man[k].append([round(t, 4), round(len(y) / SRO, 4), gm]); parts.append((t, y)); t += len(y) / SRO + GAP
     n = int(t * SRO) + int(.3 * SRO); buf = np.zeros(n, np.float32); buf[int(MARK_T * SRO)] = .7
     for t0, y in parts: o = int(round(t0 * SRO)); buf[o:o + len(y)] += y
@@ -278,11 +292,16 @@ def sprite(name, items):
     return man, buf
 
 def music():
-    """«Heartfelt Battle» (request, CC0): петля 153,6 с (96 тактов 150 уд/мин), моно; шов петли — равномощный перекрёст 60 мс (в исходнике на стыке скачок 0,1)"""
-    L = load(HB + 'heartfelt-battle_loop.ogg', 32000, 2); m = L.mean(1); sr = 32000
-    X = int(.06 * sr); P = len(m) - X
-    y = m[:P].copy(); k = np.linspace(0, np.pi / 2, X)
-    y[:X] = m[:X] * np.sin(k) + m[P:P + X] * np.cos(k)          # конец петли перетекает в её начало
+    """«Heartfelt Battle» (request, CC0): петля ровно 153,6 с (96 тактов по 1,6 с), моно. В исходнике шов «петля → петля» со скачком 0,1 (щелчок),
+    а «вступление → петля» у автора чистый: последние 60 мс петли плавно переходят в последние 60 мс вступления — после них петля начинается
+    так же, как после вступления. Длина и сетка тактов не меняются, первая доля петли не тронута (рецензия 26.11)."""
+    sr = 32000; m = load(HB + 'heartfelt-battle_loop.ogg', sr, 2).mean(1); I = load(HB + 'heartfelt-battle_intro.ogg', sr, 2).mean(1)
+    X = int(.06 * sr); P = len(m); y = m.copy(); a, b = m[P - X:], I[-X:]
+    c = float(np.dot(a, b) / (np.sqrt(np.dot(a, a) * np.dot(b, b)) + 1e-12)); k = np.linspace(0, 1, X)
+    # равная мощность с поправкой на сходство кусков (c → 1 — равное усиление, c → 0 — синус/косинус)
+    fo, fi = np.cos(k * np.pi / 2), np.sin(k * np.pi / 2)
+    if c > 0: fo, fi = (1 - c) * fo + c * (1 - k), (1 - c) * fi + c * k
+    y[P - X:] = a * fo + b * fi
     rms =lambda v: 20 * np.log10(np.sqrt((v ** 2).mean()) + 1e-12)
     tgt = -18.4; y = y * 10 ** ((tgt - rms(y)) / 20)
     if pkdb(y) > -1.5: y = limit(y, -1.5, sr)
@@ -292,15 +311,17 @@ def music():
     r = subprocess.run([FF, '-v', 'error', '-y', '-i', wav, '-ac', '1', '-ar', str(sr), '-c:a', 'libmp3lame', '-b:a', '80k', '-metadata', 'title=Heartfelt Battle (loop)',
                         '-metadata', 'artist=request (request.moe)', '-metadata', 'comment=CC0, opengameart.org/content/heartfelt-battle-loopable-fantasy-stringspianohorn', OUT + 'battle.mp3'], capture_output=True, text=True)
     if r.returncode: raise RuntimeError(r.stderr)
-    return dict(t0=HEAD, P=round(P / sr, 5), sr=sr, rms=round(rms(y), 2), pk=round(pkdb(y), 2), xf=X / sr)
+    return dict(t0=HEAD, P=round(P / sr, 5), sr=sr, rms=round(rms(y), 2), pk=round(pkdb(y), 2), xf=X / sr, xcor=round(c, 3))
 
 if __name__ == '__main__':
+    import sys
+    if len(sys.argv) > 1: PHASE = None if sys.argv[1] == 'none' else int(sys.argv[1])
     clips, rep = build()
     S = {1: [], 2: []}
     for k, (s, vs) in clips.items(): S[s].append((k, vs))
     man = {}
     for s in (1, 2):
-        m, buf = sprite('sfx%d' % s, S[s])
+        m, buf = sprite('sfx%d' % s, S[s], PHASE)
         for k, v in m.items(): man[k] = [s - 1, v]
     mu = music()
     json.dump(dict(keys=man, music=mu, mark=MARK_T), open(CHK + 'manifest.json', 'w', encoding='utf-8'), ensure_ascii=False)

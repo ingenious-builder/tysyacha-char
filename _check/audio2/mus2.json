@@ -1,0 +1,150 @@
+{
+ "rec_early": {
+  "loadedBeforeWave": true,
+  "ms": 2,
+  "mus": "calm"
+ },
+ "rec_calm": {
+  "rmsDb": -35.8,
+  "batRec": false,
+  "mus": "calm"
+ },
+ "rec_tense1": {
+  "rmsDb": -34.18,
+  "batRec": true,
+  "mus": "tense"
+ },
+ "rec_tense2": {
+  "rmsDb": -34.24,
+  "batRec": true,
+  "mus": "tense"
+ },
+ "rec_errs": [],
+ "syn_calm": {
+  "rmsDb": -35.54,
+  "batRec": false,
+  "mus": "calm"
+ },
+ "syn_tense1": {
+  "rmsDb": -34.51,
+  "batRec": false,
+  "mus": "tense"
+ },
+ "syn_tense2": {
+  "rmsDb": -34.28,
+  "batRec": false,
+  "mus": "tense"
+ },
+ "syn_errs": [],
+ "switch": {
+  "synthBefore": true,
+  "switchedAfterMs": 1788,
+  "preDb": -34.85,
+  "afterDb": -34.16,
+  "nearMin": -41.1,
+  "synthMin": -46,
+  "synthP10": -39.2,
+  "recMin": -40.4,
+  "recP10": -37.9,
+  "synthP95": -31.3,
+  "recP95": -32.1,
+  "synthMax": -28.7,
+  "recMax": -30.2,
+  "nearMax": -28.4,
+  "near": [
+   [
+    -690,
+    -37.1
+   ],
+   [
+    -627,
+    -34.6
+   ],
+   [
+    -565,
+    -39.9
+   ],
+   [
+    -501,
+    -35.7
+   ],
+   [
+    -439,
+    -36.5
+   ],
+   [
+    -375,
+    -38.2
+   ],
+   [
+    -313,
+    -36
+   ],
+   [
+    -250,
+    -36.5
+   ],
+   [
+    -188,
+    -36.1
+   ],
+   [
+    -125,
+    -41.1
+   ],
+   [
+    -64,
+    -34.5
+   ],
+   [
+    0,
+    -35.4
+   ],
+   [
+    61,
+    -33
+   ],
+   [
+    123,
+    -32.4
+   ],
+   [
+    187,
+    -34.5
+   ],
+   [
+    248,
+    -28.4
+   ],
+   [
+    309,
+    -30.1
+   ],
+   [
+    372,
+    -31.5
+   ],
+   [
+    435,
+    -31.5
+   ],
+   [
+    498,
+    -34.8
+   ],
+   [
+    560,
+    -35.1
+   ],
+   [
+    622,
+    -34.8
+   ],
+   [
+    684,
+    -37.1
+   ]
+  ],
+  "errs": []
+ }
+}

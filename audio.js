@@ -461,8 +461,8 @@ function warm(){const first=['ui_click','sw_light','sw_blade','sw_heavy','bow','
 // Декодирование — OfflineAudioContext на частоте записи (24 кГц: вдвое меньше памяти, чем 48 кГц); не вышло — общим контекстом.
 // Нарезка — в простое по ключу (≤ 6 мс за раз): копия куска × множитель громкости (float, без обрезки), края 3 мс; готовый ключ заменяет синтез.
 // Записи ещё нет (первая загрузка, нет сети) — играет синтез этого ключа, как раньше.
-const REC={f:['sfx1.mp3','sfx2.mp3'],mk:0.05,k:{hit_f:[0,0.25,0.295,1.579,0.665,0.28,1.656,1.065,0.365,1.625,1.55,0.31,1.604],hurt:[0,1.98,0.605,1.707,2.705,0.435,1.462,3.26,0.51,1.586],hit_p:[0,3.89,0.1611,1.513,4.1711,0.1611,1.775,4.4523,0.1,1.824],crit:[0,4.6723,0.255,2.098,5.0473,0.185,2.101,5.3522,0.155,2.101],shield_hit:[0,5.6273,0.21,1.586,5.9573,0.115,2.051,6.1923,0.19,1.673],th:[0,6.5023,0.5268,1.608,7.1491,0.515,1.452,7.7841,0.465,1.418],d_big:[0,8.3691,0.595,1.704,9.0841,0.565,2.101],d_stone:[0,9.7691,0.555,1.083,10.4441,0.545,1.181,11.1091,0.54,1.081],d_bone:[0,11.7691,0.27,1.568,12.1591,0.295,1.454,12.5741,0.295,1.791],d_flesh:[0,12.9891,0.395,1.304,13.5041,0.39,1.185,14.0141,0.395,1.165,14.5291,0.395,1.438],d_slime:[0,15.0441,0.432,1.053,15.5961,0.5995,1.053],d_beast:[0,16.3156,0.585,1.129,17.0206,0.5994,1.053,17.74,0.945,1.053],d_bat:[0,18.805,0.55,1.053,19.475,0.45,1.272],tw:[0,20.045,0.835,1.088,21,0.83,1.053,21.95,0.83,1.115,22.9,0.845,1.053],shield_break:[0,23.865,0.385,1.617,24.37,0.39,1.661],h_ice:[0,24.88,0.22,1.775,25.22,0.215,1.665,25.555,0.215,1.61],h_earth:[0,25.89,0.395,1.754,26.405,0.38,2.101,26.905,0.385,2.101],h_light:[0,27.41,0.545,2.101,28.075,0.56,2.101],h_arcane:[0,28.755,0.5,1.105,29.375,0.5,1.269],h_shadow:[0,29.995,0.75,1.053,30.865,0.75,1.053],sw_blade:[0,31.735,0.28,1.053,32.135,0.23,1.053],sw_light:[0,32.485,0.21,1.053,32.815,0.175,1.053],sw_heavy:[0,33.11,0.39,1.053,33.62,0.34,1.053],w_tick:[0,34.08,0.125,2.032],d_ghost:[1,0.25,2.14,1.481],twb:[1,2.51,1.33,1.053,3.96,1.315,1.053,5.395,1.27,1.053],b_roar:[1,6.785,2.995,1.053],b_phase:[1,9.9,1.4703,1.053],b_death:[1,11.4903,3.305,1.053],r_epic:[1,14.9153,0.795,1.126],r_leg:[1,15.8303,1.285,1.052],c_summon:[1,17.2353,1.62,1.053],c_barrier:[1,18.9753,0.985,1.053],heal:[1,20.0803,0.985,1.053],ui_lu:[1,21.1853,1.08,1.053],ui_click:[1,22.3853,0.085,2.101,22.5903,0.08,2.101],ui_book:[1,22.7903,0.735,2.646],ui_bookc:[1,23.6453,0.2251,2.646],chest:[1,23.9904,1.335,2.646],ess:[1,25.4454,0.2755,2.101,25.8409,0.2932,1.944],ess_big:[1,26.2541,0.81,1.758],scroll:[1,27.1841,0.4305,2.612]}},BAT={f:'battle.mp3',t0:0.25,P:153.54,sr:32000,bar:1.6,g:.6};
-const AV=3,RECST=[0,0],REC_ON={};let recTry=0;
+const REC={f:['sfx1.mp3','sfx2.mp3'],mk:0.05,k:{hit_f:[0,0.265,0.295,1.579,0.697,0.28,1.656,1.105,0.365,1.625,1.609,0.31,1.604],hurt:[0,2.041,0.665,1.429,2.833,0.51,1.335,3.481,0.56,1.251],hit_p:[0,4.177,0.1611,1.513,4.465,0.1611,1.775,4.753,0.1,1.824],crit:[0,4.993,0.255,2.098,5.377,0.185,2.101,5.689,0.155,2.101],shield_hit:[0,5.977,0.21,1.586,6.313,0.115,2.051,6.553,0.19,1.673],th:[0,6.865,0.5268,1.608,7.513,0.515,1.452,8.161,0.465,1.418],d_big:[0,8.761,0.595,1.704,9.481,0.565,2.101],d_stone:[0,10.177,0.555,1.083,10.873,0.545,1.181,11.545,0.54,1.081],d_bone:[0,12.217,0.27,1.568,12.625,0.295,1.454,13.057,0.295,1.791],d_flesh:[0,13.489,0.395,1.304,14.017,0.39,1.185,14.545,0.395,1.165,15.073,0.395,1.438],d_slime:[0,15.601,0.432,1.053,16.153,0.5995,1.053],d_beast:[0,16.873,0.585,1.129,17.593,0.5994,1.053,18.313,0.945,1.053],d_bat:[0,19.393,0.55,1.053,20.065,0.45,1.272],tw:[0,20.641,0.835,1.088,21.601,0.83,1.053,22.561,0.83,1.115,23.521,0.845,1.053],shield_break:[0,24.505,0.385,1.617,25.033,0.39,1.661],h_ice:[0,25.561,0.22,1.775,25.921,0.215,1.665,26.257,0.215,1.61],h_earth:[0,26.593,0.395,1.754,27.121,0.38,2.101,27.625,0.385,2.101],h_light:[0,28.153,0.545,2.101,28.825,0.56,2.101],h_arcane:[0,29.521,0.58,1.053,30.241,0.58,1.069],h_shadow:[0,30.961,0.75,1.053,31.849,0.75,1.053],sw_blade:[0,32.737,0.28,1.053,33.145,0.23,1.053],sw_light:[0,33.505,0.21,1.053,33.841,0.175,1.053],sw_heavy:[0,34.153,0.39,1.053,34.681,0.34,1.053],w_tick:[0,35.161,0.125,2.032],d_ghost:[1,0.265,2.14,1.481],twb:[1,2.545,1.33,1.053,4.009,1.315,1.053,5.449,1.27,1.053],b_roar:[1,6.841,2.995,1.053],b_phase:[1,9.961,1.4703,1.053],b_death:[1,11.569,3.305,1.053],r_epic:[1,15.001,0.795,1.126],r_leg:[1,15.937,1.285,1.052],c_summon:[1,17.353,1.62,1.053],c_barrier:[1,19.105,0.985,1.053],heal:[1,20.233,0.985,1.053],ui_lu:[1,21.361,1.08,1.053],ui_click:[1,22.561,0.085,2.101,22.777,0.08,2.101],ui_book:[1,22.993,0.735,2.646],ui_bookc:[1,23.857,0.2251,2.646],chest:[1,24.217,1.335,2.646],ess:[1,25.681,0.2755,2.101,26.089,0.2932,1.944],ess_big:[1,26.521,0.81,1.758],scroll:[1,27.457,0.4305,2.612]}},BAT={f:'battle.mp3',t0:0.25,P:153.6,sr:32000,bar:1.6,g:.9,g2:1.12};
+const AV=4,RECST=[0,0],REC_ON={};let recTry=0;
 const fetchAB=f=>fetch('assets/audio/'+f+'?av='+AV).then(r=>{if(!r.ok)throw new Error('http '+r.status);return r.arrayBuffer();});
 function decodeAt(ab,sr,ok,no){let c=null;try{const O=window.OfflineAudioContext||window.webkitOfflineAudioContext;if(O)c=new O(1,1,sr);}catch(e){c=null;}
   const run=(d,fail)=>{let done=false;const y=b=>{if(!done){done=true;ok(b);}},n=e=>{if(!done){done=true;fail(e);}};
@@ -476,7 +476,7 @@ function recCut(b,sp){const x=b.getChannelData(0),sr=b.sampleRate,dt=recShift(b)
         const ab=ctx.createBuffer(1,n,sr),y=ab.getChannelData(0);for(let i=0;i<n;i++)y[i]=x[i0+i]*gm;
         for(let i=0;i<E;i++){const w=.5-.5*Math.cos(Math.PI*i/E);y[i]*=w;y[n-1-i]*=w;}arr.push(ab);}
       if(arr.length){arr.base=1;arr.loop=false;BUF[k]=arr;REC_ON[k]=1;}});}}
-function recLoad(i){if(i>=REC.f.length||RECST[i]||!ctx)return;RECST[i]=1;
+function recLoad(i){if(i>=REC.f.length){batLoad();return;}if(RECST[i]||!ctx)return;RECST[i]=1;
   fetchAB(REC.f[i])
    .then(ab=>new Promise((ok,no)=>decodeAt(ab,24000,ok,no))).then(b=>{recCut(b,i);RECST[i]=2;recLoad(i+1);})
    .catch(()=>{RECST[i]=3;STAT.recErr=(STAT.recErr|0)+1;recLoad(i+1);if(recTry++<2)setTimeout(()=>{if(RECST[i]===3){RECST[i]=0;recLoad(i);}},20000);});}
@@ -516,8 +516,9 @@ function calmRun(t1){const C=MUS.calm,M=MOOD[MUS.mood]||MOOD.n,beat=60/M.bpm;
     if(b%16===12&&Math.random()<.55)note('m_bell',M.mel[(Math.random()*M.mel.length)|0]+12,t,.11,mCalm);
     C.beat++;C.next+=beat;}}
 const TK=[1,0,0,0,0,0,.55,0,.9,0,0,.45,0,0,0,0,1,0,0,0,0,0,.55,0,.9,0,0,.45,0,.35,.5,.7],OB=[0,0,0,3,0,0,7,10,0,0,0,3,0,12,10,7],TPROG=[0,-4,-2,-5];
-function tenseRun(t1){const T=MUS.tense,step=60/104/4,root=MUS.mood==='d'?38:33,k=MUS.inten;
-  while(T.next<t1){const t=T.next,s=T.step,s32=s%32,bar=(s/16|0),ch=TPROG[(bar>>1)%4];
+const TSTEP=60/104/4;
+function tenseRun(t1){const T=MUS.tense,step=TSTEP,root=MUS.mood==='d'?38:33,k=MUS.inten;
+  while(T.next<t1&&!(T.sw!=null&&T.next>T.sw+1e-4)){const t=T.next,s=T.step,s32=s%32,bar=(s/16|0),ch=TPROG[(bar>>1)%4];
     if(TK[s32])note('m_taiko',null,t,.42*TK[s32],mTense);
     if(k>=2&&(s32===14||s32===30))note('m_tom',47+(s32===30?5:0),t,.22,mTense);
     if(s%8===4)note('m_stick',null,t,.16,mTense);if(s%2===0)note('m_shk',null,t,s%4===0?.06:.035,mTense);
@@ -541,25 +542,36 @@ function bossStop(){const B=MUS.boss;if(!B)return;const t=now();for(const v of B
 function bossLoad(){if(MUS.bossBuf||MUS.bossLoading||MUS.bossErr||!ctx)return;MUS.bossLoading=true;
   fetchAB('boss.mp3').then(ab=>new Promise((ok,no)=>{const p=ctx.decodeAudioData(ab,ok,no);if(p&&p.catch)p.catch(no);}))
    .then(b=>{MUS.bossBuf=b;MUS.bossLoading=false;}).catch(()=>{MUS.bossErr=true;MUS.bossLoading=false;});}
-// музыка волны и боя — запись «Heartfelt Battle» (request, CC0): петля 96 тактов (150 уд/мин) минус 60 мс равномощного перекрёста шва — loop без щелчка.
-// Пока не загрузилась — прежний синтез (тайко, остинато). Ушла и вернулась — продолжает с того же такта.
-function batLoad(){if(MUS.batBuf||MUS.batLoading||MUS.batErr||!ctx)return;MUS.batLoading=true;
+// музыка волны и боя — запись «Heartfelt Battle» (request, CC0): петля ровно 96 тактов (150 уд/мин, 153,6 с); конец петли перетекает в конец
+// вступления автора (стык «вступление → петля» у него чистый) — loop без щелчка и без сдвига сетки тактов.
+// Грузится в фоне сразу за звуками (recLoad). Пока не загрузилась — прежний синтез (тайко, остинато); пришла посреди волны — синтез
+// доигрывает до своего такта, запись входит на нём. Ушла и вернулась — продолжает с того же такта. Тяжелее волна (inten ≥ 2) — запись чуть громче.
+// не загрузилась — ещё 2 попытки через 20 с (загрузка теперь в самом начале: сбой сети на старте не оставляет синтез на всю игру)
+function batLoad(){if(MUS.batBuf||MUS.batLoading||MUS.batErr||!ctx||Date.now()<(MUS.batWait||0))return;MUS.batLoading=true;
   fetchAB(BAT.f).then(ab=>new Promise((ok,no)=>decodeAt(ab,BAT.sr,ok,no)))
-   .then(b=>{MUS.batOff=BAT.t0+recShift(b);MUS.batBuf=b;MUS.batLoading=false;}).catch(()=>{MUS.batErr=true;MUS.batLoading=false;});}
-function batStart(t){try{const s=ctx.createBufferSource();s.buffer=MUS.batBuf;s.loop=true;s.loopStart=MUS.batOff;s.loopEnd=MUS.batOff+BAT.P;
-    const g=ctx.createGain();g.gain.value=BAT.g;s.connect(g);g.connect(mTense);const pos=MUS.batPos||0;s.start(t+.05,MUS.batOff+pos);return {rec:1,s,g,t0:t+.05,pos};}
+   .then(b=>{MUS.batOff=BAT.t0+recShift(b);MUS.batBuf=b;MUS.batLoading=false;})
+   .catch(()=>{MUS.batLoading=false;if((MUS.batTry=(MUS.batTry|0)+1)>=3)MUS.batErr=true;else MUS.batWait=Date.now()+20000;});}
+const batHi=()=>MUS.inten>=2,batG=()=>BAT.g*(batHi()?BAT.g2:1);
+function batStart(t,fi){try{const s=ctx.createBufferSource();s.buffer=MUS.batBuf;s.loop=true;s.loopStart=MUS.batOff;s.loopEnd=MUS.batOff+BAT.P;
+    const g=ctx.createGain(),G=batG();if(fi){g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(G,t+fi);}else g.gain.value=G;
+    s.connect(g);g.connect(mTense);const pos=MUS.batPos||0;s.start(t,MUS.batOff+pos);return {rec:1,s,g,t0:t,pos,hi:batHi(),gt:t+(fi||0)};}
   catch(e){STAT.errs++;return {next:t+.15,step:0};}}
-function batStop(T){const P=BAT.P,p=((now()-T.t0+T.pos)%P+P)%P;MUS.batPos=Math.floor(p/BAT.bar)*BAT.bar;try{T.s.stop();}catch(e){}try{T.s.disconnect();T.g.disconnect();}catch(e){}}
+function batStop(T){const P=BAT.P,p=((Math.max(0,now()-T.t0)+T.pos)%P+P)%P;MUS.batPos=Math.floor(p/BAT.bar)*BAT.bar;try{T.s.stop();}catch(e){}try{T.s.disconnect();T.g.disconnect();}catch(e){}}
+// синтез волны идёт, а запись догрузилась: синтез доигрывает до начала своего такта (16 шагов) и бьёт его первую долю, запись входит на ней (нарастает 0,25 с, пока гаснет удар синтеза)
+function tenseTick(t,ahead){const T=MUS.tense;
+  if(T.rec){const hi=batHi();if(hi!==T.hi&&t>=T.gt){T.hi=hi;try{T.g.gain.setTargetAtTime(batG(),t,1.2);}catch(e){}}return;}
+  if(MUS.cur!=='tense')T.sw=null;else if(MUS.batBuf&&T.sw==null)T.sw=T.next+((16-T.step%16)%16)*TSTEP;
+  tenseRun(ahead);if(T.sw!=null&&T.sw-t<.3)MUS.tense=batStart(Math.max(T.sw,t+.02),.25);}
 function musSet(w){const t=now(),G={calm:mCalm,tense:mTense,boss:mBoss};if(w==='boss'&&!MUS.bossBuf)w='tense!';const real=w==='tense!'?'tense':w;MUS.inten=w==='tense!'?3:MUS.inten;
   if(real===MUS.cur)return;if(MUS.cur)MUS.off[MUS.cur]=t+4.5;MUS.cur=real;
   for(const k in G)G[k].gain.setTargetAtTime(k===real?1:0,t,k===real?.7:.9);
   if(real==='calm'&&!MUS.calm)MUS.calm={next:t+.2,beat:0,pad:[],mi:4};
-  if(real==='tense'&&!MUS.tense)MUS.tense=MUS.batBuf?batStart(t):{next:t+.15,step:0};
+  if(real==='tense'&&!MUS.tense)MUS.tense=MUS.batBuf?batStart(t+.05):{next:t+.15,step:0};
   if(real==='boss'){if(!MUS.boss)MUS.boss={next:t+.05,srcs:[],first:true};}else if(MUS.boss)bossStop();}
 // уходящая музыка доигрывает, пока гаснет (MUS.off — когда погаснет), потом её секвенсор стоит
 function musTick(){const t=now(),ahead=t+.5,live=k=>MUS.cur===k||t<(MUS.off[k]||0);
   if(MUS.calm){if(live('calm'))calmRun(ahead);else{for(const v of MUS.calm.pad)padOff(v,t);MUS.calm=null;}}
-  if(MUS.tense){if(live('tense')){if(!MUS.tense.rec)tenseRun(ahead);}else{if(MUS.tense.rec)batStop(MUS.tense);MUS.tense=null;}}
+  if(MUS.tense){if(live('tense'))tenseTick(t,ahead);else{if(MUS.tense.rec)batStop(MUS.tense);MUS.tense=null;}}
   if(MUS.boss){MUS.boss.srcs=MUS.boss.srcs.filter(v=>v.end>t);bossRun();}}
 // ---------- фон регионов ----------
 const AMB={kind:'',lay:null,evN:{},beds:{},want:''};
@@ -588,7 +600,7 @@ function tick(){if(!ctx||!A||!A.st)return;let s;try{s=A.st();}catch(e){return;}S
     MUS.mood=s.mode==='select'||zb?'b':zd?'d':'n';
     let w='calm';if(s.mode==='game'){if(s.boss)w='boss';else if(s.wv===2||s.ag>=6){w='tense';hold=t+8;}else if(t<hold)w='tense';}
     if(s.mode==='game'&&(s.wv||s.ag>=3)){batLoad();bossLoad();}
-    if(MUS.forced)w=MUS.forced;MUS.inten=s.wn>=7||s.ag>=12?2:1;musSet(w);musTick();
+    if(MUS.forced)w=MUS.forced;MUS.inten=MUS.fk||(s.wn>=7||s.ag>=12?2:1);musSet(w);musTick();
     // приглушение: пауза (книга, окно уровня), смерть
     const dm=s.dead?.35:s.paused&&!s.set?.55:1,da=s.paused&&!s.set?.6:(w!=='calm'?.7:1);if(dm!==duckM||da!==duckA){duckM=dm;duckA=da;applyVol();}
     // отсчёт перед волной: 3, 2, 1
@@ -666,7 +678,7 @@ const API={
  // настройки и отладка
  opt:()=>Object.assign({},OPT),
  state:()=>({ctx:ctx?ctx.state:null,sr:ctx?ctx.sampleRate:0,unlocked,worker:!!WK,pend:Object.keys(PEND).length,allowed:allowed(),voices:VO.length,buffers:Object.keys(BUF).length,beds:Object.keys(AMB.beds).length,queue:GENQ.length,amb:AMB.kind,mus:MUS.cur,mood:MUS.mood,boss:!!MUS.bossBuf,bat:!!MUS.batBuf,batRec:!!(MUS.tense&&MUS.tense.rec),rec:Object.keys(REC_ON).length,recSt:RECST.slice(),stat:Object.assign({},STAT),session:navigator.audioSession?navigator.audioSession.type:'нет'}),
- dbg:{L,play:(n,o)=>play(n,o||{}),force:w=>{MUS.forced=w||'';if(w==='boss')bossLoad();if(w==='tense')batLoad();},bufs:k=>BUF[k]?BUF[k].slice():[],rec:()=>({st:RECST.slice(),on:Object.keys(REC_ON),bat:!!MUS.batBuf,batOff:MUS.batOff,batPos:MUS.batPos||0}),meter:()=>{if(!meter)return null;const a=new Float32Array(meter.fftSize);meter.getFloatTimeDomainData(a);let p=0,e=0;for(const v of a){p=Math.max(p,Math.abs(v));e+=v*v;}return {peak:p,rms:Math.sqrt(e/a.length)};},
+ dbg:{L,play:(n,o)=>play(n,o||{}),force:w=>{MUS.forced=w||'';if(w==='boss')bossLoad();if(w==='tense')batLoad();},inten:k=>{MUS.fk=k|0;},bufs:k=>BUF[k]?BUF[k].slice():[],rec:()=>({st:RECST.slice(),on:Object.keys(REC_ON),bat:!!MUS.batBuf,batOff:MUS.batOff,batPos:MUS.batPos||0}),meter:()=>{if(!meter)return null;const a=new Float32Array(meter.fftSize);meter.getFloatTimeDomainData(a);let p=0,e=0;for(const v of a){p=Math.max(p,Math.abs(v));e+=v*v;}return {peak:p,rms:Math.sqrt(e/a.length)};},
    genAll:()=>{for(const n in L)if(!BUF[n])reqBuf(n);},boss:()=>MUS.boss&&{next:+(MUS.boss.next-now()).toFixed(3),srcs:MUS.boss.srcs.length,P:BOSS_P,dur:MUS.bossBuf?MUS.bossBuf.duration:0},q:()=>GENQ.length+Object.keys(PEND).length,by:()=>Object.assign({},BY),set:o=>{Object.assign(OPT,o);applyVol();},mus:()=>({cur:MUS.cur,inten:MUS.inten,mood:MUS.mood})},
 };
 G.TCSND=API;
