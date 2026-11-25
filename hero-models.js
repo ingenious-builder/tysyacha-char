@@ -375,6 +375,26 @@
       for (const s of [-1, 1]) g.add(msh(box(.08, .34, .03), m, [s * .08, .6, -.55], [.3, 0, s * .35]));
       return g;
     },
+    // тюбетейка Тимура: бархат, золотая вышивка по краю и ромбы-узоры по кругу
+    tubeteika(e, M) {
+      const g = new T.Group(), v = M(e.c || 0x1f7a4a), gd = M(e.pat || 0xf2c46b, .2), rd = M(e.r || 0xd8453a, .1);
+      g.add(msh(cyl(.48, .52, .24, 18), v, [0, .91, -.02]));
+      g.add(msh(cyl(.48, .48, .04, 18), v, [0, 1.04, -.02]));
+      g.add(msh(tor(.52, .035, 0, 22), gd, [0, .8, -.02], [Math.PI / 2, 0, 0]));
+      g.add(msh(tor(.475, .028, 0, 22), gd, [0, 1.03, -.02], [Math.PI / 2, 0, 0]));
+      for (let i = 0; i < 8; i++) { const a = i / 8 * TAU; g.add(msh(box(.09, .09, .03), i % 2 ? rd : gd, [Math.sin(a) * .505, .915, Math.cos(a) * .505 - .02], [0, a, Math.PI / 4])); }
+      g.add(msh(cyl(.12, .12, .02, 4), gd, [0, 1.065, -.02], [0, Math.PI / 4, 0])); // ромб-звезда на макушке
+      return g;
+    },
+    // эчпочмак в руке: треугольный пирожок, дырочка с бульоном сверху
+    pie(e, M) {
+      const g = new T.Group(), cr = M(0xd8892e), dk = M(0x7a3e12), br = M(0xffb347, .7);
+      g.add(msh(cyl(.2, .2, .11, 3), cr, [0, .12, .07], [Math.PI / 2, 0, 0]));
+      g.add(msh(cyl(.17, .17, .13, 3), M(0xe8a048), [0, .12, .07], [Math.PI / 2, 0, 0], [1, 1, .6]));
+      g.add(msh(cyl(.05, .05, .14, 10), dk, [0, .12, .07], [Math.PI / 2, 0, 0]));
+      g.add(msh(sph(.035, 8, 6), br, [0, .12, .145]));
+      return g;
+    },
     // ---- оружие (в руке handslotr: ось +Y — вдоль оружия) ----
     hammer(e, M) {
       const g = new T.Group(), wd = M(0x7a5232), lt = M(0x3a2a1e), mt = M(e.metal || 0xd0d6e2), dk = M(0x464a56), gd = M(e.c || 0xf2c46b, e.em);
@@ -545,6 +565,10 @@
     alch: { b: 'R', h: 'R', w: 'throw', props: ['Rp_Throwable'], tip: TIP.bomb, ex: [{ k: 'goggles' }],
       pal: { rogue: { tunic: 0x6b4a2e, hood: 0x9be84a, leather: 0x4a3220, glove: 0x3a2a1a, pants: 0x3a2a1a, boots: 0x2a1a10, bomb: 0x9be84a, hair: 0x6a3a1a } },
       glow: { rogue: { bomb: 0x9be84a } } },
+    // 21-й: Тимур Галиев — маг в зелёном халате с золотом, бордовый плащ, тюбетейка; в руке эчпочмак (бросок — анимация Throw)
+    timur: { b: 'M', h: 'K', w: 'throw', props: ['Mp_Cape'], tip: TIP.bomb, ex: [{ k: 'tubeteika', c: 0x1f7a4a, pat: 0xf2c46b }, { k: 'pie', bone: 'handslotr' }],
+      pal: { mage: { robe: 0x1f7a4a, hat: 0x1f7a4a, robe2: 0x145a36, cape: 0x8a1f2a, trim: 0xf2c46b, inner: 0xf4ead2, teal: 0xffc23a, pants: 0x2a2a30 }, knight: { hair: 0x1a1210 } },
+      glow: { mage: { gem: 0xffc23a, teal: 0xffc23a } } },
   };
   window.HM = HM;
 })();
