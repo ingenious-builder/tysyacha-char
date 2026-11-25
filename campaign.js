@@ -30,19 +30,22 @@ const LV=[
 // xp — к опыту (врагов меньше, опыт за каждого больше). «Гончая» быстрая и бежит к хрупкому герою (меньше жизни),
 // пока у неё на пути не встанет напарник; «громила» медленный и толстый — его держит танк; стрелки бьют издали.
 const ROLE={
- grunt:  {pool:'norm',  hp:5.5,dmg:1.6, xp:1.4},
+ grunt:  {pool:'norm',  hp:5.5,dmg:1.45,xp:1.4},
  brute:  {pool:'heavy', hp:7,  dmg:1.7, xp:1.7,spd:.85},
- shooter:{pool:'ranged',hp:4.2,dmg:1.6, xp:1.3},
+ shooter:{pool:'ranged',hp:4.2,dmg:1.45,xp:1.3},
  hound:  {pool:'swarm', hp:4,  dmg:1.4, xp:1.2,spd:1.3,hound:true},
  champ:  {pool:'heavy', hp:3.2,dmg:1.5, xp:1.2,elite:true,champ:true},   // элита ×3,5 и чемпион ×2 — уже в spawnEnemy
 };
 // запас здоровья по уровням кампании: первый — без особых правил, там враги толще; остальные держит сама цель уровня
 const LVHP=[0,1.6,1,1,1.3,1.6,1,1.4,1.3];
 // сила героя с уровнем растёт быстрее, чем линейная формула врагов ущелий (таланты, ранги, слоты): на 20-м уровне страж падал
-// за 15 с. Как в свободном мире — множитель «враг своего уровня» FOE_K (та же таблица): здоровье ×(1+0,65·(K−1)), урон — треть этой прибавки
+// за 15 с. Как в свободном мире — множитель «враг своего уровня» FOE_K (та же таблица): здоровье ×(1+0,65·(K−1)), урон ×(1+0,25·(K−1))
 const CK=[[1,1],[4,1],[10,1.9],[16,3],[25,3.8],[40,4.2],[50,5.5],[60,7.5],[70,8.5],[100,9.5]];
 function campK(l){const T=CK;let k=T[T.length-1][1];if(l<=T[0][0])k=T[0][1];else for(let i=1;i<T.length;i++)if(l<=T[i][0]){const a=T[i-1],b=T[i];k=a[1]*Math.pow(b[1]/a[1],(l-a[0])/(b[0]-a[0]));break;}return 1+(k-1)*.65;}
-const dmgK=K=>1+(K-1)*.35;
+const dmgK=K=>1+(K-1)*.25;
+// герои пришли на уровень сильно перекачанными (прошли прошлые подряд: к 8-му уровню кампании они 25–30-го) — враги и боссы
+// ещё крепче: +7% здоровья за каждый уровень героя сверх «уровень кампании + 3», не больше ×1,8
+function overK(){const Z=Zf(),c=Z&&Z.camp;if(!c)return 1;return clamp(1+.07*(heroLv()-c.lv-3),1,1.8);}
 // уровень врагов кампании растёт вместе с героями (как в коопе: 3/4 сильнейшего + 1/4 второго), но не ниже уровня ущелья:
 // раньше герои за уровень вырастали на 4–5 уровней, а враги оставались прежними — к концу всё таяло с одного удара
 function heroLv(){const a=(X.S&&X.S.lvl)|0||1,pr=MPm.peer,b=pr&&pr.on&&pr.lvl||a;return Math.max(1,Math.round(Math.max(a,b)*.75+Math.min(a,b)*.25));}
@@ -88,7 +91,7 @@ function hn(text,sec){X.hint(text,sec);if(X.MPH)X.mpSend({t:'camp',k:'hn',x:text
 function sendNow(){if(!X.MPH||!CS)return;X.mpSend({t:'camp',k:'st',s:CS});sendT=.2;}
 function pickPool(kind){const Z=Zf();return X.pickW(Z.th.m[kind]||Z.th.m.norm);}
 function spawnAt(tid,off,lz,o){const Z=Zf();lz=clamp(lz,2,Z.z1-1.2);const w=lpos(off,lz),lv=foeLv()+(Math.random()<.25?1:0),K=campK(lv);
-  const op=Object.assign({gorge:true,aggro:true,noPack:true,hpMul:HPM},o);op.hpMul*=K;
+  const op=Object.assign({gorge:true,aggro:true,noPack:true,hpMul:HPM},o);op.hpMul*=K*overK();
   const l=X.spawnMob(tid,w.x,w.z,lv,op);for(const en of l)en.dmg=Math.max(1,Math.round(en.dmg*dmgK(K)));return l;}
 function killLeft(filter){for(const en of X.ENEMIES){if(!en.dead&&!en.boss&&(!filter||filter(en)))X.kill(en,0,-1,{noReward:true});}}
 // живой = не убит и ещё в игре (враг, убранный из списка без смерти, не должен навсегда держать ворота)
@@ -124,13 +127,15 @@ function stragglers(list,st,dt){if(!list||!list.length)return;const hs=heroes();
   for(const u of list){if(u.dead)continue;any=true;for(const h of hs){if(Math.hypot(h.p.x-u.pos.x,h.p.z-u.pos.z)<32){st.ft=0;return;}}}
   if(!any){st.ft=0;return;}st.ft=(st.ft||0)+dt;if(st.ft<25)return;st.ft=0;
   const lz=clamp(leadZ()+8,2,Zf().z1-1.5);for(const u of list){if(u.dead)continue;const w=lpos(rand(-2,2),lz);u.pos.set(w.x,0,w.z);u.aggro=true;X.colBurst(X.RED,w.x,1,w.z,14,4,.4,0);}}
-// загнанные: если от нужной группы осталось 1–2 врага и 35 с никто не погиб (стрелок убегает от бойца, враг застрял на камне)
-// — они оказываются рядом с ближайшим героем и на миг оглушены. Иначе ворота могли держаться бесконечно
+// загнанные: если от нужной группы осталось 1–2 врага и 35 с никто не погиб (стрелок убегает от бойца, шаман лечится быстрее,
+// чем его бьёт один танк, враг застрял на камне) — они оказываются рядом с ближайшим героем, оглушены и теряют 40% здоровья.
+// Иначе ворота могли держаться бесконечно (проверка ботами: шаман у стартовой стены 10 минут против одного паладина)
 function cornered(list,st,dt){const n=aliveN(list);if(n!==st.cn){st.cn=n;st.ct=0;return;}if(!n||n>2)return;st.ct=(st.ct||0)+dt;if(st.ct<35)return;st.ct=0;
   const hs=heroes();if(!hs.length)return;let moved=false;
   for(const u of list){if(u.dead||X.ENEMIES.indexOf(u)<0)continue;let b=null,bd=1e9;for(const h of hs){const d=Math.hypot(h.p.x-u.pos.x,h.p.z-u.pos.z);if(d<bd){bd=d;b=h;}}
-    if(!b||bd<5)continue;const a=rand(0,TAU),r=rand(2.5,4);u.pos.set(b.p.x+Math.cos(a)*r,0,b.p.z+Math.sin(a)*r);u.stun=Math.max(u.stun||0,1.4);u.aggro=true;X.colBurst(X.RED,u.pos.x,1,u.pos.z,14,4,.4,0);moved=true;}
-  if(moved)hn('Последний враг загнан — добейте его',3);}
+    if(!b)continue;if(bd>=5){const a=rand(0,TAU),r=rand(2.5,4);u.pos.set(b.p.x+Math.cos(a)*r,0,b.p.z+Math.sin(a)*r);}
+    u.stun=Math.max(u.stun||0,2.5);u.aggro=true;u.hp=Math.max(1,Math.round(u.hp*.6));X.colBurst(X.RED,u.pos.x,1,u.pos.z,18,4,.4,0);moved=true;}
+  if(moved)hn('Последний враг загнан и ослаб — добейте его',3);}
 function barsTick(){const Z=Zf();if(!Z.ce)return;for(let i=0;i<Z.ce.length;i++){const e=Z.ce[i];if(e.bi!=null&&!CS.gt[e.bi]&&encCleared(e))openBar(e.bi,i<Z.ce.length-1?['Засада разбита','Проход открыт']:null);}}
 function rearZ(){let z=1e9;for(const h of heroes())z=Math.min(z,hLocal(h).z);return z;}
 function addBar(Z,z){Z.cb.push({z});return Z.cb.length-1;}
@@ -174,12 +179,12 @@ function wave(n,mix,lzFn,offR,o){const out=[];for(let i=0;i<n;i++){const role=mi
 function bossSpawn(tid,hpm,sub,pt){
   const Z=Zf(),lz=Z.bossZ+5,w=lpos(0,lz);
   const lv=foeLv()+1,K=campK(lv);
-  const B=X.spawnEnemy(tid,w.x,w.z,lv,{gorge:true,aggro:true,hpMul:hpm*K*HPM,bsub:sub,phT:pt,phQ:true});B.skillCd=2.5;X.setBOSS(B);B.dmg=Math.round(B.dmg*dmgK(K));H.B=B;H.bsp=true;
+  const B=X.spawnEnemy(tid,w.x,w.z,lv,{gorge:true,aggro:true,hpMul:hpm*K*overK()*HPM,bsub:sub,phT:pt,phQ:true});B.skillCd=2.5;X.setBOSS(B);B.dmg=Math.round(B.dmg*dmgK(K));H.B=B;H.bsp=true;
   X.bossIntro(B);return B;}
 function shieldOn(thr,kind){CS.sh=kind;CS.shc=0;H.lock=thr;H.shT=kind===2?40:60;H.lastCombo=MPm.combo|0;sendNow();}
 function shieldOff(text){CS.sh=0;sendNow();const B=X.BOSS;if(B){B.shredT=5;B.stun=2.2;B.busy=0;}bn(text[0],text[1]);}
 function addsAround(B,tids,n,hm){const out=[];const lv=foeLv(),K=campK(lv);for(let i=0;i<n;i++){const a=rand(0,TAU),d=rand(4,8);
-  const l=X.spawnMob(tids[i%tids.length],B.pos.x+Math.cos(a)*d,B.pos.z+Math.sin(a)*d,lv,{gorge:true,aggro:true,noPack:true,hpMul:(hm||1)*K*HPM,rw:1.3});
+  const l=X.spawnMob(tids[i%tids.length],B.pos.x+Math.cos(a)*d,B.pos.z+Math.sin(a)*d,lv,{gorge:true,aggro:true,noPack:true,hpMul:(hm||1)*K*overK()*HPM,rw:1.3});
   for(const e of l){tune(e,{dmg:1.4*dmgK(K)});out.push(e);}}return out;}
 function holdShield(){const B=X.BOSS;if(CS.sh&&B&&!B.dead)B.hp=Math.max(B.hp,B.maxHp*H.lock);}
 
