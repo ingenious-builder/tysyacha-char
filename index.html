@@ -1590,7 +1590,7 @@ const CLASS_KIT={
   desc:'Бьёт сериями: каждый удар подряд сильнее и быстрее, а каждый десятый срывает с ладони волну ветра. Сто кулаков и Путь ветра — вихрь ударов по всей толпе.'},
  lock:{arch:'summ dark',ca:['summon','meteor','mark','wall','rain','vortex'],cp:['thrall','twin','volley','rift'],sig:['s_hellgate','s_darkdeal','s_pactdemon'],
   desc:'Огненные и тёмные чары проклинают врага: по проклятым больше урона, а умирая, они становятся его бесами; гибель слуг возвращает ему здоровье и ману. Открывает врата ада и приносит слуг в жертву ради Инфернала.'},
- inq:{arch:'fight holy shoot',melee:false,ca:['bolt','glyph','trap','hook','mark','mirror'],cp:['brand','ward','stagger','trophy'],sig:['s_pyre','s_unshaken','s_inquisition'],
+ inq:{arch:'fight holy shoot',melee:false,roleTxt:'Дальний бой из арбалета, крепкий',ca:['bolt','glyph','trap','hook','mark','mirror'],cp:['brand','ward','stagger','trophy'],sig:['s_pyre','s_unshaken','s_inquisition'],
   desc:'Каждая третья атака по врагу клеймит его еретиком: по нему больше урона, а его смерть взрывается святым огнём и клеймит соседа. Арбалет, печати и Инквизиция, бьющая по еретикам.'},
  alch:{arch:'alch arc',ca:['bolt','trap','totem','meteor','stasis','fan'],cp:['trail','doom','sprite','battery'],sig:['s_mutagen','s_fumes','s_philstone'],
   desc:'Каждое попадание ставит врагу метку ещё одной стихии — реакции идут одна за другой, а каждая пятая чара нестабильна и бьёт сильнее. Колбы, мины и Философский камень, который бросает всё втрое.'}};
@@ -5354,7 +5354,7 @@ function renderSelInfo(){const c=CLASS_BY[selId],sv=SAVE.chars[c.id],E1=ELEMENTS
   $('#selInfo').innerHTML=`<div class="si-scroll"><div class="si-top"><span class="ico" style="--c:${c.hex}">${svg(c.icon)}</span><div><h2>${c.name}</h2><p><b class="si-role" style="color:${c.hex}">${c.role}</b> · ${c.melee?'ближний бой':'дальний бой'} · сложность ${diffDots(c.diff)}</p></div></div>
   <div class="si-els"><span class="rchip" style="--c:${E1.hex}"><span class="dot"></span>${E1.name} — основная</span><span class="rchip" style="--c:${E2.hex}"><span class="dot"></span>${E2.name}</span>${R?`<span class="rchip"><b>${R.name}</b></span>`:''}</div>
   <p class="si-desc">${c.desc}</p>
-  <p class="si-rolebar">${ROLES[c.role]||''}</p><div class="si-nums"><span>Здоровье <b>${Math.round(120*c.hp)}</b></span><span>Мана <b>${Math.round(100*c.mp)}</b></span><span>Броня <b>${Math.round((1-(c.armor||1))*100)}%</b></span><span>Скорость <b>${Math.round(c.spd*100)}%</b></span></div>
+  <p class="si-rolebar">${c.roleTxt||ROLES[c.role]||''}</p><div class="si-nums"><span>Здоровье <b>${Math.round(120*c.hp)}</b></span><span>Мана <b>${Math.round(100*c.mp)}</b></span><span>Броня <b>${Math.round((1-(c.armor||1))*100)}%</b></span><span>Скорость <b>${Math.round(c.spd*100)}%</b></span></div>
   <div class="si-stats">${stat('Здоровье',c.hp,1.5)}${stat('Мана',c.mp,1.5)}${stat('Броня',(1-(c.armor||1))*100+8,28)}${stat('Скорость',c.spd,1.2)}</div>
   <div class="si-sig">${sig}</div>
   ${mastHtml(c,sv)}
@@ -8785,8 +8785,10 @@ function cfOnKill(en,el,o){if(!CT_ON||!CLS)return;if((o.noReward||o.fromG)&&!o.g
   case 'assassin':{const inSh=time<CT.shadowT;if(t>=4&&inSh){for(let i=0;i<8;i++){const id=S.active[i];if(id!=null&&(SKILLS[id].F.id==='strike'||SKILLS[id].F.id==='rush'))P.cds[id]=0;}}
     if(time>=CT.shadowCd){CT.shadowT=time+(t>=2?2.5:1.5);CT.shadowCd=time+4;CT.shadowFirst=t>=3;puffs(P.pos.x,.6,P.pos.z,CT_SHD,14);fxGlow(P.pos.x,P.pos.z,2,CT_SHD,.4,.8);ctProc(P.pos,'В тени','#d9b8ff',0);}break;}
   case 'lock':if(ctCurse(en)>0&&ctFreeN('imp')<(t>=4?8:6)){ctSpawn('imps','fire',en.pos,8,'imp',false);ctProc(en.pos,'Бес!','#ffb070',0);}break;
-  case 'inq':if(en.ctHer>time){const r=t>=3?4:3,v=ctLvD(),p=en.pos.clone();ctHerDrop(en);aoe(p,r,v,EL.light,{ctx:1,depth:1,noReact:true,noProc:true,knockFrom:p.clone()},en);
-    fxPillar(p.x,p.z,1.2,6,GOLD,.6);fxShock(p.x,p.z,r,GOLD,.5);fxGlow(p.x,p.z,r*1.3,GOLD,.4,.8);elBurst(EL.light,p.x,1,p.z,18);for(const n of nearestN(p,8,t>=3?2:1,en))ctHeretic(n);ctProc(p,'Святой взрыв','#ffe08a',r);}break;}}
+  case 'inq':if(en.ctHer>time){const r=t>=3?4:3,v=ctLvD(),p=en.pos.clone();ctHerDrop(en);
+    // взрыв — после смерти (как у части A): враг ещё не помечен мёртвым, и задетый им же взрыв убил бы его второй раз
+    later(0,()=>{aoe(p,r,v,EL.light,{ctx:1,depth:1,noReact:true,noProc:true,knockFrom:p.clone()},en);for(const n of nearestN(p,8,t>=3?2:1,en))ctHeretic(n);});
+    fxPillar(p.x,p.z,1.2,6,GOLD,.6);fxShock(p.x,p.z,r,GOLD,.5);fxGlow(p.x,p.z,r*1.3,GOLD,.4,.8);elBurst(EL.light,p.x,1,p.z,18);ctProc(p,'Святой взрыв','#ffe08a',r);}break;}}
 function cfDmgIn(d,src,o){if(!CT_ON||!CLS)return d;if(CLS.id==='paladin'&&CT.tier>=3&&CT.wrath>=P.maxHp*.59)return d*.85;if(CLS.id==='bers'&&CT.tier>=3&&time<CT.frenzyT)return d*.8;return d;}
 function cfOnHurt(dmg,src,o){if(!CT_ON||!CLS)return;CT.lastHurt=time;
   if(CLS.id==='paladin'){const w=CT.wrath;CT.wrath=Math.min(P.maxHp*.6,w+dmg*.3);if(w<P.maxHp*.12&&CT.wrath>=P.maxHp*.12)CT.popT=time+.4;}
