@@ -25,7 +25,7 @@ function loadGame(root) {
   const THREE = { Color }, doc = { querySelector: () => null, getElementById: () => null };
   const src = `(function(THREE,document,localStorage){const $=s=>null;const TAU=Math.PI*2;const rand=(a,b)=>a+Math.random()*(b-a);const randi=(a,b)=>Math.floor(rand(a,b+1));
 const clamp=(v,a,b)=>v<a?a:v>b?b:v;const lerp=(a,b,t)=>a+(b-a)*t;const cap=s=>s[0].toUpperCase()+s.slice(1);const fmt=n=>String(n);const fmt2=n=>String(n);
-const P={mpRegen:8,maxHp:120,pos:{x:0,z:0}};let __v;function cfStats(){}const isImp=()=>false;   // особенность класса (часть B) и «Невозможная» — в node без эффекта
+const P={mpRegen:8,maxHp:120,pos:{x:0,z:0}};let __v;function cfStats(){}function cfMana(s){return skMana(s);}const isImp=()=>false;   // особенность класса (часть B) и «Невозможная» — в node без эффекта
 ${code}
 return {get:n=>eval(n),set:(n,v)=>{__v=v;eval(n+'=__v');},P};})`;
   const G = vm.runInNewContext(src, { Math, Map, Set, Array, Object, JSON, Float64Array, Float32Array, String, Number, console })(THREE, doc, {});

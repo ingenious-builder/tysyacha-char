@@ -51,7 +51,8 @@ SIM.run=function(o){
   if(o.cls)CLS=CLASS_BY[o.cls];
   gainXp=()=>{};dropLoot=()=>{};
   const keepK=rarK,keepL=S.lvl;if(!o.withK)rarK=()=>1;if(o.lvl)S.lvl=o.lvl;   // o.lvl — уровень героя (урон крупнее, меньше округлений)   // по умолчанию — без множителя редкости: меряем саму механику
-  const keepCrit=ST.crit;ST.crit=0;const keepSB=SB_OFF;SB_OFF=true;const keepR=RESO.slice();RESO.fill(1);
+  const keepCrit=ST.crit;ST.crit=0;const keepCT=typeof CT_ON!=='undefined'?CT_ON:0;CT_ON=0;NFS.nf3hsT=-9;NFS.nf3hs=null;   // особенность класса (часть B) — без неё: меряем саму форму
+  const keepSB=SB_OFF;SB_OFF=true;const keepR=RESO.slice();RESO.fill(1);
   let res=null;
   try{
     wipe();time=0;P.pos.set(0,0,0);P.prev.set(0,0,0);
@@ -83,7 +84,7 @@ SIM.run=function(o){
     const tot=dmgSum()-drvN-(d0||0);
     res={id:o.id,scen,cls:CLS.id,dps:tot/(T-warm),cyc,casts:P.casts,tag:o.tag||undefined};
   }finally{
-    rarK=keepK;S.lvl=keepL;SB_OFF=keepSB;gainXp=ORIG.gainXp;dropLoot=ORIG.dropLoot;ST.crit=keepCrit;for(let i=0;i<10;i++)RESO[i]=keepR[i];
+    CT_ON=keepCT;rarK=keepK;S.lvl=keepL;SB_OFF=keepSB;gainXp=ORIG.gainXp;dropLoot=ORIG.dropLoot;ST.crit=keepCrit;for(let i=0;i<10;i++)RESO[i]=keepR[i];
     wipe();CLS=keepCls;Math.random=R0;
     S.passive=Array(42).fill(null);rebuildPassives();
   }
