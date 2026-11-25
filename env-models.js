@@ -22,12 +22,12 @@
       g.scene.traverse(o => { if (!o.isMesh || !o.userData || !o.userData.k) return; add.push(o); });
       for (const o of add) {
         const u = o.userData, L = EM.lib[u.k] || (EM.lib[u.k] = { all: [], vars: [], lite: null, lum: 1 });
-        L.all[u.v] = { geo: o.geometry, lite: !!u.lite };
+        L.all[u.v] = { geo: o.geometry, lite: !!u.lite, also: !!u.also };/* also — облегчённый, но и обычный вариант */
         if (u.glow) L.glow = u.glow;
       }
       for (const k in EM.lib) {
         const L = EM.lib[k]; if (L.vars.length) continue;
-        L.vars = L.all.filter(a => a && !a.lite).map(a => a.geo); const li = L.all.find(a => a && a.lite);
+        L.vars = L.all.filter(a => a && (!a.lite || a.also)).map(a => a.geo); const li = L.all.find(a => a && a.lite);
         L.lite = li ? li.geo : L.vars[L.vars.length - 1]; if (!L.vars.length) L.vars = [L.lite];
         // средняя яркость цвета вершин: материалам без цвета вершин (камни) цвет делится на неё, чтобы общий тон региона не потемнел
         const c = L.vars[0].attributes.color; let s = 0; if (c) { for (let i = 0; i < c.count; i++) s += .299 * c.getX(i) + .587 * c.getY(i) + .114 * c.getZ(i); L.lum = Math.max(.2, s / c.count); }
@@ -157,24 +157,40 @@
 
   // ---------- подгружаемые части мира ----------
   // у вида тот же один меш, что был: геометрия — слитые варианты, номер варианта у экземпляра ставится после каждой пересборки
-  EM.pk = function (e, k, maxV) {
+  // тяжёлые модели (дома: 1–2 тыс. вершин на вариант) не сливаем — каждая вершина всех вариантов считалась бы у каждого дома;
+  // у них по мешу на вариант (теней у частей мира нет, это +1 вызов на вид)
+  const MERGE_MAX = 1200;
+  EM.pk = function (e, k, maxV, parent) {
     const L = EM.lib[k]; if (!L || e.emK) return false; e.emK = k;
     const m = e.im, mat = fixMat(m.material, L, k), nv = Math.min(L.vars.length, maxV || 2);
-    m.emK = k; m.emV = 0; m.emBase = mat; m.emG = L.vars[0];
-    if (nv > 1) {
+    m.emK = k; m.emV = 0; m.emBase = mat; m.emG = L.vars[0]; e.vars = [m];
+    const verts = L.vars.slice(0, nv).reduce((s, g) => s + g.attributes.position.count, 0);
+    if (nv > 1 && verts <= MERGE_MAX) {
       const src = mergedOf(L, nv), w = new T.BufferGeometry();
       for (const a of ['position', 'normal', 'color', 'aVar']) w.setAttribute(a, src.attributes[a]);
       w.setIndex(src.index); const iv = new T.InstancedBufferAttribute(new Float32Array(e.cap), 1); iv.setUsage(T.DynamicDrawUsage); w.setAttribute('iVar', iv);
       m.emWrap = w; m.emSel = selMat(mat); m.emNV = nv;
+    } else for (let v = 1; v < nv; v++) {
+      const x = new T.InstancedMesh(L.vars[v], mat, e.cap); x.count = 0; x.frustumCulled = false; x.visible = false; x.castShadow = m.castShadow;
+      x.instanceColor = new T.InstancedBufferAttribute(new Float32Array(e.cap * 3), 3); x.instanceColor.setUsage(T.DynamicDrawUsage); x.instanceMatrix.setUsage(T.DynamicDrawUsage);
+      x.emK = k; x.emV = v; x.emBase = mat; x.emG = L.vars[v]; look(x); parent.add(x); e.vars.push(x);
     }
     look(m); e.split = EM.split; EM.pkl.push(e); return true;
   };
-  // после пересборки: номер варианта по месту экземпляра (одно и то же место — всегда та же модель)
+  // после пересборки: вариант по месту экземпляра (одно и то же место — всегда та же модель)
+  let SCR = new Float32Array(16 * 64), SCC = new Float32Array(3 * 64);
   EM.split = function (e) {
-    const m = e.im; if (!m.emWrap) return;
-    const A = m.instanceMatrix.array, iv = m.emWrap.attributes.iVar, nv = m.emNV;
-    for (let i = 0; i < m.count; i++) iv.array[i] = Math.min(nv - 1, vh(A[i * 16 + 12], A[i * 16 + 14]) * nv | 0);
-    iv.needsUpdate = true;
+    const m = e.im, n = m.count, A = m.instanceMatrix.array;
+    if (m.emWrap) { const iv = m.emWrap.attributes.iVar, nv = m.emNV; for (let i = 0; i < n; i++) iv.array[i] = Math.min(nv - 1, vh(A[i * 16 + 12], A[i * 16 + 14]) * nv | 0); iv.needsUpdate = true; return; }
+    const nv = e.vars.length; if (nv < 2) return;
+    if (SCR.length < n * 16) { SCR = new Float32Array(n * 24); SCC = new Float32Array(n * 5); }
+    SCR.set(A.subarray(0, n * 16)); SCC.set(m.instanceColor.array.subarray(0, n * 3));
+    const cnt = new Array(nv).fill(0);
+    for (let i = 0; i < n; i++) {
+      const v = Math.min(nv - 1, vh(SCR[i * 16 + 12], SCR[i * 16 + 14]) * nv | 0), x = e.vars[v], j = cnt[v]++;
+      x.instanceMatrix.array.set(SCR.subarray(i * 16, i * 16 + 16), j * 16); x.instanceColor.array.set(SCC.subarray(i * 3, i * 3 + 3), j * 3);
+    }
+    e.vars.forEach((x, v) => { x.count = cnt[v]; x.visible = cnt[v] > 0; x.instanceMatrix.needsUpdate = true; x.instanceColor.needsUpdate = true; });
   };
   // огонёк фонаря «Мёртвого города» — туда, где у модели стекло
   EM.lampGlow = function () { const g = EM.lib.lamp && EM.lib.lamp.glow || [.6, 2.42, 0]; return new T.OctahedronGeometry(.13, 0).scale(1, 1.45, 1).translate(g[0], g[1], g[2]); };
@@ -183,7 +199,7 @@
   EM.setLite = function (on) {
     on = !!on; if (on === EM.lite) return; EM.lite = on;
     for (const r of EM.roots) for (const m of r.emMade || []) if (m.parent === r) look(m);
-    for (const e of EM.pkl) look(e.im);
+    for (const e of EM.pkl) e.vars.forEach(look);
   };
   window.EM = EM;
 })();
