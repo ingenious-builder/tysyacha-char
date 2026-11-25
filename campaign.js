@@ -88,10 +88,11 @@ function wave(n,mix,lzFn,offR,extra){for(let i=0;i<n;i++){const kind=mix[i%mix.l
   for(const en of spawnAt(pickPool(kind),rand(-offR,offR),lzFn(i),extra)){en.cg=true;}}}
 
 // ---------------------------------------------------------------- боссы: общее
-function bossSpawn(tid,hpm,sub){
+// pt — пороги фаз босса под фазы уровня (полоса и смена приёмов совпадают со щитами); баннеры фаз даёт сам уровень
+function bossSpawn(tid,hpm,sub,pt){
   const Z=Zf(),lz=Z.bossZ+5,w=lpos(0,lz);
-  const B=X.spawnEnemy(tid,w.x,w.z,Z.lv+1,{gorge:true,aggro:true,hpMul:hpm*HPM});B.skillCd=2.5;X.setBOSS(B);H.B=B;H.bsp=true;
-  $('#bossName').textContent=B.t.name+' · ур. '+B.lv;X.banner(B.t.name,sub,true);X.shake(.6);X.fxPillar(w.x,w.z,2.5,10,X.RED,1);return B;}
+  const B=X.spawnEnemy(tid,w.x,w.z,Z.lv+1,{gorge:true,aggro:true,hpMul:hpm*HPM,bsub:sub,phT:pt,phQ:true});B.skillCd=2.5;X.setBOSS(B);H.B=B;H.bsp=true;
+  X.bossIntro(B);return B;}
 function shieldOn(thr,kind){CS.sh=kind;CS.shc=0;H.lock=thr;H.shT=kind===2?40:60;H.lastCombo=MPm.combo|0;sendNow();}
 function shieldOff(text){CS.sh=0;sendNow();const B=X.BOSS;if(B){B.shredT=5;B.stun=2.2;B.busy=0;}bn(text[0],text[1]);}
 function addsAround(B,tids,n){const out=[];for(let i=0;i<n;i++){const a=rand(0,TAU),d=rand(4,8);
@@ -200,9 +201,9 @@ LVL[5]={
  shape(Z){mkEnc(Z,0,30,'norm');mkEnc(Z,1,62,'ranged');for(const e of Z.enc)addBar(Z,e.z+18);Z.arenas.push({z:Z.bossZ+4,len:22,w:16});},
  begin(){CS.ph=0;CS.cn=3;},
  tick(dt){const Z=Zf();holdShield();
-  if(!H.bsp){barsTick();if(leadZ()>Z.bossZ-16&&(rearZ()>Z.bossZ-40||leadZ()>Z.bossZ-6)){bossSpawn('bonelord',.4,'Страж ущелья «'+Z.th.n+'»');CS.ph=1;sendNow();}return;}
+  if(!H.bsp){barsTick();if(leadZ()>Z.bossZ-16&&(rearZ()>Z.bossZ-40||leadZ()>Z.bossZ-6)){bossSpawn('bonelord',.4,'Страж ущелья «'+Z.th.n+'»',[.66,.33]);CS.ph=1;sendNow();}return;}
   const B=X.BOSS;
-  if(!B){if(!CS.done){CS.ph=4;killLeft();setDone(['Страж повержен','Откройте сундук вдвоём и входите в портал']);}return;}
+  if(!B){if(!CS.done&&!X.bossShow){CS.ph=4;killLeft();setDone(['Страж повержен','Откройте сундук вдвоём и входите в портал']);}return;}
   const f=B.hp/B.maxHp;
   if(CS.ph===1&&f<=.66){CS.ph=2;shieldOn(.655,1);H.adds=addsAround(B,['skeleton','skeleton','wraith'],4);B.stun=1.5;holdShield();bn('Костяной щит','Убейте прислужников — щит спадёт',true);}
   else if(CS.ph===2&&CS.sh&&!alive(H.adds)){shieldOff(['Щит пал','Бейте стража!']);}
@@ -259,9 +260,9 @@ LVL[8]={
  shape(Z){mkEnc(Z,0,28,'swarm');mkEnc(Z,1,56,'ranged');mkEnc(Z,2,84,'heavy',true);for(const e of Z.enc)addBar(Z,e.z+18);Z.arenas.push({z:Z.bossZ+4,len:24,w:18});},
  begin(){CS.ph=0;CS.cn=3;H.cT=8;H.aT=18;H.lastCombo=0;},
  tick(dt){const Z=Zf();holdShield();
-  if(!H.bsp){barsTick();if(leadZ()>Z.bossZ-16&&(rearZ()>Z.bossZ-40||leadZ()>Z.bossZ-6)){bossSpawn('heart',.8,'Последний бой «'+Z.th.n+'»');CS.ph=1;sendNow();}return;}
+  if(!H.bsp){barsTick();if(leadZ()>Z.bossZ-16&&(rearZ()>Z.bossZ-40||leadZ()>Z.bossZ-6)){bossSpawn('heart',.8,'Последний бой «'+Z.th.n+'»',[.70,.35]);CS.ph=1;sendNow();}return;}
   const B=X.BOSS;
-  if(!B){if(!CS.done){CS.ph=4;CS.cr=null;killLeft();setDone(['Хранитель повержен','Откройте сундук вдвоём и входите в портал']);}return;}
+  if(!B){if(!CS.done&&!X.bossShow){CS.ph=4;CS.cr=null;killLeft();setDone(['Хранитель повержен','Откройте сундук вдвоём и входите в портал']);}return;}
   const f=B.hp/B.maxHp,hs=heroes();
   if(CS.ph===1&&f<=.70){CS.ph=2;shieldOn(.695,2);H.cT=6;bn('Щит стихий','Нужно 3 общих реакции стихий: бейте одного врага разными стихиями вдвоём',true);B.stun=1.2;holdShield();}
   if(CS.sh===2){const c=MPm.combo|0;if(c>H.lastCombo)CS.shc+=c-H.lastCombo;H.lastCombo=c;H.shT-=dt;
