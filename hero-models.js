@@ -79,12 +79,14 @@
 
   // ---------- перекраска атласа ----------
   const hexRgb = h => [(h >> 16 & 255) / 255, (h >> 8 & 255) / 255, (h & 255) / 255];
-  function recolor(tex, pal, glow) {
+  // emK — сила свечения клеток glow; SELF — лёгкое самосвечение всей модели (герой читается на тёмной земле)
+  HM.SELF = .16;
+  function recolor(tex, pal, glow, emK) {
     const src = HM.img[tex], W = 256, c = document.createElement('canvas'); c.width = W; c.height = W;
     const x = c.getContext('2d'); x.drawImage(src, 0, 0, W, W);
-    const em = glow ? document.createElement('canvas') : null;
+    const em = document.createElement('canvas');
     let ex = null; if (em) { em.width = W; em.height = W; ex = em.getContext('2d'); ex.fillStyle = '#000'; ex.fillRect(0, 0, W, W); }
-    const cells = HM.CELLS[tex]; if (!pal && !glow) return { map: c };
+    const cells = HM.CELLS[tex];
     const id = x.getImageData(0, 0, W, W), d = id.data;
     const eid = ex ? ex.getImageData(0, 0, W, W) : null;
     const paint = (role, hex, toEm, k) => {
@@ -94,12 +96,13 @@
         lm = Math.max(1, lm / n); const t = hexRgb(hex);
         for (let y = y0; y < y0 + 64; y++) for (let xx = x0; xx < x0 + w; xx++) {
           const i = (y * W + xx) * 4, l = .3 * d[i] + .59 * d[i + 1] + .11 * d[i + 2], f = 1 + (l / lm - 1) * (k || .85);
-          if (toEm) { for (let q = 0; q < 3; q++) eid.data[i + q] = Math.min(255, Math.round(t[q] * 255 * Math.max(.4, f))); }
+          if (toEm) { for (let q = 0; q < 3; q++) eid.data[i + q] = Math.min(255, Math.round(t[q] * 255 * Math.max(.4, f) * (emK != null ? emK : 1))); }
           else { for (let q = 0; q < 3; q++) d[i + q] = Math.min(255, Math.max(0, Math.round(t[q] * 255 * f))); }
         }
       }
     };
     if (pal) for (const r in pal) if (pal[r] != null) paint(r, pal[r], false, pal._k);
+    for (let i = 0; i < d.length; i += 4) { eid.data[i] = d[i] * HM.SELF; eid.data[i + 1] = d[i + 1] * HM.SELF; eid.data[i + 2] = d[i + 2] * HM.SELF; eid.data[i + 3] = 255; }
     if (glow) for (const r in glow) paint(r, glow[r], true);
     x.putImageData(id, 0, 0); if (ex) ex.putImageData(eid, 0, 0);
     return { map: c, em };
@@ -114,12 +117,12 @@
   function heroTex(cid, sp, tex, tint) {
     const pal = Object.assign({}, (sp.pal || {})[tex] || {});
     if (tint && tex === capeTex(sp)) for (const r of HM.CAPE[tex]) { const a = pal[r] != null ? pal[r] : tint.hex, A = hexRgb(a), B = hexRgb(tint.hex); pal[r] = (Math.round((A[0] + (B[0] - A[0]) * tint.k) * 255) << 16) | (Math.round((A[1] + (B[1] - A[1]) * tint.k) * 255) << 8) | Math.round((A[2] + (B[2] - A[2]) * tint.k) * 255); }
-    return getTex(cid, tex, pal, (sp.glow || {})[tex], tint ? tint.hex + ':' + tint.k : '');
+    return getTex(cid, tex, pal, (sp.glow || {})[tex], tint ? tint.hex + ':' + tint.k : '', sp.emK);
   }
-  function getTex(cid, tex, pal, glow, capeKey) {
+  function getTex(cid, tex, pal, glow, capeKey, emK) {
     const k = cid + '|' + tex + '|' + (capeKey || '');
     if (HM.texC[k]) return HM.texC[k];
-    const r = recolor(tex, pal, glow);
+    const r = recolor(tex, pal, glow, emK);
     const mk = cv => { const t = new T.CanvasTexture(cv); t.flipY = false; t.generateMipmaps = false; t.minFilter = T.LinearFilter; t.magFilter = T.LinearFilter; t.encoding = T.LinearEncoding; return t; };
     return (HM.texC[k] = { map: mk(r.map), em: r.em ? mk(r.em) : null });
   }
@@ -138,7 +141,7 @@
       const key = tex + (skinned ? 's' : 'r'); if (mcache[key]) return mcache[key];
       const tx = opt.raw ? { map: (() => { const t = new T.Texture(HM.img[tex]); t.flipY = false; t.needsUpdate = true; return t; })() } : heroTex(cid, sp, tex, opt.tint);
       const m = new T.MeshLambertMaterial({ map: tx.map, skinning: !!skinned });
-      if (tx.em) { const k = sp.emK != null ? sp.emK : 1; m.emissiveMap = tx.em; m.emissive = new T.Color(k, k, k); }
+      if (tx.em) { m.emissiveMap = tx.em; m.emissive = new T.Color(1, 1, 1); }
       mats.push(m); rimMats.push(m); (texMats[tex] = texMats[tex] || []).push(m); return (mcache[key] = m);
     };
     const meshes = [];
@@ -413,7 +416,7 @@
       pal: { mage: { robe: 0x9a2e1c, hat: 0x7a1f14, robe2: 0x4a1410, cape: 0x5a1a12, trim: 0xffb347, inner: 0xd8b070, teal: 0xff7a33, pants: 0x3a2418 }, barbarian: { hair: 0xe9e6f2 } },
       glow: { mage: { gem: 0xff7a33 } } },
     cryo: { b: 'M', h: 'H', w: 'staff', props: ['Mp_2H_Staff', 'Mp_Cape'], tip: TIP.staff,
-      pal: { mage: { robe: 0x3f6fb0, hat: 0x2a4a7a, robe2: 0x1f3a66, cape: 0xdff4ff, trim: 0xdff4ff, inner: 0xb8d8f0, teal: 0x8fdcff, pants: 0x2a3a55 }, rogue: { hood: 0xdff4ff, hair: 0xe8f4ff } },
+      pal: { mage: { robe: 0x3f6fb0, hat: 0x2a4a7a, robe2: 0x1f3a66, cape: 0xdff4ff, trim: 0xdff4ff, inner: 0xb8d8f0, teal: 0x8fdcff, pants: 0x2a3a55 }, rogue: { hood: 0x8ec8f0, hair: 0xe8f4ff } },
       glow: { mage: { gem: 0x8fdcff }, rogue: { eye: 0x9fe8ff } } },
     storm: { b: 'M', h: 'K', w: 'book', props: ['Mp_Spellbook_open', 'Mp_1H_Wand', 'Mp_Cape'], tip: TIP.wand, ex: [{ k: 'horns', c: 0xffe45c, em: .45 }],
       pal: { mage: { robe: 0x2c2f5a, hat: 0x2c2f5a, robe2: 0x1c1e3a, cape: 0x1c1e3a, trim: 0xffe45c, inner: 0x9aa0b0, teal: 0xffe45c, pants: 0x2a2a3a }, knight: { hair: 0xc8ccd8 } },
