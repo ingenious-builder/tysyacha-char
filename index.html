@@ -2350,7 +2350,7 @@ function spawnEnemy(tid,x,z,lv,o){o=o||{};const t=MOBS[tid],mdl=buildMob(tid);ri
     kb:new THREE.Vector3(),face:rand(0,TAU),stun:0,slowT:0,burnT:0,burnDps:0,poisT:0,poisN:0,poisDps:0,dotT:.5,marks:{},chill:0,chillT:0,blindT:0,shredT:0,frozenT:0,
     atkCd:rand(.6,1.5),skillCd:rand(1.5,3.5),skill2:rand(4,8),busy:0,aggro:!!t.boss||!!o.aggro,flash:0,dead:false,deathT:0,lunge:0,step:rand(0,6),slam:0,draw:0,
     home:new THREE.Vector3(x,0,z),wander:new THREE.Vector3(x,0,z),wT:rand(1,4),affix:new Set(),trailT:0,orbHit:{},moving:false,hy:t.h*sc};
-  en.hp=en.maxHp;en.pos.set(x,0,z);en.noDespawn=!!o.gorge;
+  en.hp=en.maxHp;en.pos.set(x,0,z);en.noDespawn=!!o.gorge;en.hunt=!!o.hunt;
   if(o.elite){const n=lv>=6?2:1;const pool=AFFIX.slice();if(o.affixList)o.affixList.forEach(a=>en.affix.add(a));else while(en.affix.size<n){const a=pool.splice(Math.random()*pool.length|0,1)[0];en.affix.add(a[0]);}
     if(en.affix.has('fast'))en.spd*=1.5;
     const ring=new THREE.Mesh(FXG.ring,new THREE.MeshBasicMaterial({color:0xf2c46b,transparent:true,opacity:.85,depthWrite:false,blending:THREE.AdditiveBlending}));ring.scale.set(t.r*1.9,1,t.r*1.9);ring.position.y=.06;en.g.add(ring);en.ring=ring;
@@ -2365,16 +2365,25 @@ let WARMED=false;const WARM=[];
 function warmMobs(){WARMED=true;try{for(const id of Object.keys(MOBS)){if(MOBS[id].as)continue;const t=MOBS[id],m=buildMob(id);rimify(m.g,t.boss?0xff7a6a:0x8fb0ff,t.boss?.6:.42);m.g.position.set(0,-200,0);scene.add(m.g);WARM.push(m.g);}
   renderer.compile(scene,camera);for(const g of WARM)g.visible=false;}catch(e){}}
 const aliveCount=()=>{let n=0;for(const e of ENEMIES)if(!e.dead)n++;return n;};
-function spawnPack(){const C=mpSpawnCenter(),a=rand(0,TAU),d=rand(18,26);let x=C.x+Math.cos(a)*d,z=C.z+Math.sin(a)*d;const l=Math.hypot(x,z);if(l>WORLD-3){x*=(WORLD-3)/l;z*=(WORLD-3)/l;}
-  if(Math.hypot(x-C.x,z-C.z)<12||Math.hypot(x,z)<10)return;
+// точка стаи: герой идёт — впереди по ходу и по сторонам (не сзади), стоит — вокруг; 17–34 м и за краем экрана (проверка по самой камере,
+// поэтому подходит к любому обзору: портрет, альбом, поднятая камера), чтобы враги не возникали на глазах
+const _spv=new THREE.Vector3();
+const offScreen=(x,z)=>{_spv.set(x,1,z).project(camera);return _spv.z>1||Math.abs(_spv.x)>1.08||Math.abs(_spv.y)>1.08;};
+const HUNT_R=35;// охотник замечает героя с 35 м (обычный враг — с 13): дальше самой дальней точки появления, ближе поводка 36 м
+function packSpot(C){const mine=C===P.pos,v=mine?P.vel:(MP.peer&&MP.peer.vel)||P.vel,mv=Math.hypot(v.x,v.z)>1.5,base=Math.atan2(v.z,v.x);let best=null;
+  for(let k=0;k<8;k++){const a=mv?base+rand(-1.75,1.75):rand(0,TAU),d=rand(17,24)+k*1.4;let x=C.x+Math.cos(a)*d,z=C.z+Math.sin(a)*d;const l=Math.hypot(x,z);if(l>WORLD-3){x*=(WORLD-3)/l;z*=(WORLD-3)/l;}
+    if(Math.hypot(x-C.x,z-C.z)<12||Math.hypot(x,z)<10)continue;best={x,z};if(!mine||offScreen(x,z))break;}
+  return best;}
+// стаи свободного мира — «охотники» (hunt): сами идут на героя с HUNT_R — бой не ждёт первой атаки
+function spawnPack(){const C=mpSpawnCenter(),sp=packSpot(C);if(!sp)return;const x=sp.x,z=sp.z;
   const LV=mpLvl(),zone=zoneOf(x,z),lv=Math.max(1,enemyLvAt(x,z)+randi(-1,1)),rw=rewardMul(Math.hypot(x,z));
   const elite=LV>=4&&Math.random()<Math.min(.3,.06+zone*.04);
-  if(zone>=4&&Math.random()<.07){const ct=CHAMP[zone][randi(0,CHAMP[zone].length-1)];spawnMob(ct,x,z,lv+2,{elite:true,champ:true,guard:true,rw,noPack:true});
-    for(let k=0;k<3;k++)spawnMob(pickW(ZONE_MIX[zone]),x+rand(-4,4),z+rand(-4,4),lv,{rw});return;}
-  if(LV>=6&&Math.random()<Math.min(.2,.03+zone*.015)){const ct=CHAMP[zone][randi(0,CHAMP[zone].length-1)];spawnMob(ct,x,z,lv+1,{elite:true,champ:true,rw});return;}
+  if(zone>=4&&Math.random()<.07){const ct=CHAMP[zone][randi(0,CHAMP[zone].length-1)];spawnMob(ct,x,z,lv+2,{elite:true,champ:true,guard:true,rw,noPack:true,hunt:true});
+    for(let k=0;k<3;k++)spawnMob(pickW(ZONE_MIX[zone]),x+rand(-4,4),z+rand(-4,4),lv,{rw,hunt:true});return;}
+  if(LV>=6&&Math.random()<Math.min(.2,.03+zone*.015)){const ct=CHAMP[zone][randi(0,CHAMP[zone].length-1)];spawnMob(ct,x,z,lv+1,{elite:true,champ:true,rw,hunt:true});return;}
   const n=elite?3:LV<3?randi(1,2):LV<6?randi(2,3):randi(2,4);
   const mix=(zone===0&&LV<3)?[['slime',60],['goblin',40]]:ZONE_MIX[zone];
-  for(let k=0;k<n;k++)spawnMob(pickW(mix),x+rand(-2.5,2.5),z+rand(-2.5,2.5),lv,{elite:elite&&k===0,rw});}
+  for(let k=0;k<n;k++)spawnMob(pickW(mix),x+rand(-2.5,2.5),z+rand(-2.5,2.5),lv,{elite:elite&&k===0,rw,hunt:true});}
 
 // projectile visuals per element
 const PVPOOL={};
@@ -3575,8 +3584,9 @@ function updateEnemies(dt){
     en.dotT-=dt;if(en.dotT<=0){en.dotT=.5;let d=0;if(en.burnT>0)d+=en.burnDps*.5;if(en.poisT>0)d+=en.poisN*en.poisDps*.5;
       if(d>=.5){dealDamage(en,d,-1,{dot:true,depth:3,dotCol:en.burnT>0?'#ffa366':'#b5f07a'});if(en.dead)continue;}}
     const tp=(GZ&&GZ.camp&&en.cg&&TCC.goal(en))||(en.tauntS&&tauntTarget(en))||mpTarget(en),dx=(tp?tp.pos.x:P.pos.x)-en.pos.x,dz=(tp?tp.pos.z:P.pos.z)-en.pos.z,dist=Math.hypot(dx,dz)||.001,TD=tp?false:P.dead;
-    if(dist>50&&!en.boss&&!en.noDespawn){removeEnemy(i);continue;}
-    if(!TD&&dist<(PLAY==='gorge'?18:13))en.aggro=true;
+    // отставший уходит и освобождает лимит (без агро — уже с 40 м); новая стая встаёт на его место впереди через ~0,6 с
+    if((dist>50||!en.aggro&&dist>40)&&!en.boss&&!en.noDespawn){removeEnemy(i);if(PLAY==='world')spawnT=Math.min(spawnT,.6);continue;}
+    if(!TD&&dist<(PLAY==='gorge'?18:en.hunt?HUNT_R:13))en.aggro=true;
     if((TD||dist>36)&&!en.boss&&!en.noDespawn)en.aggro=false;
     en.moving=false;const sv=tp?mpSwapIn(tp):null;
     if(en.stun<=0&&en.busy<=0){
