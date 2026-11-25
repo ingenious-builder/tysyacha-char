@@ -3818,8 +3818,12 @@ function rarRoll(L){L=L||S.lvl;const q=rarTab(RAR_DROP,L),pl=rarTab(RAR_PLAN,L),
   for(let r=1;r<=3;r++){const d=h[r]-pl[r-1];q[r-1]*=d>0?Math.pow(.35,d):Math.min(3,1-.6*d);}
   if(q[2]>q[1])q[1]=q[2];if(q[1]>q[0])q[0]=q[1];
   const u=Math.random();return u<q[2]?3:u<q[1]?2:u<q[0]?1:0;}
-// из полезных — чары ступени t, нет таких — ступени ниже (пусто — ничего этой ступени и ниже не осталось)
-function rarPick(list,t){for(let r=t;r>=0;r--){const c=list.filter(s=>Math.min(3,rarBase(s))===r);if(c.length)return c;}return [];}
+// из полезных — чары ступени t, нет таких — ступени ниже; нет и ниже — ступени выше, но только пока она отстаёт от графика уровня
+// (RAR_PLAN): иначе выбор забивали «варианты известной» одних и тех же баз (div_check: одна база 15 раз за 50 выборов), а график
+// не даёт верху прийти раньше уровня. Пусто — карта уйдёт в ранг или вариант.
+function rarPick(list,t,L){for(let r=t;r>=0;r--){const c=list.filter(s=>Math.min(3,rarBase(s))===r);if(c.length)return c;}
+  if(t>=3||!S)return [];const pl=rarTab(RAR_PLAN,L||S.lvl),h=rarHave();
+  for(let r=t+1;r<=3;r++){if(h[r]>=pl[r-1])break;const c=list.filter(s=>Math.min(3,rarBase(s))===r);if(c.length)return c;}return [];}
 function wpick(c,mul){let t=0;const w=c.map(s=>{const v=dropW(s)*(mul?mul(s):1);t+=v;return v;});let r=Math.random()*t;for(let i=0;i<c.length;i++){r-=w[i];if(r<=0)return c[i];}return c[c.length-1];}
 const rankOffers=()=>{const a=[];for(const id of EQUIPPED)if(rk(id)<5)a.push(SKILLS[id]);return a;};
 const rankCard=sk=>{const o=Object.create(sk);o.rankUp=true;return o;};
@@ -3955,7 +3959,7 @@ function runFresh(l0){const f=newChar(CLS);S.lvl=1;S.xp=0;S.ess=0;S.ranks={};S.t
   if(!S.sandbox){S.active=f.active;S.passive=f.passive;S.learned=f.learned;}
   LEARNED=new Set(S.learned);for(const id of S.learned)if(!BOOK.has(id)){BOOK.add(id);S.book.push(id);}
   computeStats();EQUIPPED=new Set(equippedIds());
-  if(!S.sandbox)for(let l=2;l<=l0;l++){S.lvl=l;const pool=rarPick(rollPool(),rarRoll(l));if(pool.length)learn(wpick(pool).id,true);}
+  if(!S.sandbox)for(let l=2;l<=l0;l++){S.lvl=l;const pool=rarPick(rollPool(),rarRoll(l),l);if(pool.length)learn(wpick(pool).id,true);}
   S.lvl=Math.max(1,l0);if(!S.sandbox)autoTalents(S.lvl+2);S.ess=40*(S.lvl-1);}
 function runApply(){computeStats();recalcStats();P.hp=P.maxHp;P.mp=P.maxMp;onBuildChanged();luQueue=0;luOpen=false;$('#lvlup').hidden=true;cfReset();nfReset();}
 function runPicks(fresh){if(fresh&&!S.sandbox){const n=startPicks();if(n){luQueue+=n;luDelay=1.6;}}}
@@ -5845,8 +5849,10 @@ let luOpen=false;
 let LU_LAST=[];
 function rollChoices(){const D=dropScan(),ro=rankOffers(),res=[];
   const div=s=>{let m=1;for(const r of res){if(r.e===s.e)m*=.45;if(r.f===s.f)m*=.15;else if(r.F.role===s.F.role)m*=.5;}return m;};
-  const take=f=>{const free=s=>f(s)&&!res.some(r=>r.bk===s.bk),opts=[];for(const s of rarPick(D.u.filter(free),rarRoll()))opts.push([s,dropW(s)*div(s)]);
-    const bucket=(list,W,mk)=>{const c=list.filter(s=>free(s)&&(mk||dropPen(s)>=.3));if(!c.length)return;const s=pickW(c.map(x=>[x,(mk?dropPen(x):dropW(x))*div(x)]));opts.push([mk?mk(s):s,W*dropPen(s)*div(s)]);};
+  // ступень не по уровню (полезных её и ниже нет) — карта уходит в ранг или вариант; вариант тогда — только базы, которой не было
+  // 5 выборов (dropPen ≥ 0,8): заполнителей стало больше, и без этого одна база шла «вариантом известной» до 15 раз за 50 выборов
+  const take=f=>{const free=s=>f(s)&&!res.some(r=>r.bk===s.bk),opts=[];for(const s of rarPick(D.u.filter(free),rarRoll()))opts.push([s,dropW(s)*div(s)]);const pm=opts.length?.3:.8;
+    const bucket=(list,W,mk)=>{const c=list.filter(s=>free(s)&&(mk||dropPen(s)>=pm));if(!c.length)return;const s=pickW(c.map(x=>[x,(mk?dropPen(x):dropW(x))*div(x)]));opts.push([mk?mk(s):s,W*dropPen(s)*div(s)]);};
     bucket(ro,.6,rankCard);bucket(D.side,.25);if(opts.length)res.push(pickW(opts));};
   // фирменная (A): открывшаяся и ещё не изученная — третьей картой (первые две тогда — общие), раньше — с меньшим уровнем открытия
   const sg=S.sandbox?[]:D.u.filter(s=>s.F.sig&&!knownBase(s)),ns=sg.length?(s=>!s.F.sig):(()=>true);
