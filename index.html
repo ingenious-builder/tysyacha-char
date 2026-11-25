@@ -2559,6 +2559,10 @@ const skK=sk=>rarK(sk)*rkMul(sk.id)*slotBoost()*talQ(sk);
 // t чары не ниже «обычного» прироста группы G (нижняя четверть t пула, TAL_LIFT): u = max(t, G), предел и поправка считаются от u.
 // Прежний потолок (симметричное окно ×1,45 вокруг среднего) держал порядок только на одном ранге и оставлял от шага редкости запас
 // ×1,02 — в реальном уроне (оценка против боя ±10–15%) пары переворачивались (_check/rev2, _check/rev4).
+// 25.11 (слияние int/v1331, решение Петра): сродство особенности класса (CT_AFF: «Пиромант — огонь ×1,2», формы героя) — тоже в
+// потолке. Без этого чара основной стихии на 5-м ранге обгоняла чару редкостью выше (1,44 × 1,2 = 1,73 > 1,62). Порядок держится по
+// силе с особенностью: w = max(t, G) × a, пределы — по w, и без очков в талантах тоже (t = 1). Низшие чары основной стихии теряют
+// до ×1/1,2 (у легендарных особенность целиком); Артём просит сильную, ощутимую разницу редкостей — шаг ×1,75 эту потерю перекрывает.
 const TAL_CAP=1;
 const TAL_LIFT=.25;   // доля пула: «обычный» прирост от талантов — нижняя четверть t группы; ниже него чару подтягивает
 const TQ={raw:0,sig:'',key:null,L:0,cls:null,cut:null,G:null,c:TAL_CAP,lift:TAL_LIFT,fast:0,t:new Map(),q:new Map(),p0:new Map(),p0k:'',smc:null,smp:null};
@@ -2580,32 +2584,36 @@ function tqP0(ids){const k=CLS.id+'|'+S.lvl+'|'+mastB();if(TQ.p0k!==k){TQ.p0k=k;
   if(ids.every(id=>TQ.p0.has(id)))return;const need=[...new Set([...ids,...CLS.pool])].filter(id=>!TQ.p0.has(id));
   tqClean(()=>{for(const id of need)TQ.p0.set(id,skParts(SKILLS[id],false).pw/rkMul(id));},{});}
 // множитель талантов t у чар ids
-function tqT(ids){const need=ids.filter(id=>!TQ.t.has(id));
+function tqT(ids){if(!TQ.sig)return ids.map(()=>1);const need=ids.filter(id=>!TQ.t.has(id));
   if(need.length){tqP0(need);tqClean(()=>{for(const id of need){const a=skParts(SKILLS[id],false).pw/rkMul(id),b=TQ.p0.get(id);TQ.t.set(id,a>0&&b>0?a/b:1);}});}
   return ids.map(id=>TQ.t.get(id));}
 // пределы t' по ступеням: cut[группа][ступень] = TAL_CAP × наименьший t' чар выше этой ступени (Infinity — выше нет никого).
 // Весь пул класса (264 чары); пока «Авто» перебирает раскладки (TQ.fast) — каждая 3-я чара: пределы чуть шире, итоговая раскладка
 // считается заново по всему пулу (ключ кэша — с режимом).
 // ступень для потолка — всегда с «Невозможными» (IMP_OFF=false): иначе вызов из impBasePwr записал бы в кэш пределы без них
+// сродство особенности класса для потолка (ctAff объявлен ниже, с особенностями классов); без особенности (CT_ON=0: замеры формы,
+// стенды) надбавки в бою нет — и резать нечего
+const tqOn=()=>typeof CT_ON!=='undefined'&&!!CT_ON&&typeof ctAff==='function';
+const tqA=sk=>tqOn()?ctAff(sk):1;
 function tqRar(sk){const k=typeof IMP_OFF!=='undefined'&&IMP_OFF;if(k)IMP_OFF=false;try{return Math.min(4,rarOf(sk));}finally{if(k)IMP_OFF=true;}}
 function tqCut(){let ids;if(TQ.fast){if(TQ.smc!==CLS){TQ.smc=CLS;TQ.smp=[...CLS.pool].filter((_,i)=>i%3===0);}ids=TQ.smp;}else ids=[...CLS.pool];
   const t=tqT(ids),mn=[[1/0,1/0,1/0,1/0,1/0],[1/0,1/0,1/0,1/0,1/0]],tg=[[],[]];for(let i=0;i<ids.length;i++)tg[SKILLS[ids[i]].active?0:1].push(t[i]);
   const G=TQ.G=tg.map(a=>{if(!a.length||!(TQ.lift>=0))return 0;a.sort((x,y)=>x-y);return a[Math.min(a.length-1,Math.floor(a.length*TQ.lift))];});
   const mxL=TQ.mxL=[0,0];
-  for(let i=0;i<ids.length;i++){const sk=SKILLS[ids[i]],g=sk.active?0:1,r=tqRar(sk),u=Math.max(t[i],G[g]);if(u<mn[g][r])mn[g][r]=u;if(r===3&&u>mxL[g])mxL[g]=u;}
+  for(let i=0;i<ids.length;i++){const sk=SKILLS[ids[i]],g=sk.active?0:1,r=tqRar(sk),u=Math.max(t[i],G[g])*tqA(sk);if(u<mn[g][r])mn[g][r]=u;if(r===3&&u>mxL[g])mxL[g]=u;}
   // «Невозможная» (ступень 4) легендарные не режет — иначе выпавшая невозможная ослабляла бы легендарные чары «своего вида»;
   // вместо этого она сама получает от талантов не меньше лучшей легендарной пула (mxL): ×1,7 над легендарной держится и с талантами
   const cut=[[],[]];for(let g=0;g<2;g++){let m=1/0;cut[g][4]=1/0;for(let r=3;r>=0;r--){cut[g][r]=TQ.c*m;const tm=Math.min(mn[g][r],cut[g][r]);if(tm<m)m=tm;}}
   TQ.cut=cut;}
-function talQ(sk){if(TQ.raw||!TQ.sig||!S||!CLS)return 1;
-  const key=TQ.sig+(TQ.fast?'|f':'')+'|'+TQ.c+'|'+TQ.lift;
+function talQ(sk){if(TQ.raw||!S||!CLS||!TQ.sig&&!tqOn())return 1;
+  const key=TQ.sig+(TQ.fast?'|f':'')+'|'+TQ.c+'|'+TQ.lift+(tqOn()?'|a':'');
   if(TQ.key!==key||TQ.L!==S.lvl||TQ.cls!==CLS){TQ.key=key;TQ.L=S.lvl;TQ.cls=CLS;TQ.cut=null;TQ.t.clear();TQ.q.clear();}
   let v=TQ.q.get(sk.id);if(v!==undefined)return v;
   if(TQ.cut===null)tqCut();
-  const g=sk.active?0:1,t=tqT([sk.id])[0],r=tqRar(sk),c=TQ.cut[g][r];v=Math.min(Math.max(t,TQ.G[g],r===4?TQ.mxL[g]:0),c)/t;TQ.q.set(sk.id,v);return v;}
+  const g=sk.active?0:1,t=tqT([sk.id])[0],r=tqRar(sk),c=TQ.cut[g][r],a=tqA(sk);v=Math.min(Math.max(Math.max(t,TQ.G[g])*a,r===4?TQ.mxL[g]:0),c)/(t*a);TQ.q.set(sk.id,v);return v;}
 // разбивка силы для листа чары и книги: база × ранг × уровень × таланты × резонанс × реакции
 function powerBreak(sk){const I=rarInfo();rarK(sk);const base=I.B[sk.id],rm=rkMul(sk.id),cur=skParts(sk,false).pw;
-  const kt=S.talents;let lv=cur;S.talents={};computeStats();try{lv=skParts(sk,false).pw;}finally{S.talents=kt;computeStats();}
+  const kt=S.talents;let lv=cur;S.talents={};computeStats();TQ.raw++;try{lv=skParts(sk,false).pw;}finally{TQ.raw--;S.talents=kt;computeStats();}
   const re=resoMul(sk),rv=reactVal(sk.e,RESO_N),n=RESO_N[sk.e]+(EQUIPPED.has(sk.id)?0:1),im=isImp(sk.id)?(sk.active?IMP.dmg/IMP.cd:IMP.pdmg)*IMP.fl:1,sb=slotBoost(),lk=sb===1?1:lvTab(RAR_LVK,S.lvl);
   // особенность класса (CT_AFF: «Пиромант — огонь ×1,2») входит в силу чары (обёртка skPower) — и в разбор, иначе «Сила» разбора была меньше книги
   const af=typeof ctAff==='function'?ctAff(sk):1;
@@ -6967,9 +6975,9 @@ function reactName(e,c){let best=null,bw=0;for(let e2=0;e2<10;e2++){if(e2===e||!
   const w=R.type==='mult'?(R.k-1)*.16:R.type==='aoe'?R.k*.07:R.type==='freeze'?R.k*.06:R.type==='heal'?R.k*.2:.03;if(w>bw){bw=w;best={R,e2};}}return best;}
 function pwBreakHtml(sk){const b=powerBreak(sk),x=(v,t,c)=>`<span${c?' class="'+c+'"':''}>×${fmt2(v)}<i>${t}</i></span>`,on=v=>Math.abs(v-1)>.005;
   const rn=reactName(sk.e,RESO_N),parts=[`<span class="bd">${Math.round(b.base)}<i>${RARITY[Math.min(b.r,3)].n.toLowerCase()}</i></span>`,x(b.rank,'ранг '+rk(sk.id))];if(on(b.imp))parts.push(x(b.imp,'невозможная'));
-  if(on(b.lvl)&&b.lvl>0)parts.push(x(b.lvl,'уровень '+S.lvl));if(on(b.slotS))parts.push(x(b.slotS,'мало слотов'));if(on(b.lvk))parts.push(x(b.lvk,'поправка уровня'));if(on(b.tal))parts.push(x(b.tal,'таланты'));
+  if(on(b.lvl)&&b.lvl>0)parts.push(x(b.lvl,'уровень '+S.lvl));if(on(b.slotS))parts.push(x(b.slotS,'мало слотов'));if(on(b.lvk))parts.push(x(b.lvk,'поправка уровня'));const tl=TQ.sig?'таланты':'потолок редкости';if(on(b.tal))parts.push(x(b.tal,tl));
   if(on(b.aff))parts.push(x(b.aff,'особенность'));if(on(b.reso))parts.push(x(b.reso,'резонанс','bl'));if(on(b.react))parts.push(x(b.react,'реакция','bl'));
-  const tn=!on(b.cap)||!(b.total>0)?'':b.cap<1?' В «таланты» входит потолок ×'+fmt2(b.cap)+': таланты поднимают чару не выше, чем самую слабо усиленную чару редкостью выше, — так редкость остаётся силой.':
+  const tn=!on(b.cap)||!(b.total>0)?'':b.cap<1?(TQ.sig?' В «таланты» входит потолок ×':' Потолок редкости ×')+fmt2(b.cap)+': таланты и особенность класса поднимают чару не выше, чем самую слабо усиленную чару редкостью выше, — так редкость остаётся силой.':
     ' В «таланты» входит +'+pct(b.cap-1)+'%: таланты усиливают эту чару слабее обычного — ей добавлен обычный прирост.';
   // сила 0 у копий (клон, «Разлом», «Философский камень»): в билде нет чар, которые они повторяют (CLONE_F)
   const z0=!(b.total>0)&&(sk.F.id==='s_rift'||sk.F.id==='s_philstone'||sk.F.id==='summon'&&CLS&&summInfo(sk,CLS.id).k==='clone')?' Сила 0: в билде нет чар, которые она повторяет (снаряд, кольцо, метеор, цепь, луч, дождь, ловушка).':'';
@@ -10128,7 +10136,7 @@ function ctTmTable(L){let c=L[0],bn=-1;for(const e of L){let n=0;for(const m of 
   ctProc(p,'Застолье!','#ffd36b',r);}
 
 // ---------- оценка силы с особенностью («Лучший билд» и авто-выбор чар) ----------
-// основная стихия героя и формы, которые особенность усиливает; редкость (intr) не меняется. Стихия × форма — не больше ×1,45 (шаг редкости
+// основная стихия героя и формы, которые особенность усиливает; редкость (intr) не меняется, порядок редкостей держит потолок (tqA в talQ). Стихия × форма — не больше ×1,45 (шаг редкости
 // с разбросом ×1,48):
 // «Удар в сердце» ×1,5 у Ассасина поднимал в книге низшую редкость над высшей на том же ранге (25.11)
 const CT_AFF={pyro:{e:{fire:1.2}},cryo:{e:{ice:1.2}},storm:{e:{storm:1.1},f:{chain:1.1}},plague:{e:{poison:1.2}},necro:{e:{shadow:1.2},c:{sum:1.15}},
