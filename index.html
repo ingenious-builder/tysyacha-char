@@ -343,6 +343,7 @@ html[data-ui=tab] #mm{top:calc(var(--m) + var(--sat) + 70px);width:calc(92px * v
 .react.ok b{color:var(--gold)}
 .react span{min-width:0}
 .bd-actions{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 12px}
+.luAct{display:flex;gap:8px;margin:8px 0}.luAct .btn,.luAct .ghost{flex:1}
 .btn{height:44px;min-height:44px;padding:0 14px;border-radius:11px;border:1px solid var(--line);background:var(--panel-solid);font:500 14px var(--f-ui)}
 .btn.gold{border:0;color:#2a1a05;background:linear-gradient(180deg,#ffe3a0,var(--gold))}
 .btn.ess{border-color:rgba(212,176,255,.6);color:var(--ess)}
@@ -818,6 +819,7 @@ html[data-ui=tab] .sk::after{font-size:15px;padding:3px 6px;border-radius:7px;ri
       <h1 id="luTitle">Уровень 2</h1>
       <p id="luSub"></p>
       <div class="cards" id="luCards"></div>
+      <div class="luAct"><button class="btn" id="luAuto" type="button">Авто-выбор: выкл</button><button class="ghost" id="luAll" type="button" hidden>Авто для всех</button></div>
       <button class="ghost" id="luSkip" type="button">Пропустить</button>
     </div>
   </div>
@@ -897,6 +899,7 @@ html[data-ui=tab] .sk::after{font-size:15px;padding:3px 6px;border-radius:7px;ri
             <section><h3>Резонанс стихий</h3><p class="hint" id="resoHint"></p><div class="reso" id="reso"></div></section>
             <section><h3>Реакция класса</h3><p class="hint">Удар одной стихией по врагу с меткой другой вызывает реакцию.</p><div class="reacts" id="reacts"></div></section>
             <p class="hint" id="bpow"></p>
+            <label class="toggle"><input type="checkbox" id="autoLu">Авто-выбор чар после уровня (окно не появляется; включает и автозамену)</label>
             <label class="toggle"><input type="checkbox" id="autoBest">Ставить сильнее автоматически (иначе — плашка с вопросом)</label>
             <label class="toggle"><input type="checkbox" id="sandbox">Тестовый режим: все чары класса изучены, 50 слотов открыты, +30 очков талантов</label>
             <section style="margin-top:14px"><h3>Графика</h3><div class="chips" id="qChips"></div><p class="hint" id="qHint"></p></section>
@@ -1228,12 +1231,12 @@ let SAVE={cur:null,q:'auto',chars:{}};
 function loadSave(hot){let d=hot&&hot.SAVE?hot.SAVE:null;if(!d){try{const raw=localStorage.getItem(SAVE_KEY);if(raw)d=JSON.parse(raw);}catch(e){}}
   if(d&&d.chars&&typeof d.chars==='object'){SAVE.cur=CLASS_BY[d.cur]?d.cur:null;SAVE.q=['auto','high','mid','low'].includes(d.q)?d.q:'auto';SAVE.chars={};for(const id in d.chars){if(CLASS_BY[id])SAVE.chars[id]=validChar(d.chars[id],CLASS_BY[id]);}SAVE.camp=window.TCCF?(d.camp&&typeof d.camp==='object'?d.camp:null):null;}}
 let CLS=null,S=null,LEARNED=new Set(),EQUIPPED=new Set(),BOOK=new Set();
-function newChar(c){const s={lvl:1,xp:0,kills:0,ess:0,learned:[],ranks:{},talents:{},active:Array(8).fill(null),passive:Array(42).fill(null),sandbox:false,auto:false,autoBest:false,bosses:0,gorge:0,mx:0,book:[],runs:0,mig:0};
+function newChar(c){const s={lvl:1,xp:0,kills:0,ess:0,learned:[],ranks:{},talents:{},active:Array(8).fill(null),passive:Array(42).fill(null),sandbox:false,auto:false,autoBest:false,autoLu:false,bosses:0,gorge:0,mx:0,book:[],runs:0,mig:0};
   s.active[0]=sid(c.p,c.pa[0],'swift');s.active[1]=sid(c.s,c.sa[0],'mighty');
   s.passive[0]=sid(c.p,c.pp[0],'huge');
   s.learned=[...s.active,...s.passive].filter(v=>v!=null);return s;}
 function validChar(d,c){if(!d||!Array.isArray(d.active)||!Array.isArray(d.passive)||!Array.isArray(d.learned))return newChar(c);
-  const s=newChar(c);s.lvl=clamp(d.lvl|0,1,999);s.xp=Math.max(0,+d.xp||0);s.kills=d.kills|0;s.ess=Math.max(0,d.ess|0);s.sandbox=!!d.sandbox;s.auto=d.auto===true;s.autoBest=d.autoBest===true;s.bosses=d.bosses|0;s.gorge=clamp(d.gorge|0,0,12);
+  const s=newChar(c);s.lvl=clamp(d.lvl|0,1,999);s.xp=Math.max(0,+d.xp||0);s.kills=d.kills|0;s.ess=Math.max(0,d.ess|0);s.sandbox=!!d.sandbox;s.auto=d.auto===true;s.autoBest=d.autoBest===true;s.autoLu=d.autoLu===true;s.bosses=d.bosses|0;s.gorge=clamp(d.gorge|0,0,12);
   s.learned=d.learned.filter(v=>c.poolAll.has(v));s.ranks=(d.ranks&&typeof d.ranks==='object')?d.ranks:{};s.talents=(d.talents&&typeof d.talents==='object')?d.talents:{};
   for(let i=0;i<8;i++){const v=d.active[i];s.active[i]=(v!=null&&c.pool.has(v)&&SKILLS[v].active)?v:null;}
   for(let i=0;i<42;i++){const v=d.passive[i];s.passive[i]=(v!=null&&c.pool.has(v)&&!SKILLS[v].active)?v:null;}
@@ -3785,12 +3788,25 @@ function cardStat(sk){return sk.active?`${fmt(skDmg(sk))} урона · ${skMana
 function cardPow(sk){const r=rarOf(sk),u=upgradeFor(sk,true),arr=sk.active?S.active:S.passive,n=sk.active?activeSlots():passiveSlots();
   const free=baseSlot(sk)==null&&arr.findIndex((v,i)=>i<n&&v==null)>=0&&formSlot(sk)==null;
   return `<small class="pw" data-r="${r}">${RARITY[r].n} ${sk.active?'актив.':'пассив.'} · сила ${Math.round(pwr(sk))}${free?' · встанет в свободный слот':u?' · ↑ сильнее «'+skName(SKILLS[u.tgt])+'» на '+pct(u.gain)+'%':''}</small>`;}
-function openLevelUp(){const ch=rollChoices();if(!ch.length){luQueue=0;return;}luOpen=true;hideUpg();syncPause();
-  $('#luTitle').textContent='Уровень '+S.lvl;$('#luSub').textContent='Выбери новые чары. Если есть свободный слот, они сразу встанут в билд.'+(talFreeUse()?' Очков талантов: '+tpFree()+'.':'');
+function luScore(sk){const u=upgradeFor(sk,true),arr=sk.active?S.active:S.passive,n=sk.active?activeSlots():passiveSlots();
+  const free=baseSlot(sk)==null&&arr.findIndex((v,i)=>i<n&&v==null)>=0&&formSlot(sk)==null;
+  return (free?2e6:0)+(u?1e6*(1+u.gain):0)+pwr(sk);}
+function luAutoRun(n){const names=[];while(n-->0&&luQueue>0){const ch=rollChoices();if(!ch.length){luQueue=0;break;}
+  let b=ch[0],bs=-1;for(const sk of ch){const v=luScore(sk);if(v>bs){bs=v;b=sk;}}
+  learn(b.id,true);luQueue--;names.push(skName(b));}
+  if(names.length)toast(names.length===1?'Изучено: '+names[0]:'Изучено '+names.length+': '+names.slice(0,3).join(', ')+(names.length>3?'…':''));
+  luDelay=.5;}
+function luSync(){const a=$('#luAuto');if(a)a.textContent='Авто-выбор: '+(S.autoLu?'вкл':'выкл');const l=$('#luAll');if(l){l.hidden=luQueue<2;l.textContent='Авто для всех '+luQueue;}}
+function setAutoLu(v){S.autoLu=!!v;if(S.autoLu)S.autoBest=true;saveSoon();const c=$('#autoLu');if(c)c.checked=S.autoLu;const b=$('#autoBest');if(b)b.checked=!!S.autoBest;}
+function openLevelUp(){if(S.autoLu){luAutoRun(luQueue);return;}const ch=rollChoices();if(!ch.length){luQueue=0;return;}luOpen=true;hideUpg();syncPause();
+  $('#luTitle').textContent='Уровень '+S.lvl+(luQueue>1?' · ещё '+(luQueue-1):'');$('#luSub').textContent='Выбери новые чары. Если есть свободный слот, они сразу встанут в билд.'+(talFreeUse()?' Очков талантов: '+tpFree()+'.':'');luSync();
   $('#luCards').innerHTML=ch.map(sk=>`<button type="button" class="card" data-id="${sk.id}"><span class="ico${sk.active?'':' p'}" data-r="${rarOf(sk)}" style="--c:${sk.E.hex}">${svg(sk.F.id)}${modBadge(sk)}</span><span class="ct"><span class="tag">${sk.F.role} · ${sk.E.name}${knownBase(sk)?'<i class="nv">вариант известной</i>':'<i class="nv">новая чара</i>'}${bookOn()&&BOOK.has(sk.id)?'<i class="nv">из Книги чар</i>':''}</span><b>${sk.base}</b><span class="var">${sk.M.name}: ${sk.M.desc}</span><small>${cap(skLead(sk))}</small><small>${cardStat(sk)}</small>${cardPow(sk)}</span></button>`).join('');
   $('#luSkip').textContent='Пропустить: +'+(20+S.lvl*5)+' эссенции';$('#lvlup').hidden=false;}
-function closeLevelUp(){luOpen=false;$('#lvlup').hidden=true;luQueue=Math.max(0,luQueue-1);luDelay=.35;syncPause();}
+function closeLevelUp(){luOpen=false;$('#lvlup').hidden=true;luQueue=Math.max(0,luQueue-1);luDelay=1.2;syncPause();}
 $('#luCards').addEventListener('click',e=>{const b=e.target.closest('.card');if(!b)return;const sk=SKILLS[+b.dataset.id];learn(sk.id,true);toast('Изучено: '+skName(sk)+(EQUIPPED.has(sk.id)?' — в билде':' — в книге'));closeLevelUp();});
+$('#luAuto').addEventListener('click',()=>{setAutoLu(!S.autoLu);if(S.autoLu){luOpen=false;$('#lvlup').hidden=true;luAutoRun(luQueue);syncPause();toast('Авто-выбор чар включён (и автозамена в билде)');}else luSync();});
+$('#luAll').addEventListener('click',()=>{luOpen=false;$('#lvlup').hidden=true;luAutoRun(luQueue);syncPause();});
+$('#autoLu').addEventListener('change',e=>{setAutoLu(e.target.checked);toast(S.autoLu?'Чары после уровня выбираются сами (и автозамена в билде)':'Чары после уровня — через окно выбора');});
 $('#luSkip').addEventListener('click',()=>{S.ess+=20+S.lvl*5;closeLevelUp();});
 
 // =====================================================================
@@ -3866,7 +3882,7 @@ function renderBuild(){
   $('#reso').innerHTML=rs.length?rs.map(x=>`<span class="rchip" style="--c:${x.e.hex}"><span class="dot"></span>${x.e.name} ×${x.n} <b>+${Math.round(x.n*ST.resoPer*100)}%</b></span>`).join(''):'<p class="hint">Пока пусто.</p>';
   const R=REACT[rkey(EL[CLS.p],EL[CLS.s])];const has=RESO_N[R.a]>0&&RESO_N[R.b]>0;
   $('#reacts').innerHTML=`<div class="react${has?' ok':''}"><span class="pair"><i style="--c:${ELEMENTS[R.a].hex}"></i><i style="--c:${ELEMENTS[R.b].hex}"></i></span><span><b>${R.name}</b> · ${ELEMENTS[R.a].name} + ${ELEMENTS[R.b].name}: ${R.desc}.${has?'':' Возьми в билд чары обеих стихий.'}</span></div>`;
-  $('#sandbox').checked=S.sandbox;$('#autoBest').checked=!!S.autoBest;renderQuality();
+  $('#sandbox').checked=S.sandbox;$('#autoBest').checked=!!S.autoBest;$('#autoLu').checked=!!S.autoLu;renderQuality();
   $('#undoBuild').hidden=!(BUNDO&&BUNDO.cls===CLS.id);const bp=buildPower();$('#bpow').textContent='Сила билда: '+Math.round(bp.all)+' (активные '+Math.round(bp.a)+', пассивные '+Math.round(bp.p)+'). Сила чары — условный урон в секунду с учётом перезарядки, маны, стихий и ранга.';}
 $('#undoBuild').addEventListener('click',()=>{if(!BUNDO||BUNDO.cls!==CLS.id){BUNDO=null;renderBuild();return;}for(let i=0;i<8;i++)S.active[i]=BUNDO.a[i]??null;for(let i=0;i<42;i++)S.passive[i]=BUNDO.p[i]??null;BUNDO=null;onBuildChanged();renderBuild();toast('Билд возвращён');});
 $('#autoBest').addEventListener('change',e=>{S.autoBest=e.target.checked;saveSoon();toast(S.autoBest?'Сильные чары будут вставать сами':'Сильные чары — через плашку с вопросом');});
@@ -5112,7 +5128,7 @@ function start(hot){
   const el=$('#classes .cls.on');if(el)el.scrollIntoView({block:'nearest',inline:'center'});
   requestAnimationFrame(loop);}
 if(/[?&]debug\b/.test(location.search))window.__ev=c=>eval(c);
-window.__tc={lvlAt:(x,z)=>enemyLvAt(x,z),zoneAt:(x,z)=>zoneOf(x,z),stats:(tid,lv)=>{const t=MOBS[tid];return {hp:Math.round(t.hp*(1+.42*(lv-1))*(t.boss?1.3:2.2)),dmg:Math.round(t.dmg*(1+.22*(lv-1))*(t.boss?1:.9))};},chunks:()=>CH.size,inst:()=>PK.reduce((a,k)=>a+k.im.count,0),halfNear:()=>ENEMIES.forEach((e,i)=>{if(e.dead)return;e.hp=Math.round(e.maxHp*(.25+.25*(i%3)));e.pos.set(P.pos.x+2.5*Math.cos(i*1.3),0,P.pos.z+2.5*Math.sin(i*1.3));e.stun=3;}),bars:()=>ENEMIES.filter(e=>!e.dead).map(e=>[e.tid,Math.round(e.hp),e.maxHp,e.bar.visible,+e.fill.scale.x.toFixed(2)]),gorge:g=>startGorge(g),gstate:()=>GZ&&{g:GZ.g,prog:GZ.prog,boss:GZ.bossSpawned,open:GZ.open,won:GZ.won,L:GZ.L},tpLocal:z=>{const w=toWorld(gcx(z),z);P.pos.set(w.x,0,w.z);P.prev.copy(P.pos);},boss:()=>{threat=THREAT_MAX;},xp:n=>gainXp(n),ess:n=>{S.ess+=n;},state:()=>({cls:CLS.id,mode,lvl:S.lvl,ess:S.ess,kills:S.kills,hp:P.hp,learned:LEARNED.size,enemies:aliveCount(),boss:!!BOSS,fx:FX.length,proj:PROJ.length,lu:luOpen,pp:Q.pp,shadow:Q.shadow,pr}),tp:(x,z)=>{P.pos.set(x,0,z);P.prev.set(x,0,z);},sel:id=>selectClass(id),cast:i=>trySlot(i,true)};
+window.__tc={lu:()=>({open:luOpen,q:luQueue,auto:!!S.autoLu,paused,all:!$('#luAll').hidden,allTxt:$('#luAll').textContent,title:$('#luTitle').textContent}),lvlAt:(x,z)=>enemyLvAt(x,z),zoneAt:(x,z)=>zoneOf(x,z),stats:(tid,lv)=>{const t=MOBS[tid];return {hp:Math.round(t.hp*(1+.42*(lv-1))*(t.boss?1.3:2.2)),dmg:Math.round(t.dmg*(1+.22*(lv-1))*(t.boss?1:.9))};},chunks:()=>CH.size,inst:()=>PK.reduce((a,k)=>a+k.im.count,0),halfNear:()=>ENEMIES.forEach((e,i)=>{if(e.dead)return;e.hp=Math.round(e.maxHp*(.25+.25*(i%3)));e.pos.set(P.pos.x+2.5*Math.cos(i*1.3),0,P.pos.z+2.5*Math.sin(i*1.3));e.stun=3;}),bars:()=>ENEMIES.filter(e=>!e.dead).map(e=>[e.tid,Math.round(e.hp),e.maxHp,e.bar.visible,+e.fill.scale.x.toFixed(2)]),gorge:g=>startGorge(g),gstate:()=>GZ&&{g:GZ.g,prog:GZ.prog,boss:GZ.bossSpawned,open:GZ.open,won:GZ.won,L:GZ.L},tpLocal:z=>{const w=toWorld(gcx(z),z);P.pos.set(w.x,0,w.z);P.prev.copy(P.pos);},boss:()=>{threat=THREAT_MAX;},xp:n=>gainXp(n),ess:n=>{S.ess+=n;},state:()=>({cls:CLS.id,mode,lvl:S.lvl,ess:S.ess,kills:S.kills,hp:P.hp,learned:LEARNED.size,enemies:aliveCount(),boss:!!BOSS,fx:FX.length,proj:PROJ.length,lu:luOpen,pp:Q.pp,shadow:Q.shadow,pr}),tp:(x,z)=>{P.pos.set(x,0,z);P.prev.set(x,0,z);},sel:id=>selectClass(id),cast:i=>trySlot(i,true)};
 try{window.claude&&window.claude.hot&&window.claude.hot.snapshot&&window.claude.hot.snapshot(()=>{save();return {SAVE:JSON.parse(JSON.stringify(SAVE))};});}catch(e){}
 const H_=window.claude&&window.claude.hot;
 if(H_&&H_.ready)H_.ready(start);else start((H_&&H_.data)||{});
