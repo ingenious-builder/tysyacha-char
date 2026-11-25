@@ -9,6 +9,8 @@ const MODELS_V='1',MCACHE='tc-models';
 const ENV_V='1';
 // foe-models.js — своя версия ?fv= (FOEJS_V = FMJS_V в index.html): код моделей врагов и призывов обновляется без перекачки самих моделей
 const FOEJS_V='2';
+// hero-models.js — своя версия ?hv= (HEROJS_V = HMJS_V в index.html): новые герои (21-й — Тимур) без перекачки моделей
+const HEROJS_V='2';
 const isModel=p=>p.includes('/assets/models/')||p.endsWith('/vendor/GLTFLoader.js')||p.endsWith('/hero-models.js')||p.endsWith('/foe-models.js')||p.endsWith('/env-models.js');
 const CORE=['./','index.html','net-relay.js','campaign.js','net-p2p.js','manifest.webmanifest','vendor/three.min.js','vendor/trystero-nostr-0.21.5.js','icons/icon-192.png','icons/icon-512.png','icons/maskable-512.png','icons/apple-touch-icon.png'];
 self.addEventListener('install',e=>{
@@ -16,7 +18,7 @@ self.addEventListener('install',e=>{
 });
 self.addEventListener('activate',e=>{
   e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k.startsWith('tysyacha-char-')&&k!==CACHE).map(k=>caches.delete(k))))
-    .then(()=>caches.open(MCACHE)).then(c=>c.keys().then(rs=>Promise.all(rs.filter(r=>{const q=new URL(r.url).searchParams;if(r.url.includes('/foe-models.js')&&q.get('fv')!==FOEJS_V)return true;return q.has('ev')?q.get('ev')!==ENV_V:q.get('v')!==MODELS_V;}).map(r=>c.delete(r))))).catch(()=>{})
+    .then(()=>caches.open(MCACHE)).then(c=>c.keys().then(rs=>Promise.all(rs.filter(r=>{const q=new URL(r.url).searchParams;if(r.url.includes('/foe-models.js')&&q.get('fv')!==FOEJS_V)return true;if(r.url.includes('/hero-models.js')&&q.get('hv')!==HEROJS_V)return true;return q.has('ev')?q.get('ev')!==ENV_V:q.get('v')!==MODELS_V;}).map(r=>c.delete(r))))).catch(()=>{})
     .then(()=>self.clients.claim()));
 });
 const netFirst=async(req,ms)=>{
