@@ -1180,7 +1180,7 @@ const FORMS=[
  SG('plague','s_immune','poison','passive',12,'Иммунитет',{power:0,trig:'hurt',line:'Яд врагов и их лужи на тебя не действуют, а отравленные враги бьют тебя слабее.',hint:'урон от отравленных −15%'}),
  SG('plague','s_pandemic','poison','active',20,'Пандемия',{ult:true,cd:40,mana:55,power:30,range:20,how:'Весь яд на врагах вокруг срабатывает разом и удваивается, а от каждого отравленного к тебе тянется лечащая нить'}),
  SG('hemo','s_bloodlet','blood','active',1,'Кровопускание',{cd:9,mana:0,hpCost:.08,power:18,range:12,how:'Четыре врага 3 с истекают кровью по нитям к тебе — вся она тебя лечит, а в конце из них бьют шипы'}),
- SG('hemo','s_threads','blood','passive',12,'Кровавые нити',{power:0,trig:'brink',line:'Когда здоровья меньше трети, от врагов рядом к тебе тянутся кровавые нити и пьют их здоровье для тебя.',hint:'до 5 нитей, 8 м'}),
+ SG('hemo','s_threads','blood','passive',12,'Кровавые нити',{power:0,trig:'brink',line:'Когда здоровья меньше трети, от врагов рядом к тебе тянутся кровавые нити и пьют их здоровье для тебя.',hint:'до 5 нитей, 8 м; каждая — 1% здоровья в секунду'}),
  SG('hemo','s_pact','blood','active',20,'Багровый пакт',{ult:true,cd:45,mana:0,power:60,range:10,how:'Жертвует почти треть здоровья: волна крови 10 м бьёт вчетверо от отданного и возвращает тебе половину урона'}),
  SG('arcan','s_missiles','arcane','active',1,'Чародейские ракеты',{cd:4,mana:16,power:16,range:16,how:'6 самонаводящихся ракет летят в 6 разных врагов и возвращают ману'}),
  SG('arcan','s_resonator','arcane','passive',12,'Резонатор',{power:0,trig:'casts',line:'Каждые 150 потраченной маны следующая чара сильнее в полтора раза и перезаряжается вдвое быстрее.',hint:'3 руны вокруг тебя показывают заряд'}),
@@ -6184,6 +6184,341 @@ window.__tc.nf={
 //
 //
 // ----- A-фирменные-1 (свой подблок: только NFRUN/NFCAN/NFPEER/NFP/SKIND/UP своих героев) -----
+// Пиромант, Криомант, Громовержец, Геомант, Чумной лекарь, Гемомант, Арканист: 14 активных (7 ульт) и 7 пассивок
+var SG1={},SG1_DARK=new THREE.Color(0x0a0c1a),SG1_RIFTNO={blink:1,strike:1,rush:1,leap:1,whirl:1,barrier:1,mirror:1,summon:1,hook:1,s_rift:1};
+// Тройка/Эхо у долгих ульт: повтор вливается в уже идущую (сила копится), а не ставит вторую копию
+function sg1Merge(sk,key,fn){for(const e of NFS.ents||[]){if(e.sg1k===key&&e.sk===sk&&!e.gh&&!e.cl&&e.age<1){fn(e);return true;}}return false;}
+function sg1Str(en){return (en.boss?1e9:en.elite||en.champ?1e6:0)+en.maxHp;}
+function sg1Peer(pr){return ()=>pr&&pr.pos?pr.pos:P.pos;}
+function sg1Dir(from,m){const d=new THREE.Vector3(m.x-from.x,0,m.z-from.z);if(d.lengthSq()<.01)d.set(0,0,1);return d.normalize();}
+// ---------- 1. Пиромант ----------
+function pyroHeat(en){return en.cf&&en.cf.heat|0;}
+function pyroHot(en){return pyroHeat(en)>0||en.burnT>0;}
+function pyroScreen(k){let d=SG1.flash;if(!d||!document.body.contains(d)){d=document.createElement('div');d.style.cssText='position:fixed;inset:0;pointer-events:none;opacity:0;z-index:4;transition:opacity .3s;background:radial-gradient(ellipse at center,rgba(255,190,90,.18) 15%,rgba(255,70,20,.55))';document.body.appendChild(d);SG1.flash=d;}
+  d.style.transition='none';d.style.opacity=String(k);clearTimeout(SG1.flT);SG1.flT=setTimeout(()=>{d.style.transition='opacity .35s';d.style.opacity='0';},200);}
+// Феникс: птица из ядра и двух огненных крыльев летит сквозь врагов, оставляет огненную полосу, разворачивается и возвращается
+function pyroBird(sk,o){const d=o.dir.clone(),out=sk.F.range*(sk.M.radius?1.2:1),R=o.R||1,home=o.home||(()=>P.pos);
+  const body=nfMesh('sphere',C_EMB,.95),wl=nfMesh('fan',FIREC,.9),wr=nfMesh('fan',FIREC,.9),sh=nfMesh('glow',FIREC,.5);wl.material.blending=wr.material.blending=THREE.NormalBlending;
+  const p=new THREE.Vector3(o.from.x,1.6,o.from.z);body.position.copy(p);const tr=trailStart({g:body},FIREC,.35);
+  const h1=new Set(),h2=new Set();let t=0,dist=0,back=false,zn=0;
+  nfEnt({gh:o.gh,up(dt){t+=dt;
+    if(!back){const st=15*dt;p.addScaledVector(d,st);dist+=st;
+      if(!o.gh&&zn<3&&dist>=out*(zn+.5)/3){zn++;addZone(p.x,p.z,1.4*R,3,sk.e,o.dmg*.3,sk);fxDisc(p.x,p.z,1.4*R,FIREC,.5,.5);}
+      if(dist>=out){back=true;fxGlow(p.x,p.z,2.2,FIREC,.35,.8);colBurst(C_EMB,p.x,p.y,p.z,10,4,.4,1);}}
+    else{const h=home();v1.set(h.x-p.x,0,h.z-p.z);const L=v1.length();
+      if(L<1.2||t>4.5){if(!o.gh&&L<1.2)pyroBirdHome(sk,h1,h2,o.cl);else fxBurst(p.x,p.y,p.z,1.2,FIREC,.3,.7);return false;}
+      v1.divideScalar(L);d.lerp(v1,Math.min(1,dt*5)).normalize();p.addScaledVector(d,17*dt);}
+    const yaw=Math.atan2(d.x,d.z),fl=.55*Math.sin(t*15);
+    body.position.copy(p);body.rotation.set(0,yaw,0);body.scale.set(.34,.3,.7);
+    wr.position.set(p.x,p.y+.05,p.z);wr.rotation.set(0,yaw,fl);wr.scale.set(1.7*R,1,.95);wl.position.copy(wr.position);wl.rotation.set(0,yaw+Math.PI,fl);wl.scale.copy(wr.scale);
+    wl.material.opacity=wr.material.opacity=.8+.15*Math.sin(t*15+1);sh.position.set(p.x,.1,p.z);sh.scale.set(1.6*R,1,1.6*R);
+    emit(SPARK,p.x-d.x*.6+rand(-.3,.3),p.y+rand(-.15,.2),p.z-d.z*.6+rand(-.3,.3),-d.x*4,rand(.4,1.6),-d.z*4,Math.random()<.5?FIREC:C_EMB,.55,-1.5,1);
+    if(Math.random()<.5)emit(PUFF,p.x-d.x*.9,p.y,p.z-d.z*.9,0,.5,0,FIREC,.6,-.4,1);
+    if(!o.gh){const hs=back?h2:h1,hr=1.3*R;for(const en of ENEMIES){if(en.dead||hs.has(en))continue;const dx=en.pos.x-p.x,dz=en.pos.z-p.z,rr=hr+en.r;
+      if(dx*dx+dz*dz<rr*rr){hs.add(en);nfHit(en,o.dmg,sk,{knockFrom:p.clone(),noKnock:true});fxBurst(en.pos.x,1.1,en.pos.z,.5,FIREC,.2,.5);if(hs.size<5)fxTongue(en.pos.x,en.pos.z,rand(1.2,1.8),FIREC,.45);}}}
+    return true;},end(){trailEnd(tr);wl.material.blending=wr.material.blending=THREE.AdditiveBlending;dropMesh(body);dropMesh(wl);dropMesh(wr);dropMesh(sh);}});}
+function pyroBirdHome(sk,h1,h2,cl){let n=0;for(const en of new Set([...h1,...h2]))if(en.dead||pyroHot(en))n++;
+  fxPillar(P.pos.x,P.pos.z,.8,3,FIREC,.45);colBurst(C_EMB,P.pos.x,1.4,P.pos.z,10,3,.45,-1);if(!n)return;
+  const h=P.maxHp*Math.min(.15,.02*n)*(cl?.5:1);heal(h);float(P.pos,'+'+Math.round(h),'#ffb36b',15);}
+NFRUN.s_phoenix=(sk,A,i,dmg,R,col,cl)=>{const d=nfDir(sk,A,sk.F.range);if(i)d.applyAxisAngle(v2.set(0,1,0),i===1?.3:-.3);pyroBird(sk,{from:P.pos.clone(),dir:d,dmg,R,cl});};
+NFPEER.s_phoenix=(sk,m,pr)=>{pyroBird(sk,{from:pr.pos.clone(),dir:sg1Dir(pr.pos,m),gh:1,home:sg1Peer(pr)});};
+// Сверхновая: 0,8 с над головой растёт огненный шар (шаг медленнее), потом взрыв; раскалённые получают больше и тут же вспыхивают
+function pyroNova(sk,o){const r=sk.F.range*(o.R||1),home=o.home||(()=>P.pos),fix=o.fix;
+  const ball=nfMesh('sphere',FIREC,.7),core=nfMesh('sphere',C_EMB,.9),rg=nfMesh('ring2',FIREC,0),gl=nfMesh('glow',FIREC,0);let t=0;
+  nfEnt({sg1k:'nova',sk,gh:o.gh,cl:o.cl,age:0,k:1,up(dt){t+=dt;this.age=t;const c=fix||home(),q=Math.min(1,t/.8);
+    if(!fix&&!o.gh&&!P.dead)P.slowT=Math.max(P.slowT,.05);
+    const y=(fix||o.gh?0:NFS.heroY||0)+3.4,s=(.35+1.5*q)*(1+.12*(this.k-1));
+    ball.position.set(c.x,y,c.z);ball.scale.setScalar(s*(1+.05*Math.sin(t*30)));ball.material.opacity=.45+.35*q;core.position.copy(ball.position);core.scale.setScalar(s*.55);
+    rg.position.set(c.x,.09,c.z);rg.scale.set(r,1,r);rg.rotation.y+=dt*1.5;rg.material.opacity=.45*q;gl.position.set(c.x,.08,c.z);gl.scale.set(2+2*q,1,2+2*q);gl.material.opacity=.5*q;
+    for(let j=0;j<2;j++){const a=rand(0,TAU),rr=rand(2,r*.8),sx=c.x+Math.cos(a)*rr,sz=c.z+Math.sin(a)*rr;emit(SPARK,sx,.4,sz,(c.x-sx)*1.4,(y-.4)*1.4,(c.z-sz)*1.4,j?C_EMB:FIREC,.65,0,0);}
+    if(t<.8)return true;pyroNovaBoom(sk,c,r,(o.dmg||0)*this.k,o.gh,!fix&&!o.gh);return false;},
+    end(){dropMesh(ball);dropMesh(core);dropMesh(rg);dropMesh(gl);}});}
+function pyroNovaBoom(sk,c,r,dmg,gh,mine){const p=new THREE.Vector3(c.x,0,c.z);
+  fxBurst(p.x,1.6,p.z,r*.42,FIREC,.45,.45);fxBurst(p.x,1.6,p.z,r*.18,WHITE,.3,.6);fxShock(p.x,p.z,r,FIREC,.65);fxRing(p.x,p.z,.6,r,C_EMB,.55,.7);fxGlow(p.x,p.z,r*1.1,FIREC,.6,.45);
+  for(let j=0;j<10;j++){const a=j/10*TAU+rand(-.2,.2),q=r*rand(.35,.85);fxTongue(p.x+Math.cos(a)*q,p.z+Math.sin(a)*q,rand(1.8,3.2),FIREC,.7);}
+  colBurst(C_EMB,p.x,1.4,p.z,18,9,.8,4);shards(sk.e,p.x,1.4,p.z,10,9);
+  if(Math.hypot(p.x-P.pos.x,p.z-P.pos.z)<r+6)shake=Math.max(shake,mine?.45:.2);if(mine)pyroScreen(.6);if(gh)return;
+  const L=nfFoes(p,r),hot=L.filter(pyroHot);
+  for(const en of L){const h=pyroHeat(en),k=1+.25*Math.min(5,h>0?h:en.burnT>0?3:0);nfHit(en,dmg*k,sk,{knockFrom:p});}
+  let n=0;for(const en of hot){if(en.dead)continue;cfFlash(en);if(n++<8){fxTongue(en.pos.x,en.pos.z,rand(2.2,3),C_EMB,.6);fxBurst(en.pos.x,1,en.pos.z,1.4,FIREC,.3,.8);}}
+  if(hot.length)float({x:p.x,y:3.2,z:p.z},'Вспышка ×'+hot.length,'#ffb36b',18);}
+NFRUN.s_supernova=(sk,A,i,dmg,R,col,cl)=>{if(!cl&&sg1Merge(sk,'nova',e=>{e.k++;}))return;pyroNova(sk,{dmg,R,cl,fix:cl?P.pos.clone():null});};
+NFCAN.s_supernova=sk=>{const L=nfFoes(P.pos,sk.F.range*skR(sk)*.8);return L.length>=3||L.some(e=>e.boss||e.elite||e.champ)?'ok':'target';};
+NFPEER.s_supernova=(sk,m,pr)=>{pyroNova(sk,{gh:1,home:sg1Peer(pr)});};
+// Пепел: горящий враг, умирая, оставляет угли; на углях герой быстрее и сильнее
+function pyroAshSpd(a,on){if(on){if(!a.sp||Math.abs(P.speed-a.sp)>1e-6){a.sp=P.speed*1.25;P.speed=a.sp;}}else if(a.sp){if(Math.abs(P.speed-a.sp)<1e-6)P.speed=a.sp/1.25;a.sp=0;}}
+NFP.s_ash={build(a){a.L=[];a.on=0;a.sp=0;},drop(a){pyroAshSpd(a,false);},
+  kill(a,en){if(!pyroHot(en))return;const x=en.pos.x,z=en.pos.z,r=1.5*a.R,sk=a.sk;
+    later(0,()=>{if(a.L.length>=6)a.L.shift();addZone(x,z,r,4,sk.e,skDmg(sk)*.8,sk);a.L.push({x,z,r,t:4});fxGlow(x,z,r*1.6,C_EMB,.5,.8);colBurst(C_EMB,x,.5,z,8,3,.6,2);});},
+  tick(a,dt){let on=false;for(let i=a.L.length-1;i>=0;i--){const l=a.L[i];l.t-=dt;if(l.t<=0){a.L.splice(i,1);continue;}
+      if(Math.random()<.3)emit(SPARK,l.x+rand(-l.r,l.r)*.7,.15,l.z+rand(-l.r,l.r)*.7,0,rand(.6,1.6),0,C_EMB,.7,-.5,1);
+      if(!on&&Math.hypot(P.pos.x-l.x,P.pos.z-l.z)<l.r+.3)on=true;}
+    a.on=on&&!P.dead;pyroAshSpd(a,a.on);
+    if(a.on&&Math.random()<.6)emit(SPARK,P.pos.x+rand(-.35,.35),.2,P.pos.z+rand(-.35,.35),0,rand(1.5,3),0,Math.random()<.5?FIREC:C_EMB,.45,-1,1);},
+  dmgOut(a,en,el,o){return a.on&&!o.dot?1.15:1;},
+  hud(a){return a.L.length?{v:a.L.length}:null;}};
+// ---------- 2. Криомант ----------
+function cryoShat(en){let n=0;for(const a of NFS.pa||[])if(a.sk.F.id==='s_winterheart'){cryoHeart(a,en);n++;}return n;}
+function cryoHeart(a,en){P.mp=Math.min(P.maxMp,P.mp+4);for(const k in P.cds)if(P.cds[k]>0)P.cds[k]=Math.max(0,P.cds[k]-.3);a.n++;
+  if(FX.length<140){fxBurst(en.pos.x,1.1,en.pos.z,1,ICEC,.25,.85);fxBeam(new THREE.Vector3(en.pos.x,1.1,en.pos.z),new THREE.Vector3(P.pos.x,(NFS.heroY||0)+1.5,P.pos.z),ICEC,.25,.05);}
+  shards(EL.ice,en.pos.x,1,en.pos.z,5,5);if(time-a.ft>.35){a.ft=time;fxRing(P.pos.x,P.pos.z,.3,1.4,ICEC,.35,.7);float(P.pos,'+4 маны','#8fd8ff',12);}}
+// Ледяная гробница: группа вмерзает в глыбу, через 2,5 с глыба раскалывается
+function cryoTomb(sk,c,dmg,R,gh){const r=3*R,vic=gh?[]:nfFoes(c,r);
+  for(let k=0;k<8;k++){const a=k/8*TAU;spikeAt(c.x+Math.cos(a)*r,c.z+Math.sin(a)*r,ICEC,rand(.28,.4),rand(1.3,2.1));}
+  fxShock(c.x,c.z,r+.6,ICEC,.5);fxGlow(c.x,c.z,r*1.2,sk.E.color,.45,.35);fxRune(c.x,c.z,r*1.1,ICEC,.9);colBurst(ICEC,c.x,1.2,c.z,12,4,.5,3);
+  for(const en of vic){if(en.boss)en.stun=Math.max(en.stun,.6);else freezeEn(en,2.5);}
+  const pl=nfMesh('pillar',ICEC,0),bs=nfMesh('ring2',ICEC,0);pl.position.set(c.x,0,c.z);pl.scale.set(r,2.6,r);bs.position.set(c.x,.08,c.z);bs.scale.set(r,1,r);let t=0;
+  nfEnt({gh,up(dt){t+=dt;const k=Math.min(1,t*5,(2.6-t)*5);pl.material.opacity=Math.max(0,.2*k+.04*Math.sin(time*6));bs.material.opacity=.55*k;bs.rotation.y+=dt*.5;
+    if(Math.random()<.5){const a=rand(0,TAU),q=rand(0,r);emit(SPARK,c.x+Math.cos(a)*q,rand(.3,2.4),c.z+Math.sin(a)*q,0,.3,0,WHITE,.5,0,1);}
+    if(t<2.5)return true;cryoTombEnd(sk,c,r,dmg,R,vic,gh);return false;},end(){dropMesh(pl);dropMesh(bs);}});}
+function cryoTombEnd(sk,c,r,dmg,R,vic,gh){const p=new THREE.Vector3(c.x,0,c.z),live=vic.filter(e=>!e.dead),pn=Math.max(3,Math.floor(24/Math.max(1,live.length)));
+  fxBurst(p.x,1.1,p.z,r,ICEC,.35,.8);fxShock(p.x,p.z,4*R,ICEC,.5);fxRing(p.x,p.z,.5,4*R,WHITE,.4,.6);
+  for(let k=0;k<6;k++){const a=k/6*TAU+.3;spikeAt(p.x+Math.cos(a)*r*1.1,p.z+Math.sin(a)*r*1.1,ICEC,.22,1);}
+  if(Math.hypot(p.x-P.pos.x,p.z-P.pos.z)<14)shake=Math.max(shake,.18);if(gh){shards(EL.ice,p.x,1,p.z,12,7);return;}
+  let sh=0;for(const en of live){en.frozenT=0;en.stun=Math.min(en.stun,.15);const q=en.pos.clone();nfHit(en,dmg*2.5,sk,{knockFrom:p});shards(EL.ice,q.x,1,q.z,pn,7);if(sh<10&&cryoShat(en))sh++;}
+  nfAoe(p,4*R,dmg*.5,sk,{np:1,depth:1,knockFrom:p,noReact:true},null);
+  if(live.length)float({x:p.x,y:3,z:p.z},'Раскол!','#bfeaff',17);}
+NFRUN.s_tomb=(sk,A,i,dmg,R,col,cl)=>{const tg=A?coneTarget(A.dir,sk.F.range+2,.8):getTarget(sk.F.range+2);const c=tg?tg.pos.clone():nfPt(sk,A,3,6);c.y=0;if(i)c.add(v3.set(rand(-2.5,2.5),0,rand(-2.5,2.5)));cryoTomb(sk,c,dmg,R,false);};
+NFPEER.s_tomb=(sk,m)=>{cryoTomb(sk,{x:m.x,z:m.z},0,1,true);};
+// Абсолютный ноль: метель вокруг героя растёт до 9 м, держит и морозит, в конце все в ней замерзают и раскалываются
+function cryoZero(sk,o){const rm=sk.F.range*(o.R||1),home=o.home||(()=>P.pos),fix=o.fix;
+  const rg=nfMesh('ring2',ICEC,0),dk=nfMesh('disc',ICEC,0),rg2=nfMesh('ring',WHITE,0);let t=0,tk=.25;
+  nfEnt({sg1k:'zero',sk,gh:o.gh,cl:o.cl,age:0,k:1,up(dt){t+=dt;this.age=t;const c=fix||home(),r=Math.max(.6,rm*Math.min(1,t/3));
+    rg.position.set(c.x,.1,c.z);rg.scale.set(r,1,r);rg.rotation.y+=dt*1.2;rg.material.opacity=.32;
+    dk.position.set(c.x,.06,c.z);dk.scale.set(r,1,r);dk.material.opacity=.06+.025*Math.sin(time*5);
+    rg2.position.set(c.x,.12,c.z);rg2.scale.set(r*.62,1,r*.62);rg2.rotation.y-=dt*2.5;rg2.material.opacity=.22;
+    {const q=Math.random()<.5?0:1,an=t*4+q*Math.PI+rand(-.3,.3),rr=r*rand(.35,1);emit(PUFF,c.x+Math.cos(an)*rr,rand(.2,1.1),c.z+Math.sin(an)*rr,-Math.sin(an)*5,.2,Math.cos(an)*5,ICEC,.7,0,1);}
+    {const an=rand(0,TAU),rr=r*Math.sqrt(Math.random());emit(SPARK,c.x+Math.cos(an)*rr,3,c.z+Math.sin(an)*rr,rand(-.6,.6),-2.5,rand(-.6,.6),WHITE,1,1,0);}
+    if(!o.gh){for(const en of nfFoes(c,r))nfSlow(en,.3);tk-=dt;if(tk<=0){tk=.5;nfAoe(c,r,(o.dmg||0)*.15*this.k,sk,{noKnock:true});}}
+    if(t<3)return true;cryoZeroEnd(sk,c,rm,(o.dmg||0)*this.k,o.gh,!fix&&!o.gh);return false;},
+    end(){dropMesh(rg);dropMesh(dk);dropMesh(rg2);}});}
+function cryoZeroEnd(sk,c,r,dmg,gh,mine){const p=new THREE.Vector3(c.x,0,c.z);
+  fxShock(p.x,p.z,r,ICEC,.6);fxRing(p.x,p.z,.6,r,WHITE,.5,.8);fxGlow(p.x,p.z,r*1.2,ICEC,.5,.7);fxBurst(p.x,1.3,p.z,2.2,WHITE,.3,.8);fxRune(p.x,p.z,r,ICEC,.9);
+  if(Math.hypot(p.x-P.pos.x,p.z-P.pos.z)<r+6)shake=Math.max(shake,mine?.35:.15);if(gh){colBurst(ICEC,p.x,1,p.z,16,7,.6,3);return;}
+  const L=nfFoes(p,r),pn=Math.max(2,Math.floor(26/Math.max(1,L.length)));let sh=0;
+  for(const en of L){const q=en.pos.clone();en.frozenT=0;nfHit(en,dmg*1.5,sk,{knockFrom:p});shards(EL.ice,q.x,1,q.z,pn,7);if(sh<10&&cryoShat(en))sh++;
+    if(!en.dead&&!en.boss)freezeEn(en,.4);}
+  if(L.length)float({x:p.x,y:3.2,z:p.z},'Раскол ×'+L.length,'#bfeaff',18);}
+NFRUN.s_zero=(sk,A,i,dmg,R,col,cl)=>{if(!cl&&sg1Merge(sk,'zero',e=>{e.k++;}))return;cryoZero(sk,{dmg,R,cl,fix:cl?P.pos.clone():null});};
+NFCAN.s_zero=sk=>{const L=nfFoes(P.pos,6.5*skR(sk));return L.length>=3||L.some(e=>e.boss||e.elite||e.champ)?'ok':'target';};
+NFPEER.s_zero=(sk,m,pr)=>{cryoZero(sk,{gh:1,home:sg1Peer(pr)});};
+// Сердце зимы: героя не замедляют; каждый раскол замороженного — мана и быстрее перезарядка
+NFP.s_winterheart={build(a){a.n=0;a.ft=-9;a.st=-9;a.v=0;},
+  tick(a,dt){if(P.slowT>0){P.slowT=0;if(time-a.st>.7){a.st=time;colBurst(ICEC,P.pos.x,1.3,P.pos.z,6,2,.4,1);fxRing(P.pos.x,P.pos.z,.4,1.3,ICEC,.3,.6);}}
+    if(Math.random()<.55){const f=P.face,s=Math.random()<.5?1:-1;emit(SPARK,P.pos.x+Math.cos(f)*s*.32,(NFS.heroY||0)+1.5+rand(0,.2),P.pos.z-Math.sin(f)*s*.32,0,.25,0,Math.random()<.5?ICEC:WHITE,.5,-.3,1);}
+    a.v-=dt;if(a.v<=0){a.v=.1;for(const en of ENEMIES){if(en.dead)continue;if(en.frozenT>0){if(!en.cryoF){en.cryoF=1;en.cryoD=0;}en.cryoT=time;}else if(en.cryoF&&time-en.cryoT>.15)en.cryoF=0;}}},
+  hit(a,en,d,el,o){if(o.dot||o.np||!o.sk&&!o.basic)return;if(en.frozenT>0&&!en.cryoF){en.cryoF=1;en.cryoD=0;en.cryoT=time;}if(!en.cryoF||en.cryoD)return;en.cryoD=1;cryoHeart(a,en);}};
+// ---------- 3. Громовержец ----------
+// Шаровая гроза: шар медленно плывёт к цели и каждые 0,3 с бьёт молниями трёх ближайших
+function stormBall(sk,o){const col=sk.E.color,R=o.R||1,core=nfMesh('sphere',WHITE,.95),sh=nfMesh('sphere',col,.4),gl=nfMesh('glow',col,.55);
+  const p=new THREE.Vector3(o.from.x,1.5,o.from.z);core.position.copy(p);const tr=trailStart({g:core},col,.16);let t=0,zt=.15;
+  nfEnt({gh:o.gh,up(dt){t+=dt;let tx=o.aim.x,tz=o.aim.z;const tg=o.tgt&&!o.tgt.dead?o.tgt:o.gh?null:nearest(p,7);if(tg){tx=tg.pos.x;tz=tg.pos.z;}
+    const dx=tx-p.x,dz=tz-p.z,L=Math.hypot(dx,dz);if(L>.4){const s=Math.min(L-.4,4*dt);p.x+=dx/L*s;p.z+=dz/L*s;}
+    p.y=1.6+Math.sin(t*3)*.2;core.position.copy(p);sh.position.copy(p);gl.position.set(p.x,.1,p.z);
+    core.scale.setScalar(.3+rand(-.04,.04));sh.scale.setScalar(.75+.15*Math.sin(t*23));sh.material.opacity=.25+rand(0,.3);gl.scale.set(1.8,1,1.8);gl.material.opacity=.35+rand(0,.25);
+    if(Math.random()<.7)emit(SPARK,p.x+rand(-.6,.6),p.y+rand(-.5,.5),p.z+rand(-.6,.6),rand(-2,2),rand(-1,2),rand(-2,2),Math.random()<.5?col:WHITE,.22,0,1);
+    zt-=dt;if(zt<=0){zt=.3;const L3=o.gh?nearestN(p,5*R,3).filter(()=>Math.random()<.5):nearestN(p,5*R,3);
+      for(const en of L3){zigzag(p.clone(),new THREE.Vector3(en.pos.x,1,en.pos.z),col);if(!o.gh)nfHit(en,o.dmg,sk,{noKnock:true});}
+      if(!L3.length&&Math.random()<.6){const a=rand(0,TAU);zigzag(p.clone(),new THREE.Vector3(p.x+Math.cos(a)*2.2,.1,p.z+Math.sin(a)*2.2),col);}}
+    if(t<4)return true;fxBurst(p.x,p.y,p.z,1.5,col,.3,.8);fxBurst(p.x,p.y,p.z,.8,WHITE,.2,.9);colBurst(col,p.x,p.y,p.z,12,5,.35,2);fxRing(p.x,p.z,.3,2.5,col,.35);return false;},
+    end(){trailEnd(tr);dropMesh(core);dropMesh(sh);dropMesh(gl);}});}
+NFRUN.s_ballstorm=(sk,A,i,dmg,R,col,cl)=>{const tg=A?coneTarget(A.dir,sk.F.range+2,.8):getTarget(sk.F.range+2),d=nfDir(sk,A),aim=nfPt(sk,A,3,8);
+  const from=P.pos.clone().addScaledVector(d,1.1);if(i)from.add(v3.set(rand(-1.5,1.5),0,rand(-1.5,1.5)));stormBall(sk,{from,tgt:tg,aim,dmg,R});};
+NFPEER.s_ballstorm=(sk,m,pr)=>{const d=sg1Dir(pr.pos,m);stormBall(sk,{from:pr.pos.clone().addScaledVector(d,1.1),aim:{x:m.x,z:m.z},gh:1});};
+// Гнев небес: 4 с с неба бьют 14 молний по самым сильным врагам вокруг
+function stormSky(sk,o){const col=sk.E.color,rad=sk.F.range,R=o.R||1,home=o.home||(()=>P.pos),fix=o.fix;
+  const dk=nfMesh('disc',SG1_DARK,0),rg=nfMesh('ring2',col,0);dk.material.blending=THREE.NormalBlending;let t=0,bt=.1,j=0;
+  nfEnt({sg1k:'sky',sk,gh:o.gh,cl:o.cl,age:0,k:1,up(dt){t+=dt;this.age=t;const c=fix||home();
+    dk.position.set(c.x,.07,c.z);dk.scale.set(rad,1,rad);dk.material.opacity=Math.max(0,Math.min(.32,t*1.2,(4.4-t)*1.2));
+    rg.position.set(c.x,.11,c.z);rg.scale.set(rad,1,rad);rg.rotation.y+=dt*.4;rg.material.opacity=Math.max(0,Math.min(.5,t*2,(4.4-t)*2))*(.75+.25*Math.sin(time*9));
+    if(Math.random()<.3){const a=rand(0,TAU),q=rand(2,rad);emit(SPARK,c.x+Math.cos(a)*q,rand(4,7),c.z+Math.sin(a)*q,0,-1,0,col,.4,0,0);}
+    bt-=dt;if(bt<=0&&j<14){bt=4/14;j++;let x,z;
+      if(!o.gh){const L=nfFoes(c,rad).sort((a,b)=>sg1Str(b)-sg1Str(a));if(L.length){const tg=L[(j-1)%Math.min(L.length,5)];x=tg.pos.x+rand(-.3,.3);z=tg.pos.z+rand(-.3,.3);}}
+      if(x==null){const a=rand(0,TAU),q=rand(2,rad*.8);x=c.x+Math.cos(a)*q;z=c.z+Math.sin(a)*q;}
+      skyBolt(x,z,col);fxShock(x,z,1.8*R,col,.35);if(!o.gh){const p=new THREE.Vector3(x,0,z);nfAoe(p,1.8*R,(o.dmg||0)*this.k,sk,{stunX:.4,knockFrom:p});}
+      if(Math.hypot(x-P.pos.x,z-P.pos.z)<10)shake=Math.max(shake,.12);}
+    return t<4.4;},end(){dk.material.blending=THREE.AdditiveBlending;dropMesh(dk);dropMesh(rg);}});}
+NFRUN.s_skywrath=(sk,A,i,dmg,R,col,cl)=>{if(!cl&&sg1Merge(sk,'sky',e=>{e.k++;}))return;stormSky(sk,{dmg,R,cl,fix:cl?P.pos.clone():null});};
+NFCAN.s_skywrath=sk=>{const L=nfFoes(P.pos,sk.F.range*.8);return L.length>=3||L.some(e=>e.boss||e.elite||e.champ)?'ok':'target';};
+NFPEER.s_skywrath=(sk,m,pr)=>{stormSky(sk,{gh:1,home:sg1Peer(pr)});};
+// Громоотвод: громоотвод над головой; когда бьют — иногда молния в ударившего и +2 заряда
+NFP.s_rod={build(a){a.lt=-9;a.m=nfMesh('beam',a.sk.E.color,.6);},drop(a){dropMesh(a.m);},
+  tick(a,dt){const y=(NFS.heroY||0)+2.75,k=Math.min(1,(time-a.lt)/.5);a.m.position.set(P.pos.x,y,P.pos.z);a.m.scale.set(.05,.7,.05);a.m.rotation.y+=dt*2;a.m.material.opacity=(.35+.25*k)+(Math.random()<.08?.4:0);
+    if(Math.random()<.12)emit(SPARK,P.pos.x,y+.4,P.pos.z,rand(-1,1),rand(.5,1.5),rand(-1,1),a.sk.E.color,.25,0,1);},
+  dmgIn(a,d,src,o){if(!src||o.dot||src.dead||!src.pos||time-a.lt<.5||Math.random()>=.3)return d;a.lt=time;const sk=a.sk,en=src;
+    later(0,()=>{if(en.dead)return;const y=(NFS.heroY||0)+3.1;zigzag(new THREE.Vector3(P.pos.x,y,P.pos.z),new THREE.Vector3(en.pos.x,1.2,en.pos.z),sk.E.color);skyBolt(en.pos.x,en.pos.z,sk.E.color);
+      nfHit(en,skDmg(sk),sk,{np:1,depth:1,noKnock:true});cfAdd('charge',2);float({x:en.pos.x,y:2.8,z:en.pos.z},'Громоотвод','#fff3a0',13);});return d;},
+  hud(a){const k=(time-a.lt)/.5;return k<1?{t:k}:null;}};
+// ---------- 4. Геомант ----------
+// Валун: катится по прямой, растёт, бьёт сильнее с каждым сбитым и раскидывает их в стороны, один раз отскакивает от препятствия
+function geoBoulder(sk,o){const d=o.dir.clone(),len=sk.F.range*(sk.M.radius?1.2:1),R=o.R||1,v=takeProjVis('earth',EARTHC,1),g=v.g;v.gl.visible=false;
+  const p=new THREE.Vector3(o.from.x,0,o.from.z),hit=new Set();let dist=0,n=0,bn=0,t=0,rr=1;
+  nfEnt({gh:o.gh,up(dt){t+=dt;const st=11*dt;p.addScaledVector(d,st);dist+=st;
+    const q=p.clone();collide(q,.8);const cx=q.x-p.x,cz=q.z-p.z;
+    if(cx*cx+cz*cz>.0025){const L=Math.hypot(cx,cz),nx=cx/L,nz=cz/L,dn=d.x*nx+d.z*nz;p.copy(q);
+      if(bn<1&&dn<0){bn++;d.x-=2*dn*nx;d.z-=2*dn*nz;d.normalize();puffs(p.x,.5,p.z,C_DUST,6,1.6,.8);fxShock(p.x,p.z,2,EARTHC,.35);shake=Math.max(shake,.12);}else if(dn<-.2)dist=len;}
+    const sc=1+.8*Math.min(1,dist/len),s=1.15*Math.sqrt(R)*sc;rr=.85*s;g.scale.setScalar(s);g.position.set(p.x,rr,p.z);g.rotation.set(0,Math.atan2(d.x,d.z),0);v.core.rotation.x+=st/rr;
+    if(Math.random()<.8)emit(PUFF,p.x+rand(-rr,rr)*.6,.15,p.z+rand(-rr,rr)*.6,-d.x*2+rand(-.6,.6),rand(.3,.9),-d.z*2+rand(-.6,.6),C_DUST,.7,-.2,1);
+    if(!o.gh)for(const en of ENEMIES){if(en.dead||hit.has(en))continue;const ex=en.pos.x-p.x,ez=en.pos.z-p.z,hr=rr+en.r+.2;if(ex*ex+ez*ez>hr*hr)continue;
+      hit.add(en);n++;nfHit(en,o.dmg*(1+.1*Math.min(10,n-1)),sk,{knockFrom:new THREE.Vector3(p.x-d.x*.6,0,p.z-d.z*.6)});
+      if(!en.remote&&!en.boss){const sd=Math.sign(ex*d.z-ez*d.x)||1;en.kb.x+=d.z*sd*7/(en.mass||1);en.kb.z+=-d.x*sd*7/(en.mass||1);}
+      fxBurst(en.pos.x,1,en.pos.z,1,EARTHC,.25,.7);colBurst(C_DUST,en.pos.x,.8,en.pos.z,5,4,.4,6);if(Math.hypot(en.pos.x-P.pos.x,en.pos.z-P.pos.z)<12)shake=Math.max(shake,.08);}
+    if(dist<len&&t<3)return true;
+    fxBurst(p.x,rr,p.z,rr*1.3,EARTHC,.3,.6);puffs(p.x,.5,p.z,C_DUST,8,2,1);shards(EL.earth,p.x,rr,p.z,8,6);fxShock(p.x,p.z,2.2*sc,EARTHC,.4);
+    if(n>1&&!o.gh)float({x:p.x,y:2.6,z:p.z},'Сбито '+n,'#e0c090',14);return false;},
+    end(){v.gl.visible=true;dropProjVis(v);}});}
+NFRUN.s_boulder=(sk,A,i,dmg,R,col,cl)=>{const d=nfDir(sk,A);if(i)d.applyAxisAngle(v2.set(0,1,0),i===1?.25:-.25);geoBoulder(sk,{from:P.pos.clone().addScaledVector(d,1.2),dir:d,dmg,R});};
+NFPEER.s_boulder=(sk,m,pr)=>{const d=sg1Dir(pr.pos,m);geoBoulder(sk,{from:pr.pos.clone().addScaledVector(d,1.2),dir:d,gh:1});};
+// Землетрясение: 4 с от героя каждые 0,5 с ударная волна, оглушает и ломает броню; каждый толчок — слой каменной кожи
+function geoQuake(sk,o){const r=sk.F.range*(o.R||1),home=o.home||(()=>P.pos),fix=o.fix;const rg=nfMesh('ring2',EARTHC,0),ds=nfMesh('disc',C_DUST,0);let t=0,pt=0,n=0;
+  nfEnt({sg1k:'quake',sk,gh:o.gh,cl:o.cl,age:0,k:1,up(dt){t+=dt;this.age=t;const c=fix||home();
+    rg.position.set(c.x,.09,c.z);rg.scale.set(r,1,r);rg.material.opacity=Math.max(0,Math.min(.22,t*3,(4.3-t)*3));ds.position.set(c.x,.05,c.z);ds.scale.set(r,1,r);ds.material.opacity=Math.max(0,Math.min(.07,t,(4.3-t)))*(1+.3*Math.sin(time*20));
+    pt-=dt;if(pt<=0&&n<8){pt=.5;n++;fxRing(c.x,c.z,.6,r,EARTHC,.45,.5);fxRing(c.x,c.z,.3,r*.5,C_DUST,.35,.45);fxDisc(c.x,c.z,1.6,EARTHC,.3,.5);
+      for(let k=0;k<5;k++){const a=rand(0,TAU),q=rand(1.6,r*.9);spikeAt(c.x+Math.cos(a)*q,c.z+Math.sin(a)*q,EARTHC,rand(.25,.45),rand(.6,1.3));}
+      for(let k=0;k<6;k++){const a=rand(0,TAU),q=rand(1,r);emit(PUFF,c.x+Math.cos(a)*q,.2,c.z+Math.sin(a)*q,0,rand(.5,1.5),0,C_DUST,.8,-.3,1);}
+      if(!o.gh){nfAoe(c,r,(o.dmg||0)*this.k,sk,{stunX:.3,noKnock:true});for(const en of nfFoes(c,r))en.shredT=Math.max(en.shredT,4);if(!o.cl)cfAdd('layers',1);}
+      if(Math.hypot(c.x-P.pos.x,c.z-P.pos.z)<12)shake=Math.max(shake,o.gh?.1:.22);}
+    return n<8||t<4.3;},end(){dropMesh(rg);dropMesh(ds);}});}
+NFRUN.s_earthquake=(sk,A,i,dmg,R,col,cl)=>{if(!cl&&sg1Merge(sk,'quake',e=>{e.k++;}))return;geoQuake(sk,{dmg,R,cl,fix:cl?P.pos.clone():null});};
+NFCAN.s_earthquake=sk=>{const L=nfFoes(P.pos,6.5*skR(sk));return L.length>=3||L.some(e=>e.boss||e.elite||e.champ)?'ok':'target';};
+NFPEER.s_earthquake=(sk,m,pr)=>{geoQuake(sk,{gh:1,home:sg1Peer(pr)});};
+// Обломки: враг, убитый земляной чарой, разлетается тремя камнями в соседей
+NFP.s_debris={kill(a,en,el,o,lo){if(el!==EL.earth||!lo||!lo.sk||lo.sk===a.sk||lo.np||o.fromG||procBudget<=0)return;procBudget--;const sk=a.sk,p=en.pos.clone(),d=skDmg(sk);
+  later(0,()=>{const L=nearestN(p,6*a.R,3,en);for(let k=0;k<3;k++){const tg=L.length?L[k%L.length]:null,an=k/3*TAU+rand(-.3,.3);
+      const dir=tg?new THREE.Vector3(tg.pos.x-p.x,0,tg.pos.z-p.z).normalize():new THREE.Vector3(Math.cos(an),0,Math.sin(an));
+      makeBolt(sk,new THREE.Vector3(p.x,1,p.z).addScaledVector(dir,.4),dir,tg,d,1,{mini:true,size:.24,speed:15,range:8,depth:1});}
+    puffs(p.x,.6,p.z,C_DUST,5,1.5,.8);fxBurst(p.x,.8,p.z,1.3,EARTHC,.25,.6);shards(EL.earth,p.x,.8,p.z,6,6);});}};
+// ---------- 5. Чумной лекарь ----------
+// Чумной фонарь: фонарь на шесте 8 с, туман травит врагов и лечит героя внутри
+function plagueLantern(sk,c,o){const col=sk.E.color,r=5*(o.R||1);
+  const pole=nfMesh('beam',C_DUST,.85),box=nfMesh('beam',col,.75),fl=nfMesh('sphere',WHITE,.9),fog=nfMesh('disc',col,0),rg=nfMesh('ring',col,0);
+  pole.position.set(c.x,.85,c.z);pole.scale.set(.07,1.7,.07);box.position.set(c.x,1.8,c.z);box.scale.set(.34,.42,.34);fl.position.set(c.x,1.8,c.z);fog.position.set(c.x,.06,c.z);fog.scale.set(r,1,r);rg.position.set(c.x,.08,c.z);rg.scale.set(r,1,r);
+  let t=0,tk=.25;
+  nfEnt({gh:o.gh,lantern:1,up(dt){t+=dt;const k=Math.max(0,Math.min(1,t*3,(8-t)*2));
+    box.rotation.y+=dt*1.5;box.position.y=1.8+Math.sin(t*2)*.05;fl.position.y=box.position.y;fl.scale.setScalar(.13+.05*Math.sin(time*13));fl.material.opacity=.6+.4*Math.random();
+    fog.material.opacity=.07*k;rg.material.opacity=.35*k;rg.rotation.y-=dt*.3;
+    if(Math.random()<.6){const an=rand(0,TAU),rr=r*Math.sqrt(Math.random());emit(PUFF,c.x+Math.cos(an)*rr,rand(.1,.6),c.z+Math.sin(an)*rr,rand(-.3,.3),rand(.2,.5),rand(-.3,.3),col,.9,-.2,1);}
+    if(!o.gh){tk-=dt;if(tk<=0){tk=.5;nfAoe(c,r,o.dmg||0,sk,{noKnock:true});
+      if(!P.dead&&Math.hypot(P.pos.x-c.x,P.pos.z-c.z)<r){heal(P.maxHp*.01*(o.cl?.5:1));fxBubble(P.pos.x+rand(-.4,.4),.8,P.pos.z+rand(-.4,.4),GREENH);emit(SPARK,P.pos.x,1.2,P.pos.z,0,1.4,0,GREENH,.5,-.5,1);}}}
+    return t<8;},end(){dropMesh(pole);dropMesh(box);dropMesh(fl);dropMesh(fog);dropMesh(rg);}});
+  fxPillar(c.x,c.z,.5,3,col,.5);puffs(c.x,.6,c.z,col,6,1.4,1);fxRing(c.x,c.z,.5,r,col,.5,.7);}
+function plagueSpot(sk,A){if(A)return nfPt(sk,A,2,5);const tg=getTarget(sk.F.range+2);if(!tg)return P.pos.clone().addScaledVector(fwd(),3);
+  const dd=Math.hypot(tg.pos.x-P.pos.x,tg.pos.z-P.pos.z);return dd<=6?P.pos.clone().lerp(tg.pos,.5):tg.pos.clone().lerp(P.pos,2/dd);}
+NFRUN.s_lantern=(sk,A,i,dmg,R,col,cl)=>{const c=plagueSpot(sk,A);c.y=0;if(i)c.add(v3.set(rand(-3,3),0,rand(-3,3)));collide(c,.4);plagueLantern(sk,c,{dmg,R,cl});};
+NFPEER.s_lantern=(sk,m)=>{plagueLantern(sk,{x:m.x,z:m.z},{gh:1});};
+// Пандемия: весь яд на врагах вокруг срабатывает разом и удваивается, от отравленных к герою тянутся лечащие нити
+function plagueThreads(sk,L,home,gh){if(!L.length)return;const col=sk.E.color;let t=0,bt=0;
+  nfEnt({gh,up(dt){t+=dt;bt-=dt;if(bt<=0){bt=.22;const h=home(),hy=gh?1.2:(NFS.heroY||0)+1.2;let n=0;
+      for(const en of L){if(en.dead||n>=12)continue;n++;fxBeam(new THREE.Vector3(en.pos.x,(en.hy||2)*.5,en.pos.z),new THREE.Vector3(h.x,hy,h.z),col,.3,.07);}}
+    if(Math.random()<.6){const en=L[Math.random()*L.length|0],h=home();if(!en.dead){const f=Math.random();emit(SPARK,lerp(en.pos.x,h.x,f),1.1,lerp(en.pos.z,h.z,f),(h.x-en.pos.x)*.9,0,(h.z-en.pos.z)*.9,GREENH,.3,0,0);}}
+    return t<1.1;}});}
+NFRUN.s_pandemic=(sk,A,i,dmg,R,col,cl)=>{const r=sk.F.range*R,c=P.pos.clone(),L=nfFoes(c,r),pz=[];
+  fxRing(c.x,c.z,.6,r,col,.8,.45);fxShock(c.x,c.z,6,col,.5);fxGlow(c.x,c.z,3.5,col,.5,.5);puffs(c.x,.8,c.z,col,4,2,1);
+  for(const en of L){if(en.poisT>0&&en.poisN>0)pz.push(en);}
+  const pn=Math.max(1,Math.floor(24/Math.max(1,pz.length)));
+  for(const en of pz){const n0=en.poisN,rem=n0*en.poisDps*Math.max(0,en.poisT),q=en.pos;fxBurst(q.x,1,q.z,1.3,col,.3,.75);puffs(q.x,.8,q.z,col,Math.min(3,pn),1.4,.8);
+    nfHit(en,(i?0:rem*1.5)+dmg,sk,{noKnock:true});if(!en.dead&&!i){en.poisN=Math.min(12,n0*2);en.poisT=4;}}
+  for(const en of L)if(pz.indexOf(en)<0)nfHit(en,dmg*.5,sk,{noKnock:true});
+  if(!i&&pz.length){plagueThreads(sk,pz,()=>P.pos,false);const h=P.maxHp*Math.min(.2,.01*pz.length)*(cl?.5:1);heal(h);float(P.pos,'+'+Math.round(h),'#9dff8a',15);
+    float({x:c.x,y:3.2,z:c.z},'Пандемия ×'+pz.length,'#9dff5a',17);}};
+NFCAN.s_pandemic=sk=>{let n=0,b=0;for(const en of nfFoes(P.pos,sk.F.range*skR(sk)))if(en.poisT>0&&en.poisN>0){n++;if(en.boss||en.elite||en.champ)b=1;}return n>=3||b?'ok':'target';};
+NFPEER.s_pandemic=(sk,m,pr)=>{const c=pr.pos;fxRing(c.x,c.z,.6,20,sk.E.color,.8,.45);fxShock(c.x,c.z,6,sk.E.color,.5);const L=nearestN(c,20,8);for(const en of L)fxBurst(en.pos.x,1,en.pos.z,1.2,sk.E.color,.3,.7);plagueThreads(sk,L,sg1Peer(pr),true);};
+// Иммунитет: вражеские лужи не жгут (вспыхивает зелёный пузырь), отравленные враги бьют слабее
+function plagueInEZ(){for(const e of EZ)if(Math.hypot(P.pos.x-e.x,P.pos.z-e.z)<e.r)return true;return false;}
+NFP.s_immune={build(a){a.m=nfMesh('sphere',a.sk.E.color,0);a.m.visible=false;a.on=0;a.ft=0;a.lt=-9;},drop(a){a.m.visible=true;dropMesh(a.m);},
+  tick(a,dt){a.on=EZ.length&&!P.dead?plagueInEZ():false;a.ft-=dt;const m=a.m;
+    if(a.on||a.ft>0){m.visible=true;m.position.set(P.pos.x,(NFS.heroY||0)+1.1,P.pos.z);m.scale.setScalar(1.3+.06*Math.sin(time*6));m.material.opacity=(a.on?.14:0)+Math.max(0,a.ft)*.9;
+      if(a.on&&Math.random()<.2)fxBubble(P.pos.x+rand(-.7,.7),.3,P.pos.z+rand(-.7,.7),a.sk.E.color);}else m.visible=false;},
+  dmgIn(a,d,src,o){if(o.dot&&!src&&plagueInEZ()){a.ft=.3;if(time-a.lt>1.5){a.lt=time;float(P.pos,'Иммунитет','#9dff8a',13);}return 0;}
+    if(src&&!o.dot&&src.poisT>0&&src.poisN>0){a.ft=Math.max(a.ft,.12);return d*.85;}return d;}};
+// ---------- 6. Гемомант ----------
+// Кровопускание: четыре врага истекают кровью по нитям к герою (вся кровь лечит), в конце из них бьют шипы
+function hemoBleed(sk,L,o){const col=sk.E.color,R=o.R||1,home=o.home||(()=>P.pos),bm=L.map(()=>nfMesh('beam',col,.6));let t=0,tk=.5;
+  for(const en of L)fxBurst(en.pos.x,1,en.pos.z,.9,col,.25,.8);
+  nfEnt({gh:o.gh,up(dt){t+=dt;const h=home(),hy=(o.gh?0:NFS.heroY||0)+1.2;
+    for(let k=0;k<L.length;k++){const en=L[k],m=bm[k];if(en.dead){m.visible=false;continue;}m.visible=true;const ax=en.pos.x,az=en.pos.z,ay=(en.hy||2)*.55;
+      m.position.set((ax+h.x)/2,(ay+hy)/2,(az+h.z)/2);m.lookAt(h.x,hy,h.z);m.scale.set(.11,.11,Math.max(.1,Math.hypot(ax-h.x,ay-hy,az-h.z)));m.material.opacity=.6+.25*Math.sin(time*10+k);
+      if(Math.random()<.35){const f=(time*1.6+k*.27)%1;emit(SPARK,lerp(ax,h.x,f),lerp(ay,hy,f),lerp(az,h.z,f),0,0,0,C_DRP,.25,0,0);}}
+    if(!o.gh){tk-=dt;if(tk<=0){tk=.5;let s=0;for(const en of L){if(en.dead)continue;const h0=en.hp;nfHit(en,o.dmg*.5,sk,{noKnock:true,noReact:true});s+=Math.max(0,h0-Math.max(0,en.hp));}
+      if(s>0){heal(s*(o.cl?.5:1));float(P.pos,'+'+Math.round(s*(o.cl?.5:1)),'#ff8a9a',12);}}}
+    if(t<3)return true;
+    for(const en of L){if(en.dead)continue;const q=en.pos.clone();for(let k=0;k<3;k++){const a=k/3*TAU+rand(0,1);spikeAt(q.x+Math.cos(a)*.9,q.z+Math.sin(a)*.9,C_DRP,.22,1.3);}
+      fxBurst(q.x,1,q.z,1.6,col,.3,.7);if(!o.gh)nfAoe(q,2*R,o.dmg*30/18,sk,{knockFrom:q});}
+    return false;},end(){for(const m of bm){m.visible=true;dropMesh(m);}}});}
+NFRUN.s_bloodlet=(sk,A,i,dmg,R,col,cl)=>{const c=A?P.pos.clone().addScaledVector(A.dir,Math.max(2,A.dist*sk.F.range)*.5):P.pos.clone();const L=nearestN(c,sk.F.range*(sk.M.radius?1.3:1),4);
+  if(!L.length){fxRing(P.pos.x,P.pos.z,.3,2,col,.35);return;}hemoBleed(sk,L,{dmg,R,cl});};
+NFCAN.s_bloodlet=sk=>P.hp>P.maxHp*.25&&getTarget(sk.F.range)?'ok':'target';
+NFPEER.s_bloodlet=(sk,m,pr)=>{const L=nearestN({x:m.x,z:m.z},12,4);if(L.length)hemoBleed(sk,L,{gh:1,home:sg1Peer(pr)});};
+// Багровый пакт: жертва трети здоровья, через 0,5 с волна крови бьёт вчетверо от отданного и возвращает половину урона
+function hemoPact(sk,c0,o){const col=sk.E.color,r=sk.F.range*(o.R||1),home=o.home||(()=>P.pos);const orb=nfMesh('sphere',C_DRP,.8),rg=nfMesh('ring2',col,0);let t=0,c=null,dealt=0;const hit=new Set();
+  fxPillar(c0.x,c0.z,.9,3.5,col,.6);
+  nfEnt({gh:o.gh,up(dt){t+=dt;const h=home();
+    if(t<.5){const k=t/.5;orb.position.set(h.x,1.3,h.z);orb.scale.setScalar(.25+.55*k);orb.material.opacity=.5+.4*k;
+      for(let j=0;j<2;j++){const a=rand(0,TAU),q=rand(3,5),sx=h.x+Math.cos(a)*q,sz=h.z+Math.sin(a)*q;emit(PUFF,sx,.6,sz,(h.x-sx)*2,1,(h.z-sz)*2,C_DRP,.5,0,0);}return true;}
+    if(!c){c=new THREE.Vector3(h.x,0,h.z);orb.visible=false;fxShock(c.x,c.z,r,col,.6);fxGlow(c.x,c.z,r*1.2,C_DRP,.5,.8);fxBurst(c.x,1.2,c.z,2.4,col,.35,.8);shards(sk.e,c.x,1.2,c.z,12,9);
+      for(let k=0;k<10;k++){const a=k/10*TAU+rand(-.15,.15);spikeAt(c.x+Math.cos(a)*r*.55,c.z+Math.sin(a)*r*.55,C_DRP,rand(.25,.35),rand(1.2,1.9));}
+      if(Math.hypot(c.x-P.pos.x,c.z-P.pos.z)<r+6)shake=Math.max(shake,o.gh?.15:.35);}
+    const f=Math.min(1,(t-.5)/.35),fr=r*f;rg.position.set(c.x,.1,c.z);rg.scale.set(Math.max(.3,fr),1,Math.max(.3,fr));rg.material.opacity=.85*(1-f*.6);
+    if(Math.random()<.9){const a=rand(0,TAU);emit(SPARK,c.x+Math.cos(a)*fr,.3,c.z+Math.sin(a)*fr,Math.cos(a)*3,rand(1,3),Math.sin(a)*3,col,.4,4,1);}
+    if(!o.gh)for(const en of nfFoes(c,fr)){if(hit.has(en))continue;hit.add(en);const h0=en.hp;nfHit(en,o.dmg,sk,{knockFrom:c});dealt+=Math.max(0,h0-Math.max(0,en.hp));fxBurst(en.pos.x,1,en.pos.z,.9,col,.22,.8);}
+    if(f<1)return true;
+    if(!o.gh&&!o.cl&&dealt>0){const hv=dealt*.5;heal(hv);float(P.pos,'+'+Math.round(hv),'#ff8a9a',16);fxPillar(P.pos.x,P.pos.z,.8,3,C_DRP,.5);}
+    return false;},end(){orb.visible=true;dropMesh(orb);dropMesh(rg);}});}
+NFRUN.s_pact=(sk,A,i,dmg,R,col,cl)=>{let sac;
+  if(!cl&&!i&&time-(SG1.pactT||-9)>1){sac=Math.max(0,Math.min(P.hp-1,P.hp*.3));P.hp-=sac;SG1.pact=sac;SG1.pactT=time;float(P.pos,'−'+Math.round(sac),'#ff4060',16);hurtFlash=Math.min(1,hurtFlash+.3);}
+  else sac=(SG1.pact||P.hp*.3)*(cl?.5:1);
+  hemoPact(sk,P.pos.clone(),{dmg:Math.max(dmg,4*sac*(sk.M.dmg||1)),R,cl});};
+NFCAN.s_pact=sk=>P.hp>P.maxHp*.5&&countNear(P.pos,8*skR(sk))>=3?'ok':'target';
+NFPEER.s_pact=(sk,m,pr)=>{hemoPact(sk,pr.pos.clone(),{gh:1,home:sg1Peer(pr)});};
+// Кровавые нити: ниже трети здоровья от врагов рядом к груди героя тянутся нити (до 5) и пьют их здоровье для героя: каждая — 1% его здоровья в секунду
+NFP.s_threads={build(a){a.on=0;a.t=0;a.v=0;a.L=[];},
+  tick(a,dt){const low=!P.dead&&P.hp<P.maxHp/3;a.on=low;if(!low){a.L.length=0;return;}const col=a.sk.E.color,hy=(NFS.heroY||0)+1.25;
+    a.v-=dt;if(a.v<=0){a.v=.25;a.L=nearestN(P.pos,8*a.R,5);for(const en of a.L)fxBeam(new THREE.Vector3(en.pos.x,(en.hy||2)*.55,en.pos.z),new THREE.Vector3(P.pos.x,hy,P.pos.z),col,.32,.12);}
+    if(a.L.length&&Math.random()<.6){const en=a.L[Math.random()*a.L.length|0];if(!en.dead){const f=Math.random();emit(SPARK,lerp(en.pos.x,P.pos.x,f),lerp((en.hy||2)*.55,hy,f),lerp(en.pos.z,P.pos.z,f),(P.pos.x-en.pos.x)*.9,0,(P.pos.z-en.pos.z)*.9,C_DRP,.3,0,0);}}
+    a.t-=dt;if(a.t<=0){a.t=.5;let s=0;for(const en of a.L){if(en.dead)continue;const h0=en.hp;dealDamage(en,Math.max(1,P.maxHp*.005),a.sk.e,{sk:a.sk,depth:1,np:1,dot:true,dotCol:'#ff5a6a',noKnock:true});s+=Math.max(0,h0-Math.max(0,en.hp));}
+      if(s>0)heal(s);}},
+  hud(a){return a.on&&a.L.length?{v:a.L.length}:null;}};
+// ---------- 7. Арканист ----------
+// Чародейские ракеты: 6 самонаводящихся ракет веером в 6 разных врагов (ману возвращает сама аркана)
+NFRUN.s_missiles=(sk,A,i,dmg,R,col,cl)=>{const rng=sk.F.range+2;let L=nearestN(P.pos,rng,6);if(A){const c=coneTarget(A.dir,rng,.5);if(c){L=L.filter(e=>e!==c);L.unshift(c);L=L.slice(0,6);}}
+  const base=nfDir(sk,A,sk.F.range),ba=Math.atan2(base.z,base.x),x0=P.pos.x,z0=P.pos.z;
+  for(let k=0;k<6;k++){const tg=L.length?L[k%L.length]:null,an=ba+(k-2.5)*.5+(i?rand(-.2,.2):0),dir=new THREE.Vector3(Math.cos(an),0,Math.sin(an));
+    later(k*.05,()=>{spawnProj({pos:new THREE.Vector3(x0+dir.x*.6,1.5,z0+dir.z*.6),dir:dir.clone(),speed:19,dmg,el:sk.e,sk,depth:0,target:tg&&!tg.dead?tg:null,size:.2*Math.sqrt(R),range:24,mini:true,hit:new Set()});
+      emit(SPARK,x0+dir.x*.6,1.5,z0+dir.z*.6,dir.x*3,1,dir.z*3,WHITE,.25,0,1);});}
+  fxRing(x0,z0,.3,1.7,col,.3);colBurst(col,x0,1.5,z0,8,3,.3,0);};
+NFPEER.s_missiles=(sk,m,pr,from)=>{const L=nearestN({x:m.x,z:m.z},8,6),n=Math.max(3,L.length);for(let k=0;k<n;k++){const e=L.length?L[k%L.length]:null,to=e?new THREE.Vector3(e.pos.x,1,e.pos.z):new THREE.Vector3(m.x+rand(-2,2),1,m.z+rand(-2,2));
+  later(k*.05,()=>{fxBeam(from,to,sk.E.color,.25,.06);fxBurst(to.x,to.y,to.z,.5,sk.E.color,.2);});}};
+// Разлом реальности: 4 с за плечом героя висит портал и бесплатно повторяет каждую его чару с силой 70%
+function arcRift(sk,o){const col=sk.E.color,home=o.home||(()=>P.pos),ring=nfMesh('ring2',col,0),core=nfMesh('disc',col,0),rn=nfMesh('rune',col,0);let t=0;
+  nfEnt({sg1k:'rift',sk,gh:o.gh,age:0,T:4,px:null,pz:0,
+    up(dt){t+=dt;this.age=t;const h=home(),f=o.gh?(MP.peer&&MP.peer.tf||0):P.face,tx=h.x-Math.sin(f)*1.4,tz=h.z-Math.cos(f)*1.4;
+      if(this.px==null){this.px=tx;this.pz=tz;fxPillar(tx,tz,.8,3.4,col,.5);}this.px+=(tx-this.px)*Math.min(1,dt*6);this.pz+=(tz-this.pz)*Math.min(1,dt*6);
+      const k=Math.max(0,Math.min(1,t*4,(this.T-t)*4)),y=(o.gh?0:NFS.heroY||0)+3.2;
+      ring.position.set(this.px,y,this.pz);ring.scale.set(1.35*k,1,1.35*k);ring.rotation.y+=dt*2.2;ring.material.opacity=.6*k;
+      core.position.set(this.px,y-.02,this.pz);core.scale.set(1.05*k,1,1.05*k);core.material.opacity=(.16+.06*Math.sin(time*8))*k;
+      rn.position.set(this.px,.1,this.pz);rn.scale.set(.85*k,1,.85*k);rn.rotation.y-=dt;rn.material.opacity=.55*k;
+      if(Math.random()<.5)emit(SPARK,this.px+rand(-1,1),y,this.pz+rand(-1,1),0,-2,0,Math.random()<.5?col:WHITE,.5,1,0);
+      return t<this.T;},
+    cast(s,A){if(o.gh||NFS.inTwin||s===sk||SG1_RIFTNO[s.F.id]||this.px==null)return;const x=this.px,z=this.pz;
+      later(.25,()=>{if(P.dead||mode!=='game')return;fxBeam(new THREE.Vector3(x,3.2,z),new THREE.Vector3(x,.2,z),col,.3,.22);fxRing(x,z,.3,1.6,col,.35);colBurst(col,x,3.2,z,8,3,.35,2);
+        const op=P.pos.clone(),of=P.face,ot=target,k0=ST.dmg;P.pos.set(x,0,z);NFS.inTwin=1;ST.dmg=k0*1.4;try{cast(s,A,true);}finally{ST.dmg=k0;P.pos.copy(op);P.face=of;target=ot;NFS.inTwin=0;}});},
+    end(){dropMesh(ring);dropMesh(core);dropMesh(rn);}});}
+NFRUN.s_rift=(sk,A,i,dmg,R,col,cl)=>{if(cl)return;if(sg1Merge(sk,'rift',e=>{e.T+=1;}))return;arcRift(sk,{});};
+NFCAN.s_rift=sk=>countNear(P.pos,12)>=3&&!(NFS.ents||[]).some(e=>e.sg1k==='rift'&&!e.gh)?'ok':'target';
+NFPEER.s_rift=(sk,m,pr)=>{arcRift(sk,{gh:1,home:sg1Peer(pr)});};
+// Резонатор: каждые 150 потраченной маны следующая чара ×1,5 и перезаряжается вдвое быстрее; три руны вокруг героя показывают заряд
+NFP.s_resonator={build(a){a.acc=0;a.rdy=0;a.bs=-1;a.bt=0;a.m=[0,1,2].map(()=>{const m=nfMesh('rune',a.sk.E.color,.25);m.scale.set(.4,1,.4);return m;});},
+  drop(a){for(const m of a.m)dropMesh(m);},
+  tick(a,dt){const n=a.rdy?3:Math.min(3,Math.floor(a.acc/50)),y=(NFS.heroY||0)+.14;
+    for(let k=0;k<3;k++){const m=a.m[k],an=time*1.3+k*TAU/3,on=k<n,s=on?(a.rdy?.62+.06*Math.sin(time*8):.52):.36;
+      m.position.set(P.pos.x+Math.cos(an)*1.2,y,P.pos.z+Math.sin(an)*1.2);m.rotation.y=-an*2;m.scale.set(s,1,s);m.material.opacity=on?1:.22;}
+    if(a.rdy&&Math.random()<.35){const an=time*1.3+(Math.random()*3|0)*TAU/3;emit(SPARK,P.pos.x+Math.cos(an)*1.2,.3,P.pos.z+Math.sin(an)*1.2,0,1.3,0,a.sk.E.color,.45,-.5,1);}},
+  dmgOut(a,en,el,o){if(!o.sk||!o.sk.active||o.dot)return 1;if(o.sk.id===a.bs&&time<a.bt)return 1.5;if(a.rdy&&Math.abs((P.cds[o.sk.id]||0)-skCd(o.sk))<1e-6)return 1.5;return 1;},
+  cast(a,sk){if(NFS.inTwin)return;const col=a.sk.E.color;
+    if(a.rdy){a.rdy=0;a.acc=0;a.bs=sk.id;a.bt=time+3;P.cds[sk.id]=(P.cds[sk.id]||0)*.5;fxShock(P.pos.x,P.pos.z,3,col,.4);for(let k=0;k<3;k++){const an=time*1.3+k*TAU/3;fxBurst(P.pos.x+Math.cos(an)*1.2,.4,P.pos.z+Math.sin(an)*1.2,.7,col,.25,.9);}
+      float(P.pos,'Резонанс ×1.5','#c8dcff',14);return;}
+    a.acc+=skMana(sk);if(a.acc>=150){a.rdy=1;fxPillar(P.pos.x,P.pos.z,.9,3,col,.5);fxRing(P.pos.x,P.pos.z,.4,1.6,col,.4,.8);float(P.pos,'Резонатор готов','#c8dcff',13);}},
+  hud(a){return a.rdy?{v:'✓'}:{t:Math.min(1,a.acc/150)};}};
 // ----- /A-фирменные-1 -----
 //
 //
