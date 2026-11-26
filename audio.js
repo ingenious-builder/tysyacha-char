@@ -1,7 +1,10 @@
 /* «Тысяча чар» — звук (25.11; живые записи — 26.11).
    Звуки, фоны регионов и музыка затишья синтезируются прямо в игре (DSP на JS → AudioBuffer, WebAudio).
-   Живые записи (26.11) поверх синтеза — assets/audio/sfx1.mp3, sfx2.mp3 (нарезка по таблице REC), музыка боя battle.mp3:
-   Kenney (kenney.nl: Impact Sounds, RPG Audio, Interface Sounds), JaggedStone, Darsycho, pauliuw (opengameart.org), «Heartfelt Battle» — request; всё CC0.
+   Живые записи (26.11) поверх синтеза — assets/audio/sfx1.mp3, sfx2.mp3, sfx3.mp3 (нарезка по таблице REC), музыка боя battle.mp3,
+   фоны регионов amb_cave.mp3, amb_forest.mp3, amb_wind.mp3 (петли, грузятся только своего региона):
+   Kenney (kenney.nl: Impact Sounds, RPG Audio, Interface Sounds), JaggedStone (Magic Spell SFX, Loopable Dungeon Ambience), Darsycho, pauliuw,
+   artisticdude (RPG Sound Pack), qubodup (Earth Element Magic Spell), FGResources (CC0 Background Ambience), Spring Spring (Birds and Wind)
+   (opengameart.org), «Heartfelt Battle» — request; всё CC0. Раунд 3 — _check/audio3/СКАЧАНО.md.
    Пока запись не загрузилась (или её нет у ключа) — играет прежний синтез. Сборка записей — _check/audio2/tools/build.py.
    Музыка босса — «Volatile Reaction», Kevin MacLeod (incompetech.com), CC BY 4.0 → assets/audio/boss.mp3.
    В index.html — только обёртки событий (блок «ЗВУК») и window.TCSND; настройки и строки «Благодарностей» этот файл ставит сам.
@@ -461,8 +464,8 @@ function warm(){const first=['ui_click','sw_light','sw_blade','sw_heavy','bow','
 // Декодирование — OfflineAudioContext на частоте записи (24 кГц: вдвое меньше памяти, чем 48 кГц); не вышло — общим контекстом.
 // Нарезка — в простое по ключу (≤ 6 мс за раз): копия куска × множитель громкости (float, без обрезки), края 3 мс; готовый ключ заменяет синтез.
 // Записи ещё нет (первая загрузка, нет сети) — играет синтез этого ключа, как раньше.
-const REC={f:['sfx1.mp3','sfx2.mp3'],mk:0.05,k:{hit_f:[0,0.265,0.295,1.579,0.697,0.28,1.656,1.105,0.365,1.625,1.609,0.31,1.604],hurt:[0,2.041,0.665,1.429,2.833,0.51,1.335,3.481,0.56,1.251],hit_p:[0,4.177,0.1611,1.513,4.465,0.1611,1.775,4.753,0.1,1.824],crit:[0,4.993,0.255,2.098,5.377,0.185,2.101,5.689,0.155,2.101],shield_hit:[0,5.977,0.21,1.586,6.313,0.115,2.051,6.553,0.19,1.673],th:[0,6.865,0.5268,1.608,7.513,0.515,1.452,8.161,0.465,1.418],d_big:[0,8.761,0.595,1.704,9.481,0.565,2.101],d_stone:[0,10.177,0.555,1.083,10.873,0.545,1.181,11.545,0.54,1.081],d_bone:[0,12.217,0.27,1.568,12.625,0.295,1.454,13.057,0.295,1.791],d_flesh:[0,13.489,0.395,1.304,14.017,0.39,1.185,14.545,0.395,1.165,15.073,0.395,1.438],d_slime:[0,15.601,0.432,1.053,16.153,0.5995,1.053],d_beast:[0,16.873,0.585,1.129,17.593,0.5994,1.053,18.313,0.945,1.053],d_bat:[0,19.393,0.55,1.053,20.065,0.45,1.272],tw:[0,20.641,0.835,1.088,21.601,0.83,1.053,22.561,0.83,1.115,23.521,0.845,1.053],shield_break:[0,24.505,0.385,1.617,25.033,0.39,1.661],h_ice:[0,25.561,0.22,1.775,25.921,0.215,1.665,26.257,0.215,1.61],h_earth:[0,26.593,0.395,1.754,27.121,0.38,2.101,27.625,0.385,2.101],h_light:[0,28.153,0.545,2.101,28.825,0.56,2.101],h_arcane:[0,29.521,0.58,1.053,30.241,0.58,1.069],h_shadow:[0,30.961,0.75,1.053,31.849,0.75,1.053],sw_blade:[0,32.737,0.28,1.053,33.145,0.23,1.053],sw_light:[0,33.505,0.21,1.053,33.841,0.175,1.053],sw_heavy:[0,34.153,0.39,1.053,34.681,0.34,1.053],w_tick:[0,35.161,0.125,2.032],d_ghost:[1,0.265,2.14,1.481],twb:[1,2.545,1.33,1.053,4.009,1.315,1.053,5.449,1.27,1.053],b_roar:[1,6.841,2.995,1.053],b_phase:[1,9.961,1.4703,1.053],b_death:[1,11.569,3.305,1.053],r_epic:[1,15.001,0.795,1.126],r_leg:[1,15.937,1.285,1.052],c_summon:[1,17.353,1.62,1.053],c_barrier:[1,19.105,0.985,1.053],heal:[1,20.233,0.985,1.053],ui_lu:[1,21.361,1.08,1.053],ui_click:[1,22.561,0.085,2.101,22.777,0.08,2.101],ui_book:[1,22.993,0.735,2.646],ui_bookc:[1,23.857,0.2251,2.646],chest:[1,24.217,1.335,2.646],ess:[1,25.681,0.2755,2.101,26.089,0.2932,1.944],ess_big:[1,26.521,0.81,1.758],scroll:[1,27.457,0.4305,2.612]}},BAT={f:'battle.mp3',t0:0.25,P:153.6,sr:32000,bar:1.6,g:.9,g2:1.12};
-const AV=4,RECST=[0,0],REC_ON={};let recTry=0;
+const REC={f:['sfx1.mp3','sfx2.mp3','sfx3.mp3'],mk:0.05,k:{hit_f:[0,0.265,0.295,1.579,0.697,0.28,1.656,1.105,0.365,1.625,1.609,0.31,1.604],hurt:[0,2.041,0.665,1.429,2.833,0.51,1.335,3.481,0.56,1.251],hit_p:[0,4.177,0.1611,1.513,4.465,0.1611,1.775,4.753,0.1,1.824],crit:[0,4.993,0.255,2.098,5.377,0.185,2.101,5.689,0.155,2.101],shield_hit:[0,5.977,0.21,1.586,6.313,0.115,2.051,6.553,0.19,1.673],th:[0,6.865,0.5268,1.608,7.513,0.515,1.452,8.161,0.465,1.418],d_big:[0,8.761,0.595,1.704,9.481,0.565,2.101],d_stone:[0,10.177,0.555,1.083,10.873,0.545,1.181,11.545,0.54,1.081],d_bone:[0,12.217,0.27,1.568,12.625,0.295,1.454,13.057,0.295,1.791],d_flesh:[0,13.489,0.395,1.304,14.017,0.39,1.185,14.545,0.395,1.165,15.073,0.395,1.438],d_slime:[0,15.601,0.432,1.053,16.153,0.5995,1.053],d_beast:[0,16.873,0.585,1.129,17.593,0.5994,1.053,18.313,0.945,1.053],d_bat:[0,19.393,0.55,1.053,20.065,0.45,1.272],tw:[0,20.641,0.835,1.088,21.601,0.83,1.053,22.561,0.83,1.115,23.521,0.845,1.053],shield_break:[0,24.505,0.385,1.617,25.033,0.39,1.661],h_ice:[0,25.561,0.22,1.775,25.921,0.215,1.665,26.257,0.215,1.61],h_earth:[0,26.593,0.395,1.754,27.121,0.38,2.101,27.625,0.385,2.101],h_light:[0,28.153,0.545,2.101,28.825,0.56,2.101],h_arcane:[0,29.521,0.58,1.053,30.241,0.58,1.069],h_shadow:[0,30.961,0.75,1.053,31.849,0.75,1.053],sw_blade:[0,32.737,0.28,1.053,33.145,0.23,1.053],sw_light:[0,33.505,0.21,1.053,33.841,0.175,1.053],sw_heavy:[0,34.153,0.39,1.053,34.681,0.34,1.053],w_tick:[0,35.161,0.125,2.032],d_ghost:[1,0.265,2.14,1.481],twb:[1,2.545,1.33,1.053,4.009,1.315,1.053,5.449,1.27,1.053],b_roar:[1,6.841,2.995,1.053],b_phase:[1,9.961,1.4703,1.053],b_death:[1,11.569,3.305,1.053],r_epic:[1,15.001,0.795,1.126],r_leg:[1,15.937,1.285,1.052],c_summon:[1,17.353,1.62,1.053],c_barrier:[1,19.105,0.985,1.053],heal:[1,20.233,0.985,1.053],ui_lu:[1,21.361,1.08,1.053],ui_click:[1,22.561,0.085,2.101,22.777,0.08,2.101],ui_book:[1,22.993,0.735,2.646],ui_bookc:[1,23.857,0.2251,2.646],chest:[1,24.217,1.335,2.646],ess:[1,25.681,0.2755,2.101,26.089,0.2932,1.944],ess_big:[1,26.521,0.81,1.758],scroll:[1,27.457,0.4305,2.612],h_fire:[2,0.265,0.36,1.053,0.745,0.32,1.053,1.201,0.395,1.053],h_poison:[2,1.729,0.385,1.302,2.257,0.39,1.278,2.785,0.525,1.136],h_wind:[2,3.433,0.385,1.053,3.961,0.385,1.053,4.489,0.4,1.053],'h_ice+':[2,5.017,0.46,1.053,5.617,0.54,1.053],'h_earth+':[2,6.289,0.42,1.053,6.841,0.5,1.053]}},BAT={f:'battle.mp3',t0:0.25,P:153.6,sr:32000,bar:1.6,g:.9,g2:1.12};
+const AV=5,RECST=[0,0,0],REC_ON={};let recTry=0;
 const fetchAB=f=>fetch('assets/audio/'+f+'?av='+AV).then(r=>{if(!r.ok)throw new Error('http '+r.status);return r.arrayBuffer();});
 function decodeAt(ab,sr,ok,no){let c=null;try{const O=window.OfflineAudioContext||window.webkitOfflineAudioContext;if(O)c=new O(1,1,sr);}catch(e){c=null;}
   const run=(d,fail)=>{let done=false;const y=b=>{if(!done){done=true;ok(b);}},n=e=>{if(!done){done=true;fail(e);}};
@@ -471,11 +474,11 @@ function decodeAt(ab,sr,ok,no){let c=null;try{const O=window.OfflineAudioContext
 function recShift(b){const x=b.getChannelData(0),n=Math.min(x.length,Math.round(.2*b.sampleRate));let mi=0,mv=0;
   for(let i=0;i<n;i++){const v=x[i]<0?-x[i]:x[i];if(v>mv){mv=v;mi=i;}}return mv>.15?mi/b.sampleRate-REC.mk:0;}
 function recCut(b,sp){const x=b.getChannelData(0),sr=b.sampleRate,dt=recShift(b),E=Math.round(.003*sr);
-  for(const k in REC.k){const r=REC.k[k];if(r[0]!==sp)continue;
+  for(const kk in REC.k){const r=REC.k[kk];if(r[0]!==sp)continue;const k=kk.replace(/\+$/,'');
     enq(()=>{const arr=[];for(let j=1;j+2<r.length;j+=3){const i0=Math.max(0,Math.round((r[j]+dt-.004)*sr)),n=Math.min(x.length-i0,Math.round((r[j+1]+.008)*sr)),gm=r[j+2];if(n<=2*E)continue;
         const ab=ctx.createBuffer(1,n,sr),y=ab.getChannelData(0);for(let i=0;i<n;i++)y[i]=x[i0+i]*gm;
         for(let i=0;i<E;i++){const w=.5-.5*Math.cos(Math.PI*i/E);y[i]*=w;y[n-1-i]*=w;}arr.push(ab);}
-      if(arr.length){arr.base=1;arr.loop=false;BUF[k]=arr;REC_ON[k]=1;}});}}
+      if(arr.length){const all=kk!==k&&REC_ON[k]&&BUF[k]?BUF[k].concat(arr):arr;all.base=1;all.loop=false;BUF[k]=all;REC_ON[k]=1;}});}}
 function recLoad(i){if(i>=REC.f.length){batLoad();return;}if(RECST[i]||!ctx)return;RECST[i]=1;
   fetchAB(REC.f[i])
    .then(ab=>new Promise((ok,no)=>decodeAt(ab,24000,ok,no))).then(b=>{recCut(b,i);RECST[i]=2;recLoad(i+1);})
@@ -574,19 +577,31 @@ function musTick(){const t=now(),ahead=t+.5,live=k=>MUS.cur===k||t<(MUS.off[k]||
   if(MUS.tense){if(live('tense'))tenseTick(t,ahead);else{if(MUS.tense.rec)batStop(MUS.tense);MUS.tense=null;}}
   if(MUS.boss){MUS.boss.srcs=MUS.boss.srcs.filter(v=>v.end>t);bossRun();}}
 // ---------- фон регионов ----------
-const AMB={kind:'',lay:null,evN:{},beds:{},want:''};
+const AMB={kind:'',tag:'',lay:null,evN:{},beds:{},want:'',rec:{},recSt:{},recTry:{}};
+// записи фона (26.11, раунд 3): петли амбиента; в файле [хвост 0,6 с][петля P][голова 0,6 с] — любой сдвиг декодера шва не создаёт, играем loopStart=t0, loopEnd=t0+P.
+// Какой регион какой записью: пещеры и тёмные края — подземелье, леса — лес, горы, небо и лёд — ветер; остальным (болото, пепел, вулкан, мёртвый город…) — прежний синтез.
+const AREC_F={cave:{f:'amb_cave.mp3',P:91.3098,t0:0.6,sr:22050},forest:{f:'amb_forest.mp3',P:41.736,t0:0.6,sr:22050},wind:{f:'amb_wind.mp3',P:15.5,t0:0.6,sr:22050}};
+const AREC={cave:'cave',barrow:'cave',moans:'cave',abyss:'cave',crystal:'cave',forest:'forest',wolves:'forest',windy:'wind',sky:'wind',ice:'wind'};
+const AREC_EV={cave:[['a_moan',35,70,.2]]};    // в записи подземелья свои капли — синтезные убраны
+function ambRecLoad(k){const key=AREC[k];if(!key||!ctx||AMB.rec[key])return;const F=AREC_F[key],st=AMB.recSt[key]|0;if(st===1||st===3)return;AMB.recSt[key]=1;
+  fetchAB(F.f).then(ab=>new Promise((ok,no)=>decodeAt(ab,F.sr,ok,no))).then(b=>{AMB.rec[key]=b;AMB.recSt[key]=2;})
+   .catch(()=>{AMB.recSt[key]=3;STAT.ambErr=(STAT.ambErr|0)+1;if((AMB.recTry[key]=(AMB.recTry[key]|0)+1)<3)setTimeout(()=>{if(AMB.recSt[key]===3)AMB.recSt[key]=0;},30000);});}
+function ambRecKeep(){for(const q of Object.keys(AMB.rec))if(q!==AREC[AMB.want]&&q!==AREC[AMB.kind]){delete AMB.rec[q];AMB.recSt[q]=0;}}
 const bedBuf=(k,i)=>AMB.beds[k+'#'+i]||null;
 function bedKeep(){const ks=Object.keys(AMB.beds);if(ks.length>8)for(const q of ks.slice(0,ks.length-8))if(!q.startsWith(AMB.want+'#')&&!q.startsWith(AMB.kind+'#'))delete AMB.beds[q];}
 function bedGen(k){for(let i=0;i<2;i++){const key=k+'#'+i;if(AMB.beds[key]||PEND[key])continue;
   if(WK){PEND[key]=1;wkPost({bed:k,i,sr:SRA},m=>{delete PEND[key];if(m.err){STAT.errs++;return;}AMB.beds[key]=mkAB(m.x,SRA);STAT.gen++;STAT.wkMs=(STAT.wkMs||0)+m.ms;bedKeep();});continue;}
   enq(()=>{if(AMB.beds[key])return;const t0=performance.now();AMB.beds[key]=mkAB(bedArr(k,i,SRA),SRA);genStat(t0);bedKeep();},true);}}
-function ambTick(kind){const t=now();if(kind!==AMB.want){AMB.want=kind;if(kind)bedGen(kind);}
-  if(AMB.want!==AMB.kind&&(!AMB.want||(bedBuf(AMB.want,0)&&bedBuf(AMB.want,1)))){
-    if(AMB.lay){const o=AMB.lay;o.g.gain.setTargetAtTime(0,t,1);for(const s of o.s)try{s.stop(t+5);}catch(e){}o.s[0].onended=()=>{for(const n of o.s.concat(o.p,[o.g]))try{n.disconnect();}catch(e){}};}AMB.lay=null;AMB.kind=AMB.want;AMB.evN={};
+function ambTick(kind){const t=now();if(kind!==AMB.want){AMB.want=kind;if(kind&&!(AREC[kind]&&AMB.rec[AREC[kind]]))bedGen(kind);}
+  if(AMB.want)ambRecLoad(AMB.want);
+  const rb=AMB.want&&AREC[AMB.want]?AMB.rec[AREC[AMB.want]]:null,tag=AMB.want+(rb?'@':'');
+  if(tag!==AMB.tag&&(!AMB.want||rb||(bedBuf(AMB.want,0)&&bedBuf(AMB.want,1)))){
+    if(AMB.lay){const o=AMB.lay;o.g.gain.setTargetAtTime(0,t,1);for(const s of o.s)try{s.stop(t+5);}catch(e){}o.s[0].onended=()=>{for(const n of o.s.concat(o.p,[o.g]))try{n.disconnect();}catch(e){}};}AMB.lay=null;AMB.kind=AMB.want;AMB.tag=tag;AMB.evN={};ambRecKeep();
     if(AMB.kind){const K=AMBK[AMB.kind]||AMBK.forest,g=ctx.createGain();g.gain.value=0;g.gain.setTargetAtTime(K.g,t,1);g.connect(busA);const ss=[],pp=[];
-      for(let i=0;i<2;i++){const s=ctx.createBufferSource();s.buffer=bedBuf(AMB.kind,i);s.loop=true;let out=s;if(ctx.createStereoPanner){const p=ctx.createStereoPanner();p.pan.value=i?.55:-.55;s.connect(p);out=p;pp.push(p);}out.connect(g);s.start(t+.02,Math.random()*3);ss.push(s);}
+      if(rb){const R=AREC_F[AREC[AMB.kind]],s=ctx.createBufferSource();s.buffer=rb;s.loop=true;s.loopStart=R.t0;s.loopEnd=Math.min(rb.duration,R.t0+R.P);s.connect(g);s.start(t+.02,R.t0+Math.random()*(s.loopEnd-R.t0));ss.push(s);}
+      else for(let i=0;i<2;i++){const s=ctx.createBufferSource();s.buffer=bedBuf(AMB.kind,i);s.loop=true;let out=s;if(ctx.createStereoPanner){const p=ctx.createStereoPanner();p.pan.value=i?.55:-.55;s.connect(p);out=p;pp.push(p);}out.connect(g);s.start(t+.02,Math.random()*3);ss.push(s);}
       AMB.lay={g,s:ss,p:pp};}}
-  if(AMB.kind&&AMB.lay){const K=AMBK[AMB.kind]||{ev:[]};for(const e of K.ev){const n=AMB.evN[e[0]];if(n==null){AMB.evN[e[0]]=t+rr(e[1]*.3,e[2]*.6);continue;}
+  if(AMB.kind&&AMB.lay){const K=AMBK[AMB.kind]||{ev:[]};for(const e of (AMB.tag.slice(-1)==='@'&&AREC_EV[AMB.kind])||K.ev){const n=AMB.evN[e[0]];if(n==null){AMB.evN[e[0]]=t+rr(e[1]*.3,e[2]*.6);continue;}
       if(t>=n){AMB.evN[e[0]]=t+rr(e[1],e[2]);if(!BUF[e[0]]){reqBuf(e[0]);continue;}play(e[0],{g:e[3]*rr(.7,1.1),pan:rr(-.8,.8),bus:busA,key:'amb',max:3,pri:0,jit:.08});}}}}
 // ---------- тик: состояние игры, слушатель, фоны, музыка, отсчёт ----------
 let tickT=0,prev={},hold=0,lastHeart=0,cdLast=9,stT=0;
@@ -594,7 +609,7 @@ function tick(){if(!ctx||!A||!A.st)return;let s;try{s=A.st();}catch(e){return;}S
   try{LX=s.x;LZ=s.z;if(isFinite(s.yaw)){RX=Math.cos(s.yaw);RZ=-Math.sin(s.yaw);}
     // фон
     let amb='';if(s.mode==='select')amb='camp';else if(s.mode==='game'){if(s.play==='world')amb=ZONE_AMB[clamp(s.zone|0,0,9)];else if(s.gorge>=0)amb=GORGE_AMB[s.gorge]||'cave';else amb='cave';}
-    ambTick(amb);
+    ambTick(AMB.forced||amb);
     // музыка
     const zb=s.play==='world'?[0,6,7].includes(s.zone):[0,3,11].includes(s.gorge),zd=s.play==='world'?[2,8,9].includes(s.zone):[2,7,8,9].includes(s.gorge);
     MUS.mood=s.mode==='select'||zb?'b':zd?'d':'n';
@@ -678,7 +693,7 @@ const API={
  // настройки и отладка
  opt:()=>Object.assign({},OPT),
  state:()=>({ctx:ctx?ctx.state:null,sr:ctx?ctx.sampleRate:0,unlocked,worker:!!WK,pend:Object.keys(PEND).length,allowed:allowed(),voices:VO.length,buffers:Object.keys(BUF).length,beds:Object.keys(AMB.beds).length,queue:GENQ.length,amb:AMB.kind,mus:MUS.cur,mood:MUS.mood,boss:!!MUS.bossBuf,bat:!!MUS.batBuf,batRec:!!(MUS.tense&&MUS.tense.rec),rec:Object.keys(REC_ON).length,recSt:RECST.slice(),stat:Object.assign({},STAT),session:navigator.audioSession?navigator.audioSession.type:'нет'}),
- dbg:{L,play:(n,o)=>play(n,o||{}),force:w=>{MUS.forced=w||'';if(w==='boss')bossLoad();if(w==='tense')batLoad();},inten:k=>{MUS.fk=k|0;},bufs:k=>BUF[k]?BUF[k].slice():[],rec:()=>({st:RECST.slice(),on:Object.keys(REC_ON),bat:!!MUS.batBuf,batOff:MUS.batOff,batPos:MUS.batPos||0}),meter:()=>{if(!meter)return null;const a=new Float32Array(meter.fftSize);meter.getFloatTimeDomainData(a);let p=0,e=0;for(const v of a){p=Math.max(p,Math.abs(v));e+=v*v;}return {peak:p,rms:Math.sqrt(e/a.length)};},
+ dbg:{ambSet:k=>{AMB.forced=k||'';},ambRec:()=>({kind:AMB.kind,tag:AMB.tag,rec:Object.keys(AMB.rec),st:Object.assign({},AMB.recSt),loop:AMB.lay&&AMB.lay.s[0].loop,ls:AMB.lay&&AMB.lay.s[0].loopStart,le:AMB.lay&&AMB.lay.s[0].loopEnd,ns:AMB.lay&&AMB.lay.s.length}),L,play:(n,o)=>play(n,o||{}),force:w=>{MUS.forced=w||'';if(w==='boss')bossLoad();if(w==='tense')batLoad();},inten:k=>{MUS.fk=k|0;},bufs:k=>BUF[k]?BUF[k].slice():[],rec:()=>({st:RECST.slice(),on:Object.keys(REC_ON),bat:!!MUS.batBuf,batOff:MUS.batOff,batPos:MUS.batPos||0}),meter:()=>{if(!meter)return null;const a=new Float32Array(meter.fftSize);meter.getFloatTimeDomainData(a);let p=0,e=0;for(const v of a){p=Math.max(p,Math.abs(v));e+=v*v;}return {peak:p,rms:Math.sqrt(e/a.length)};},
    genAll:()=>{for(const n in L)if(!BUF[n])reqBuf(n);},boss:()=>MUS.boss&&{next:+(MUS.boss.next-now()).toFixed(3),srcs:MUS.boss.srcs.length,P:BOSS_P,dur:MUS.bossBuf?MUS.bossBuf.duration:0},q:()=>GENQ.length+Object.keys(PEND).length,by:()=>Object.assign({},BY),set:o=>{Object.assign(OPT,o);applyVol();},mus:()=>({cur:MUS.cur,inten:MUS.inten,mood:MUS.mood})},
 };
 G.TCSND=API;
@@ -702,7 +717,7 @@ function uiInit(){const body=document.getElementById('setBody');if(!body||docume
     const p1=document.createElement('p');p1.className='hint';p1.innerHTML='Музыка босса: «Volatile Reaction» — Kevin MacLeod (<a href="https://incompetech.com" target="_blank" rel="noopener">incompetech.com</a>), лицензия <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">Creative Commons: By Attribution 4.0</a>.';
     const a=(u,t)=>'<a href="'+u+'" target="_blank" rel="noopener">'+t+'</a>',oga='https://opengameart.org/content/';
     const p3=document.createElement('p');p3.className='hint';p3.innerHTML='Музыка боя: «Heartfelt Battle» — request ('+a('http://www.request.moe','request.moe')+', '+a(oga+'heartfelt-battle-loopable-fantasy-stringspianohorn','OpenGameArt')+'), CC0.';
-    const p4=document.createElement('p');p4.className='hint';p4.innerHTML='Звуки: '+a('https://kenney.nl','Kenney')+' — Impact Sounds, RPG Audio, Interface Sounds (CC0); «Magic Spell SFX» — JaggedStone, «Monster snarls» и «Big scary troll sounds» — Darsycho, «Monster or beast sounds» — pauliuw ('+a('https://opengameart.org','OpenGameArt')+', CC0). Спасибо авторам!';
+    const p4=document.createElement('p');p4.className='hint';p4.innerHTML='Звуки: '+a('https://kenney.nl','Kenney')+' — Impact Sounds, RPG Audio, Interface Sounds (CC0); «Magic Spell SFX» и «Loopable Dungeon Ambience» — JaggedStone, «Monster snarls» и «Big scary troll sounds» — Darsycho, «Monster or beast sounds» — pauliuw, «RPG Sound Pack» — artisticdude, «Earth Element Magic Spell» — qubodup, «CC0 Background Ambience» — FGResources, «Birds and Wind» — Spring Spring ('+a('https://opengameart.org','OpenGameArt')+', CC0). Спасибо авторам!';
     const p2=document.createElement('p');p2.className='hint';p2.textContent='Остальные звуки, фоны регионов и музыка затишья — свои: синтезируются прямо в игре.';s.appendChild(p1);s.appendChild(p3);s.appendChild(p4);s.appendChild(p2);break;}}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',uiInit);else uiInit();
 // звук кнопок в меню и окнах (не в бою: джойстик, атака и слоты чар молчат); своё у книги и карт — щелчок тогда не нужен

@@ -1,0 +1,278 @@
+{
+ "before": {
+  "ctx": null,
+  "reqs": 0
+ },
+ "loaded": {
+  "ctx": "running",
+  "recSt": [
+   2,
+   2,
+   2
+  ],
+  "keys": 45,
+  "errs": 0,
+  "recErr": 0,
+  "has": [
+   "h_fire:3",
+   "h_poison:3",
+   "h_wind:3",
+   "h_ice:5",
+   "h_earth:5"
+  ]
+ },
+ "keys": {
+  "h_fire": "ok",
+  "h_poison": "ok",
+  "h_wind": "ok",
+  "h_ice": "ok",
+  "h_earth": "ok",
+  "h_storm": "ok",
+  "h_blood": "ok"
+ },
+ "cutCheck": {
+  "buffers": 19,
+  "bad": []
+ },
+ "regions": [
+  {
+   "want": "cave",
+   "reqs": "200 amb_forest.mp3?av=5,200 amb_cave.mp3?av=5",
+   "kind": "cave",
+   "tag": "cave@",
+   "rec": [
+    "cave"
+   ],
+   "st": {
+    "forest": 0,
+    "cave": 2
+   },
+   "loop": true,
+   "ls": 0.6,
+   "le": 91.90979999999999,
+   "ns": 1,
+   "voices": 0,
+   "errs": 0,
+   "ambErr": 0,
+   "buffers": 6
+  },
+  {
+   "want": "forest",
+   "reqs": "200 amb_forest.mp3?av=5,200 amb_cave.mp3?av=5,200 amb_forest.mp3?av=5",
+   "kind": "forest",
+   "tag": "forest@",
+   "rec": [
+    "forest"
+   ],
+   "st": {
+    "forest": 2,
+    "cave": 0
+   },
+   "loop": true,
+   "ls": 0.6,
+   "le": 42.336,
+   "ns": 1,
+   "voices": 0,
+   "errs": 0,
+   "ambErr": 0,
+   "buffers": 6
+  },
+  {
+   "want": "windy",
+   "reqs": "200 amb_forest.mp3?av=5,200 amb_cave.mp3?av=5,200 amb_forest.mp3?av=5,200 amb_wind.mp3?av=5",
+   "kind": "windy",
+   "tag": "windy@",
+   "rec": [
+    "wind"
+   ],
+   "st": {
+    "forest": 0,
+    "cave": 0,
+    "wind": 2
+   },
+   "loop": true,
+   "ls": 0.6,
+   "le": 16.1,
+   "ns": 1,
+   "voices": 0,
+   "errs": 0,
+   "ambErr": 0,
+   "buffers": 8
+  },
+  {
+   "want": "swamp",
+   "reqs": "200 amb_forest.mp3?av=5,200 amb_cave.mp3?av=5,200 amb_forest.mp3?av=5,200 amb_wind.mp3?av=5",
+   "kind": "swamp",
+   "tag": "swamp",
+   "rec": [],
+   "st": {
+    "forest": 0,
+    "cave": 0,
+    "wind": 0
+   },
+   "loop": true,
+   "ls": 0,
+   "le": 0,
+   "ns": 2,
+   "voices": 0,
+   "errs": 0,
+   "ambErr": 0,
+   "buffers": 8
+  },
+  {
+   "want": "abyss",
+   "reqs": "200 amb_forest.mp3?av=5,200 amb_cave.mp3?av=5,200 amb_forest.mp3?av=5,200 amb_wind.mp3?av=5,200 amb_cave.mp3?av=5",
+   "kind": "abyss",
+   "tag": "abyss@",
+   "rec": [
+    "cave"
+   ],
+   "st": {
+    "forest": 0,
+    "cave": 2,
+    "wind": 0
+   },
+   "loop": true,
+   "ls": 0.6,
+   "le": 91.90979999999999,
+   "ns": 1,
+   "voices": 0,
+   "errs": 0,
+   "ambErr": 0,
+   "buffers": 8
+  },
+  {
+   "want": "sky",
+   "reqs": "200 amb_forest.mp3?av=5,200 amb_cave.mp3?av=5,200 amb_forest.mp3?av=5,200 amb_wind.mp3?av=5,200 amb_cave.mp3?av=5,200 amb_wind.mp3?av=5",
+   "kind": "sky",
+   "tag": "sky@",
+   "rec": [
+    "wind"
+   ],
+   "st": {
+    "forest": 0,
+    "cave": 0,
+    "wind": 2
+   },
+   "loop": true,
+   "ls": 0.6,
+   "le": 16.1,
+   "ns": 1,
+   "voices": 0,
+   "errs": 0,
+   "ambErr": 0,
+   "buffers": 8
+  }
+ ],
+ "reqsAll": [
+  "200 sfx1.mp3?av=5",
+  "200 sfx2.mp3?av=5",
+  "200 sfx3.mp3?av=5",
+  "200 battle.mp3?av=5",
+  "200 amb_forest.mp3?av=5",
+  "200 amb_cave.mp3?av=5",
+  "200 amb_forest.mp3?av=5",
+  "200 amb_wind.mp3?av=5",
+  "200 amb_cave.mp3?av=5",
+  "200 amb_wind.mp3?av=5"
+ ],
+ "seam": {
+  "cave": {
+   "dur": 92.51,
+   "sr": 22050,
+   "sh": {
+    "0": {
+     "seamStep": 0.00732,
+     "p999": 0.02056,
+     "d2ratio": 8.69
+    },
+    "-0.1": {
+     "seamStep": 0.00311,
+     "p999": 0.02056,
+     "d2ratio": 7.26
+    },
+    "0.1": {
+     "seamStep": 0.00884,
+     "p999": 0.02056,
+     "d2ratio": 21.65
+    }
+   }
+  },
+  "forest": {
+   "dur": 42.936,
+   "sr": 22050,
+   "sh": {
+    "0": {
+     "seamStep": 0.05941,
+     "p999": 0.44529,
+     "d2ratio": 1.31
+    },
+    "-0.1": {
+     "seamStep": 0.05491,
+     "p999": 0.44529,
+     "d2ratio": 2.72
+    },
+    "0.1": {
+     "seamStep": 0.07975,
+     "p999": 0.44529,
+     "d2ratio": 2.59
+    }
+   }
+  },
+  "wind": {
+   "dur": 16.7,
+   "sr": 22050,
+   "sh": {
+    "0": {
+     "seamStep": 0.00364,
+     "p999": 0.01198,
+     "d2ratio": 2.09
+    },
+    "-0.1": {
+     "seamStep": 0.00327,
+     "p999": 0.01198,
+     "d2ratio": 2.48
+    },
+    "0.1": {
+     "seamStep": 0.0015,
+     "p999": 0.01157,
+     "d2ratio": 2.02
+    }
+   }
+  }
+ },
+ "credits": {
+  "kenney": true,
+  "jagged": true,
+  "artisticdude": true,
+  "qubodup": true,
+  "fg": true,
+  "spring": true,
+  "kevin": true
+ },
+ "errs": [],
+ "noNet": {
+  "recSt": [
+   3,
+   3,
+   3
+  ],
+  "amb": {
+   "kind": "cave",
+   "tag": "cave",
+   "rec": [],
+   "st": {
+    "cave": 3
+   },
+   "loop": true,
+   "ls": 0,
+   "le": 0,
+   "ns": 2
+  },
+  "beds": 2,
+  "fire": true,
+  "errs": 0,
+  "ambErr": 1,
+  "pageErrs": []
+ }
+}
