@@ -478,7 +478,7 @@ function recCut(b,sp){const x=b.getChannelData(0),sr=b.sampleRate,dt=recShift(b)
     enq(()=>{const arr=[];for(let j=1;j+2<r.length;j+=3){const i0=Math.max(0,Math.round((r[j]+dt-.004)*sr)),n=Math.min(x.length-i0,Math.round((r[j+1]+.008)*sr)),gm=r[j+2];if(n<=2*E)continue;
         const ab=ctx.createBuffer(1,n,sr),y=ab.getChannelData(0);for(let i=0;i<n;i++)y[i]=x[i0+i]*gm;
         for(let i=0;i<E;i++){const w=.5-.5*Math.cos(Math.PI*i/E);y[i]*=w;y[n-1-i]*=w;}arr.push(ab);}
-      if(arr.length){const all=kk!==k&&REC_ON[k]&&BUF[k]?BUF[k].concat(arr):arr;all.base=1;all.loop=false;BUF[k]=all;REC_ON[k]=1;}});}}
+      if(arr.length){const all=REC_ON[k]&&BUF[k]?BUF[k].concat(arr):arr;all.base=1;all.loop=false;BUF[k]=all;REC_ON[k]=1;}});}}
 function recLoad(i){if(i>=REC.f.length){batLoad();return;}if(RECST[i]||!ctx)return;RECST[i]=1;
   fetchAB(REC.f[i])
    .then(ab=>new Promise((ok,no)=>decodeAt(ab,24000,ok,no))).then(b=>{recCut(b,i);RECST[i]=2;recLoad(i+1);})
@@ -586,6 +586,9 @@ const AREC_EV={cave:[['a_moan',35,70,.2]]};    // в записи подземе
 function ambRecLoad(k){const key=AREC[k];if(!key||!ctx||AMB.rec[key])return;const F=AREC_F[key],st=AMB.recSt[key]|0;if(st===1||st===3)return;AMB.recSt[key]=1;
   fetchAB(F.f).then(ab=>new Promise((ok,no)=>decodeAt(ab,F.sr,ok,no))).then(b=>{AMB.rec[key]=b;AMB.recSt[key]=2;})
    .catch(()=>{AMB.recSt[key]=3;STAT.ambErr=(STAT.ambErr|0)+1;if((AMB.recTry[key]=(AMB.recTry[key]|0)+1)<3)setTimeout(()=>{if(AMB.recSt[key]===3)AMB.recSt[key]=0;},30000);});}
+// сеть вернулась — снова пробуем записи, которые не скачались офлайн (иначе до перезагрузки играл бы синтез)
+addEventListener('online',()=>{for(const q in AMB.recSt)if(AMB.recSt[q]===3){AMB.recSt[q]=0;AMB.recTry[q]=0;}recTry=0;
+  for(let i=0;i<RECST.length;i++)if(RECST[i]===3){RECST[i]=0;recLoad(i);}});
 function ambRecKeep(){for(const q of Object.keys(AMB.rec))if(q!==AREC[AMB.want]&&q!==AREC[AMB.kind]){delete AMB.rec[q];AMB.recSt[q]=0;}}
 const bedBuf=(k,i)=>AMB.beds[k+'#'+i]||null;
 function bedKeep(){const ks=Object.keys(AMB.beds);if(ks.length>8)for(const q of ks.slice(0,ks.length-8))if(!q.startsWith(AMB.want+'#')&&!q.startsWith(AMB.kind+'#'))delete AMB.beds[q];}
