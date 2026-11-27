@@ -2731,7 +2731,7 @@ const isWeak=sk=>isLearned(sk.id)&&!EQUIPPED.has(sk.id)&&rarOf(sk)===0&&!upgrade
 // мана −20 % и ЧЁРНОЕ ПЛАМЯ: удар невозможной поджигает врага (burn — доля удара в секунду, 3 с), враг умирает горящим — пламя
 // перекидывается на двух ближайших в 6 м (не дальше 3-го прыжка). Пламя в потоке толпы — +21 % урона (fl, стенд _check/rf/rf_browser.js dps).
 // Итог к той же легендарной: активные ×2,5, пассивные ×2,0 (было ×2,0/×1,7 по числу и ×1,7 в бою) + прыжки пламени по толпе.
-const IMP={dmg:1.65,pdmg:2,cd:.8,mana:.8,burn:.15,burnT:3,jump:2,jumpR:6,fl:1.2,tau:2400,cap:1.6,boss:2.2,mem:3,echo:300};
+const IMP={dmg:1.65,pdmg:2,cd:.8,mana:.8,burn:.15,burnT:3,jump:2,jumpR:6,fl:1.2,tau:1500,cap:1.6,boss:3.5,mem:3,echo:300};
 // пассивная невозможная (25.11, проверка rev_rf2: ×1,65–1,98 к легендарной, у кокона/оберега/рывка ×1,65) — без выгоды перезарядки и маны,
 // поэтому свой урон ×2 (IMP.pdmg): с чёрным пламенем ×2,0–2,4, как у активных ×2,4
 const impDm=sk=>sk.active?IMP.dmg:IMP.pdmg;
@@ -2976,18 +2976,28 @@ function makeGround(){
   'float v3=sin(p.x*.075+sin(p.y*.05)*2.6)*sin(p.y*.085+sin(p.x*.045)*2.2),ck=(1.-smoothstep(0.,.018,abs(v3)))*wT*smoothstep(.1,.5,sin(p.x*.021+1.3)*sin(p.y*.019-.4)+.35);t=mix(t,t*.4,ck);em+=vec3(.2,.9,.5)*ck*.36;}'+
   'return t;}\n';
   const m=new THREE.MeshLambertMaterial({map:groundTex});
-  m.customProgramCacheKey=()=>'tcground3';
-  m.onBeforeCompile=sh=>{regC.forEach((c,i)=>{sh.uniforms['gC'+i]={value:c};});sh.uniforms.gT=timeU;
+  m.customProgramCacheKey=()=>'tcground4';
+  m.onBeforeCompile=sh=>{regC.forEach((c,i)=>{sh.uniforms['gC'+i]={value:c};});sh.uniforms.gT=timeU;sh.uniforms.gR={value:REG_R.slice()};
     sh.vertexShader=sh.vertexShader.replace('void main() {','varying vec2 vWP;\nvoid main() {').replace('#include <begin_vertex>','#include <begin_vertex>\nvWP=(modelMatrix*vec4(transformed,1.)).xz;');
-    sh.fragmentShader=sh.fragmentShader.replace('void main() {',FS+'void main() {')
+    sh.fragmentShader=sh.fragmentShader.replace('void main() {',FS+'uniform float gR['+REG_R.length+'];float bdrF(vec2 p){float r=length(p),b=0.;for(int i=0;i<'+REG_R.length+';i++){float d=abs(r-gR[i]);b=max(b,(1.-smoothstep(.12,.55,d))+.35*(1.-smoothstep(.55,2.6,d)));}return b;}\n'+'void main() {')
       .replace('#include <map_fragment>','vec4 texelColor=texture2D(map,vWP*.104);texelColor=mapTexelToLinear(texelColor);diffuseColor*=texelColor;')
-      .replace('#include <color_fragment>','vec3 em_=vec3(0.);diffuseColor.rgb*=gcol(vWP,em_);')
+      .replace('#include <color_fragment>','vec3 em_=vec3(0.);diffuseColor.rgb*=gcol(vWP,em_);float bd_=bdrF(vWP);diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.08,.06,.05),min(1.,bd_)*.5);em_+=vec3(1.,.7,.28)*max(0.,bd_-.35)*.8;')
       .replace('#include <emissivemap_fragment>','#include <emissivemap_fragment>\ntotalEmissiveRadiance+=em_;');};
   const g=new THREE.PlaneGeometry(300,300,2,2);g.rotateX(-Math.PI/2);
   const ground=new THREE.Mesh(g,m);ground.receiveShadow=true;ground.frustumCulled=false;worldGroup.add(ground);return ground;}
 const _rnd0=Math.random;Math.random=mpRng(4242);
+// 27.11 (Артём: «между локациями не хватает границы»): граница края — светящаяся черта на земле (шейдер земли) и ряд каменных
+// столбиков с огоньками каждые ~10 м (золотые у ближних краёв, красные — с 4-го, как на мини-карте). Один вызов отрисовки на ряд
+function buildBorders(){
+  const cnt=REG_R.map(r=>Math.round(TAU*r/10)),n=cnt.reduce((a,b)=>a+b,0);
+  const pg=new THREE.CylinderGeometry(.22,.32,1.5,6).translate(0,.75,0),cg=new THREE.OctahedronGeometry(.26,0).translate(0,1.72,0);
+  const posts=new THREE.InstancedMesh(pg,new THREE.MeshLambertMaterial({color:0x6d6a66}),n),caps=new THREE.InstancedMesh(cg,new THREE.MeshBasicMaterial({color:0xffffff}),n);
+  const M4=new THREE.Matrix4(),cA=new THREE.Color(0xffd27a),cB=new THREE.Color(0xff5a3c);let k=0;
+  REG_R.forEach((r,i)=>{const c=cnt[i],a0=i*.37;for(let j=0;j<c;j++){const a=a0+j/c*TAU;M4.makeRotationY(-a);M4.setPosition(Math.cos(a)*r,0,Math.sin(a)*r);
+    posts.setMatrixAt(k,M4);caps.setMatrixAt(k,M4);caps.setColorAt(k,i>=3?cB:cA);k++;}});
+  posts.frustumCulled=caps.frustumCulled=false;posts.receiveShadow=true;worldGroup.add(posts,caps);}
 (function buildWorld(){
-  GROUND=makeGround();
+  GROUND=makeGround();buildBorders();
 
   const pine=merge([geoC(new THREE.CylinderGeometry(.16,.26,1.6,6).translate(0,.8,0),0x5a4030),geoC(new THREE.ConeGeometry(1.25,2.4,7).translate(0,2.3,0),0x2f6a4c,1),geoC(new THREE.ConeGeometry(.9,1.9,7).translate(0,3.5,0),0x377a55,1),geoC(new THREE.ConeGeometry(.55,1.2,7).translate(0,4.5,0),0x3f8a5e,1)]);
   const round=merge([geoC(new THREE.CylinderGeometry(.18,.28,1.8,6).translate(0,.9,0),0x5f4533),geoC(new THREE.IcosahedronGeometry(1.25,0).translate(0,2.6,0),0x4f8a4a,1),geoC(new THREE.IcosahedronGeometry(.8,0).translate(.6,3.1,.2),0x5a9a50,1),geoC(new THREE.IcosahedronGeometry(.7,0).translate(-.55,2.9,-.3),0x4a8044,1)]);
@@ -3889,7 +3899,8 @@ function spawnEnemy(tid,x,z,lv,o){o=o||{};const t=MOBS[tid],mdl=buildMob(tid);ri
     kb:new THREE.Vector3(),face:rand(0,TAU),stun:0,slowT:0,burnT:0,burnDps:0,poisT:0,poisN:0,poisDps:0,dotT:.5,marks:{},chill:0,chillT:0,blindT:0,shredT:0,frozenT:0,
     atkCd:rand(.6,1.5),skillCd:rand(1.5,3.5),skill2:rand(4,8),busy:0,aggro:!!t.boss||!!o.aggro,flash:0,dead:false,deathT:0,lunge:0,step:rand(0,6),slam:0,draw:0,
     home:new THREE.Vector3(x,0,z),wander:new THREE.Vector3(x,0,z),wT:rand(1,4),affix:new Set(),trailT:0,orbHit:{},moving:false,hy:t.h*sc};
-  en.hp=en.maxHp;en.pos.set(x,0,z);en.noDespawn=!!o.gorge;en.hunt=!!o.hunt;if(o.wvT&&PLAY==='world'&&!MPG)wvFit(en,o);  // живучесть по силе команды — до отправки гостю
+  en.hp=en.maxHp;en.pos.set(x,0,z);en.noDespawn=!!o.gorge;en.hunt=!!o.hunt;if(o.wvT&&PLAY==='world'&&!MPG)wvFit(en,o);
+  else if(t.boss&&!o.mini&&!o.gorge&&PLAY==='world'&&!MPG){const hf=Math.round(wvHm()*15*(wvCoop()?1.5:1));if(hf>en.maxHp)en.maxHp=en.hp=hf;}  // хозяин края — не меньше 15 сильнейших ударов  // живучесть по силе команды — до отправки гостю
   if(o.elite){const n=lv>=6?2:1;const pool=AFFIX.slice();if(o.affixList)o.affixList.forEach(a=>en.affix.add(a));else while(en.affix.size<n){const a=pool.splice(Math.random()*pool.length|0,1)[0];en.affix.add(a[0]);}
     if(en.affix.has('fast'))en.spd*=1.5;
     const ring=new THREE.Mesh(FXG.ring,new THREE.MeshBasicMaterial({color:0xf2c46b,transparent:true,opacity:.85,depthWrite:false,blending:THREE.AdditiveBlending}));ring.scale.set(t.r*1.9,1,t.r*1.9);ring.position.y=.06;en.g.add(ring);en.ring=ring;
@@ -3957,7 +3968,7 @@ const WV_BOSSES=[['wolfking','spiderq','colossus'],['queen','shroomk','hydra'],[
 // Хранится в долях роста врагов по уровню (foeScale), поэтому скачок уровня не сбивает оценку. Здоровье врага хода боя = T · сила · роль · уровень,
 // где T — сколько секунд он живёт под огнём команды. Так и Пиромант, и Паладин видят одинаково живучих врагов; урон врагов — прежний
 // (уровень, край, фаза). Пока сила не измерена (начало забега) — прежняя формула.
-const WV_T={calm:7,build:5,done:6,wave:4.5,champ:25,b3:22,b6:32,lord:45};
+const WV_T={calm:7,build:5,done:6,wave:4.5,champ:25,b3:34,b6:48,lord:70};
 // 25.11 напор волн по самочувствию команды: WV.dk — множитель урона врагов волны и босса. Прошли волну, ни разу не опустившись ниже 75 %
 // здоровья, — следующая бьёт на 10 % больнее; опускались ниже 30 % — на 12 % мягче; герой пал — на 25 % мягче (в пределах 0,8–1,7; босс — не больше 1,2).
 // Так стрелок, который не подпускает врагов, и хрупкий маг получают одинаково напряжённые волны. Вдвоём — по среднему двух героев.
@@ -3971,8 +3982,12 @@ function wvFit(en,o){const pw=(o.wvW&&WV.pwW>0?WV.pwW:WV.pw)*wvLk();if(!(pw>0)||
   // вдвоём враги крепче: оценка силы — в основном по одному герою на цель, а вдвоём бьют двоих сразу и босса — вместе
   const cp=wvCoop(),k=en.boss?(cp?1.5:1):(o.champ?1:wvTK(en)*(en.elite?1.75:1))*(cp?1.35:1);
   const h=Math.round(Math.max(f0*.2,o.wvT*pw*k*Math.pow(foeRelHp(Math.max(0,en.lv-strongLv())),.6)));
+  if(en.boss||o.champ)h=Math.max(h,Math.round(wvHm()*(en.boss?(o.wvT>=WV_T.lord?24:o.wvT>=WV_T.b6?15:10):6)*(cp?1.5:1)));
   en.maxHp=en.hp=h;en.wvF=1;if(h>f0&&!en.boss)en.xp=Math.round(en.xp*Math.min(2,Math.pow(h/f0,.35)));}  // живучий дольше под огнём — опыта больше, не больше ×2
-function wvPwHit(en,d){const g=en.pwL!=null?time-en.pwL:0;en.pwA=(en.pwA||0)+Math.min(g,1.5);en.pwL=time;en.pwD=(en.pwD||0)+(en.hp<0?d+en.hp:d);}  // добивающий удар — только до нуля, иначе один большой удар выглядел как огромный урон в секунду
+// 27.11: самый сильный удар героя за последние ~1,5 мин (полураспад 90 с). Сила по убийствам обычных врагов при ударах насмерть
+// с одного раза занижена во много раз (урон обрезан здоровьем врага) — босс и чемпион не меньше N таких ударов
+const wvHm=()=>(WV.hm||0)*Math.pow(.5,Math.max(0,time-(WV.hmT||0))/90);
+function wvPwHit(en,d){if(d>=wvHm()){WV.hm=d;WV.hmT=time;}const g=en.pwL!=null?time-en.pwL:0;en.pwA=(en.pwA||0)+Math.min(g,1.5);en.pwL=time;en.pwD=(en.pwD||0)+(en.hp<0?d+en.hp:d);}  // добивающий удар — только до нуля, иначе один большой удар выглядел как огромный урон в секунду
 function wvPwKill(en){if(en.mini||!en.pwD||en.pwD<en.maxHp*.5)return;const a=WV.pws;a.push(en.pwD/Math.max(.6,en.pwA+.25)/wvLk());if(a.length>24)a.shift();
   const b=a.slice().sort((x,y)=>x-y),i0=Math.floor(b.length/4),i1=Math.max(i0+1,b.length-Math.floor(b.length/4));let l=0;for(let i=i0;i<i1;i++)l+=Math.log(b[i]);WV.pw=Math.exp(l/(i1-i0));}
 const WV_RNG=new Set(['ranged','caster','sniper','spitter','blinker','icer','necro']);
@@ -3980,7 +3995,7 @@ const WV_RNG=new Set(['ranged','caster','sniper','spitter','blinker','icer','nec
 function mobRole(tid){const t=MOBS[tid],ai=t.ai;if(WV_RNG.has(ai))return 'r';if(ai==='brute'||ai==='golem'||ai==='shield'||t.hp>=120)return 't';
   if(t.spd>=4.3||ai==='wolf'||ai==='bat'||ai==='imp'||ai==='bomber')return 'f';return 'm';}
 const WV={z:-1,zT:0,st:'',cd:0,cd0:9,id:0,q:[],tot:0,spT:0,burst:0,champ:null,chT:0,dir:0,away:0,amb:2,ann:0,syncT:0,thT:0,g:null,gT:0,pw:0,pwW:0,pws:[],dk:1,cp:false,bossT:-9};
-function wvPwReset(){WV.pw=WV.pwW=0;WV.pws=[];WV.dk=1;}  // новый забег или другой герой — сила и напор меряются заново
+function wvPwReset(){WV.pw=WV.pwW=0;WV.hm=0;WV.pws=[];WV.dk=1;}  // новый забег или другой герой — сила и напор меряются заново
 function wvReset(){Object.assign(WV,{z:-1,zT:0,st:'',cd:0,q:[],tot:0,spT:0,burst:0,champ:null,chT:0,away:0,amb:2,ann:0,syncT:0,g:null});}
 const wvOn=()=>PLAY==='world'&&!!S;
 function wvSt(z){z=clamp(z|0,0,ZONES.length-1);const all=S.wv||(S.wv={});let s=all[z];
@@ -4351,16 +4366,19 @@ const DROPS_SIDE=()=>dropScan().side;   // варианты известных �
 // опустевший низ не выталкивает наверх легендарные. Сверху — график RAR_PLAN: изучено чар ступени ≥ r больше положенного к уровню —
 // шанс этой ступени ×0,35 за каждую лишнюю (много свитков, удачная серия — легендарки не приходят пачкой).
 // Итог (drop_sim, 160 забегов): легендарная — праздник до ~40-го, полный легендарный билд — к ~75–90-му, обычные и редкие — начало забега.
-const RAR_DROP=[[1,.15,.008,0],[10,.22,.02,0],[20,.28,.045,.0015],[30,.34,.07,.004],[40,.4,.1,.013],[50,.45,.14,.035],[60,.5,.18,.06],
-  [70,.55,.22,.08],[80,.6,.26,.1],[90,.64,.3,.12],[100,.68,.33,.14]];
+const RAR_DROP=[[1,.15,.008,0],[10,.22,.02,0],[20,.28,.045,.0015],[30,.34,.07,.004],[40,.4,.1,.025],[50,.45,.14,.05],[60,.5,.18,.08],
+  [70,.55,.22,.11],[80,.6,.26,.14],[90,.64,.3,.17],[100,.68,.33,.2]];
 // график: сколько чар ступени ≥ редкой, ≥ эпической и легендарных изучено к уровню при обычной игре. Обогнал график на n чар — шанс
 // ступени ×0,35ⁿ, отстал — ×(1 + 0,6·n), не больше ×3 (мало врагов и свитков — легендарки всё равно приходят к своим уровням)
-const RAR_PLAN=[[1,0,0,0],[10,5,.6,0],[20,9,2.5,.3],[30,13,5,.6],[40,17,8,1.6],[50,21,11,4.5],[60,25,14,8],[70,29,17,11],[80,33,20,14],[90,37,23,16],[100,41,26,17]];
+const RAR_PLAN=[[1,0,0,0],[10,5,.6,0],[20,9,2.5,.3],[30,13,5,.6],[40,17,9,2.5],[50,22,13,6],[60,27,17,9.5],[70,32,21,13],[80,37,25,17],[90,42,29,21],[100,47,33,25]];
 const rarTab=(T,L)=>{if(L<=T[0][0])return T[0].slice(1);for(let i=1;i<T.length;i++)if(L<=T[i][0]){const a=T[i-1],b=T[i],k=(L-a[0])/(b[0]-a[0]);return a.slice(1).map((v,j)=>v+(b[j+1]-v)*k);}return T[T.length-1].slice(1);};
 // изучено чар класса ступени ≥ r (невозможные — как легендарные)
 function rarHave(){const h=[0,0,0,0];for(const id of LEARNED){if(!CLS.pool.has(id))continue;const r=Math.min(3,rarBase(SKILLS[id]));for(let k=0;k<=r;k++)h[k]++;}return h;}
 // ступень этой карты/свитка: 0 обычная … 3 легендарная
-function rarRoll(L){L=L||S.lvl;const q=rarTab(RAR_DROP,L),pl=rarTab(RAR_PLAN,L),h=rarHave();
+// 27.11 (Артём: «в бездне уже последнего босса убиваю, а у меня до сих пор эпические чары»): редкость — не ниже уровня края,
+// где стоишь (Бездна — как 100-й и выше), график легендарных доходит до всех 25 к 100-му, свиток босса — легендарная, если есть
+const rarZoneL=()=>PLAY==='world'&&mode==='game'?LVB[clamp(zoneOf(P.pos.x,P.pos.z),0,LVB.length-1)][0]:0;
+function rarRoll(L){L=Math.max(L||S.lvl,rarZoneL());const q=rarTab(RAR_DROP,L),pl=rarTab(RAR_PLAN,L),h=rarHave();
   for(let r=1;r<=3;r++){const d=h[r]-pl[r-1];q[r-1]*=d>0?Math.pow(.35,d):Math.min(3,1-.6*d);}
   if(q[2]>q[1])q[1]=q[2];if(q[1]>q[0])q[0]=q[1];
   const u=Math.random();return u<q[2]?3:u<q[1]?2:u<q[0]?1:0;}
@@ -4380,7 +4398,7 @@ function learnRandom(src){const pool=S.sandbox?[]:rollPool();
   if(!pool.length&&!S.sandbox){if(impIgnite(src))return;const ro=rankOffers();if(ro.length){const sk=pickW(ro.map(s=>[s,dropPen(s)]));dropSeen([sk]);rankUp(sk);
     fxPillar(P.pos.x,P.pos.z,.8,5,GOLD,.7);if(scrollSaid(1))float(P.pos,'Свиток: ранг ↑ '+skName(sk),'#f2c46b',13);else toast('Свиток: новых сильных чар нет — ранг «'+skName(sk)+'» → '+rk(sk.id));return;}}
   if(!pool.length){S.ess+=60;if(scrollSaid(2))float(P.pos,'Свиток → +60 эссенции','#d4b0ff',13);else toast('Свиток рассыпался в 60 эссенции');return;}
-  let c=S.sandbox?pool:rarPick(pool,rarRoll());
+  let c=S.sandbox?pool:rarPick(pool,src==='boss'?3:rarRoll());
   // ступень не по уровню: полезные есть, но все — выше выпавшей ступени. Ранг чаре из билда, иначе вариант известной базы, иначе эссенция
   if(!c.length){const ro=rankOffers();if(ro.length){const sk=pickW(ro.map(s=>[s,dropPen(s)]));dropSeen([sk]);rankUp(sk);
       fxPillar(P.pos.x,P.pos.z,.8,5,GOLD,.7);if(scrollSaid(1))float(P.pos,'Свиток: ранг ↑ '+skName(sk),'#f2c46b',13);else toast('Свиток: ранг «'+skName(sk)+'» → '+rk(sk.id));return;}
@@ -4396,7 +4414,8 @@ const auraT=new Map(),revCd=new Map(),trailT=new Map();
 let procBudget=40,shake=0,hurtFlash=0,target=null,threat=0,BOSS=null;
 const THREAT_MAX=120;
 function heal(n){if(P.dead||n<=0)return;const over=P.hp+n-P.maxHp;P.hp=Math.min(P.maxHp,P.hp+n);if(over>0)cfOverheal(over);}
-function stunEn(en,t){en.stun=Math.max(en.stun,en.boss?t*.15:t);}
+// 27.11 (Артём: «часто станятся слишком»): оглушение короче, повторное в течение 3 с — ещё слабее (нет вечного оглушения)
+function stunEn(en,t){if(!(t>0))return;const k=en.boss?.15:en.champ||en.guard?.3:en.elite?.5:.65,dr=time-(en.stunAt||-99)<3?.4:1,v=t*k*dr;if(v>en.stun){en.stun=v;en.stunAt=time;}}
 function freezeEn(en,t){if(en.boss){stunEn(en,t);return;}stunEn(en,t);en.frozenT=Math.max(en.frozenT,t);}
 function applyStatus(en,el,dmg){if(cfStatus(en,el,dmg))return;switch(ELEMENTS[el].id){
   case 'fire':en.burnT=3;en.burnDps=Math.max(en.burnDps,dmg*.14);break;
@@ -4478,7 +4497,8 @@ function kill(en,depth,el,o){o=o||{};if(en.dead)return;
 }
 function fireBlast(x,z,r){fxBurst(x,.8,z,r,FIREC,.4,.7);fxRing(x,z,.5,r+.5,FIREC,.45);fxGlow(x,z,r*1.4,FIREC,.5,.9);elBurst(EL.fire,x,.6,z,24,1.3);puffs(x,.6,z,new THREE.Color(0x553322),6,1.5,1);shake=Math.max(shake,.3);}
 function hurtPlayer(d,src,o){o=o||{};if(P.dead||P.invulnT>0)return;let dmg=d*ST.armor;if(src&&src.blindT>0)dmg*=.7;dmg=Math.max(1,Math.round(dmg));
-  dmg=nfDmgIn(cfDmgIn(dmg,src,o),src,o);if(dmg<=0)return;dmg=Math.max(1,Math.round(dmg));   // без «−85.6000000000001» над героем
+  dmg=nfDmgIn(cfDmgIn(dmg,src,o),src,o);if(dmg<=0)return;dmg=Math.max(1,Math.round(dmg));
+  if(!o.dot)dmg=Math.min(dmg,Math.max(1,Math.round(P.maxHp*(src&&src.boss?.5:.35))));   // 27.11: «с одного удара убивают» — предел одного удара   // без «−85.6000000000001» над героем
   if(!o.dot)revengeProc(src);   // 25.11: «Ответ» — на удар по герою, и щит его не гасит (раньше щит Рыцаря смерти глушил шипы)
   if(P.shield>0){const a=Math.min(P.shield,dmg);P.shield-=a;dmg-=a;if(!o.dot)colBurst(elCol(P.shieldSk?P.shieldSk.e:-1),P.pos.x,1.2,P.pos.z,5,3,.3,0);if(P.shield<=0)shieldBurst();if(dmg<=0)return;}
   P.hp-=dmg;if(!o.dot)P.hitAt=time;hurtFlash=Math.min(1,hurtFlash+(o.dot?.12:.45));float(P.pos,'−'+Math.round(dmg),'#ff8a8a',o.dot?12:15);
@@ -5476,7 +5496,7 @@ const BPH_COL=[0xff8a3a,0xffc040,0xff40a0],BPH_RIM=[0xff7a6a,0xffb848,0xff3a7a],
 const DUSTC=new THREE.Color(0x4a3a2a),ACIDD=ACID.clone().multiplyScalar(.5),SPORED=SPOREC.clone().multiplyScalar(.5),WOLFC=new THREE.Color(0xc8d4ea),REAPC=new THREE.Color(0x6a9aff),BANSC=new THREE.Color(0xcfe0ff);
 const RMOT=(()=>{try{return matchMedia('(prefers-reduced-motion: reduce)').matches;}catch(e){return false;}})();
 let bossShowT=0;
-function bossScale(t){return clamp(5.4/(t.h||4),1.2,1.6);}   // низкие боссы растут сильнее: все не ниже ~5 м, заметно выше стражей и чемпионов
+function bossScale(t){return PLAY==='world'?clamp(8.6/(t.h||4),1.6,2.8):clamp(5.4/(t.h||4),1.2,1.6);}  // 27.11 (Артём: «боссов прям супер огромных»): в мире ~9–10 м   // низкие боссы растут сильнее: все не ниже ~5 м, заметно выше стражей и чемпионов
 // тряска только рядом с ударом и мягче при «уменьшить движение»
 function bShake(v,x,z){const hx=SWP?_sw.x:P.pos.x,hz=SWP?_sw.z:P.pos.z;if(x!=null){const d=Math.hypot(x-hx,z-hz);if(d>28)return;if(d>14)v*=.55;}shake=Math.max(shake,RMOT?v*.35:v);}
 const bflashEl=$('#bflash');
@@ -5786,6 +5806,7 @@ function updateEnemies(dt){
     else if(en.busy>0&&en.charge)enemyAI(en,dt,dx,dz,dist);
     else if(en.jump)bossQueen(en,dt,dx,dz,dist,0);
     if(sv)mpSwapOut(sv);mvUpdate(en,dt);
+    {const kl=en.kb.length(),km=en.boss?2:en.champ||en.guard||en.elite?4:8;if(kl>km)en.kb.multiplyScalar(km/kl);}  // 27.11: «отлетают очень далеко»
     en.pos.addScaledVector(en.kb,dt);en.kb.multiplyScalar(Math.exp(-7*dt));
     for(let j=0;j<i;j++){const o=ENEMIES[j];if(o.dead)continue;const sx=en.pos.x-o.pos.x,sz=en.pos.z-o.pos.z,rr=en.r+o.r,d2=sx*sx+sz*sz;
       if(d2<rr*rr&&d2>1e-6){const d=Math.sqrt(d2),push=(rr-d)*.5,wa=o.mass/(en.mass+o.mass),wb=1-wa;en.pos.x+=sx/d*push*2*wa;en.pos.z+=sz/d*push*2*wa;o.pos.x-=sx/d*push*2*wb;o.pos.z-=sz/d*push*2*wb;}}
@@ -7221,7 +7242,7 @@ const r2=x=>Math.round(x*100)/100;
 function mpRng(seed){let a=seed>>>0;return()=>{a=(a+0x6D2B79F5)>>>0;let t=a;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296;};}
 function mpSeeded(seed,fn){if(!MPon){fn();return;}const old=Math.random;Math.random=mpRng(seed);try{fn();}finally{Math.random=old;}}
 
-const APP_BUILD='v13.38';window.APP_BUILD=APP_BUILD;// = VERSION в sw.js; при выпуске менять в обоих местах (кооператив сверяет сборки игроков)
+const APP_BUILD='v13.39';window.APP_BUILD=APP_BUILD;// = VERSION в sw.js; при выпуске менять в обоих местах (кооператив сверяет сборки игроков)
 const MP_APP='ingenious-builder/tysyacha-char/v1';
 const MP_RELAYS=['nos.lol','nostr.mom','nostr.sathoarder.com','relay.fountain.fm','multiplexer.huszonegy.world'].map(u=>'wss://'+u);
 // TURN убран: openrelay.metered.ca закрыт (DNS не резолвится, relay-кандидатов нет). STUN у Trystero свой (Google и др.).
@@ -10592,7 +10613,7 @@ if(H_&&H_.ready)H_.ready(start);else start((H_&&H_.data)||{});
 <script>
 // версия, проверка обновлений и диагностика экрана
 (function(){
-const CUR=window.APP_BUILD||'v13.38';let reg=null;
+const CUR=window.APP_BUILD||'v13.39';let reg=null;
 const $=id=>document.getElementById(id);
 function showUpd(v){if($('updBar'))return;const b=document.createElement('div');b.id='updBar';b.innerHTML='<span>Есть обновление '+v+'</span><button type="button">Обновить</button>';b.querySelector('button').onclick=async()=>{b.firstChild.textContent='Обновляю…';try{if(reg)await reg.update();}catch(e){}try{const ks=await caches.keys();await Promise.all(ks.filter(k=>k.startsWith('tysyacha-char-')).map(k=>caches.delete(k)));}catch(e){}try{if(reg&&reg.waiting)reg.waiting.postMessage('skip');}catch(e){}appUpdateNow();};($('app')||document.body).appendChild(b);}
 async function chk(){try{const r=await fetch('sw.js?'+Date.now(),{cache:'no-store'});const t=await r.text();const m=t.match(/VERSION\s*=\s*['"]([^'"]+)['"]/);if(m&&m[1]!==CUR)showUpd(m[1]);}catch(e){}}
