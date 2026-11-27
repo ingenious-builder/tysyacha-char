@@ -2531,8 +2531,12 @@ function rarInfo(){const np=S?passiveSlots():PAS_AT.length,k=CLS.id+'|'+np;if(RA
     const fm={};for(const x of arr){const f=SKILLS[x.id].F.id;(fm[f]=fm[f]||[]).push(x);}
     for(const f in fm){const g=fm[f],m=gm(g.map(x=>x.p));g.sort((a,b)=>a.p-b.p||a.id-b.id);g.forEach((x,i)=>{x.w=(i+.5)/g.length;x.q=x.p/m;});}
     arr.sort((a,b)=>a.w-b.w||a.q-b.q||a.id-b.id);const n=arr.length,cut=RAR_Q.map(q=>Math.floor(n*q)),b0=RAR_B0[act?0:1]*MG[act?0:1]*(act?1:pasK(np));I.b0[act?0:1]=b0;   // PASS_K (A): пассивок в билде 8 — база пассивных выше
-    for(let i=0;i<n;i++){const x=arr[i];let r=0;while(r<cut.length&&i>=cut[r])r++;
-      const lo=r?cut[r-1]:0,hi=(r<cut.length?cut[r]:n)-1,pos=hi>lo?(i-lo)/(hi-lo):0,B=b0*RAR_POW[r]*(1+RAR_W*pos);
+    for(let i=0;i<n;i++){const x=arr[i];let r=0;while(r<cut.length&&i>=cut[r])r++;x.r=r;}
+    // 27.11 (Артём: «почему не могу собрать билд полностью из легендарных»): легендарки шли верхними 6 % по месту в форме и доставались
+    // только формам с множеством вариантов (у Пироманта легендарные активные — 7 основ при 8 слотах). Теперь сильнейший вариант каждой формы — легендарный
+    for(const f in fm){const g=fm[f];if(!g.some(x=>x.r>=3)){g[g.length-1].r=3;g[g.length-1].up=1;}}
+    for(let i=0;i<n;i++){const x=arr[i],r=x.r;
+      const lo=r?cut[r-1]:0,hi=(r<cut.length?cut[r]:n)-1,pos=x.up?0:hi>lo?(i-lo)/(hi-lo):0,B=b0*RAR_POW[r]*(1+RAR_W*pos);
       // чара без урона (тотем лечения): лечение не раздуваем больше ×1,5 — она остаётся слабой обычной, база = её настоящая сила
       const K=x.u?Math.min(RAR_KU,B/x.p):Math.min(20,B/x.p);I.map.set(x.id,r);I.B[x.id]=K*x.p;I.K[x.id]=K;if(x.u)I.U[x.id]=1;}}
   return I;}
@@ -2731,7 +2735,7 @@ const isWeak=sk=>isLearned(sk.id)&&!EQUIPPED.has(sk.id)&&rarOf(sk)===0&&!upgrade
 // мана −20 % и ЧЁРНОЕ ПЛАМЯ: удар невозможной поджигает врага (burn — доля удара в секунду, 3 с), враг умирает горящим — пламя
 // перекидывается на двух ближайших в 6 м (не дальше 3-го прыжка). Пламя в потоке толпы — +21 % урона (fl, стенд _check/rf/rf_browser.js dps).
 // Итог к той же легендарной: активные ×2,5, пассивные ×2,0 (было ×2,0/×1,7 по числу и ×1,7 в бою) + прыжки пламени по толпе.
-const IMP={dmg:1.65,pdmg:2,cd:.8,mana:.8,burn:.15,burnT:3,jump:2,jumpR:6,fl:1.2,tau:1500,cap:1.6,boss:3.5,mem:3,echo:300};
+const IMP={dmg:1.65,pdmg:2,cd:.8,mana:.8,burn:.15,burnT:3,jump:2,jumpR:6,fl:1.2,tau:900,cap:1.6,boss:3.5,mem:3,echo:300};
 // пассивная невозможная (25.11, проверка rev_rf2: ×1,65–1,98 к легендарной, у кокона/оберега/рывка ×1,65) — без выгоды перезарядки и маны,
 // поэтому свой урон ×2 (IMP.pdmg): с чёрным пламенем ×2,0–2,4, как у активных ×2,4
 const impDm=sk=>sk.active?IMP.dmg:IMP.pdmg;
@@ -2739,7 +2743,7 @@ const IMP_L0=45;   // с этого уровня забега Невозможн
 const impAwake=()=>!!S&&(S.sandbox||S.lvl>=IMP_L0);
 const IMP_ZW=[.5,.6,.7,.8,.9,1,1.15,1.3,1.5,1.8];
 const IMP_OFFER=new Set();let IMP_OFF=false;
-const isImp=id=>!IMP_OFF&&!!S&&(IMP_OFFER.has(id)||!!S.imp&&S.imp.includes(id));
+const isImp=id=>!IMP_OFF&&!!S&&(IMP_OFFER.has(id)||!!S.imp&&S.imp.includes(id)||!!S.sandbox&&rarBase(SKILLS[id])>=3);  // 27.11: в тестовом режиме все легендарные — невозможные
 const rarBase=sk=>rarMap().get(sk.id)|0;
 const impList=()=>S.imp||(S.imp=[]);
 const impDirty=()=>{PWC=new Map();WKC=null;TQ.key=null;TQ.p0k='';};   // невозможная меняет силу без талантов — потолок талантов пересчитать
@@ -7242,7 +7246,7 @@ const r2=x=>Math.round(x*100)/100;
 function mpRng(seed){let a=seed>>>0;return()=>{a=(a+0x6D2B79F5)>>>0;let t=a;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296;};}
 function mpSeeded(seed,fn){if(!MPon){fn();return;}const old=Math.random;Math.random=mpRng(seed);try{fn();}finally{Math.random=old;}}
 
-const APP_BUILD='v13.39';window.APP_BUILD=APP_BUILD;// = VERSION в sw.js; при выпуске менять в обоих местах (кооператив сверяет сборки игроков)
+const APP_BUILD='v13.40';window.APP_BUILD=APP_BUILD;// = VERSION в sw.js; при выпуске менять в обоих местах (кооператив сверяет сборки игроков)
 const MP_APP='ingenious-builder/tysyacha-char/v1';
 const MP_RELAYS=['nos.lol','nostr.mom','nostr.sathoarder.com','relay.fountain.fm','multiplexer.huszonegy.world'].map(u=>'wss://'+u);
 // TURN убран: openrelay.metered.ca закрыт (DNS не резолвится, relay-кандидатов нет). STUN у Trystero свой (Google и др.).
@@ -10613,7 +10617,7 @@ if(H_&&H_.ready)H_.ready(start);else start((H_&&H_.data)||{});
 <script>
 // версия, проверка обновлений и диагностика экрана
 (function(){
-const CUR=window.APP_BUILD||'v13.39';let reg=null;
+const CUR=window.APP_BUILD||'v13.40';let reg=null;
 const $=id=>document.getElementById(id);
 function showUpd(v){if($('updBar'))return;const b=document.createElement('div');b.id='updBar';b.innerHTML='<span>Есть обновление '+v+'</span><button type="button">Обновить</button>';b.querySelector('button').onclick=async()=>{b.firstChild.textContent='Обновляю…';try{if(reg)await reg.update();}catch(e){}try{const ks=await caches.keys();await Promise.all(ks.filter(k=>k.startsWith('tysyacha-char-')).map(k=>caches.delete(k)));}catch(e){}try{if(reg&&reg.waiting)reg.waiting.postMessage('skip');}catch(e){}appUpdateNow();};($('app')||document.body).appendChild(b);}
 async function chk(){try{const r=await fetch('sw.js?'+Date.now(),{cache:'no-store'});const t=await r.text();const m=t.match(/VERSION\s*=\s*['"]([^'"]+)['"]/);if(m&&m[1]!==CUR)showUpd(m[1]);}catch(e){}}
